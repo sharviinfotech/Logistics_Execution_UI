@@ -1,0 +1,97 @@
+<div class="card">
+  <div class="card-header">
+    Inventory / Raw Material Management
+  </div>
+  <div class="card-body">
+
+
+    <div class="table-responsive tableFixHead">
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>Material ID</th>
+            <th>Description</th>
+            <th>UoM</th>
+            <th>Available Qty</th>
+            <th>Min Stock</th>
+            <th>Supplier Name</th>
+            <th>Batch No / Lot ID</th>
+            <th>Date Received</th>
+            <th>Expiry Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let material of rawMaterials">
+            <td>{{ material.materialId }}</td>
+            <td>{{ material.description }}</td>
+            <td>{{ material.uom }}</td>
+            <td>{{ material.availableQty }}</td>
+            <td>{{ material.minStock }}</td>
+            <td>{{ material.supplierName }}</td>
+            <td>{{ material.batchNo }}</td>
+            <td>{{ material.dateReceived }}</td>
+            <td>{{ material.expiryDate }}</td>
+            <td>
+              <span class="status-badge {{ getStatusClass(material.status) }}">
+                {{ material.status }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-edit">Edit</button>
+              <button class="btn btn-delete">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- <div class="inventory-container">
+  <h2>Inventory / Raw Material Management</h2>
+
+  <table class="inventory-table">
+    <thead>
+      <tr>
+        <th>Material ID</th>
+        <th>Description</th>
+        <th>UoM</th>
+        <th>Available Qty</th>
+        <th>Min Stock</th>
+        <th>Supplier Name</th>
+        <th>Batch No / Lot ID</th>
+        <th>Date Received</th>
+        <th>Expiry Date</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let material of rawMaterials">
+        <td>{{ material.materialId }}</td>
+        <td>{{ material.description }}</td>
+        <td>{{ material.uom }}</td>
+        <td>{{ material.availableQty }}</td>
+        <td>{{ material.minStock }}</td>
+        <td>{{ material.supplierName }}</td>
+        <td>{{ material.batchNo }}</td>
+        <td>{{ material.dateReceived }}</td>
+        <td>{{ material.expiryDate }}</td>
+        <td>
+          <span class="status-badge {{ getStatusClass(material.status) }}">
+            {{ material.status }}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-edit">Edit</button>
+          <button class="btn btn-delete">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div> -->

@@ -1,0 +1,252 @@
+
+<div class="flex w-full flex-auto flex-col" id="dashboard-container">
+    <div class="mx-auto flex w-full max-w-screen-xl flex-wrap p-1 shadow-md">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="flex-grow-1 text-center fw-bold">Invoice Data Visualization</div>
+        <div>
+          <i class="fas fa-print fs-4 text-dark cursor-pointer" (click)="downloadPDF()"></i>
+        </div>
+      </div>
+      
+  
+      <div class="card">
+        <div class="rounded">
+          <div class="left-side">
+            <div class="status-box total-records" role="button" (click)="OnClickCard('1')">  
+              <div class="flex items-center">
+                <i class="fas fa-database text-xl mr-2"></i>
+                <h3>Total Records</h3>
+              </div>
+              <p>{{ totalInvoiceCount }}</p>
+              <div class="flex items-center">
+                <h3>Amount</h3>
+              </div>
+              <p>{{ grandTotalInvoices | number:'1.2-2' }}</p>
+            </div>
+      
+            <div class="middlewidth">
+              <div class="status-box total-Approved" role="button" (click)="OnClickCard('2')">
+                <div class="flex items-center">
+                  <i class="fas fa-check-circle text-xl mr-2"></i>
+                  <h3>Approved</h3>
+                </div>
+                <p>{{ approvedCount }}</p>
+                <div class="flex items-center">
+                  <h3>Amount</h3>
+                </div>
+                <p>{{ approvedTotal | number:'1.2-2'  }}</p>
+              </div>
+      
+              <div class="status-box total-rejected" role="button" (click)="OnClickCard('3')">
+                <div class="flex items-center">
+                  <i class="fas fa-times-circle text-xl mr-2"></i>
+                  <h3>Rejected</h3>
+                </div>
+                <p>{{ rejectedCount }}</p>
+                <div class="flex items-center">
+                  <h3>Amount</h3>
+                </div>
+                <p>{{ rejectedTotal  | number:'1.2-2' }}</p>
+              </div>
+            </div>
+      
+            <div class="rightwidth">
+              <div class="status-box Recevied_Amount" role="button" (click)="OnClickCard('4')">
+                <div class="flex items-center">
+                  <i class="fas fa-wallet text-xl mr-2"></i> <!-- Changed to a wallet icon -->
+                  <h3 class="font-semibold">Amount Received</h3>
+                </div>
+                <p class="text-lg font-bold">{{ AmountReceivedCount }}</p>
+              
+                <div class="flex items-center mt-2">
+                  <h3 class="font-semibold">Amount</h3>
+                </div>
+                <p class="text-lg font-bold">{{ AmountReceivedTotal | number:'1.2-2' }}</p>
+              </div>
+              
+             
+      
+              <div class="status-box total-Pending" role="button" (click)="OnClickCard('5')">
+                <div class="flex items-center">
+                  <i class="fas fa-hourglass-half text-xl mr-2"></i>
+                  <h3>Payment Pending</h3>
+                </div>
+                <p>{{ PaymentPendingCount }}</p>
+                <div class="flex items-center">
+                  <h3>Amount</h3>
+                </div>
+                <p>{{ PaymentPendingTotal | number:'1.2-2' }}</p>
+              </div>
+            </div>
+      
+            <div class="status-box total-overall" role="button" (click)="OnClickCard('6')">
+              <div class="flex items-center">
+                <i class="fas fa-coins text-xl mr-2 text-white"></i>
+                <h3 class="font-semibold">Over All Count</h3>
+              </div>
+              <p class="text-lg font-bold">{{ OverAllAmountCount }}</p>
+            
+              <div class="flex items-center mt-2">
+                <h3 class="font-semibold">Over All Amount</h3>
+              </div>
+              <p class="text-lg font-bold">{{ OverAllAmountTotal | number:'1.2-2' }}</p>
+            </div>
+          </div>
+      
+          <div class="rightCard">
+            <apx-chart [series]="customerChartOptions.series" [chart]="customerChartOptions.chart"
+              [labels]="customerChartOptions.labels" [responsive]="customerChartOptions.responsive">
+            </apx-chart>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+          <button *ngIf="monthlyCardDisplay" (click)="goBackToYearChart()" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+        </div>
+        
+        
+        <div class="row" id="barChart" style="margin-top: 30px; border: 2px solid darkviolet !important; margin-right: 0px !important; margin-left: 0px !important;">
+          
+          <!-- Yearly Bar Chart -->
+          <div class="col-md-6 col-lg-6" id="leftBar">
+            <apx-chart 
+              [series]="barChartOptions.series" 
+              [chart]="barChartOptions.chart"
+              [xaxis]="barChartOptions.xaxis"
+              [yaxis]="barChartOptions.yaxis"
+              [plotOptions]="barChartOptions.plotOptions" 
+              [colors]="barChartOptions.colors">
+            </apx-chart>
+          </div>
+      
+          <!-- Pie Chart (Appears only when data exists) -->
+          <div *ngIf="pieChartOptions.series?.length > 0" class="col-md-6 col-lg-6" id="rightBar">
+            <apx-chart 
+              [series]="pieChartOptions.series" 
+              [chart]="pieChartOptions.chart"
+              [labels]="pieChartOptions.labels" 
+              [colors]="pieChartOptions.colors">
+            </apx-chart>
+          </div>
+        
+        </div>
+      
+        <!-- Monthly Bar Chart (Appears only when there is data) -->
+       
+  
+  <div *ngIf="monthlyCardDisplay" class="row mt-3">
+    <h3 >Year: {{ selectedYear }}</h3> <!-- Add this line here -->
+  
+    <div class="col-md-6 col-lg-6" id="leftBar">
+      <apx-chart 
+        [series]="monthlyBarChartOptions.series" 
+        [chart]="monthlyBarChartOptions.chart"
+        [xaxis]="monthlyBarChartOptions.xaxis"
+        [yaxis]="monthlyBarChartOptions.yaxis"
+        [plotOptions]="monthlyBarChartOptions.plotOptions" 
+        [colors]="monthlyBarChartOptions.colors">
+      </apx-chart>
+    </div>
+  
+    <div *ngIf="monthlyPieChartOptions" class="col-md-6 col-lg-6" id="rightBar">
+      <apx-chart 
+        [series]="monthlyPieChartOptions.series" 
+        [chart]="monthlyPieChartOptions.chart" 
+        [labels]="monthlyPieChartOptions.labels" 
+        [colors]="monthlyPieChartOptions.colors" 
+        [legend]="monthlyPieChartOptions.legend">
+      </apx-chart>
+    </div>
+  </div>
+  
+  
+      </div>
+      
+  
+      <!-- <div class="card">
+        <div class="row" id="barChart" style="margin-top: 30px;" style="margin-top: 10px;border: 2px solid darkviolet !important;margin-right: 0px !important;
+              margin-left: 0px !important;">
+        <div class="col-md-6 col-lg-6" id="leftBar">
+          <apx-chart [series]="barChartOptions.series" [chart]="barChartOptions.chart" [xaxis]="barChartOptions.xaxis"
+            [yaxis]="barChartOptions.yaxis" [plotOptions]="barChartOptions.plotOptions" [colors]="barChartOptions.colors">
+          </apx-chart>
+        </div>
+  
+        <div *ngIf="pieChartOptions.series?.length > 0" class="col-md-6 col-lg-6" id="rightBar">
+          <apx-chart [options]="pieChartOptions" [series]="pieChartOptions.series" [chart]="pieChartOptions.chart"
+            [labels]="pieChartOptions.labels" [colors]="pieChartOptions.colors">
+          </apx-chart>
+        </div>
+      </div>
+  
+      </div> -->
+      <!-- below is comentad by sunil  start-->
+      <!-- <div class="row" style="margin-top: 30px;">
+        
+        <div>
+          <apx-chart [series]="customerChartOptions.series" [chart]="customerChartOptions.chart"
+            [labels]="customerChartOptions.labels" [responsive]="customerChartOptions.responsive">
+          </apx-chart>
+        </div>
+  
+  
+  
+      </div> -->
+  <!-- below is comentad by sunil  end-->
+  
+    </div>
+  
+  
+  
+  
+    <!-- Invoice List Table -->
+    <div class="tableFixHeadR">
+      <table class="table table-bordered table-stripped">
+        <thead class="thead-light">
+          <tr>
+            <th class="text-nowrap">Invoice Number</th>
+            <th class="text-nowrap">Invoice Date</th>
+            <th class="text-nowrap">Customer Name</th>
+            <th class="text-nowrap">Type Of Aircraft</th>
+            <th class="text-nowrap">City</th>
+            <th class="text-nowrap">Destination</th>
+            <th class="text-nowrap">Date Of Journey</th>
+            <th class="text-nowrap">Total Amount</th>
+            <th class="text-nowrap">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- (click)="invoice.status === 'Approved' ? openInvoicePopup(invoice) : null" -->
+          <tr *ngFor="let invoice of filteredInvoiceList">
+  
+            <td>{{ invoice.invoiceUniqueNumber }}</td>
+            <td>{{ invoice.header.ProformaInvoiceDate }}</td>
+            <td>{{ invoice.header.ProformaCustomerName }}</td>
+            <td>{{ invoice.header.ProformaTypeOfAircraft }}</td>
+            <td>{{ invoice.header.ProformaCity }}</td>
+            <td>{{ invoice.header.BookingSector }}</td>
+            <td class="text-nowrap">{{ invoice.header.startBookingDateOfJourny }}/{{ invoice.header.endBookingDateOfJourny }}</td>
+            <td>{{ invoice.grandTotal | number: '1.2-2' }}</td>
+            <td [ngClass]="{
+          'approved': invoice.status === 'Approved',
+          'pending': invoice.status === 'Pending',
+          'rejected': invoice.status === 'Rejected',
+          'rejected_Reversed': invoice.status === 'Rejected_Reversed',
+          'AmountReceived': invoice.status === 'Amount Received'
+        }">{{ invoice.status }}</td>
+  
+          </tr>
+  
+  
+        </tbody>
+      </table>
+      <!-- <button printSectionId="invoice-content" ngxPrint>Print Invoice</button> -->
+    </div>
+  </div>
+  
+  
+  
+  <!-- <button (click)="showSpinner()">Show Spinner</button> -->

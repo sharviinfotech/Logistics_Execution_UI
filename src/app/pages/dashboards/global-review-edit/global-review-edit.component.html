@@ -1,0 +1,469 @@
+<div>
+    <div class="modal-header">
+        <div class="col-lg-12 col-md-12 d-flex">
+            <div class="col-lg-11 col-md-11 col-sm-11" style="text-align: left;">
+                <h3>Edit Invoice</h3>
+            </div>
+            <div class="col-lg-1 col-md-1 col-sm-1">
+                <button type="button" class="close" aria-label="Close" (click)="close()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-body">
+        <form [formGroup]="newInvoiceCreation">
+
+            <div class="">
+
+                <!-- <div class="header-row">
+            
+              <img [src]="logoUrl" alt="Company Logo" class="logo">
+              <img [src]="InvoiceLogo" alt="Company Logo" class="logo">
+              <img [src]="logoUrl" alt="Company Logo" class="logo">
+            </div> -->
+                <div class="card mb-1">
+                    <div class="card-header " >
+                        Proforma Invoice
+                    </div>
+                    <div class="card-body"
+                        >
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Customer Name<span class="text-danger">*</span></label>
+                                    <input type="text" formControlName="ProformaCustomerName" placeholder="">
+                                </div>
+                                <div class="text-danger" style="color: red;"
+                                    *ngIf="newInvoiceCreation.get('ProformaCustomerName')?.hasError('required') && newInvoiceCreation.get('ProformaCustomerName')?.touched">
+                                    Customer Name is required.
+                                </div>
+
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Address<span class="text-danger">*</span></label>
+                                    <input type="text" formControlName="ProformaAddress" placeholder="">
+                                </div>
+                                <div class="text-danger" style="color: red;"
+                                    *ngIf="newInvoiceCreation.get('ProformaAddress')?.hasError('required') && newInvoiceCreation.get('ProformaAddress')?.touched">
+                                    Address is required.
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>City<span class="text-danger">*</span></label>
+                                    <input type="text" formControlName="ProformaCity" placeholder="">
+                                </div>
+                                <div class="text-danger" style="color: red;"
+                                    *ngIf="newInvoiceCreation.get('ProformaCity')?.hasError('required') && newInvoiceCreation.get('ProformaCity')?.touched">
+                                    City is required.
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label for="state">State<span class="text-danger">*</span></label>
+                                    <select formControlName="ProformaState" class="form-control"
+                                        (change)="onChangeState()">
+                                        <option value="">Select a state</option>
+                                        <option *ngFor="let state of statesList" [value]="state.stateName">
+                                            {{state.stateName}}</option>
+
+                                    </select>
+                                </div>
+                                <div class="text-danger" style="color: red;"
+                                    *ngIf="newInvoiceCreation.get('ProformaState')?.hasError('required') && newInvoiceCreation.get('ProformaState')?.touched">
+                                    State is required.
+                                </div>
+
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label for="Pincode">Pincode<span class="text-danger">*</span></label>
+                                    <input id="Pincode" type="text" formControlName="ProformaPincode" maxlength="6"
+                                        placeholder="Enter Pincode" />
+                                    <div *ngIf="newInvoiceCreation.get('ProformaPincode')?.hasError('required')">
+                                        Pincode is required.
+                                    </div>
+                                    <div *ngIf="newInvoiceCreation.get('ProformaPincode')?.hasError('pattern')">
+                                        Pincode must be exactly 6 digits.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Gst No<span class="text-danger">*</span></label>
+                                    <input type="text" formControlName="ProformaGstNo" placeholder="">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>PAN No<span class="text-danger">*</span></label>
+                                    <input id="ProformaPanNO" type="text" formControlName="ProformaPanNO" maxlength="10"
+                                        placeholder="Enter PAN No (e.g., ABCD1234E)" />
+                                    <div
+                                        *ngIf="newInvoiceCreation.get('ProformaPanNO')?.hasError('pattern') && newInvoiceCreation.get('ProformaPanNO')?.touched">
+                                        PAN number must be in the format: 4 capital letters, 4 numbers, and 1 capital
+                                        letter (e.g.,
+                                        ABCD1234E).
+                                    </div>
+                                    <div
+                                        *ngIf="newInvoiceCreation.get('ProformaPanNO')?.hasError('required') && newInvoiceCreation.get('ProformaPanNO')?.touched">
+                                        PAN number is required.
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Invoice Number<span class="text-danger">*</span></label>
+                                    <input type="text" formControlName="ProformaInvoiceNumber" class="form-control"
+                                        placeholder="INV0001">
+                                </div>
+                                <div class="text-danger" style="color: red;"
+                                    *ngIf="newInvoiceCreation.get('ProformaInvoiceNumber')?.hasError('required') && newInvoiceCreation.get('ProformaInvoiceNumber')?.touched">
+                                    Invoice Number is required.
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Date<span class="text-danger">*</span></label>
+                                    <input type="text" placeholder="Date" formControlName="ProformaInvoiceDate"
+                                        class="form-control form-control-sm" [bsConfig]="bsConfig" bsDatepicker />
+                                </div>
+                                <div class="text-danger" style="color: red;"
+                                    *ngIf="newInvoiceCreation.get('ProformaInvoiceDate')?.hasError('required') && newInvoiceCreation.get('ProformaInvoiceDate')?.touched">
+                                    Date is required.
+                                </div>
+
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>PAN Number<span class="text-danger">*</span></label>
+                                    <input id="ProformaPan" type="text" formControlName="ProformaPan" maxlength="10"
+                                        placeholder="Enter PAN Number (e.g., ABCD1234E)" />
+                                    <div
+                                        *ngIf="newInvoiceCreation.get('ProformaPan')?.hasError('pattern') && newInvoiceCreation.get('ProformaPan')?.touched">
+                                        PAN number must be in the format: 4 capital letters, 4 numbers, and 1 capital
+                                        letter (e.g.,
+                                        ABCD1234E).
+                                    </div>
+                                    <div
+                                        *ngIf="newInvoiceCreation.get('ProformaPan')?.hasError('required') && newInvoiceCreation.get('ProformaPan')?.touched">
+                                        PAN number is required.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>GST No<span class="text-danger">*</span></label>
+                                    <input type="text" formControlName="ProformaGstNumber" class="form-control"
+                                        placeholder="">
+                                </div>
+                                <div class="text-danger" style="color: red;"
+                                    *ngIf="newInvoiceCreation.get('ProformaGstNumber')?.hasError('required') && newInvoiceCreation.get('ProformaGstNumber')?.touched">
+                                    GST No is required.
+                                </div>
+
+
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Type of Aircraft<span class="text-danger">*</span></label>
+                                    <input type="text" formControlName="proformatypeOfAircraft" class="form-control"
+                                        placeholder="" (input)="convertToUpperCase($event)" />
+                                </div>
+                                <div class="text-danger" style="color: red;"
+                                    *ngIf="newInvoiceCreation.get('proformatypeOfAircraft')?.hasError('required') && newInvoiceCreation.get('proformatypeOfAircraft')?.touched">
+                                    Type of Aircraft is required.
+                                </div>
+
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Seating Capasity<span class="text-danger">*</span></label>
+                                    <input type="text" formControlName="proformaseatingcapasity" class="form-control"
+                                        placeholder="">
+                                </div>
+                                <div class="text-danger" style="color: red;"
+                                    *ngIf="newInvoiceCreation.get('proformaseatingcapasity')?.hasError('required') && newInvoiceCreation.get('proformaseatingcapasity')?.touched">
+                                    Seating Capasity is required.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-1">
+                    <div class="card-header " >
+                        Booking Details
+                    </div>
+                    <div class="card-body"
+                    >
+                    <div class="row">
+                      <div class="col-lg-4">
+                        <div class="form-group mb-0">
+                          <label>Date Of Journey<span class="text-danger">*</span></label>
+                          
+                        </div>
+                        <div class="row mb-0">
+                         <div class="col-lg-6">
+                          <label>Start Date<span class="text-danger">*</span></label>
+                          <input type="text" placeholder="Date" formControlName="startBookingDateOfJourny"
+                          class="form-control form-control-sm" [bsConfig]="bsConfig" bsDatepicker  (input)="convertToUpperCase($event)"/>
+                          <div class="text-danger"
+                          *ngIf="newInvoiceCreation.get('startBookingDateOfJourny')?.hasError('required') && newInvoiceCreation.get('startBookingDateOfJourny')?.touched">
+                          Start Date  is required.
+                        </div>
+                         </div>
+                        
+                         <div class="col-lg-6">
+                          <label>End Date<span class="text-danger">*</span></label>
+                          <input type="text" placeholder="Date" formControlName="endBookingDateOfJourny"
+                          class="form-control form-control-sm" [bsConfig]="bsConfig" bsDatepicker  (input)="convertToUpperCase($event)"/>
+                          <div class="text-danger"
+                          *ngIf="newInvoiceCreation.get('endBookingDateOfJourny')?.hasError('required') && newInvoiceCreation.get('endBookingDateOfJourny')?.touched">
+                          End Date  is required.
+                        </div>
+                         </div>
+                       
+                        </div>
+                        
+                      </div>
+                      <div class="col-lg-4 pt-4" style="border-left: 2px solid blue;">
+                        <div class="form-group">
+                          <label>Sector<span class="text-danger">*</span></label>
+                          <!-- <input type="text" formControlName="bookingsector" class="form-control" placeholder="" (input)="convertToUpperCase($event)"> -->
+                          <input type="text" formControlName="bookingsector" class="form-control"
+                          (input)="updateChargeItem(0, 'description', $event.target.value);convertToUpperCase($event)">
+                        </div>
+                        <div class="text-danger"
+                          *ngIf="newInvoiceCreation.get('bookingsector')?.hasError('required') && newInvoiceCreation.get('bookingsector')?.touched ">
+                          Sector is required.
+                        </div>
+                      </div>
+                      <div class="col-lg-4 pt-4" style="border-left: 2px solid blue;">
+                        <div class="form-group">
+                          <label>Billing Flying Time<span class="text-danger">*</span></label>
+                          <!-- <input type="text" formControlName="bookingbillingflyingtime" class="form-control" placeholder="" (input)="convertToUpperCase($event)"> -->
+                          <input type="text" formControlName="bookingbillingflyingtime" class="form-control"
+                          (input)="updateChargeItem(0, 'units', $event.target.value)">
+                        </div>
+                        <div class="text-danger"
+                          *ngIf="newInvoiceCreation.get('bookingbillingflyingtime')?.hasError('required') && newInvoiceCreation.get('bookingbillingflyingtime')?.touched ">
+                          Billing Flying Time is required.
+                        </div>
+          
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+
+            <div class="card mt-1 mb-2">
+                <div class="m-3">
+                    <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th>S.No</th>
+                            <th>Description</th>
+                            <th>Units (Hrs.)</th>
+                            <th>Rate</th>
+                            <th>Amount (INR)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <!-- Charges Section -->
+                          <tr>
+                            <td>1</td>
+                            <td class="bold">Charges</td>
+                            <td class="text-right">
+                              <!-- No input for units here -->
+                            </td>
+                            <td class="text-right">
+                              <!-- No input for rate here -->
+                            </td>
+                            <td></td>
+                          </tr>
+            
+                          <!-- <tr *ngFor="let item of chargeItems; let i = index">
+                            <td>{{i + 2}}</td> 
+                            <td class="indent">
+                              <input type="text" [(ngModel)]="item.description" [ngModelOptions]="{standalone: true}"
+                                class="description-input" (input)="calculateTotals()">
+                            </td>
+                            <td class="text-right">
+                              
+                              <input *ngIf="i === 0" type="text" [(ngModel)]="item.units" [ngModelOptions]="{standalone: true}"
+                                class="units-input" (input)="calculateTotals()">
+                            </td>
+                            <td class="text-right">
+                              <input type="text" [(ngModel)]="item.rate" [ngModelOptions]="{standalone: true}" class="rate-input"
+                                (input)="calculateTotals()" (keyup)="numbersOnly($event)">
+                            </td>
+                            <td class="text-right">
+                             
+                              {{item.amount | number:'1.0-0'}}
+                            </td>
+                          </tr> -->
+            
+                          <tr *ngFor="let item of chargeItems; let i = index" 
+                          class="hover-row"
+                          (mouseenter)="hoveredIndex = i" 
+                          (mouseleave)="hoveredIndex = -1">
+                        <td>{{ i + 2 }}
+                          <i *ngIf="hoveredIndex === i && i !== 0" (click)="deleteChargeItem(i)" class="delete-btn bx bx-trash" title="Do you want to Delete"></i>
+                        </td>
+                        <td class="indent">
+                          <div class="form-group" *ngIf="i !== 0 && allCharges.length > 0">
+                              <!-- <label *ngIf="i !== 0 && allCharges.length > 0">Charge Description</label> -->
+                              <ng-select
+                                  [items]="allCharges"
+                                  bindLabel="chargesName"
+                                  bindValue="chargesName"
+                                  placeholder="Select Charge"
+                                  [multiple]="false"
+                                  [searchable]="true"
+                                  [(ngModel)]="item.description"
+                                  [ngModelOptions]="{standalone: true}"
+                                  (change)="onChargeSelectionChange(item, item.description)"
+                                  (keypress)="restrictToNumbers($event)"
+                              >
+                              </ng-select>
+                          </div>
+                      
+                          <div class="form-group" *ngIf="i === 0">
+                              <!-- <label *ngIf="i === 0">Charge Description</label> -->
+                              <input
+                                  type="text"
+                                  [(ngModel)]="item.description"
+                                  [disabled]="i === 0"
+                                  [ngModelOptions]="{standalone: true}"
+                                  class="description-input"
+                                  (input)="calculateTotals(); convertToUpperCase($event)"
+                              />
+                          </div>
+                      
+                          </td>
+                        <td class="text-right">
+                          <input *ngIf="i === 0" type="text" [disabled]="i === 0" [(ngModel)]="item.units" [ngModelOptions]="{standalone: true}" class="units-input" (input)="calculateTotals();convertToUpperCase($event)">
+                        </td>
+                        <td class="text-right">
+                          <input type="text" [(ngModel)]="item.rate" [ngModelOptions]="{standalone: true}" class="rate-input" (input)="calculateTotals();numbersOnly($event)">
+                        </td>
+                        <td class="text-right">
+                          {{ item.amount | number:'1.0-0' }}
+                        </td>
+                      </tr>
+                      
+                          
+            
+            
+            
+                          <tr>
+                            <td colspan="4" class="text-right">
+                            </td>
+                            <td style="text-align: end">
+                              <button (click)="addChargeItem()" class="add-btn">+ Add Charge</button>
+                            </td>
+                          </tr>
+            
+                          <tr>
+                            <td></td>
+                            <td class="bold">TOTAL</td>
+                            <td></td>
+                            <td></td>
+                            <td class="text-right bold">{{subtotal | number:'1.0-0'}}</td>
+                          </tr>
+            
+                          <!-- Taxes Section -->
+                          <tr>
+                            <td>2</td>
+                            <td class="bold">Taxes:</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                          </tr>
+            
+                          <tr *ngFor="let tax of taxItems; let i = index">
+                            <td></td>
+                            <td class="indent">
+                              {{tax.description}}
+                            </td>
+                            <td></td>
+                            <td class="text-right">
+                            </td>
+                            <td class="text-right">{{tax.amount | number:'1.0-0'}}</td>
+                          </tr>
+            
+                          <tr>
+                            <td></td>
+                            <td class="bold">GRAND TOTAL</td>
+                            <td></td>
+                            <td></td>
+                            <td class="text-right bold">{{grandTotal | number:'1.0-0'}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                    <div class="amount-in-words">
+                        Rupees in words: {{amountInWords}}
+                    </div>
+                </div>
+
+            </div>
+            <div class="card mb-1">
+                <div class="card-header" >
+                    Notes
+                </div>
+                <div class="card-body"
+                    >
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="notes-section form-group">
+                                <label>Notes</label>
+                                <textarea id="notes" class="form-control" formControlName="notes"
+                                    placeholder="Notes - any relevant information not covered, additional terms and conditions"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="notes-section form-group">
+                                <label>Description</label>
+                                <textarea id="description" class="form-control" formControlName="reviewedDescriptionEdit"
+                                    placeholder="Enter Description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                document.getElementById("notes").addEventListener("input", function () {
+                    this.value = this.value.toUpperCase();
+                });
+            </script>
+            <!-- <div class="card-body"
+                >
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="description-section form-group">
+                            <label>Description</label>
+                            <textarea id="description" class="form-control" formControlName="reviewedDescriptionEdit"
+                                placeholder="Enter Description"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+            </div> -->
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btnSave btn" (click)="UpdateInvoice()">Update</button>
+        <button class="btn btn-secondary" (click)="closeInvoice()">Close</button>
+    </div>
+
+</div>

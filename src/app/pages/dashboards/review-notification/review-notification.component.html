@@ -1,0 +1,97 @@
+
+
+<div class="card" *ngIf="notificationCard == 'ADMIN'">
+    <div class="card-header" >
+        Pending Corrections
+    </div>
+    <div class="card-body">  
+        <div class="table-responsive tableFixHead">
+            <table class="table table-bordered table-stripped">
+                <thead class="thead-light">
+                  <tr>
+                    <th class="text-nowrap">Invoice Number</th>
+                    <th class="text-nowrap">Invoice Date</th>
+                    <th class="text-nowrap">Customer Name</th>
+                    <th class="text-nowrap">Type Of Aircraft</th>
+                    <th class="text-nowrap">City</th>
+                    <th class="text-nowrap">Destination</th>
+                    <th class="text-nowrap">Date Of Journey</th>
+                    <th class="text-nowrap">Total Amount</th>
+                    <th class="text-nowrap">Description</th>
+                    <!-- <th class="text-nowrap">Action</th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let invoice of reviewedNotificationList" >
+                    <td class="text-nowrap">{{ invoice.invoiceUniqueNumber }}</td>
+                    <td class="text-nowrap">{{ invoice.header.ProformaInvoiceDate }}</td>
+                    <td class="text-nowrap">{{ invoice.header.ProformaCustomerName }}</td>
+                    <td class="text-nowrap">{{ invoice.header.ProformaTypeOfAircraft }}</td>
+                    <td class="text-nowrap">{{ invoice.header.ProformaCity }}</td>
+                    <td class="text-nowrap">{{ invoice.header.BookingSector }}</td>
+                    <td class="text-nowrap">{{ invoice.header.startBookingDateOfJourny }}/{{ invoice.header.endBookingDateOfJourny }}</td>
+                    <td class="text-nowrap">{{ invoice.grandTotal | number: '1.2-2'}}</td>
+                    <td class="text-nowrap">{{ invoice.reviewedDescription }} ({{ invoice.reviewedDate }})</td>
+                    <!-- <td ><i class="edit-btn fa fa-edit" style="font-size: 20px;" role="button" (click)="openGlobalReviewPopup(invoice)"></i></td> -->
+          
+                  </tr>
+                </tbody>
+              </table>
+
+        </div>
+       
+    </div>
+
+</div>
+<div class="card" *ngIf="notificationCard == 'MD' ">
+    <div class="card-header" >
+        Resolved Corrections
+    </div>
+    <div class="card-body">
+
+       
+         
+        <div class="table-responsive tableFixHead">
+            <table class="table table-bordered table-stripped">
+                <thead class="thead-light">
+                  <tr>
+                    <th class="text-nowrap">Action</th>
+                    <th class="text-nowrap">Invoice Number</th>
+                    <th class="text-nowrap">Invoice Date</th>
+                    <th class="text-nowrap">Customer Name</th>
+                    <th class="text-nowrap">Type Of Aircraft</th>
+                    <th class="text-nowrap">City</th>
+                    <th class="text-nowrap">Destination</th>
+                    <th class="text-nowrap">Date Of Journey</th>
+                    <th class="text-nowrap">Total Amount</th>
+                    <th class="text-nowrap">Description</th>
+                    
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let invoice of reviewedNotificationList" >
+                    <td class="text-success">{{invoice.reviewedReSubmited == true?'Modifications Completed – Awaiting Your Decision':''}}</td>
+                    <td class="text-nowrap">{{ invoice.invoiceUniqueNumber }}</td>
+                    <td class="text-nowrap">{{ invoice.header.ProformaInvoiceDate }}</td>
+                    <td class="text-nowrap">{{ invoice.header.ProformaCustomerName }}</td>
+                    <td class="text-nowrap">{{ invoice.header.ProformaTypeOfAircraft }}</td>
+                    <td class="text-nowrap">{{ invoice.header.ProformaCity }}</td>
+                    <td class="text-nowrap">{{ invoice.header.BookingSector }}</td>
+                    <td class="text-nowrap">{{ invoice.header.startBookingDateOfJourny }}/{{ invoice.header.endBookingDateOfJourny }}</td>
+                    <td class="text-nowrap">{{ invoice.grandTotal | number: '1.2-2'}}</td>
+                    <td class="text-nowrap">{{ invoice.reviewedDescription }} ({{ invoice.reviewedDate }})</td>
+                    <!-- <td><i class="fa fa-check-circle text-success" style="font-size: 20px;" role="button" (click)="verifyedInvoice(invoice)"></i></td> -->
+          
+                  </tr>
+                </tbody>
+              </table>
+
+        </div>
+       
+    </div>
+
+</div>
+
+  <ng-template>
+    <app-global-review-edit [childMessage]="parentMessage" (messageEvent)="receiveMessage(invoice)"></app-global-review-edit>
+  </ng-template>

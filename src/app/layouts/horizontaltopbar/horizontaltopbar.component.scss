@@ -1,0 +1,24 @@
+.topnav-menu .navbar-nav {
+    display: flex;
+    justify-content: center; /* Center the items */
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  
+  .navbar-nav .nav-item {
+    list-style: none;
+    padding: 10px 15px;
+  }
+  
+  .navbar-nav .nav-item a {
+    text-decoration: none;
+    color: #000;
+    font-weight: 500;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+  }
+  
+  .navbar-nav .nav-item a:hover {
+    color: #007bff;
+  }
+  

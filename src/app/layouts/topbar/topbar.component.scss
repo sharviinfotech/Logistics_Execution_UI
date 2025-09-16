@@ -1,0 +1,35 @@
+.cancelBtn {
+  background-color: rgb(201, 9, 54);
+  
+}
+
+.navbar-header {
+  background: url("/assets/images/bgrdashboard.png") no-repeat center center / cover !important;
+  // background-image: linear-gradient(to right, #6ba3cd, #031c2e) !important;
+    //  background: url("/assets/images/bg5.jpg") no-repeat center center / cover !important;
+
+  // background: rgb(78,95,95);
+  // background: radial-gradient(circle, rgba(78,95,95,1) 0%, rgba(47,45,24,0.7933298319327731) 92%, rgba(184,170,65,1) 100%);
+//   background: url("/assets/images/Flight38.jpeg") no-repeat center center / cover !important;
+//   background-size: cover;
+// background-position: center;
+// background-repeat: no-repeat;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+}
+.text-success{
+  color: green;
+}
+.text-danger{
+  color:red
+}
+
+
+::ng-deep {@media (min-width: 1200px) {
+  .modal-xl {
+      --bs-modal-width: 1315px !important;
+  }
+}
+}

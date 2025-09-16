@@ -1,0 +1,453 @@
+<div class="card">
+  <div class="card-header text-center">
+    <h5>All Invoice Reports</h5>
+  </div>
+  <div class="card-body">
+    <form [formGroup]="reportsForm">
+      <div class="row">
+        <!-- Add a row to align fields in one line -->
+        <div class="col-lg-2">
+          <div class="form-group">
+            <label>From Invoice Date</label>
+            <input
+              type="text"
+              formControlName="fromDate"
+              class="form-control form-control-sm"
+              [bsConfig]="bsConfig"
+              placeholder="Enter From Invoice Date"
+              bsDatepicker
+            />
+            <div class="text-danger" *ngIf="submit && f['fromDate'].errors">
+              From Invoice Date is required.
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2">
+          <div class="form-group">
+            <label>To Invoice Date</label>
+            <input
+              type="text"
+              formControlName="toDate"
+              class="form-control form-control-sm"
+              [bsConfig]="{
+                dateInputFormat: 'DD-MM-YYYY',
+                minDate: reportsForm.get('fromDate')?.value
+              }"
+              placeholder="Enter To Invoice Date"
+              bsDatepicker
+            />
+            <div
+              class="text-danger"
+              *ngIf="f['toDate'].errors?.dateRangeInvalid"
+            >
+              To Invoice Date should be at least one day after From Invoice
+              Date.
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2">
+          <div class="form-group">
+            <label>Invoice Type</label>
+            <select
+              class="form-control form-control-sm"
+              formControlName="invoiceType"
+            >
+              <option value="">Select</option>
+              <option value="PQ">PQ</option>
+              <option value="TAX">TAX</option>
+            </select>
+            <div class="text-danger" *ngIf="submit && f['invoiceType'].errors">
+              Invoice Type is required.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-2">
+          <div class="form-group">
+            <label>Status</label>
+            <select
+              class="form-control form-control-sm"
+              formControlName="status"
+            >
+              <option value="">Select</option>
+              <option
+                value="approved"
+                *ngIf="this.reportsForm.value.invoiceType == 'PQ'"
+              >
+                Approved
+              </option>
+              <option
+                value="rejected"
+                *ngIf="this.reportsForm.value.invoiceType == 'PQ'"
+              >
+                Rejected
+              </option>
+              <option
+                value="pending"
+                *ngIf="this.reportsForm.value.invoiceType == 'PQ'"
+              >
+                Pending
+              </option>
+              <option
+                value="Amount Received"
+                *ngIf="this.reportsForm.value.invoiceType == 'TAX'"
+              >
+                Amount Received
+              </option>
+            </select>
+            <div class="text-danger" *ngIf="submit && f['status'].errors">
+              Status is required.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 mt-4 d-flex" style="text-align: end">
+          <!-- <button class="btnCustomize btn-success btn-md" (click)="onChangeForm()">
+              Get
+            </button> -->
+          <button
+            class="btnCustomize btn-success btn-md"
+            (click)="onChangeForm()"
+            [disabled]="reportsForm.invalid"
+          >
+            Get
+          </button>
+
+          <button class="btnCustomize btn-primary btn-md" (click)="printData()">
+            Print
+          </button>
+          <button class="btnCustomize btn-danger btn-md" (click)="reset()">
+            Reset
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- <div class="row">
+      <div class="col-lg-4">
+        <div class="form-group">
+          <label>From<span class="text-danger">*</span></label>
+          <input type="text" [(ngModel)]="item.description" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="">
+        </div>
+      </div>
+
+    </div> -->
+    <div class="">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <label class="d-inline-flex align-items-center">
+            Show
+            <select
+              [(ngModel)]="pageSize"
+              (ngModelChange)="onPageSizeChange()"
+              [ngModelOptions]="{ standalone: true }"
+            >
+              <option [value]="5">5</option>
+              <option [value]="10">10</option>
+              <option [value]="20">20</option>
+              <option [value]="25">25</option>
+              <option [value]="30">30</option>
+            </select>
+            entries
+          </label>
+        </div>
+        <div id="tickets-table_filter" class="dataTables_filter">
+          <label class="d-inline-flex align-items-center">
+            Search:
+            <input
+  type="text"
+  name="searchTerm"
+  class="form-control form-control-sm ms-2"
+  aria-controls="tickets-table"
+  [(ngModel)]="searchTerm"
+  (input)="resetPagination()"
+/>
+          </label>
+          <!-- <button class="btn btn-sm btn-outline-secondary ms-2" (click)="resetTable()" title="Reset">
+      <i class="fas fa-sync-alt"></i>
+    </button> -->
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-bordered table-stripped">
+          <thead class="thead-light">
+            <tr>
+              <th class="text-nowrap">Invoice Number</th>
+              <th class="text-nowrap">Invoice Date</th>
+              <th class="text-nowrap">Customer Name</th>
+              <th class="text-nowrap">Type Of Aircraft</th>
+              <th class="text-nowrap">City</th>
+              <th class="text-nowrap">Destination</th>
+              <th class="text-nowrap">Date Of Journey</th>
+              <th class="text-nowrap">Total Amount</th>
+              <th class="text-nowrap">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- (click)="invoice.status === 'Approved' ? openInvoicePopup(invoice) : null" -->
+            <tr
+              *ngFor="let invoice of paginatedInvoices"
+              (click)="selectInvoice(invoice)"
+              [class.selected]="invoiceItem === invoice"
+            >
+              <td>
+                <span
+                  [ngClass]="{
+                    'text-green-600 underline cursor-pointer':
+                      invoice.status === 'Approved',
+                    'text-orange-600': invoice.status === 'Pending',
+                    'text-red-600': invoice.status === 'Rejected',
+                    'text-Amount_Received underline cursor-pointer':
+                      invoice.status === 'Amount Received',
+                    rejected_Reversed: invoice.status === 'Rejected_Reversed'
+                  }"
+                >
+                  {{ invoice.invoiceUniqueNumber }}
+                </span>
+              </td>
+              <td>{{ invoice.header.ProformaInvoiceDate }}</td>
+              <td>{{ invoice.header.ProformaCustomerName }}</td>
+              <td>{{ invoice.header.ProformaTypeOfAircraft }}</td>
+              <td>{{ invoice.header.ProformaCity }}</td>
+              <td>{{ invoice.header.BookingSector }}</td>
+              <td class="text-nowrap">
+                {{ invoice.header.startBookingDateOfJourny }}/{{
+                  invoice.header.endBookingDateOfJourny
+                }}
+              </td>
+              <td>{{ invoice.grandTotal | number : "1.2-2" }}</td>
+              <td
+                [ngClass]="{
+                  'text-green-600': invoice.status === 'Approved',
+                  'text-orange-600': invoice.status === 'Pending',
+                  'text-red-600': invoice.status === 'Rejected',
+                  'text-Amount_Received  ':
+                    invoice.status === 'Amount Received',
+                  rejected_Reversed: invoice.status === 'Rejected_Reversed'
+                }"
+              >
+                {{ invoice.status }}
+              </td>
+            </tr>
+            <tr *ngIf="allInvoiceList.length === 0">
+              <td colspan="8" style="text-align: center">
+                <label cols> No Data </label>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- <button printSectionId="invoice-content" ngxPrint>Print Invoice</button> -->
+      </div>
+      <div class="row justify-content-center align-items-md-center mt-2">
+        <ul class="pagination" style="justify-content: end">
+          <!-- Previous Button -->
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a
+              class="page-link"
+              (click)="currentPage > 1 && pageChanged(currentPage - 1)"
+            >
+              &laquo; Previous
+            </a>
+          </li>
+
+         
+          <li *ngFor="let page of pages" class="page-item" [class.active]="currentPage === page">
+  <a class="page-link" (click)="pageChanged(page)">{{ page }}</a>
+</li>
+
+        
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <a
+              class="page-link"
+              (click)="currentPage < totalPages && pageChanged(currentPage + 1)"
+              style="background-color: green; color: white"
+            >
+              Next &raquo;
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- <div id="invoice-content" class="m-2">
+    <h2>Invoice Details</h2>
+    <p><strong>Invoice Number:</strong> {{ invoice.invoiceNumber }}</p>
+    <p><strong>Invoice Date:</strong> {{ invoice.invoiceDate }}</p>
+    <p><strong>To:</strong> {{ invoice.header.toName }}</p>
+    <p><strong>Amount:</strong> {{ invoice.amount }}</p>
+  </div> -->
+
+  <!-- <div class="container my-5 p-4 border" #invoiceContent id="invoiceContent" style="max-width: 800px; background-color: white;">
+
+    <div class="text-center mb-4">
+      <h3 class="company-name">RITHWIK GREEN POWER & AVIATION PRIVATE LIMITED</h3>
+      <img src="assets/images/logo.jpg" alt="Company Logo" class="img-fluid" style="height: 50px;">
+    </div>
+
+   
+    <div class="card mb-4">
+      <div class="card-header text-center" style="background-color: yellow !important;">
+        PROFORMA INVOICE
+      </div>
+      <div class="card-body">
+        <table class="table table-bordered" style="border: 2px solid black !important;">
+          <tr>
+            <td>To:</td>
+            <td> INVOICE NO RGPAPL/PI-803/12-2024</td>
+          </tr>
+          <tr>
+            <td>MYTHRI MOVIE MAKERS</td>
+            <td> DATE 29-12-2024</td>
+
+          </tr>
+          <tr>
+            <td>ROAD NO.25,HYDERABAD</td>
+            <td>PAN AAICS 9057Q</td>
+          </tr>
+          <tr>
+            <td>TELANGANA-500033</td>
+            <td>GST NO 36AAICS9057Q1Z2D</td>
+          </tr>
+          <td>GST NO. 36AAWFM8714H1ZO</td>
+          <td>TYPE OF typeOfAircraft B-250 GT (VT-VIN)</td>
+          <tr>
+            <td>PAN NO.AAWFM8714H</td>
+            <td>SEATING CAPASITY 7</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+ 
+    <div class="tabCard">
+      <div class="card-header text-center" style="background-color: yellow;">
+        BOOKING DETAILS
+      </div>
+      <div class="card-body">
+        <table class="table table-bordered" style="border: 2px solid black !important;">
+          <tr>
+            <td>Date Of Journey</td>
+            <td> 29-Dec-2024</td>
+          </tr>
+          <tr>
+            <td>SECTOR</td>
+            <td> HYDERABAD-CHENNAI-HYDERABAD</td>
+
+          </tr>
+          <tr>
+            <td>BILLING FLYING TIME </td>
+            <td> 03.30 Hrs.</td>
+          </tr>
+        </table>
+
+      
+        <table class="table table-bordered text-center align-middle">
+          <thead style="background-color: #f4f4f4; font-weight: bold;">
+            <tr>
+              <th>S.No</th>
+              <th>Description</th>
+              <th>Units (Hrs.)</th>
+              <th>Rate (INR)</th>
+              <th>Amount (INR)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Hyderabad-Chennai-Hyderabad</td>
+              <td>03:30</td>
+              <td>1,50,000</td>
+              <td>5,25,000</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Ground Handling Charges</td>
+              <td>-</td>
+              <td>1,20,000</td>
+              <td>1,20,000</td>
+            </tr>
+            <tr>
+              <td colspan="4"><strong>Total</strong></td>
+              <td><strong>6,45,000</strong></td>
+            </tr>
+            <tr>
+              <td colspan="4">CGST 9% + SGST 9%</td>
+              <td>1,16,100</td>
+            </tr>
+            <tr>
+              <td colspan="4"><strong>Grand Total</strong></td>
+              <td><strong>7,61,100</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="border mb-4">
+      <h5 class="text-center booking-title" style="background-color:yellow;">BANK DETAILS</h5>
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Note:</strong> 1. In case of any discrepancy contact accounts within 5 days of receiving the bill
+          </p>
+          <p>2. Payment to be made with in 2 days after receiving the invoice</p>
+          <p>3. Incase of Payments delayed beyond 30 days will attract 18 % penal Interest per Annum</p>
+        </div>
+      </div>
+
+
+      <div class="text-center mt-4">
+        <p class="footer-text">RITHWIK GREEN POWER & AVIATION PRIVATE LIMITED</p>
+        <p>Authorised Signatory</p>
+        <div class="row">
+          <div class="col-md-6">
+            <tr>
+              <td>ACCOUNT NSAME:</td>
+              <td> RITHWIK GREEN POWER & AVIATION PRIVATE LIMITED</td>
+            </tr>
+            <tr>
+              <td>BANK:</td>
+              <td> KOTAK MAHINDRA BANK</td>
+            </tr>
+            <tr>
+              <td>ACCOUNT NO:</td>
+              <td>0745211990</td>
+            </tr>
+            <tr>
+              <td>BRANCH:</td>
+              <td>BANJARAHILLS</td>
+            </tr>
+            <tr>
+              <td>IFSC CODE:</td>
+              <td> KKBK00007461(NEFT/RTGS)</td>
+            </tr>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+  <!-- // <div class="flight-group-1" style="width: 30%; text-align: center; margin-bottom: 10px; display: flex; flex-direction: column;">
+    //   <img src="${this.Flight1Logo}" alt="Invoice Logo" style="width: 210px; height:200px; margin-bottom: 10px;">
+    //   <img src="${this.Flight2Logo}" alt="Invoice Logo" style="width: 210px; height: 200px;">
+    // </div>
+    // <div class="flight-group-2" style="width: 30%; text-align: center; margin-bottom: 10px; display: flex; flex-direction: column;">
+    //   <img src="${this.Flight3Logo}" alt="Invoice Logo" style="width: 210px; height:200px; margin-bottom: 10px;">
+    //   <img src="${this.Flight4Logo}" alt="Invoice Logo" style="width: 210px; height:200px;">
+    // </div>
+    // <div class="flight-group-3" style="width: 40%; text-align: center; margin-bottom: 10px; border-bo:1px solid white">
+    //   <img src="${this.Flight5Logo}" alt="Invoice Logo" style="width: 290px; height: 410px;">
+    // </div> -->
+
+
+
+
+
+
+
+
+
+
+
+
+

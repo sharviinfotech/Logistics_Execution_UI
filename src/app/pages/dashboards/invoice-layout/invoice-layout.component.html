@@ -1,0 +1,663 @@
+<div class="">
+  
+  <div class="mt-3">
+    <div class="row">
+      <!-- Card 1 with Form Preview -->
+      <div class="col-md-6" (click)="setActiveTab('100')">
+        <div class="card hover-card">
+          <div class="card-header">
+            Create Invoice Layout 1
+          </div>
+          <div class="card-body">
+            
+            <!-- Preview for Layout 1 -->
+            <div class="form-preview">
+              <img src="/assets/images/backgroundimage.png" alt="Layout 1 Preview" class="img-fluid" />
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Card 2 with Form Preview -->
+      <div class="col-md-6" (click)="setActiveTab('101')">
+        <div class="card hover-card">
+          <div class="card-header">
+            Create Invoice Layout 2
+          </div>
+          <div class="card-body">
+            <div class="form-preview">
+              <img src="/assets/images/backgroundimage 1.png" alt="Layout 2 Preview" class="img-fluid" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+  
+  
+  <div>
+    <div *ngIf="activeTab == '100' " > 
+      <form [formGroup]="creationInvoiceLayout">
+        <div class="row">
+          <div class="col-lg-6 col-md-6 col-sm-6">
+            <h3>New Invoice</h3>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-6 " style="text-align: end;">
+            <button class="btnBack btn" (click)="backButton()">Back</button>
+    
+          </div>
+        </div>
+        <div class="invoice-container">
+          <div class="invoice-header">
+            <input type="text" formControlName="invoiceHeader" placeholder="Invoice" class="w-50">
+    
+            <div class="logo-upload" (click)="logoInput.click()" (mouseenter)="isHoveringLogo = true"
+              (mouseleave)="isHoveringLogo = false">
+              <input #logoInput type="file" (change)="onLogoSelected($event)" accept="image/*" style="display: none">
+              <div *ngIf="!logoUrl" class="logo-placeholder">
+                <i>+ Logo</i>
+                <div>Add your logo</div>
+              </div>
+              <ng-container *ngIf="logoUrl">
+                <button class="remove-logo" (click)="removeLogo($event)" (mouseenter)="isHoveringRemove = true"
+                  (mouseleave)="isHoveringRemove = false">×</button>
+                <div class="hover-text">{{ isHoveringRemove ? 'Remove your logo' : 'Update your logo' }}</div>
+                <img [src]="logoUrl" alt="Company Logo">
+              </ng-container>
+            </div>
+          </div>
+          <div class="card mb-4">
+            <div class="card-header " >
+              Proforma Invoice
+            </div>
+            <div class="card-body"
+              >
+              <div class="row">
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Customer Name</label>
+                    <input type="text" formControlName="ProformaCustomerName" placeholder="">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Address</label>
+                    <input type="text" formControlName="ProformaAddress" placeholder="">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>City</label>
+                    <input type="text" formControlName="ProformaCity" placeholder="">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="state">State</label>
+                    <select formControlName="ProformaSate" class="form-control">
+                      <option value="" disabled selected>Select a state</option>
+                      <option value="draft">Andhra Pradesh</option>
+                      <option value="submitted">Telangana</option>
+                      <option value="karnataka">Karnataka</option>
+                      <option value="maharashtra">Maharashtra</option>
+                      <option value="tamilnadu">Tamil Nadu</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="Pincode">Pincode</label>
+                    <input id="Pincode" type="text" formControlName="ProformaPincode" maxlength="6"
+                      placeholder="Enter Pincode" />
+                  
+                    
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Gst No</label>
+                    <input type="text" formControlName="ProformaGstNo" placeholder="">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>PAN No</label>
+                    <input id="ProformaPanNO" type="text" formControlName="ProformaPanNO" maxlength="10"
+                      placeholder="Enter PAN Number (e.g., ABCD1234E)" />
+                    
+    
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Invoice Number</label>
+                    <input type="text" formControlName="ProformaInvoiceNumber" class="form-control" placeholder="INV0001">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" formControlName="ProformaInvoiceDate" class="form-control">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>PAN Number</label>
+                    <input id="ProformaPanNumber" type="text" formControlName="ProformaPanNumber" maxlength="10"
+                      placeholder="Enter PAN Number (e.g., ABCD1234E)" />
+                    
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>GST No</label>
+                    <input type="text" formControlName="ProformaGstNumber" class="form-control" placeholder="">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Type of Aircraft</label>
+                    <input type="text" formControlName="proformatypeOfAircraft" class="form-control" placeholder="">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Seating Capasity</label>
+                    <input type="text" formControlName="proformaseatingcapasity" class="form-control" placeholder="">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    
+          <div class="card mb-4">
+            <div class="card-header " >
+              Booking Details
+            </div>
+            <div class="card-body"
+              >
+              <div class="row">
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Date Of Journey</label>
+                    <input type="date" formControlName="bookingdetailsdateofjourney" class="form-control" placeholder="">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Sector</label>
+                    <input type="text" formControlName="bookingsector" class="form-control" placeholder="">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Billing Flying Time</label>
+                    <input type="text" formControlName="bookingdetailsbillingflyingtime" class="form-control"
+                      placeholder="">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    
+    
+    
+        </div>
+    
+        <div class="card mt-1 mb-2">
+          <div class="m-3">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Description</th>
+                  <th>Units (Hrs.)</th>
+                  <th>Rate</th>
+                  <th>Amount (INR)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Charges Section -->
+                <tr>
+                  <td>1</td>
+                  <td class="bold">Charges</td>
+                  <td class="text-right">
+                    <!-- No input for units here -->
+                  </td>
+                  <td class="text-right">
+                    <!-- No input for rate here -->
+                  </td>
+                  <td></td>
+                </tr>
+    
+                <tr *ngFor="let item of chargeItems; let i = index">
+                  <td>{{i + 2}}</td> <!-- Sequential numbering -->
+                  <td class="indent">
+                    <input type="text" [(ngModel)]="item.description" [ngModelOptions]="{standalone: true}"
+                      class="description-input" (input)="calculateTotals()">
+                  </td>
+                  <td class="text-right">
+                    <!-- Show input for Units only for the first item -->
+                    <input *ngIf="i === 0" type="text" [(ngModel)]="item.units" [ngModelOptions]="{standalone: true}"
+                      class="units-input" (input)="calculateTotals()">
+                  </td>
+                  <td class="text-right">
+                    <input type="text" [(ngModel)]="item.rate" [ngModelOptions]="{standalone: true}" class="rate-input"
+                      (input)="calculateTotals()" (keyup)="numbersOnly($event)">
+                  </td>
+                  <td class="text-right">
+                    <!-- Amount is now calculated automatically, no input needed -->
+                    {{item.amount | number:'1.0-0'}}
+                  </td>
+                </tr>
+    
+    
+    
+    
+    
+                <tr>
+                  <td colspan="4" class="text-right">
+                  </td>
+                  <td style="text-align: end">
+                    <button (click)="addChargeItem()" class="add-btn">+ Add Charge</button>
+                  </td>
+                </tr>
+    
+                <tr>
+                  <td></td>
+                  <td class="bold">TOTAL</td>
+                  <td></td>
+                  <td></td>
+                  <td class="text-right bold">{{subtotal | number:'1.0-0'}}</td>
+                </tr>
+    
+                <!-- Taxes Section -->
+                <tr>
+                  <td>2</td>
+                  <td class="bold">Taxes:</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+    
+                <tr *ngFor="let tax of taxItems; let i = index">
+                  <td></td>
+                  <td class="indent">
+                    {{tax.description}}
+                  </td>
+                  <td></td>
+                  <td class="text-right">
+                  </td>
+                  <td class="text-right">{{tax.amount | number:'1.0-0'}}</td>
+                </tr>
+    
+                <tr>
+                  <td></td>
+                  <td class="bold">GRAND TOTAL</td>
+                  <td></td>
+                  <td></td>
+                  <td class="text-right bold">{{grandTotal | number:'1.0-0'}}</td>
+                </tr>
+              </tbody>
+            </table>
+    
+            <div class="amount-in-words">
+              Rupees in words: {{amountInWords}}
+            </div>
+          </div>
+    
+        </div>
+        <div class="card-body"
+        >
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="notes-section form-group">
+              <label>Notes</label>
+              <textarea formControlName="notes" class="form-control"
+                placeholder="Notes - any relevant information not covered, additional terms and conditions"></textarea>
+            </div>
+          </div>
+          <div class="signature-section mt-4">
+            <label>Signature</label>
+            <div class="btnPlus">
+              <button class="btn btn-primary">+</button>
+            </div>
+          </div>
+         
+        </div>
+      </div>
+    
+      </form>
+    </div>
+  
+  
+    <div *ngIf="activeTab == '101' " >
+      <form [formGroup]="creationInvoiceLayout">
+        <div class="row">
+          <div class="col-lg-6 col-md-6 col-sm-6">
+            <h3>New Invoice</h3>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-6 " style="text-align: end;">
+            <button class="btnBack btn" (click)="backButton()">Back</button>
+    
+          </div>
+        </div>
+        <div class="invoice-container">
+          <div class="invoice-header">
+            <input type="text" formControlName="invoiceHeader" placeholder="Invoice" class="w-50">
+    
+            <div class="logo-upload" (click)="logoInput.click()" (mouseenter)="isHoveringLogo = true"
+              (mouseleave)="isHoveringLogo = false">
+              <input #logoInput type="file" (change)="onLogoSelected($event)" accept="image/*" style="display: none">
+              <div *ngIf="!logoUrl" class="logo-placeholder">
+                <i>+ Logo</i>
+                <div>Add your logo</div>
+              </div>
+              <ng-container *ngIf="logoUrl">
+                <button class="remove-logo" (click)="removeLogo($event)" (mouseenter)="isHoveringRemove = true"
+                  (mouseleave)="isHoveringRemove = false">×</button>
+                <div class="hover-text">{{ isHoveringRemove ? 'Remove your logo' : 'Update your logo' }}</div>
+                <img [src]="logoUrl" alt="Company Logo">
+              </ng-container>
+            </div>
+          </div>
+          <div class="card mb-4">
+            <div class="card-header " >
+              Proforma Invoice
+            </div>
+            <div class="card-body"
+              >
+              <div class="row">
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Customer Name</label>
+                    <input type="text" formControlName="ProformaCustomerName" placeholder="">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Address</label>
+                    <input type="text" formControlName="ProformaAddress" placeholder="">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>City</label>
+                    <input type="text" formControlName="ProformaCity" placeholder="">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="state">State</label>
+                    <select formControlName="ProformaSate" class="form-control">
+                      <option value="" disabled selected>Select a state</option>
+                      <option value="draft">Andhra Pradesh</option>
+                      <option value="submitted">Telangana</option>
+                      <option value="karnataka">Karnataka</option>
+                      <option value="maharashtra">Maharashtra</option>
+                      <option value="tamilnadu">Tamil Nadu</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="Pincode">Pincode</label>
+                    <input id="Pincode" type="text" formControlName="ProformaPincode" maxlength="6"
+                      placeholder="Enter Pincode" />
+                  
+                    <div *ngIf="newInvoiceCreation.get('ProformaPincode')?.hasError('pattern')">
+                      Pincode must be exactly 6 digits.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Gst No</label>
+                    <input type="text" formControlName="ProformaGstNo" placeholder="">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>PAN No</label>
+                    <input id="ProformaPanNO" type="text" formControlName="ProformaPanNO" maxlength="10"
+                      placeholder="Enter PAN Number (e.g., ABCD1234E)" />
+                   
+    
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Invoice Number</label>
+                    <input type="text" formControlName="ProformaInvoiceNumber" class="form-control" placeholder="INV0001">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" formControlName="ProformaInvoiceDate" class="form-control">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>PAN Number</label>
+                    <input id="ProformaPanNumber" type="text" formControlName="ProformaPanNumber" maxlength="10"
+                      placeholder="Enter PAN Number (e.g., ABCD1234E)" />
+                    
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>GST No</label>
+                    <input type="text" formControlName="ProformaGstNumber" class="form-control" placeholder="">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Type of Aircraft</label>
+                    <input type="text" formControlName="proformatypeOfAircraft" class="form-control" placeholder="">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Seating Capasity</label>
+                    <input type="text" formControlName="proformaseatingcapasity" class="form-control" placeholder="">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    
+          <div class="card mb-4">
+            <div class="card-header " >
+              Booking Details
+            </div>
+            <div class="card-body"
+              >
+              <div class="row">
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Date Of Journey</label>
+                    <input type="date" formControlName="bookingdetailsdateofjourney" class="form-control" placeholder="">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Sector</label>
+                    <input type="text" formControlName="bookingsector" class="form-control" placeholder="">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>Billing Flying Time</label>
+                    <input type="text" formControlName="bookingdetailsbillingflyingtime" class="form-control"
+                      placeholder="">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    
+    
+    
+        </div>
+    
+        <div class="card mt-1 mb-2">
+          <div class="m-3">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Description</th>
+                  <th>Units (Hrs.)</th>
+                  <th>Rate</th>
+                  <th>Amount (INR)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Charges Section -->
+                <tr>
+                  <td>1</td>
+                  <td class="bold">Charges</td>
+                  <td class="text-right">
+                    <!-- No input for units here -->
+                  </td>
+                  <td class="text-right">
+                    <!-- No input for rate here -->
+                  </td>
+                  <td></td>
+                </tr>
+    
+                <tr *ngFor="let item of chargeItems; let i = index">
+                  <td>{{i + 2}}</td> <!-- Sequential numbering -->
+                  <td class="indent">
+                    <input type="text" [(ngModel)]="item.description" [ngModelOptions]="{standalone: true}"
+                      class="description-input" (input)="calculateTotals()">
+                  </td>
+                  <td class="text-right">
+                    <!-- Show input for Units only for the first item -->
+                    <input *ngIf="i === 0" type="text" [(ngModel)]="item.units" [ngModelOptions]="{standalone: true}"
+                      class="units-input" (input)="calculateTotals()">
+                  </td>
+                  <td class="text-right">
+                    <input type="text" [(ngModel)]="item.rate" [ngModelOptions]="{standalone: true}" class="rate-input"
+                      (input)="calculateTotals()" (keyup)="numbersOnly($event)">
+                  </td>
+                  <td class="text-right">
+                    <!-- Amount is now calculated automatically, no input needed -->
+                    {{item.amount | number:'1.0-0'}}
+                  </td>
+                </tr>
+    
+    
+    
+    
+    
+                <tr>
+                  <td colspan="4" class="text-right">
+                  </td>
+                  <td style="text-align: end">
+                    <button (click)="addChargeItem()" class="add-btn">+ Add Charge</button>
+                  </td>
+                </tr>
+    
+                <tr>
+                  <td></td>
+                  <td class="bold">TOTAL</td>
+                  <td></td>
+                  <td></td>
+                  <td class="text-right bold">{{subtotal | number:'1.0-0'}}</td>
+                </tr>
+    
+                <!-- Taxes Section -->
+                <tr>
+                  <td>2</td>
+                  <td class="bold">Taxes:</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+    
+                <tr *ngFor="let tax of taxItems; let i = index">
+                  <td></td>
+                  <td class="indent">
+                    {{tax.description}}
+                  </td>
+                  <td></td>
+                  <td class="text-right">
+                  </td>
+                  <td class="text-right">{{tax.amount | number:'1.0-0'}}</td>
+                </tr>
+    
+                <tr>
+                  <td></td>
+                  <td class="bold">GRAND TOTAL</td>
+                  <td></td>
+                  <td></td>
+                  <td class="text-right bold">{{grandTotal | number:'1.0-0'}}</td>
+                </tr>
+              </tbody>
+            </table>
+    
+            <div class="amount-in-words">
+              Rupees in words: {{amountInWords}}
+            </div>
+          </div>
+    
+        </div>
+        <div class="card-body"
+        >
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="notes-section form-group">
+              <label>Notes</label>
+              <textarea formControlName="notes" class="form-control"
+                placeholder="Notes - any relevant information not covered, additional terms and conditions"></textarea>
+            </div>
+          </div>
+          <div class="signature-section mt-4">
+            <label>Signature</label>
+            <div class="btnPlus">
+              <button class="btn btn-primary">+</button>
+            </div>
+          </div>
+         
+        </div>
+      </div>
+    
+      </form>
+    </div>
+
+    <div class="col-sm-12 col-md-12 col-lg-12 text-right" style="text-align: end;">
+      <button class="btnSave btn" (click)="createLayout()"> Create Invoice Layout</button>
+  </div>
+  </div>
+
+
+
+  <!-- <div class="card mb-4">
+    <div class="card-header " >
+      Booking Details
+    </div>
+    <div class="card-body">
+    <table class="table table-bordered" style="border: 2px solid black !important;">
+     <tr>
+      <td>Date Of Journey</td>
+      <td> 29-Dec-2024</td>
+    </tr>
+    <tr>
+      <td>SECTOR</td>
+      <td> HYDERABAD-CHENNAI-HYDERABAD</td>
+      
+    </tr>
+    <tr>
+      <td>BILLING FLYING TIME </td>
+      <td> 03.30 Hrs.</td>
+    </tr>
+    </table>
+      
+    </div>
+  </div> -->

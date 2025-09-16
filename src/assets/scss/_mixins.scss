@@ -1,0 +1,11 @@
+// _mixins.scss
+@mixin set-gradient-background-color($start-color, $end-color) {
+    background-color: $start-color; /* Fallback for non-gradient browsers */
+    background-image: linear-gradient(to bottom, $start-color, $end-color);
+    background: -webkit-linear-gradient(to bottom, $start-color, $end-color);
+    background: -o-linear-gradient(to bottom, $start-color, $end-color);
+    background: -moz-linear-gradient(to bottom, $start-color, $end-color);
+    background: linear-gradient(to bottom, $start-color, $end-color);
+    background-size: cover;
+  }
+  

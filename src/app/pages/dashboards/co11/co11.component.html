@@ -1,0 +1,107 @@
+<div class="card">
+  <div class="card-header">
+   Co11
+    <span *ngIf="isEditMode" class="edit-note">
+      (Editing Plan #{{ editIndex! + 1 }})
+    </span>
+  </div>
+  <div class="card-body">
+    <form class="form-grid vstack gap-4" [formGroup]="planForm" (ngSubmit)="savePlan()">
+
+      <!-- Card 1: Goods Movement -->
+      <div class="card w-100">
+        <div class="card-header">Goods Movement</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="confirmation">Confirmation</label>
+              <input id="confirmation" type="text" formControlName="confirmation" placeholder=" " />
+            </div>
+            <div class="col-md-6">
+              <label for="material">Material</label>
+              <input id="material" type="text" formControlName="material" placeholder=" " />
+            </div>
+            <div class="col-md-6">
+              <label for="order">Order</label>
+              <input id="order" type="text" formControlName="order" placeholder=" " />
+            </div>
+            <div class="col-md-6">
+              <label for="matDescr">Mat.Descr.</label>
+              <input id="matDescr" type="text" formControlName="matDescr" placeholder=" " />
+            </div>
+            <div class="col-md-6">
+              <label for="operation">Operation</label>
+              <input id="operation" type="text" formControlName="operation" placeholder=" " />
+            </div>
+            <div class="col-md-6">
+              <label for="sequence">Sequence</label>
+              <input id="sequence" type="text" formControlName="sequence" placeholder=" " />
+            </div>
+            <div class="col-md-6">
+              <label for="suboperation">Suboperation</label>
+              <input id="suboperation" type="text" formControlName="suboperation" placeholder=" " />
+            </div>
+            <div class="col-md-6">
+              <label for="capacityCat">Capacity Cat</label>
+              <input id="capacityCat" type="text" formControlName="capacityCat" placeholder=" " />
+            </div>
+            <div class="col-md-6">
+              <label for="split">Split</label>
+              <input id="split" type="text" formControlName="split" placeholder=" " />
+            </div>
+            <div class="col-md-6">
+              <label for="workCenter">Work Center</label>
+              <input id="workCenter" type="text" formControlName="workCenter" placeholder=" " />
+            </div>
+            <div class="col-md-6">
+              <label for="plant">Plant</label>
+              <input id="plant" type="text" formControlName="plant" placeholder=" " />
+            </div>
+            <div class="col-md-6">
+              <label for="confirmType">Confirm Type</label>
+              <input id="confirmType" type="text" formControlName="confirmType" placeholder=" " />
+            </div>
+            <div class="col-md-6">
+              <label for="clearOpenReservations">Clear Open Reservations</label>
+              <input id="clearOpenReservations" type="text" formControlName="clearOpenReservations" placeholder=" " />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Quantities -->
+      <div class="card w-100">
+        <div class="card-header">Quantities</div>
+        <div class="card-body" formGroupName="variance">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="yield">Yield</label>
+              <input id="yield" type="text" formControlName="yield" placeholder=" " />
+            </div>
+            <div class="col-md-6">
+              <label for="scrap">Scrap</label>
+              <input id="scrap" type="text" formControlName="scrap" placeholder=" " />
+            </div>
+            <div class="col-md-6">
+              <label for="rework">Rework</label>
+              <input id="rework" type="text" formControlName="rework" placeholder=" " />
+            </div>
+            <div class="col-md-6">
+              <label for="reasonForVariance">Reason for Variance</label>
+              <input id="reasonForVariance" type="text" formControlName="reasonForVariance" placeholder=" " />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="form-buttons mt-3 text-end">
+        <button type="submit" class="btn btn-primary">
+          {{ isEditMode ? 'Update Plan' : 'save' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+

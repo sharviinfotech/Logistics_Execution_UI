@@ -1,0 +1,73 @@
+<div class="dashboard-body">
+ 
+  <div class="card-header">
+    Smart Manufacturing Dashboard
+  </div>
+
+  <div class="card-body">
+    
+    <section class="grid">
+
+      
+      <article class="card small-card">
+        <div class="card-title">Production Today</div>
+        <div class="kpi big">{{ productionToday }}</div>
+      </article>
+
+     
+      <article class="card small-card">
+        <div class="card-title">OEE</div>
+        <div class="kpi big">{{ oee }}%</div>
+      </article>
+
+      
+      <article class="card status-card">
+        <div class="card-title">Machine Status</div>
+        <div class="status-row">
+          <div><span class="dot green"></span> Running</div>
+          <div class="status-val">{{ machineStatus.running }}</div>
+        </div>
+        <div class="status-row">
+          <div><span class="dot yellow"></span> Idle</div>
+          <div class="status-val">{{ machineStatus.idle }}</div>
+        </div>
+        <div class="status-row">
+          <div><span class="dot red"></span> Faulty</div>
+          <div class="status-val">{{ machineStatus.faulty }}</div>
+        </div>
+      </article>
+
+      
+      <article class="card alerts-small">
+        <div class="card-title">Real-time Alerts</div>
+        <ul>
+          <li *ngFor="let a of alerts">{{ a }}</li>
+        </ul>
+      </article>
+
+      
+      <article class="card chart-card big">
+        <div class="card-title">Energy Consumption</div>
+        <canvas baseChart [data]="energyData" [options]="energyOptions" chartType="line">
+        </canvas>
+      </article>
+
+      
+      <article class="card chart-card big">
+        <div class="card-title">Downtime Summary</div>
+        <canvas baseChart [data]="downtimeData" [options]="downtimeOptions" chartType="bar">
+        </canvas>
+      </article>
+
+      
+      <article class="card wide-card">
+        <div class="card-title">Real-time Alerts</div>
+        <ul>
+          <li *ngFor="let a of alerts">{{ a }}</li>
+        </ul>
+      </article>
+
+    </section>
+
+  </div>
+</div>

@@ -1,0 +1,11 @@
+/* Logo size for sidebar */
+.sidebar-logo {
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 12px auto;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}

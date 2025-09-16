@@ -1,0 +1,91 @@
+<div class="card">
+  <div class="card-header">coois</div>
+  <div class="card-body">
+    <form [formGroup]="form" >
+
+      <!-- Top Row: Dropdown + Checkboxes + Plant -->
+      <div class="d-flex flex-wrap align-items-center mb-3 gap-4">
+        <!-- List Dropdown -->
+        <div class="d-flex align-items-center">
+          <label class="mb-0 me-2">List</label>
+          <select formControlName="dropdown" class="form-select form-select-sm">
+            <option value="">Select</option>
+            <option *ngFor="let option of dropdownOptions" [value]="option">
+              {{ option }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Conditional: Checkboxes + Plant Field -->
+        <ng-container *ngIf="form.get('dropdown')?.value">
+          <div class="d-flex align-items-center gap-4">
+            <div class="form-check d-flex align-items-center">
+              <input type="checkbox" formControlName="prdOrdersCheck" class="form-check-input me-2" />
+              <label class="form-check-label mb-0 fw-bold">
+                Production Order
+              </label>
+            </div>
+
+            <div class="form-check d-flex align-items-center">
+              <input type="checkbox" formControlName="plndOrdersCheck" class="form-check-input me-2" />
+              <label class="form-check-label mb-0 fw-bold">
+                Planned Order
+              </label>
+            </div>
+
+            <div class="d-flex flex-column" *ngIf="form.get('prdOrdersCheck')?.value || form.get('plndOrdersCheck')?.value">
+              <label class="mb-0">Plant</label>
+              <input type="text" formControlName="WERKS" class="form-control form-control-sm mt-1 w-auto" />
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- Conditional Fields -->
+      <ng-container *ngIf="form.get('prdOrdersCheck')?.value || form.get('plndOrdersCheck')?.value && this.form.value.dropdown == 'Order Headers'">
+        <div class="row">
+          <div class="col-sm-3">
+            <label class="form-label">From Order Number</label>
+            <input type="text" formControlName="AUFNR_F" class="form-control form-control-sm mt-1" />
+          </div>
+          <div class="col-sm-3">
+            <label class="form-label">To Order Number</label>
+            <input type="text" formControlName="AUFNR_T" class="form-control form-control-sm mt-1" />
+          </div>
+          <div class="col-sm-3">
+            <label class="form-label">From Order Type</label>
+            <input type="text" formControlName="AUART_F" class="form-control form-control-sm mt-1" />
+          </div>
+          <div class="col-sm-3">
+            <label class="form-label">To Order Type</label>
+            <input type="text" formControlName="AUART_T" class="form-control form-control-sm mt-1" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-3">
+            <label class="form-label">From Sales Order</label>
+            <input type="text" formControlName="KDAUF_F" class="form-control form-control-sm mt-1" />
+          </div>
+          <div class="col-sm-3">
+            <label class="form-label">To Sales Order</label>
+            <input type="text" formControlName="KDAUF_T" class="form-control form-control-sm mt-1" />
+          </div>
+          <div class="col-sm-3">
+            <label class="form-label">From Sales Order Item</label>
+            <input type="text" formControlName="KDPOS_F" class="form-control form-control-sm mt-1" />
+          </div>
+          <div class="col-sm-3">
+            <label class="form-label">To Sales Order Item</label>
+            <input type="text" formControlName="KDPOS_T" class="form-control form-control-sm mt-1" />
+          </div>
+        </div>
+      </ng-container>
+
+       <div class="text-end mt-3">
+        <button type="button" (click)="onSubmit()" class="btn btn-primary">Submit</button>
+      </div>
+
+    </form>
+  </div>
+</div>

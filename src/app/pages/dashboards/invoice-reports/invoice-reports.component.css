@@ -1,0 +1,119 @@
+
+ 
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+
+
+.table th {
+  padding: 10px !important;
+  border-bottom: 2px solid #ddd !important;
+  /* background-color: #090979 !important; */
+  background-color: rgb(88 98 145)!important;
+  color: white;
+}
+.table td {
+    padding: 10px !important;
+  }
+
+  ::ng-deep .text-blue-600 {
+    color: #2563eb !important;
+  }
+  
+  ::ng-deep .text-green-600 {
+    color: #16a34a !important;
+    cursor: pointer !important;
+  }
+  
+  
+  ::ng-deep .text-orange-600 {
+    color: orange !important;
+  }
+  
+  ::ng-deep .text-red-600 {
+    color: #dc2626 !important;
+  }
+  
+  ::ng-deep .cursor-pointer {
+    cursor: pointer !important;
+  }
+  ::ng-deep .underline {
+    text-decoration: underline !important;
+  }
+::ng-deep  .rejected_Reversed{
+  background: linear-gradient(135deg, #FFA500, #FF4500) !important;
+  /* -webkit-background-clip: text !important; */
+  -webkit-text-fill-color: transparent !important;
+  font-weight: bold !important;
+}
+
+::ng-deep  .btnCustomize{
+
+  padding: 5px !important;
+  width: 93px !important;
+  height: 37px !important;
+  font-size: 18px !important;
+  margin-left: 10px !important;
+
+}
+.btn-success{
+  background-color: #16a34a !important;
+  color: white !important;
+
+}
+.btn-danger{
+  background-color: red !important;
+  color: white !important;
+
+}
+.btn-primary{
+  background-color: #2563eb !important;
+  color: white !important;
+}
+
+::ng-deep .text-Amount_Received {
+  color: #21e421 !important;
+  font-weight: 700 !important;
+}
+#tickets-table_filter {
+  display: flex;
+  justify-content: flex-end; /* Moves the search to the right */
+  align-items: center; /* Aligns items vertically */
+}
+
+#tickets-table_filter label {
+  display: flex;
+  align-items: center; /* Keeps text and input aligned */
+}
+
+#tickets-table_filter input {
+  margin-left: 8px; /* Adds space between 'Search:' and the input */
+}
+
+
+.pagination {
+  margin: 0;
+  justify-content: end;
+}
+
+.page-item {
+  cursor: pointer;
+}
+
+.page-item.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.page-item.active .page-link {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+.page-link {
+  color: #007bff;
+}
+  

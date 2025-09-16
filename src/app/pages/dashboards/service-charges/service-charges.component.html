@@ -1,0 +1,74 @@
+<div class="card">
+    <div class="card-header">
+        <h5>Service Charges</h5>
+    </div>
+    <div class="card-body">
+        <form [formGroup]="chargesForm" (ngSubmit)="SaveCharges()">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label for="charges" class="form-label fw-bold">Charges Name</label>
+                        <input type="text" class="form-control" formControlName="chargesName" placeholder="Enter charge name">
+                        <div *ngIf="submit && chargesName.invalid" class="text-danger">
+                            <p>Charges Name is required.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mt-4">
+                    <button type="submit" class="btn btn-success btn-sm mt-3">Save</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="" *ngIf="allCharges && allCharges.length > 0">
+            <table class="table table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>Charges Id</th>
+                        <th>Charges Name</th>
+                        <th>Action</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let charge of allCharges; let i = index">
+                        <td>{{charge.chargesUniqueId}}</td>
+                        <td>{{ charge.chargesName }}</td>
+                       <td> 
+                        <i class="edit-btn bx bx-edit-alt" (click)="editservicesCharge(charge)"></i>
+                        <i class="delete-btn bx bx-trash"  (click)="delete(charge)"></i>
+                      </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<ng-template #editservicesChargeTemplate let-c="close">
+    <div class="modal-header" style="justify-content: space-between;">
+      <h5 class="modal-title">Edit Services Charge</h5>
+      <button type="button" class="close" (click)="c('Close click')" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="editForm">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label for="charges" class="form-label fw-bold">Charges Name</label>
+                    <input type="text" class="form-control" formControlName="chargesName" placeholder="Enter charge name">
+                    <div *ngIf="submit && chargesName.invalid" class="text-danger">
+                        <p>Charges Name is required.</p>
+                    </div>
+                </div>
+            </div>
+           
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="updateCharge()">Update</button>
+      <button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
+    </div>
+  </ng-template>

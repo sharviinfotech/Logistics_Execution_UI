@@ -1,0 +1,450 @@
+<div class="">
+    <form >
+ 
+    <div class="card">
+        <div class="card-header" >
+        Customer Creation
+        </div>
+        <div class="card-body">
+ 
+            <button type="button" class="btn btn-raised btn-md btnSubmitApproval" style="background-color: green;" (click)="newCustomerCreation(newCustomerTemplate)">
+                Create New Customer
+              </button>
+             
+            <div class="table-responsive tableFixHead">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                           
+                            <th class="text-nowrap">Customer Name</th>
+                            <th>Address</th>
+                            <th>City</th>
+                            <th>State</th>
+                            <th>Pincode</th>
+                            <th>Gst No</th>
+                            <th>Pan No</th>
+                            <th>Email</th>
+                            <th>Contact</th>
+                            <th class="text-nowrap">Alernative No</th>
+                             <th class="text-nowrap"    >Credit Period</th>
+                            <th 
+                            *ngIf='loginData?.data.userActivity != "MD"'>Actions</th>
+                           
+                            <!-- <th *ngIf='loginData?.data.userActivity != "customer"'>Action</th> -->
+                           
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let data of customerList">
+                           
+                            <td class="text-nowrap">{{data.customerName}}</td>
+                            <td class="text-nowrap">{{data.customerAddress}}</td>
+                            <td class="text-nowrap">{{data.customerCity}}</td>
+                            <td class="text-nowrap">{{data.customerState}}</td>
+                            <td class="text-nowrap">{{data.customerPincode}}</td>
+                            <td class="text-nowrap">{{data.customerGstNo}}</td>
+                            <td class="text-nowrap">{{data.customerPanNo}}</td>
+                            <td class="text-nowrap">{{data.customerEmail}}</td>
+                            <td class="text-nowrap">{{data.customerContact}}</td>
+                            <td class="text-nowrap">{{data.customerAlernativecontact}}</td>
+                            <td class="text-nowrap">{{data.customerCreditPeriod}}</td>
+                       
+                            <!-- <td>
+                              {{ data.userStatus ? 'Active' : 'Inactive' }}
+                            </td> -->
+ 
+                           <td class="text-center d-flex" *ngIf='loginData?.data.userActivity != "MD"'
+                           >
+                            
+                            <i class="edit-btn fa fa-edit"  (click)="openEditModal(data, editCustomerTemplate)"></i>
+                            <i class="delete-btn bx bx-trash"  (click)="delete(data)"></i>
+                          
+                           
+                        </tr>
+                       
+                       
+                    </tbody>
+                </table>
+ 
+            </div>
+           
+        </div>
+ 
+    </div>
+   
+ 
+</form>
+ 
+</div>
+ 
+<ng-template #newCustomerTemplate let-c="close">
+    <div class="modal-header">
+        Create New Customer
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="CustomerCreationForm">
+            <div class="row">
+                <!-- Customer Name -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label>Customer Name<span class="text-danger">*</span></label>
+                        <input class="form-control form-control-sm" formControlName="customerName" type="text" placeholder="Enter Customer Name" 
+                        >
+                        <div class="text-danger" *ngIf="submit && f['customerName'].errors">
+                            Customer Name is required.
+                        </div>
+                    </div>
+                </div>
+ 
+                <!-- Address -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label>Address<span class="text-danger">*</span></label>
+                        <input class="form-control form-control-sm" formControlName="customerAddress" type="text" placeholder="Enter Address" 
+                        >
+                        <div class="text-danger" *ngIf="submit && f['customerAddress'].errors">
+                            Address is required.
+                        </div>
+                    </div>
+                </div>
+ 
+                <!-- City -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label>City<span class="text-danger">*</span></label>
+                        <input class="form-control form-control-sm" formControlName="customerCity" type="text" placeholder="Enter City" 
+                        >
+                        <div class="text-danger" *ngIf="submit && f['customerCity'].errors">
+                            City is required.
+                        </div>
+                    </div>
+                </div>
+ 
+                <!-- State -->
+               
+                 
+                    <!-- State Field -->
+                    <div class="col-lg-4">
+                      <div class="form-group">
+                        <label for="state">State <span class="text-danger">*</span></label>
+                        <select
+                          formControlName="customerState"
+                          class="form-control"
+                          [ngClass]="{'is-errors': submit && f['customerState'].errors}">
+                          <option value="">Select a state</option>
+                          <option *ngFor="let state of statesList" [value]="state.stateName">{{ state.stateName }}</option>
+                        </select>
+                      </div>
+                 
+                      <!-- State Error Message -->
+                      <div class="text-danger" *ngIf="submit && f['customerState'].errors">
+                        Customer state is required.
+                      </div>
+                    </div>
+               
+                 
+                 
+ 
+                <!-- Pincode -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                    <label>Pincode<span class="text-danger">*</span></label>
+                    <input class="form-control form-control-sm" 
+                                   formControlName="customerPincode" 
+                                   type="text" 
+                                   placeholder="Enter Pincode" 
+                                   maxlength="6"
+                                   pattern="[0-9]{6}"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    <div class="text-danger" *ngIf="submit && f['customerPincode'].errors?.required">
+                                Pincode is required.
+                    </div>
+                    <div class="text-danger" *ngIf="submit && f['customerPincode'].errors?.pattern">
+                                Pincode must be exactly 6 digits.
+                    </div>
+                    </div>
+                    </div>
+ 
+                <!-- GST No -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label>GST No</label>
+                        <input class="form-control form-control-sm" formControlName="customerGstNo" type="text" placeholder="Enter GST No" style="text-transform: uppercase;" 
+                        (input)="convertToUpperCase($event)">
+                        <div class="text-danger" *ngIf="submit && f['customerGstNo'].errors">
+                            Valid Gst No is required.
+                        </div>
+                    </div>
+                </div>
+ 
+                <!-- PAN No -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label>PAN No<span class="text-danger">*</span></label>
+                        <input class="form-control form-control-sm" formControlName="customerPanNo" type="text" placeholder="Enter PAN No"
+                        (input)="convertToUpperCase($event)">
+                        <div class="text-danger" *ngIf="submit && f['customerPanNo'].errors">
+                            PAN No is required.
+                        </div>
+                    </div>
+                </div>
+                <!-- email Id -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label>Email<span class="text-danger">*</span></label>
+                        <input class="form-control form-control-sm" formControlName="customerEmail" type="email" placeholder="Enter email">
+                        <div class="text-danger" *ngIf="submit && f['customerEmail'].errors">
+                            Email is required.
+                        </div>
+                    </div>
+                </div>
+                <!-- contact -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label>Customer Contact<span class="text-danger">*</span></label>
+                        <input class="form-control form-control-sm"
+                               formControlName="customerContact"
+                               type="text"
+                               placeholder="Enter Contact Number"
+                               maxlength="10"
+                               pattern="[0-9]{10}"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        <div class="text-danger" *ngIf="submit && f['customerContact'].errors">
+                            Customer Contact is required.
+                        </div>
+                    </div>
+                </div>
+                <!-- alt contact -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                    <label>Alternative Contact</label>
+                    <input class="form-control form-control-sm" 
+                                   formControlName="customerAlernativecontact" 
+                                   type="text" 
+                                   placeholder="Enter Alternative Contact" 
+                                   maxlength="10" 
+                                   pattern="[0-9]{10}"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    <div class="text-danger" *ngIf="submit && f['customerAlernativecontact'].errors">
+                                Alternative contact is required.
+                    </div>
+                    </div>
+                    </div>
+               
+                <div class="col-lg-4">
+                    <div class="form-group">
+                      <label for="creditPeriod">Credit Period <span class="text-danger">*</span></label>
+                      <select
+                        formControlName="customerCreditPeriod"
+                        class="form-control"
+                        [ngClass]="{'is-errors': submit && f['customerCreditPeriod'].errors}">
+                        <option value="">Select a credit period</option>
+                        <option *ngFor="let period of creditPeriodList" [value]="period">{{ period }}</option>
+                      </select>
+                    </div>
+                 
+                    <!-- Credit Period Error Message -->
+                    <div class="text-danger" *ngIf="submit && f['customerCreditPeriod'].errors">
+                      Customer credit period is required.
+                    </div>
+                  </div>
+                 
+               
+               
+            </div>
+        </form>
+    </div>
+ 
+    <div class="modal-footer">
+        <button type="button" class="btn btnSave btn-raised"(click)="savecustomerCreation()">Submit</button>
+        <button type="button" class="btn btnClose btn-raised" (click)="c('Close click')">Close</button>
+    </div>
+</ng-template>
+ 
+ 
+  <ng-template #editCustomerTemplate let-c="close">
+   
+      <div class="modal-header">
+        Edit Customer
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="customerEditForm"> <!-- FIXED: Added formGroup -->
+            <div class="row">
+                <!-- Customer Name -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label>Customer Name<span class="text-danger">*</span></label>
+                        <input class="form-control form-control-sm" formControlName="customerName" type="text" placeholder="Enter Customer Name" style="text-transform: uppercase;" 
+                        (input)="convertToUpperCase($event)">
+                        <div class="text-danger" *ngIf="submit && f['customerName'].errors">
+                            Customer Name is required.
+                        </div>
+                    </div>
+                </div>
+                <!-- Address -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label>Address<span class="text-danger">*</span></label>
+                        <input class="form-control form-control-sm" formControlName="customerAddress" type="text" placeholder="Enter Address" style="text-transform: uppercase;" 
+                        (input)="convertToUpperCase($event)">
+                        <div class="text-danger" *ngIf="submit && f['customerAddress'].errors">
+                            Address  is required.
+                        </div>
+                    </div>
+                </div>
+                <!-- La -->
+                 <!-- City -->
+                 <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label>City<span class="text-danger">*</span></label>
+                        <input class="form-control form-control-sm" formControlName="customerCity" type="text" placeholder="Enter City" style="text-transform: uppercase;" 
+                        (input)="convertToUpperCase($event)">
+                        <div class="text-danger" *ngIf="submit && f['customerCity'].errors">
+                            City is required.
+                        </div>
+                    </div>
+                </div>
+ 
+                <!-- State -->
+                <div class="col-lg-4">
+                    <div class="form-group">
+                      <label for="state">State <span class="text-danger">*</span></label>
+                      <select
+                        formControlName="customerState"
+                        class="form-control"
+                        [ngClass]="{'is-errors': submit && f['customerState'].errors}">
+                        <option value="">Select a state</option>
+                        <option *ngFor="let state of statesList" [value]="state.stateName">{{ state.stateName }}</option>
+                      </select>
+                    </div>
+                 
+                    <!-- Error Message -->
+                    <div *ngIf="submit && f['customerState'].errors" class="text-danger">
+                      Customer state is required.
+                    </div>
+                  </div>
+                 
+               
+ 
+                <!-- Pincode -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                    <label>Pincode<span class="text-danger">*</span></label>
+                    <input class="form-control form-control-sm" 
+                                   formControlName="customerPincode" 
+                                   type="text" 
+                                   placeholder="Enter Pincode" 
+                                   maxlength="6"
+                                   pattern="[0-9]{6}"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    <div class="text-danger" *ngIf="submit && f['customerPincode'].errors?.required">
+                                Pincode is required.
+                    </div>
+                    <div class="text-danger" *ngIf="submit && f['customerPincode'].errors?.pattern">
+                                Pincode must be exactly 6 digits.
+                    </div>
+                    </div>
+                    </div>
+ 
+                <!-- GST No -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label>GST No</label>
+                        <input class="form-control form-control-sm" formControlName="customerGstNo" type="text" placeholder="Enter GST No" style="text-transform: uppercase;" 
+                        (input)="convertToUpperCase($event)">
+                    </div>
+                </div>
+ 
+                <!-- PAN No -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label>PAN No<span class="text-danger">*</span></label>
+                        <input class="form-control form-control-sm" formControlName="customerPanNo" type="text" placeholder="Enter PAN No"maxlength="10" pattern="(/^[A-Z]{5}[0-9]{4}[A-Z]$/)" style="text-transform: uppercase;" 
+                        (input)="convertToUpperCase($event)">
+                        <div class="text-danger" *ngIf="submit && f['customerPanNo'].errors">
+                            PAN No is required.
+                        </div>
+                    </div>
+                </div>
+ 
+               
+ 
+                <!-- email Id -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label>Email<span class="text-danger">*</span></label>
+                        <input class="form-control form-control-sm" formControlName="customerEmail" type="email" placeholder="Enter the email">
+                        <div class="text-danger" *ngIf="submit && f['customerEmail'].errors">
+                            Email is required.
+                        </div>
+                    </div>
+                </div>
+                <!-- contact-number -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label>Customer Contact<span class="text-danger">*</span></label>
+                        <input class="form-control form-control-sm"
+                               formControlName="customerContact"
+                               type="text"
+                               placeholder="Enter Contact Number"
+                               maxlength="10"
+                               pattern="[0-9]{10}"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        <div class="text-danger" *ngIf="submit && f['customerContact'].errors">
+                            Customer Contact is required.
+                        </div>
+                    </div>
+                </div>
+                <!-- alt contact -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                    <label>Alternative Contact</label>
+                    <input class="form-control form-control-sm" 
+                                   formControlName="customerAlernativecontact" 
+                                   type="text" 
+                                   placeholder="Enter Alternative Contact" 
+                                   maxlength="10" 
+                                   pattern="[0-9]{10}"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    <!-- <div class="text-danger" *ngIf="submit && f['customerAlernativecontact'].errors">
+                                Alternative contact is required.
+                    </div> -->
+                    </div>
+                    </div>
+                <!-- credit period -->
+               
+                <div class="col-lg-4">
+                    <div class="form-group">
+                      <label for="creditPeriod">Credit Period <span class="text-danger">*</span></label>
+                      <select
+                        formControlName="customerCreditPeriod"
+                        class="form-control"
+                        [ngClass]="{'is-errors': submit && f['customerCreditPeriod'].errors}">
+                        <option value="">Select a credit period</option>
+                        <option *ngFor="let period of creditPeriodList" [value]="period">{{ period }}</option>
+                      </select>
+                    </div>
+                 
+                    <!-- Credit Period Error Message -->
+                    <div class="text-danger" *ngIf="submit && f['customerCreditPeriod'].errors">
+                      Customer credit period is required.
+                    </div>
+                  </div>
+                 
+                 
+               
+               
+               
+            </div>
+        </form>
+    </div>
+      <div class="card-footer" style="text-align: right;">
+        <button type="button" class="btn btn-primary" (click)="updateExitCustomer()">Update</button>
+        <button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
+      </div>
+   
+  </ng-template>
+ 
+ 
+ 
+ 

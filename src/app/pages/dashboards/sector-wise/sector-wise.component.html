@@ -1,0 +1,596 @@
+<div class="card">
+    <div class="card-header text-center">
+        <h5>Sector Wise</h5>
+    </div>
+    <div class="card-body">
+        <div class="">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <label class="d-inline-flex align-items-center">
+                        Show
+                        <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()"
+                            [ngModelOptions]="{ standalone: true }">
+                            <option [value]="5">5</option>
+                            <option [value]="10">10</option>
+                            <option [value]="20">20</option>
+                            <option [value]="25">25</option>
+                            <option [value]="30">30</option>
+                        </select>
+                        entries
+                    </label>
+                </div>
+                <div id="tickets-table_filter" class="dataTables_filter">
+                    <label class="d-inline-flex align-items-center">
+                        Search:
+                        <input type="text" name="searchTerm" class="form-control form-control-sm ms-2"
+                            aria-controls="tickets-table" [(ngModel)]="searchTerm" (input)="resetPagination()" />
+                    </label>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-stripped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="text-nowrap">Invoice Number</th>
+                            <th class="text-nowrap">Invoice Date</th>
+                            <th class="text-nowrap">Billed Time</th>
+                            <th class="text-nowrap">Type Of Aircraft</th>
+                            <th class="text-nowrap">Destination</th>
+                            <th class="text-nowrap">Date Of Journey</th>
+                            <th class="text-nowrap">Flying Charges</th>
+                            <th class="text-nowrap">GST Charges</th>
+                            <th class="text-nowrap">Total Amount</th>
+                            <th class="text-nowrap">Ground Handling</th>
+                            <th class="text-nowrap">Landing & Parking</th>
+                            <th class="text-nowrap">GA Terminal & Others</th>
+                            <th class="text-nowrap">Onboard Catering</th>
+                            <th class="text-nowrap">Crew Expenses</th>
+                            <th class="text-nowrap">Fuel expenses</th>
+                            <th class="text-nowrap">other expenses</th>
+                            <th class="text-nowrap">Total Expenses</th>
+                            <th class="text-nowrap">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let invoice of paginatedInvoices">
+                            <td>
+                                <span [ngClass]="{
+                    'text-green-600 underline cursor-pointer':
+                      invoice.status === 'Approved',
+                    'text-orange-600': invoice.status === 'Pending',
+                    'text-red-600': invoice.status === 'Rejected',
+                    'text-Amount_Received underline cursor-pointer':
+                      invoice.status === 'Amount Received',
+                    rejected_Reversed: invoice.status === 'Rejected_Reversed'
+                  }">
+                                    {{ invoice.invoiceUniqueNumber }}
+                                </span>
+                            </td>
+                            <td>{{ invoice.header.ProformaInvoiceDate }}</td>
+                            <td>{{ invoice.header.BookingBillingFlyingTime }}</td>
+                            <td>{{ invoice.header.ProformaTypeOfAircraft }}</td>
+                            <td>{{ invoice.header.BookingSector }}</td>
+                            <td class="text-nowrap">
+                                {{ invoice.header.startBookingDateOfJourny }}/{{
+                                invoice.header.endBookingDateOfJourny
+                                }}
+                            </td>
+                            <td>{{ invoice.subtotal | number : "1.2-2" }}</td>
+                            <td>{{ (invoice.grandTotal - invoice.subtotal) | number: '1.2-2' }}</td>
+                            <td>{{ invoice.grandTotal | number : "1.2-2" }}</td>
+
+                            <!-- Ground Handling Column -->
+                            <td style="min-width: 320px;">
+                                <!-- Display when in EDIT mode -->
+                                <ng-container *ngIf="invoice.isGroundHandlingEditing">
+                                    <input type="number" [(ngModel)]="invoice.groundHandlingAmount"
+                                        [ngModelOptions]="{ standalone: true }" class="description-input mb-1"
+                                        placeholder="Amount" style="width: 100%; margin-bottom: 4px;" />
+
+                                    <input type="file" (change)="onFileSelected($event, invoice, 'groundHandling')"
+                                        accept="application/pdf" style="width: 100%; margin-bottom: 4px;" />
+                                    <div *ngIf="invoice.groundHandlingFileName"
+                                        style="font-size: 0.8em; color: grey; margin-bottom: 4px;">
+                                        File: {{ invoice.groundHandlingFileName }}
+                                    </div>
+
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <button (click)="saveExpense(invoice, 'groundHandling')"
+                                            class="btn btn-raised btn-md btnSave">Save</button>
+                                        <!-- Show View/Download even in edit mode if a file is already selected/exists -->
+                                        <span *ngIf="invoice.groundHandlingFile"
+                                            (click)="viewPDF(invoice.groundHandlingFile)" title="View PDF"
+                                            style="cursor: pointer; color: #007bff;"><i class="fas fa-eye"></i></span>
+                                        <span *ngIf="invoice.groundHandlingFile"
+                                            (click)="downloadPDF(invoice.groundHandlingFile, invoice.groundHandlingFileName || 'ground_handling.pdf')"
+                                            title="Download PDF" style="cursor: pointer; color: #007bff;"><i
+                                                class="fas fa-download"></i></span>
+                                    </div>
+                                </ng-container>
+
+                                <!-- Display when in VIEW mode -->
+                                <ng-container *ngIf="!invoice.isGroundHandlingEditing">
+                                    <div style="margin-bottom: 4px;font-size: 13px;font-weight: 500;">
+                                        Amount: {{ invoice.groundHandlingAmount !== null && invoice.groundHandlingAmount
+                                        !== undefined ? (invoice.groundHandlingAmount | number : "1.2-2") : 'N/A' }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <button (click)="toggleEditMode(invoice, 'groundHandling')"
+                                            class="btn btn-raised btn-md btnEdit">Edit</button>
+                                        <span *ngIf="invoice.groundHandlingFile"
+                                            (click)="viewPDF(invoice.groundHandlingFile)" title="View PDF"
+                                            style="cursor: pointer; color: #007bff;"><i class="fas fa-eye"></i></span>
+                                        <span *ngIf="invoice.groundHandlingFile"
+                                            (click)="downloadPDF(invoice.groundHandlingFile, invoice.groundHandlingFileName || 'ground_handling.pdf')"
+                                            title="Download PDF" style="cursor: pointer; color: #007bff;"><i
+                                                class="fas fa-download"></i></span>
+                                    </div>
+                                </ng-container>
+                            </td>
+
+                            <!-- Landing Parking -->
+                            <td style="min-width: 320px;">
+                                <ng-container *ngIf="invoice.isLandingParkingEditing">
+                                    <input type="number" [(ngModel)]="invoice.landingParkingAmount"
+                                        [ngModelOptions]="{ standalone: true }" class="description-input mb-1"
+                                        placeholder="Amount" style="width: 100%; margin-bottom: 4px;" />
+                                    <input type="file" (change)="onFileSelected($event, invoice, 'landingParking')"
+                                        accept="application/pdf" style="width: 100%; margin-bottom: 4px;" />
+                                    <div *ngIf="invoice.landingParkingFileName"
+                                        style="font-size: 0.8em; color: grey; margin-bottom: 4px;">
+                                        File: {{ invoice.landingParkingFileName }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <button (click)="saveExpense(invoice, 'landingParking')"
+                                            class="btn btn-raised btn-md btnSave">Save</button>
+                                        <span *ngIf="invoice.landingParkingFile"
+                                            (click)="viewPDF(invoice.landingParkingFile)" title="View PDF"
+                                            style="cursor: pointer; color: #007bff;"><i class="fas fa-eye"></i></span>
+                                        <span *ngIf="invoice.landingParkingFile"
+                                            (click)="downloadPDF(invoice.landingParkingFile, invoice.landingParkingFileName || 'landing_parking.pdf')"
+                                            title="Download PDF" style="cursor: pointer; color: #007bff;"><i
+                                                class="fas fa-download"></i></span>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="!invoice.isLandingParkingEditing">
+                                    <div style="margin-bottom: 4px;font-size: 13px;font-weight: 500;">
+                                        Amount: {{ invoice.landingParkingAmount !== null && invoice.landingParkingAmount
+                                        !== undefined ? (invoice.landingParkingAmount | number : "1.2-2") : 'N/A' }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <button (click)="toggleEditMode(invoice, 'landingParking')"
+                                            class="btn btn-raised btn-md btnEdit">Edit</button>
+                                        <span *ngIf="invoice.landingParkingFile"
+                                            (click)="viewPDF(invoice.landingParkingFile)" title="View PDF"
+                                            style="cursor: pointer; color: #007bff;"><i class="fas fa-eye"></i></span>
+                                        <span *ngIf="invoice.landingParkingFile"
+                                            (click)="downloadPDF(invoice.landingParkingFile, invoice.landingParkingFileName || 'landing_parking.pdf')"
+                                            title="Download PDF" style="cursor: pointer; color: #007bff;"><i
+                                                class="fas fa-download"></i></span>
+                                    </div>
+                                </ng-container>
+                            </td>
+
+                            <!-- GA Terminal & Others -->
+                            <td style="min-width: 320px;">
+                                <ng-container *ngIf="invoice.isGATerminalOthersEditing">
+                                    <input type="number" [(ngModel)]="invoice.GATerminalOthersAmount"
+                                        [ngModelOptions]="{ standalone: true }" class="description-input mb-1"
+                                        placeholder="Amount" style="width: 100%; margin-bottom: 4px;" />
+                                    <input type="file" (change)="onFileSelected($event, invoice, 'GATerminalOthers')"
+                                        accept="application/pdf" style="width: 100%; margin-bottom: 4px;" />
+                                    <div *ngIf="invoice.GATerminalOthersFileName"
+                                        style="font-size: 0.8em; color: grey; margin-bottom: 4px;">
+                                        File: {{ invoice.GATerminalOthersFileName }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <button (click)="saveExpense(invoice, 'GATerminalOthers')"
+                                            class="btn btn-raised btn-md btnSave">Save</button>
+                                        <span *ngIf="invoice.GATerminalOthersFile"
+                                            (click)="viewPDF(invoice.GATerminalOthersFile)" title="View PDF"
+                                            style="cursor: pointer; color: #007bff;"><i class="fas fa-eye"></i></span>
+                                        <span *ngIf="invoice.GATerminalOthersFile"
+                                            (click)="downloadPDF(invoice.GATerminalOthersFile, invoice.GATerminalOthersFileName || 'ga_terminal_others.pdf')"
+                                            title="Download PDF" style="cursor: pointer; color: #007bff;"><i
+                                                class="fas fa-download"></i></span>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="!invoice.isGATerminalOthersEditing">
+                                    <div style="margin-bottom: 4px;font-size: 13px;font-weight: 500;">
+                                        Amount: {{ invoice.GATerminalOthersAmount !== null &&
+                                        invoice.GATerminalOthersAmount !== undefined ? (invoice.GATerminalOthersAmount |
+                                        number : "1.2-2") : 'N/A' }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <button (click)="toggleEditMode(invoice, 'GATerminalOthers')"
+                                            class="btn btn-raised btn-md btnEdit">Edit</button>
+                                        <span *ngIf="invoice.GATerminalOthersFile"
+                                            (click)="viewPDF(invoice.GATerminalOthersFile)" title="View PDF"
+                                            style="cursor: pointer; color: #007bff;"><i class="fas fa-eye"></i></span>
+                                        <span *ngIf="invoice.GATerminalOthersFile"
+                                            (click)="downloadPDF(invoice.GATerminalOthersFile, invoice.GATerminalOthersFileName || 'ga_terminal_others.pdf')"
+                                            title="Download PDF" style="cursor: pointer; color: #007bff;"><i
+                                                class="fas fa-download"></i></span>
+                                    </div>
+                                </ng-container>
+                            </td>
+
+                            <!-- Onboard Catering -->
+                            <td style="min-width: 320px;">
+                                <ng-container *ngIf="invoice.isOnboardCateringEditing">
+                                    <input type="number" [(ngModel)]="invoice.onboardCateringAmount"
+                                        [ngModelOptions]="{ standalone: true }" class="description-input mb-1"
+                                        placeholder="Amount" style="width: 100%; margin-bottom: 4px;" />
+                                    <input type="file" (change)="onFileSelected($event, invoice, 'onboardCatering')"
+                                        accept="application/pdf" style="width: 100%; margin-bottom: 4px;" />
+                                    <div *ngIf="invoice.onboardCateringFileName"
+                                        style="font-size: 0.8em; color: grey; margin-bottom: 4px;">
+                                        File: {{ invoice.onboardCateringFileName }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <button (click)="saveExpense(invoice, 'onboardCatering')"
+                                            class="btn btn-raised btn-md btnSave">Save</button>
+                                        <span *ngIf="invoice.onboardCateringFile"
+                                            (click)="viewPDF(invoice.onboardCateringFile)" title="View PDF"
+                                            style="cursor: pointer; color: #007bff;"><i class="fas fa-eye"></i></span>
+                                        <span *ngIf="invoice.onboardCateringFile"
+                                            (click)="downloadPDF(invoice.onboardCateringFile, invoice.onboardCateringFileName || 'onboard_catering.pdf')"
+                                            title="Download PDF" style="cursor: pointer; color: #007bff;"><i
+                                                class="fas fa-download"></i></span>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="!invoice.isOnboardCateringEditing">
+                                    <div style="margin-bottom: 4px;font-size: 13px;font-weight: 500;">
+                                        Amount: {{ invoice.onboardCateringAmount !== null &&
+                                        invoice.onboardCateringAmount !== undefined ? (invoice.onboardCateringAmount |
+                                        number : "1.2-2") : 'N/A' }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <button (click)="toggleEditMode(invoice, 'onboardCatering')"
+                                            class="btn btn-raised btn-md btnEdit">Edit</button>
+                                        <span *ngIf="invoice.onboardCateringFile"
+                                            (click)="viewPDF(invoice.onboardCateringFile)" title="View PDF"
+                                            style="cursor: pointer; color: #007bff;"><i class="fas fa-eye"></i></span>
+                                        <span *ngIf="invoice.onboardCateringFile"
+                                            (click)="downloadPDF(invoice.onboardCateringFile, invoice.onboardCateringFileName || 'onboard_catering.pdf')"
+                                            title="Download PDF" style="cursor: pointer; color: #007bff;"><i
+                                                class="fas fa-download"></i></span>
+                                    </div>
+                                </ng-container>
+                            </td>
+
+                            <!-- Crew Expenses -->
+                            <td style="min-width: 320px;">
+                                <ng-container *ngIf="invoice.isCrewExpensesEditing">
+                                    <input type="number" [(ngModel)]="invoice.crewExpensesAmount"
+                                        [ngModelOptions]="{ standalone: true }" class="description-input mb-1"
+                                        placeholder="Amount" style="width: 100%; margin-bottom: 4px;" />
+                                    <input type="file" (change)="onFileSelected($event, invoice, 'crewExpenses')"
+                                        accept="application/pdf" style="width: 100%; margin-bottom: 4px;" />
+                                    <div *ngIf="invoice.crewExpensesFileName"
+                                        style="font-size: 0.8em; color: grey; margin-bottom: 4px;">
+                                        File: {{ invoice.crewExpensesFileName }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <button (click)="saveExpense(invoice, 'crewExpenses')"
+                                            class="btn btn-raised btn-md btnSave">Save</button>
+                                        <span *ngIf="invoice.crewExpensesFile"
+                                            (click)="viewPDF(invoice.crewExpensesFile)" title="View PDF"
+                                            style="cursor: pointer; color: #007bff;"><i class="fas fa-eye"></i></span>
+                                        <span *ngIf="invoice.crewExpensesFile"
+                                            (click)="downloadPDF(invoice.crewExpensesFile, invoice.crewExpensesFileName || 'crew_expenses.pdf')"
+                                            title="Download PDF" style="cursor: pointer; color: #007bff;"><i
+                                                class="fas fa-download"></i></span>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="!invoice.isCrewExpensesEditing">
+                                    <div style="margin-bottom: 4px;font-size: 13px;font-weight: 500;">
+                                        Amount: {{ invoice.crewExpensesAmount !== null && invoice.crewExpensesAmount !==
+                                        undefined ? (invoice.crewExpensesAmount | number : "1.2-2") : 'N/A' }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <button (click)="toggleEditMode(invoice, 'crewExpenses')"
+                                            class="btn btn-raised btn-md btnEdit">Edit</button>
+                                        <span *ngIf="invoice.crewExpensesFile"
+                                            (click)="viewPDF(invoice.crewExpensesFile)" title="View PDF"
+                                            style="cursor: pointer; color: #007bff;"><i class="fas fa-eye"></i></span>
+                                        <span *ngIf="invoice.crewExpensesFile"
+                                            (click)="downloadPDF(invoice.crewExpensesFile, invoice.crewExpensesFileName || 'crew_expenses.pdf')"
+                                            title="Download PDF" style="cursor: pointer; color: #007bff;"><i
+                                                class="fas fa-download"></i></span>
+                                    </div>
+                                </ng-container>
+                            </td>
+
+                            <!-- Fuel Expenses -->
+                            <td style="min-width: 320px;">
+                                <ng-container *ngIf="invoice.isFuelexpensesEditing">
+                                    <input type="number" [(ngModel)]="invoice.fuelexpensesAmount"
+                                        [ngModelOptions]="{ standalone: true }" class="description-input mb-1"
+                                        placeholder="Amount" style="width: 100%; margin-bottom: 4px;" />
+                                    <input type="file" (change)="onFileSelected($event, invoice, 'fuelexpenses')"
+                                        accept="application/pdf" style="width: 100%; margin-bottom: 4px;" />
+                                    <div *ngIf="invoice.fuelexpensesFileName"
+                                        style="font-size: 0.8em; color: grey; margin-bottom: 4px;">
+                                        File: {{ invoice.fuelexpensesFileName }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <button (click)="saveExpense(invoice, 'fuelexpenses')"
+                                            class="btn btn-raised btn-md btnSave">Save</button>
+                                        <span *ngIf="invoice.fuelexpensesFile"
+                                            (click)="viewPDF(invoice.fuelexpensesFile)" title="View PDF"
+                                            style="cursor: pointer; color: #007bff;"><i class="fas fa-eye"></i></span>
+                                        <span *ngIf="invoice.fuelexpensesFile"
+                                            (click)="downloadPDF(invoice.fuelexpensesFile, invoice.fuelexpensesFileName || 'fuel_expenses.pdf')"
+                                            title="Download PDF" style="cursor: pointer; color: #007bff;"><i
+                                                class="fas fa-download"></i></span>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="!invoice.isFuelexpensesEditing">
+                                    <div style="margin-bottom: 4px;font-size: 13px;font-weight: 500;">
+                                        Amount: {{ invoice.fuelexpensesAmount !== null && invoice.fuelexpensesAmount !==
+                                        undefined ? (invoice.fuelexpensesAmount | number : "1.2-2") : 'N/A' }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <button (click)="toggleEditMode(invoice, 'fuelexpenses')"
+                                            class="btn btn-raised btn-md btnEdit">Edit</button>
+                                        <span *ngIf="invoice.fuelexpensesFile"
+                                            (click)="viewPDF(invoice.fuelexpensesFile)" title="View PDF"
+                                            style="cursor: pointer; color: #007bff;"><i class="fas fa-eye"></i></span>
+                                        <span *ngIf="invoice.fuelexpensesFile"
+                                            (click)="downloadPDF(invoice.fuelexpensesFile, invoice.fuelexpensesFileName || 'fuel_expenses.pdf')"
+                                            title="Download PDF" style="cursor: pointer; color: #007bff;"><i
+                                                class="fas fa-download"></i></span>
+                                    </div>
+                                </ng-container>
+                            </td>
+
+                            <!-- Other Expenses -->
+                            <td style="min-width: 320px;">
+                                <ng-container *ngIf="invoice.isOtherexpensesEditing">
+                                    <input type="number" [(ngModel)]="invoice.otherexpensesAmount"
+                                        [ngModelOptions]="{ standalone: true }" class="description-input mb-1"
+                                        placeholder="Amount" style="width: 100%; margin-bottom: 4px;" />
+                                    <input type="file" (change)="onFileSelected($event, invoice, 'otherexpenses')"
+                                        accept="application/pdf" style="width: 100%; margin-bottom: 4px;" />
+                                    <div *ngIf="invoice.otherexpensesFileName"
+                                        style="font-size: 0.8em; color: grey; margin-bottom: 4px;">
+                                        File: {{ invoice.otherexpensesFileName }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <button (click)="saveExpense(invoice, 'otherexpenses')"
+                                            class="btn btn-raised btn-md btnSave">Save</button>
+                                        <span *ngIf="invoice.otherexpensesFile"
+                                            (click)="viewPDF(invoice.otherexpensesFile)" title="View PDF"
+                                            style="cursor: pointer; color: #007bff;"><i class="fas fa-eye"></i></span>
+                                        <span *ngIf="invoice.otherexpensesFile"
+                                            (click)="downloadPDF(invoice.otherexpensesFile, invoice.otherexpensesFileName || 'other_expenses.pdf')"
+                                            title="Download PDF" style="cursor: pointer; color: #007bff;"><i
+                                                class="fas fa-download"></i></span>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="!invoice.isOtherexpensesEditing">
+                                    <div style="margin-bottom: 4px;font-size: 13px;font-weight: 500;">
+                                        Amount: {{ invoice.otherexpensesAmount !== null && invoice.otherexpensesAmount
+                                        !== undefined ? (invoice.otherexpensesAmount | number : "1.2-2") : 'N/A' }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <button (click)="toggleEditMode(invoice, 'otherexpenses')"
+                                            class="btn btn-raised btn-md btnEdit">Edit</button>
+                                        <span *ngIf="invoice.otherexpensesFile"
+                                            (click)="viewPDF(invoice.otherexpensesFile)" title="View PDF"
+                                            style="cursor: pointer; color: #007bff;"><i class="fas fa-eye"></i></span>
+                                        <span *ngIf="invoice.otherexpensesFile"
+                                            (click)="downloadPDF(invoice.otherexpensesFile, invoice.otherexpensesFileName || 'other_expenses.pdf')"
+                                            title="Download PDF" style="cursor: pointer; color: #007bff;"><i
+                                                class="fas fa-download"></i></span>
+                                    </div>
+                                </ng-container>
+                            </td>
+
+
+                            <td>{{invoice.totalExpensesAmount}}</td>
+
+                            <td [ngClass]="{
+                  'text-green-600': invoice.status === 'Approved',
+                  'text-orange-600': invoice.status === 'Pending',
+                  'text-red-600': invoice.status === 'Rejected',
+                  'text-Amount_Received  ':
+                    invoice.status === 'Amount Received',
+                  rejected_Reversed: invoice.status === 'Rejected_Reversed'
+                }">
+                                {{ invoice.status }}
+                            </td>
+                        </tr>
+                        <tr *ngIf="allInvoiceList.length === 0">
+                            <td colspan="8" style="text-align: center">
+                                <label cols> No Data </label>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- <button printSectionId="invoice-content" ngxPrint>Print Invoice</button> -->
+            </div>
+            <div class="row justify-content-center align-items-md-center mt-2">
+                <ul class="pagination" style="justify-content: end">
+                    <!-- Previous Button -->
+                    <li class="page-item" [class.disabled]="currentPage === 1">
+                        <a class="page-link" (click)="currentPage > 1 && pageChanged(currentPage - 1)">
+                            &laquo; Previous
+                        </a>
+                    </li>
+
+
+                    <li *ngFor="let page of pages" class="page-item" [class.active]="currentPage === page">
+                        <a class="page-link" (click)="pageChanged(page)">{{ page }}</a>
+                    </li>
+
+
+                    <li class="page-item" [class.disabled]="currentPage === totalPages">
+                        <a class="page-link" (click)="currentPage < totalPages && pageChanged(currentPage + 1)"
+                            style="background-color: green; color: white">
+                            Next &raquo;
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+<ng-template #newUserTemplate let-c="close">
+  <div class="modal-header">
+    <h4 class="modal-title">View PDF</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="c('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <!-- The iframe will display the PDF from the Base64 string -->
+    <!-- Add some styling for the iframe to make it look good in the modal -->
+    <iframe [src]="currentPdfBase64" width="100%" height="500px" frameborder="0"
+            style="border-radius: 0.5rem; display: block;"></iframe>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btnClose btn-raised" (click)="c('Close click')">Close</button>
+  </div>
+</ng-template>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- <td style="min-width: 320px;">
+                                <input type="number" [(ngModel)]="invoice.groundHandlingAmount"
+                                    [ngModelOptions]="{ standalone: true }" class="description-input mb-1"
+                                    placeholder="Amount" style="width: 100%; margin-bottom: 4px;" />
+
+                                <input type="file" (change)="onFileSelected($event, invoice, 'groundHandling')"
+                                    accept="application/pdf" style="width: 100%; margin-bottom: 4px;" />
+
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <button (click)="saveExpense(invoice, 'groundHandling')"
+                                        class="btn btn-raised btn-md btnSave">Save</button>
+                                    <span *ngIf="invoice.groundHandlingFile"
+                                        (click)="viewPDF(invoice.groundHandlingFile)" title="View PDF"
+                                        style="cursor: pointer; color: #007bff;"><i class="fas fa-eye"></i></span>
+                                </div>
+                            </td>
+
+                           
+                            <td style="min-width: 320px;">
+                                <input type="number" [(ngModel)]="invoice.landingParkingAmount"
+                                    [ngModelOptions]="{ standalone: true }" class="description-input mb-1"
+                                    placeholder="Amount" style="width: 100%; margin-bottom: 4px;" />
+
+                                <input type="file" (change)="onFileSelected($event, invoice, 'landingParking')"
+                                    accept="application/pdf" style="width: 100%; margin-bottom: 4px;" />
+
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <button (click)="saveExpense(invoice, 'landingParking')"
+                                        class="btn btn-raised btn-md btnSave">Save</button>
+                                    <span *ngIf="invoice.landingParkingFile"
+                                        (click)="viewPDF(invoice.landingParkingFile)" title="View PDF"
+                                        style="cursor: pointer; color: #007bff;"><i class="fas fa-eye"></i></span>
+                                </div>
+                            </td>
+
+                           
+                            <td style="min-width: 320px;">
+                                <input type="number" [(ngModel)]="invoice.GATerminalOthersAmount"
+                                    [ngModelOptions]="{ standalone: true }" class="description-input mb-1"
+                                    placeholder="Amount" style="width: 100%; margin-bottom: 4px;" />
+
+                                <input type="file" (change)="onFileSelected($event, invoice, 'GATerminalOthers')"
+                                    accept="application/pdf" style="width: 100%; margin-bottom: 4px;" />
+
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <button (click)="saveExpense(invoice, 'GATerminalOthers')"
+                                        class="btn btn-raised btn-md btnSave">Save</button>
+                                    <span *ngIf="invoice.GATerminalOthersFile"
+                                        (click)="viewPDF(invoice.GATerminalOthersFile)" title="View PDF"
+                                        style="cursor: pointer; color: #007bff;"><i class="fas fa-eye"></i></span>
+                                </div>
+                            </td>
+
+                            
+                            <td style="min-width: 320px;">
+                                <input type="number" [(ngModel)]="invoice.onboardCateringAmount"
+                                    [ngModelOptions]="{ standalone: true }" class="description-input mb-1"
+                                    placeholder="Amount" style="width: 100%; margin-bottom: 4px;" />
+
+                                <input type="file" (change)="onFileSelected($event, invoice, 'onboardCatering')"
+                                    accept="application/pdf" style="width: 100%; margin-bottom: 4px;" />
+
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <button (click)="saveExpense(invoice, 'onboardCatering')"
+                                        class="btn btn-raised btn-md btnSave">Save</button>
+                                    <span *ngIf="invoice.onboardCateringFile"
+                                        (click)="viewPDF(invoice.onboardCateringFile)" title="View PDF"
+                                        style="cursor: pointer; color: #007bff;"><i class="fas fa-eye"></i></span>
+                                </div>
+                            </td>
+
+                           
+                            <td style="min-width: 320px;">
+                                <input type="number" [(ngModel)]="invoice.crewExpensesAmount"
+                                    [ngModelOptions]="{ standalone: true }" class="description-input mb-1"
+                                    placeholder="Amount" style="width: 100%; margin-bottom: 4px;" />
+
+                                <input type="file" (change)="onFileSelected($event, invoice, 'crewExpenses')"
+                                    accept="application/pdf" style="width: 100%; margin-bottom: 4px;" />
+
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <button (click)="saveExpense(invoice, 'crewExpenses')"
+                                        class="btn btn-raised btn-md btnSave">Save</button>
+                                    <span *ngIf="invoice.crewExpensesFile" (click)="viewPDF(invoice.crewExpensesFile)"
+                                        title="View PDF" style="cursor: pointer; color: #007bff;"><i
+                                            class="fas fa-eye"></i></span>
+                                </div>
+                            </td>
+
+                            
+                            <td style="min-width: 320px;">
+                                <input type="number" [(ngModel)]="invoice.fuelexpensesAmount"
+                                    [ngModelOptions]="{ standalone: true }" class="description-input mb-1"
+                                    placeholder="Amount" style="width: 100%; margin-bottom: 4px;" />
+
+                                <input type="file" (change)="onFileSelected($event, invoice, 'fuelexpenses')"
+                                    accept="application/pdf" style="width: 100%; margin-bottom: 4px;" />
+
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <button (click)="saveExpense(invoice, 'fuelexpenses')"
+                                        class="btn btn-raised btn-md btnSave">Save</button>
+                                    <span *ngIf="invoice.fuelexpensesFile" (click)="viewPDF(invoice.fuelexpensesFile)"
+                                        title="View PDF" style="cursor: pointer; color: #007bff;"><i
+                                            class="fas fa-eye"></i></span>
+                                </div>
+                            </td>
+
+                           
+                            <td style="min-width: 320px;">
+                                <input type="number" [(ngModel)]="invoice.otherexpensesAmount"
+                                    [ngModelOptions]="{ standalone: true }" class="description-input mb-1"
+                                    placeholder="Amount" style="width: 100%; margin-bottom: 4px;" />
+
+                                <input type="file" (change)="onFileSelected($event, invoice, 'otherexpenses')"
+                                    accept="application/pdf" style="width: 100%; margin-bottom: 4px;" />
+
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <button (click)="saveExpense(invoice, 'otherexpenses')"
+                                        class="btn btn-raised btn-md btnSave">Save</button>
+                                    <span *ngIf="invoice.otherexpensesFile" (click)="viewPDF(invoice.otherexpensesFile)"
+                                        title="View PDF" style="cursor: pointer; color: #007bff;"><i
+                                            class="fas fa-eye"></i></span>
+                                </div>
+                            </td> -->

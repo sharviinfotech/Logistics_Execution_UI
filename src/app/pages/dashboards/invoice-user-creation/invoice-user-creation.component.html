@@ -1,0 +1,375 @@
+
+<div class="">
+    <form >
+
+    <div class="card">
+        <div class="card-header" >
+        User Creation
+        </div>
+        <div class="card-body">
+
+            <button type="button" class="btn btn-raised btn-md btnSubmitApproval" style="background-color: green;" (click)="newUserCreation(newUserTemplate)">
+                Create New User
+              </button>
+              
+            <div class="table-responsive tableFixHead">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                           
+                            <th>User Name</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Contact</th>
+                            <th>Status</th>
+                            <th *ngIf='loginData?.data.userActivity != "user"'>Action</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let data of userList">
+                            
+                            <td>{{data.userName}}</td>
+                            <td>{{data.userFirstName}}</td>
+                            <td>{{data.userLastName}}</td>
+                            <td>{{data.userEmail}}</td>
+                            <td>{{data.userContact}}</td>
+                            <td>
+                              {{ data.userStatus ? 'Active' : 'Inactive' }}
+                            </td>
+
+                           <td class="text-center" *ngIf="loginData?.data.userActivity == 'ADMIN'">
+                           
+                            <i class="edit-btn fa fa-edit"  (click)="openEditModal(data, editUserTemplate)"></i>
+                            <i class="delete-btn bx bx-trash"  (click)="delete(data)"></i>
+                          
+                           </td>
+                            
+                        </tr>
+                       
+                        
+                    </tbody>
+                </table>
+
+            </div>
+            
+        </div>
+
+    </div>
+    
+
+</form>
+
+</div>
+
+<ng-template #newUserTemplate let-c="close">
+ 
+      <div class="modal-header">
+          Create New User
+      </div>
+      <div class="modal-body">
+          <form [formGroup]="userCreationForm" autocomplete="off"> <!-- FIXED: Added formGroup -->
+              <div class="row">
+                  <!-- User Name -->
+                  <div class="col-lg-4 col-md-4 col-sm-4">
+                      <div class="form-group">
+                          <label>User Name<span class="text-danger">*</span></label>
+                          <input class="form-control form-control-sm" formControlName="userName" type="text" placeholder="Enter userName" autocomplete="off">
+                          <div class="text-danger" *ngIf="submit && f['userName'].errors">
+                              User Name is required.
+                          </div>
+                      </div>
+                  </div>
+                  <!-- First Name -->
+                  <div class="col-lg-4 col-md-4 col-sm-4">
+                      <div class="form-group">
+                          <label>First Name<span class="text-danger">*</span></label>
+                          <input class="form-control form-control-sm" formControlName="firstName" type="text" placeholder="Enter First Name"  
+                          >
+                          <div class="text-danger" *ngIf="submit && f['firstName'].errors">
+                              First Name is required.
+                          </div>
+                      </div>
+                  </div>
+                  <!-- Last Name -->
+                  <div class="col-lg-4 col-md-4 col-sm-4">
+                      <div class="form-group">
+                          <label>Last Name<span class="text-danger">*</span></label>
+                          <input class="form-control form-control-sm" formControlName="lastName" type="text" placeholder="Enter Last Name"  
+                          >
+                          <div class="text-danger"*ngIf="submit && f['lastName'].errors">
+                              Last Name is required.
+                          </div>
+                      </div>
+                  </div>
+                  <!-- Email -->
+                  <div class="col-lg-4 col-md-4 col-sm-4 alert-email">
+                      <div class="form-group">
+                          <label for="contactemail">Email <span class="text-danger">*</span></label>
+                          <input type="email" id="contactemail" class="form-control form-control-sm" formControlName="email" placeholder="Enter Email" required/>
+                          <div class="text-danger" *ngIf="submit && f['email'].errors">
+                              Email is required.
+                          </div>
+                          
+                      </div>
+                  </div>
+                  <!-- Contact -->
+                  <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label>Contact<span class="text-danger">*</span></label>
+                        <input class="form-control form-control-sm"
+                               formControlName="contact"
+                               type="text"
+                               placeholder="Enter Contact Number"
+                               maxlength="10"
+                               pattern="[0-9]{10}"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '')"  
+                               >
+                        <div class="text-danger" *ngIf="submit && f['contact'].errors">
+                             Contact is required.
+                        </div>
+                    </div>
+                </div>
+                  <!-- Password -->
+                  <div class="col-md-4">
+                    <label for="password">Password<span class="text-danger">*</span></label>
+                    <div class="input-group auth-pass-inputgroup">
+                        <input
+                            [type]="fieldTextType ? 'text' : 'password'"
+                            class="form-control"
+                            formControlName="password"
+                            placeholder="Enter password"
+                            [ngClass]="{ 'is-invalid': submitted && f.password.errors }" autocomplete="new-password"
+                           />
+                        <button class="btn btn-light ms-0" type="button" (click)="toggleFieldTextType()">
+                            <i
+                                class="mdi mdi-eye-outline"
+                                [ngClass]="{ 'mdi-eye-off-outline': !fieldTextType, 'mdi-eye-outline': fieldTextType }"
+                            ></i>
+                        </button>
+                    </div>
+                    <div class="text-danger"  *ngIf="submit && f['password'].errors">
+                        Password is required.
+                    </div>
+                </div>
+
+                  <!-- Confirm Password -->
+                   <!-- Confirm Password -->
+                   <div class="col-md-4">
+                    <label for="confirmPassword">Confirm Password<span class="text-danger">*</span></label>
+                    <div class="input-group auth-pass-inputgroup">
+                        <input
+                            [type]="confirmFieldTextType ? 'text' : 'password'"
+                            class="form-control"
+                            formControlName="confirmPassword"
+                            placeholder="Confirm password"
+                            [ngClass]="{ 'is-invalid': submitted && f.confirmPassword.errors }"
+                            />
+                        <button class="btn btn-light ms-0" type="button" (click)="toggleConfirmFieldTextType()">
+                            <i
+                                class="mdi mdi-eye-outline"
+                                [ngClass]="{ 'mdi-eye-off-outline': !confirmFieldTextType, 'mdi-eye-outline': confirmFieldTextType }" autocomplete="new-password"
+                            ></i>
+                        </button>
+                    </div>
+                    <div class="text-danger" *ngIf="submit && f['confirmPassword'].errors">
+                        Confirm password is required.
+                    </div>
+                    <div class="text-danger" *ngIf="f.confirmPassword?.hasError('mustMatch')">
+                        Password and Confirm Password do not match.
+                    </div>
+                </div>
+
+                  <!-- Activity -->
+                  <div class="col-md-4">
+                      <label>Activity<span class="text-danger">*</span></label>
+                      <select class="form-control" formControlName="activity">
+                          <option value="MD">MD</option>
+                          <option value="ADMIN">ADMIN</option>
+                          <option value="ACCOUNTS">ACCOUNTS</option>
+                      </select>
+                      <div class="text-danger" *ngIf="submit && f['activity'].errors">
+                        Activity is required.
+                   </div>
+                  </div>
+                  <div class="col-md-4 d-flex align-items-center">
+                      <label class="me-2">Active</label>
+                      <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" formControlName="status" 
+                          >
+                      </div>
+                      <label class="ms-2">Inactive</label>
+                  </div>
+              </div>
+          </form>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btnSave btn-raised" (click)="submitUserForm()">Submit</button> <!-- FIXED: Removed modal param -->
+          <button type="button" class="btn btnClose btn-raised" (click)="c('Close click')">Close</button>
+      </div>
+  
+</ng-template>
+
+  <ng-template #editUserTemplate let-c="close">
+    
+      <div class="modal-header">
+        Edit User
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="userEditForm"> <!-- FIXED: Added formGroup -->
+            <div class="row">
+                <!-- User Name -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label>User Name<span class="text-danger">*</span></label>
+                        <input class="form-control form-control-sm" formControlName="userName" type="text" placeholder="" 
+                       >
+                        <div class="text-danger" *ngIf="submit && f['userName'].errors">
+                            User Name is required.
+                        </div>
+                    </div>
+                </div>
+                <!-- First Name -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label>First Name<span class="text-danger">*</span></label>
+                        <input class="form-control form-control-sm" formControlName="firstName" type="text" placeholder="" 
+                        >
+                        <div class="text-danger" *ngIf="submit && f['firstName'].errors">
+                            First Name is required.
+                        </div>
+                    </div>
+                </div>
+                <!-- Last Name -->
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label>Last Name<span class="text-danger">*</span></label>
+                        <input class="form-control form-control-sm" formControlName="lastName" type="text" placeholder="" 
+                        >
+                        <div class="text-danger"*ngIf="submit && f['lastName'].errors">
+                            Last Name is required.
+                        </div>
+                    </div>
+                </div>
+                <!-- Email -->
+                <div class="col-lg-4 col-md-4 col-sm-4 alert-email">
+                    <div class="form-group">
+                        <label for="contactemail">EMAIL: <span class="text-danger">*</span></label>
+                        <input type="email" id="contactemail" class="form-control form-control-sm" formControlName="email" required/>
+                        <div class="text-danger" *ngIf="submit && f['email'].errors">
+                            Email is required.
+                        </div>
+                    </div>
+                </div>
+                <!-- Contact -->
+                <!-- <div class="col-lg-4 col-md-4 col-sm-4">
+                  <div class="form-group">
+                      <label>Contact<span class="text-danger">*</span></label>
+                      <input class="form-control form-control-sm" formControlName="contact" 
+                      type="text" placeholder="" maxlength="10" pattern="[0-9]{10}">
+                                         <div class="text-danger"  *ngIf="submit && f['contact'].errors">
+                          Contact is required.
+                      </div>
+                  </div>
+              </div> -->
+
+              
+              <div class="col-lg-4 col-md-4 col-sm-4">
+                <div class="form-group">
+                    <label>Contact<span class="text-danger">*</span></label>
+                    <input class="form-control form-control-sm"
+                           formControlName="contact"
+                           type="text"
+                           placeholder="Enter Contact Number"
+                           maxlength="10"
+                           pattern="[0-9]{10}"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')" 
+                           >
+                    <div class="text-danger" *ngIf="submit && f['contact'].errors">
+                         Contact is required.
+                    </div>
+                </div>
+            </div>
+                <!-- Password -->
+                <div class="col-md-4">
+                  <label for="password">Password<span class="text-danger">*</span></label>
+                  <div class="input-group auth-pass-inputgroup">
+                      <input
+                          [type]="fieldTextType ? 'text' : 'password'"
+                          class="form-control"
+                          formControlName="password"
+                          placeholder="Enter password"
+                          [ngClass]="{ 'is-invalid': submitted && f.password.errors }"
+                         />
+                      <button class="btn btn-light ms-0" type="button" (click)="toggleFieldTextType()">
+                          <i
+                              class="mdi mdi-eye-outline"
+                              [ngClass]="{ 'mdi-eye-off-outline': !fieldTextType, 'mdi-eye-outline': fieldTextType }"
+                          ></i>
+                      </button>
+                  </div>
+                  <div class="text-danger"  *ngIf="submit && f['password'].errors">
+                      Password is required.
+                  </div>
+              </div>
+
+                <!-- Confirm Password -->
+                 <!-- Confirm Password -->
+                 <div class="col-md-4">
+                  <label for="confirmPassword">Confirm Password<span class="text-danger">*</span></label>
+                  <div class="input-group auth-pass-inputgroup">
+                      <input
+                          [type]="confirmFieldTextType ? 'text' : 'password'"
+                          class="form-control"
+                          formControlName="confirmPassword"
+                          placeholder="Confirm password"
+                          [ngClass]="{ 'is-invalid': submitted && f.confirmPassword.errors }"
+                         />
+                      <button class="btn btn-light ms-0" type="button" (click)="toggleConfirmFieldTextType()">
+                          <i
+                              class="mdi mdi-eye-outline"
+                              [ngClass]="{ 'mdi-eye-off-outline': !confirmFieldTextType, 'mdi-eye-outline': confirmFieldTextType }"
+                          ></i>
+                      </button>
+                  </div>
+                  <div class="text-danger" *ngIf="submit && f['confirmPassword'].errors">
+                      Confirm password is required.
+                  </div>
+                  <div class="text-danger" *ngIf="f.confirmPassword?.hasError('mustMatch')">
+                      Password and Confirm Password do not match.
+                  </div>
+              </div>
+
+                <!-- Activity -->
+                <div class="col-md-4">
+                    <label>Activity<span class="text-danger">*</span></label>
+                    <select class="form-control" formControlName="activity">
+                        <option value="MD">MD</option>
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="ACCOUNTS">ACCOUNTS</option>
+                    </select>
+                    <div class="text-danger" *ngIf="submit && f['activity'].errors">
+                        Activity is required.
+                   </div>
+                    
+                </div>
+                <div class="col-md-4 d-flex align-items-center">
+                    <label class="me-2">Active</label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" formControlName="status" 
+                        >
+                    </div>
+                    <label class="ms-2">Inactive</label>
+                </div>
+            </div>
+        </form>
+    </div>
+      <div class="card-footer" style="text-align: right;">
+        <button type="button" class="btn btn-primary" (click)="updateUserCreation(c)">Update</button>
+        <button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
+      </div>
+    
+  </ng-template>
+  
+  
