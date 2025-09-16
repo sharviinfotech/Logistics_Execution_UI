@@ -1,0 +1,77 @@
+<div class="">
+  <div class="p-3">
+    <div class="card-LE">
+      <div class="card-header-LE">
+        Freight billing
+      </div>
+
+      <div class="card-body-LE">
+        <form class="form-grid" [formGroup]="FreightBilling" (ngSubmit)="saveFreightBill()">
+
+          <!-- Freight Bill Number -->
+          <div class="form-field">
+            <input type="text" formControlName="FreightBillNumber" placeholder=" " />
+            <label>Freight Bill Number</label>
+            <small class="error"
+              *ngIf="FreightBilling.get('FreightBillNumber')?.touched && FreightBilling.get('FreightBillNumber')?.invalid">
+              Freight Bill Number is required
+            </small>
+          </div>
+
+          <!-- Freight Bill Date -->
+          <div class="form-field">
+            <input type="date" formControlName="FreightBillDate" placeholder=" " />
+            <label>Freight Bill Date</label>
+            <small class="error"
+              *ngIf="FreightBilling.get('FreightBillDate')?.touched && FreightBilling.get('FreightBillDate')?.invalid">
+              Freight Bill Date is required
+            </small>
+          </div>
+
+          <!-- Freight Bill Physical Submission Date -->
+          <div class="form-field">
+            <input type="date" formControlName="FreightBillPhysicalSubmissionDate" placeholder=" " />
+            <label>Freight Bill Physical Submission Date</label>
+            <small class="error"
+              *ngIf="FreightBilling.get('FreightBillPhysicalSubmissionDate')?.touched && FreightBilling.get('FreightBillPhysicalSubmissionDate')?.invalid">
+              Freight Bill Physical Submission Date is required
+            </small>
+          </div>
+
+          <!-- Freight Charges -->
+          <div class="form-field">
+            <input type="number" formControlName="FreightCharges" placeholder=" " step="0.01" />
+            <label>Freight Charges</label>
+            <small class="error"
+              *ngIf="FreightBilling.get('FreightCharges')?.touched && FreightBilling.get('FreightCharges')?.invalid">
+              Freight Charges are required
+            </small>
+          </div>
+
+          <!-- Work Order Number -->
+          <div class="form-field">
+            <input type="text" formControlName="WorkOrderNumber" placeholder=" " />
+            <label>Work Order Number</label>
+            <small class="error"
+              *ngIf="FreightBilling.get('WorkOrderNumber')?.touched && FreightBilling.get('WorkOrderNumber')?.invalid">
+              Work Order Number is required
+            </small>
+          </div>
+
+          <!-- Submit / Cancel Buttons -->
+          <div class="form-buttons">
+            <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
+              Cancel Edit
+            </button>
+            <button type="submit">
+              {{ isEditMode ? 'Update Plan' : 'Save' }}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+

@@ -1,0 +1,137 @@
+
+<div class="p-3">
+  <div class="card-LE">
+    <div class="card-header-LE">Vehicle Info</div>
+    <div class="card-body-LE">
+      <form class="form-grid" [formGroup]="Vechileinfo" (ngSubmit)="savePlan()">
+
+        <!-- Type of Shipment -->
+        <div class="form-field">
+          <input type="text" formControlName="typeofshipment" placeholder="" />
+          <label>Type of Shipment</label>
+          <small class="error"
+                 *ngIf="Vechileinfo.get('typeofshipment')?.touched && Vechileinfo.get('typeofshipment')?.invalid">
+            Type of Shipment is required
+          </small>
+        </div>
+
+        <!-- Transporter -->
+        <div class="form-field">
+          <input type="text" formControlName="transporter" placeholder="" />
+          <label>Transporter</label>
+          <small class="error"
+                 *ngIf="Vechileinfo.get('transporter')?.touched && Vechileinfo.get('transporter')?.invalid">
+           Transporter  is required
+          </small>
+        </div>
+
+        <!-- LR No -->
+        <div class="form-field">
+          <input type="" formControlName="Lrno" placeholder="" />
+          <label>LR No</label>
+          <small class="error"
+                 *ngIf="Vechileinfo.get('Lrno')?.touched && Vechileinfo.get('Lrno')?.invalid">
+            LR No is required
+          </small>
+        </div>
+
+       <!-- Type of Vechile -->
+        <div class="form-field">
+          <input type="text" formControlName="typeofvechile" placeholder="" />
+          <label>Type of Vechile</label>
+          <small class="error"
+                 *ngIf="Vechileinfo.get('typeofvechile')?.touched && Vechileinfo.get('typeofvechile')?.invalid">
+            Type of Vechile is required
+          </small>
+        </div>
+
+      <!-- Passing Weight -->
+        <div class="form-field">
+          <input type="text" formControlName="passingweight" placeholder="" />
+          <label>Passing Weight</label>
+          <small class="error"
+                 *ngIf="Vechileinfo.get('passingweight')?.touched && Vechileinfo.get('passingweight')?.invalid">
+           Passing Weight is required
+          </small>
+        </div>
+     
+
+      <!-- Volume of the truck -->
+        <div class="form-field">
+          <input type="text" formControlName="volumeofthetruck" placeholder="" />
+          <label>Volume of the truck</label>
+          <small class="error"
+                 *ngIf="Vechileinfo.get('volumeofthetruck')?.touched && Vechileinfo.get('volumeofthetruck')?.invalid">
+          Volume of the truck is required
+          </small>
+        </div>
+       
+        
+      <!-- Vechile Number -->
+        <div class="form-field">
+          <input type="text" formControlName="vechilenumber" placeholder="" />
+          <label>Vechile Number</label>
+          <small class="error"
+                 *ngIf="Vechileinfo.get('vechilenumber')?.touched && Vechileinfo.get('vechilenumber')?.invalid">
+        Vechile Number is required
+          </small>
+        </div>
+          
+
+          <!-- No of Vechiles -->
+        <div class="form-field">
+          <input type="text" formControlName="noofvechiles" placeholder="" />
+          <label>No of Vechiles</label>
+          <small class="error"
+                 *ngIf="Vechileinfo.get('noofvechiles')?.touched && Vechileinfo.get('noofvechiles')?.invalid">
+       No of Vechiles is required
+          </small>
+        </div>
+
+       
+          <!-- Driver Name -->
+        <div class="form-field">
+          <input type="text" formControlName="drivername" placeholder="" />
+          <label>Driver Name</label>
+          <small class="error"
+                 *ngIf="Vechileinfo.get('drivername')?.touched && Vechileinfo.get('drivername')?.invalid">
+       Driver Name is required
+          </small>
+        </div>
+
+           <!-- Driver Mobile Number -->
+        <div class="form-field">
+          <input type="text" formControlName="drivermobilenumber" placeholder="" />
+          <label>Driver Mobile Number</label>
+          <small class="error"
+                 *ngIf="Vechileinfo.get('drivermobilenumber')?.touched && Vechileinfo.get('drivermobilenumber')?.invalid">
+       Driver Mobile Number is required
+          </small>
+        </div>
+
+       
+           <!-- Transparent Group -->
+        <div class="form-field">
+          <input type="text" formControlName="transparentgroup" placeholder="" />
+          <label>Transparent Group</label>
+          <small class="error"
+                 *ngIf="Vechileinfo.get('transparentgroup')?.touched && Vechileinfo.get('transparentgroup')?.invalid">
+      Transparent Group is required
+          </small>
+        </div>
+     
+
+         <!-- Submit / Cancel Buttons -->
+        <div class="form-buttons">
+          <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
+            Cancel Edit
+          </button>
+          <button type="submit">
+            {{ isEditMode ? 'Update Plan' : 'Save' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

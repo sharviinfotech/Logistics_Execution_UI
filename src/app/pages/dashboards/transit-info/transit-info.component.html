@@ -1,0 +1,61 @@
+<div class="p-3">
+  <div class="card-LE">
+    <div class="card-header-LE">Transit Info</div>
+    <div class="card-body-LE">
+      <form class="form-grid" [formGroup]="transitInfo" (ngSubmit)="savePlan()">
+
+        <!-- Segment -->
+        <div class="form-field">
+          <input type="text" formControlName="physicalarrivedatdestinationdateandtime" placeholder="" />
+          <label>Physical arrived at destination date and time</label>
+          <small class="error" *ngIf="transitInfo.get('physicalarrivedatdestinationdateandtime')?.touched && transitInfo.get('physicalarrivedatdestinationdateandtime')?.invalid">
+          Physical arrived at destination  is required
+          </small>
+        </div>
+
+        <!-- Customer Profile -->
+        <div class="form-field">
+          <input type="text" formControlName="unloadingdateandtime" placeholder="" />
+          <label>Unloading date and time</label>
+          <small class="error" *ngIf="transitInfo.get('unloadingdateandtime')?.touched && transitInfo.get('unloadingdateandtime')?.invalid">
+          Unloading date and time is required
+          </small>
+        </div>
+
+        <!-- Branch -->
+        <div class="form-field">
+          <input type="text" formControlName="sit" placeholder="" />
+          <label>SIT/SALE</label>
+          <small class="error" *ngIf="transitInfo.get('sit')?.touched && transitInfo.get('sit')?.invalid">
+           SIT/SALE is required
+          </small>
+        </div>
+
+        <!-- Branch Zone -->
+        <div class="form-field">
+          <input type="text" formControlName="podscanreceiveddateandtime" placeholder="" />
+          <label>POD scan received date and time</label>
+          <small class="error" *ngIf="transitInfo.get('podscanreceiveddateandtime')?.touched && transitInfo.get('podscanreceiveddateandtime')?.invalid">
+           POD scan received date and time is required
+          </small>
+        </div>
+
+        
+
+
+        <!-- Buttons -->
+        <div class="form-buttons">
+          <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
+            Cancel
+          </button>
+          <button type="submit">
+            {{ isEditMode ? 'Update Details' : 'Save' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+

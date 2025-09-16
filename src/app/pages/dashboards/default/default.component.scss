@@ -5,9 +5,43 @@
   padding: 20px;
   color: #ecf0f1;
   font-family: "Segoe UI", Roboto, sans-serif;
-    background: url("/assets/images/Dashboard_bg.jpg") no-repeat center center / cover !important;
+    background: url("/images/Dashboard_bg.jpg") no-repeat center center / cover !important;
 
 }
+.card-LE-Dashboard {
+    border-radius: 8px !important;
+    // margin-bottom: 20px !important;
+    // background-color: #ffffff !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  }
+   
+:host ::ng-deep  .card-header-LE-Dashboard {
+    // background-color: #f8f9fa !important; 
+    font-size: 20px !important;
+    font-weight: bold !important;
+    /* height: 36px; */
+    /* padding: 15px; */
+    padding: 10px;
+    border-bottom: 2px solid green;
+    color: brown;
+    background-color: transparent !important;
+    text-align: center;
+  }
+   
+  .card-body-LE-Dashboard {
+    padding: 20px !important;
+    // box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    // background-color: #ffffff !important;
+
+     background: rgba(255, 255, 255, 0.15);
+  background: url("/images/Dashboard_bg.jpg") no-repeat center center / cover !important;
+  // border-radius: 16px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
 
 
 
@@ -22,7 +56,13 @@
 }
 
 /* Grid Layout */
-.grid {
+.grid1 {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr); /* 12-column system */
+  gap: 20px;
+}
+.grid2 {
+  margin-top: 5px;
   display: grid;
   grid-template-columns: repeat(12, 1fr); /* 12-column system */
   gap: 20px;
@@ -43,7 +83,9 @@
     background-color: rgba(255, 255, 255, 0.1);
     border: 2px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+    background-color:none !important;
 }
+
 
 // .card:hover {
 //   transform: translateY(-6px);
@@ -52,18 +94,27 @@
 
 .card-title {
   font-size: 1rem;
-  margin-bottom: 12px;
+//   margin-bottom: 12px;
   font-weight: 500;
   color:black;
   border-bottom: 1px solid rgba(255,255,255,0.1);
   padding-bottom: 6px;
+  text-align: center;
+  border-bottom: 1px solid blue;
 }
 
 /* KPI Big Number */
-.kpi.big {
+.card-Data-Big {
   font-size: 2rem;
   font-weight: 700;
-  color: #4cd137;
+  color: brown;
+  text-align: center;
+}
+.card-Data-small {
+  font-size: 13px;
+  font-weight: 700;
+  color: blue;
+  text-align: center;
 }
 
 /* Small cards (3/12 each) */
@@ -139,3 +190,34 @@
     grid-column: span 12; /* stack vertically */
   }
 }
+.full-Div{
+  display: flex;
+}
+.left-side{
+  width: 20%;
+  border: 2px solid #ffffff7d;
+  padding: 10px ;
+}
+.right-side{
+  width: 80%;
+  margin-left: 5px;
+}
+.form-grid{
+  display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    
+}
+:host ::ng-deep .form-field input,
+  .form-field select {
+    padding: 12px;
+    font-size: 14px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    outline: none;
+    background: transparent !important;
+    transition: border-color 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+    height: 48px;
+    color: #333;
+  }

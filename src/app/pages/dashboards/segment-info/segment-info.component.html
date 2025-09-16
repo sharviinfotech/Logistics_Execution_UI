@@ -1,0 +1,77 @@
+<div class="p-3">
+  <div class="card-LE">
+    <div class="card-header-LE">Segment Info</div>
+    <div class="card-body-LE">
+      <form class="form-grid" [formGroup]="segmentInfo" (ngSubmit)="savePlan()">
+
+        <!-- Segment -->
+        <div class="form-field">
+          <input type="text" formControlName="segment" placeholder="" />
+          <label>Segment</label>
+          <small class="error" *ngIf="segmentInfo.get('segment')?.touched && segmentInfo.get('segment')?.invalid">
+            Segment is required
+          </small>
+        </div>
+
+        <!-- ODN Number -->
+        <div class="form-field">
+          <input type="text" formControlName="customerprofile" placeholder="" />
+          <label>Customer Profile</label>
+          <small class="error" *ngIf="segmentInfo.get('customerprofile')?.touched && segmentInfo.get('customerprofile')?.invalid">
+            Customer Profile is required
+          </small>
+        </div>
+
+        <!-- Invoice Date -->
+        <div class="form-field">
+          <input type="text" formControlName="branch" placeholder="" />
+          <label>branch</label>
+          <small class="error" *ngIf="segmentInfo.get('branch')?.touched && segmentInfo.get('branch')?.invalid">
+          branch  is required
+          </small>
+        </div>
+
+        <!-- Basic Shipment Value -->
+        <div class="form-field">
+          <input type="text" formControlName="branchzone" placeholder="" />
+          <label>Branch Zone</label>
+          <small class="error" *ngIf="segmentInfo.get('branchzone')?.touched && segmentInfo.get('branchzone')?.invalid">
+          Branch Zone  is required
+          </small>
+        </div>
+
+        <!-- Invoice Value with GST -->
+        <div class="form-field">
+          <input type="text" formControlName="tat" placeholder="" />
+          <label>TAT</label>
+          <small class="error" *ngIf="segmentInfo.get('tat')?.touched && segmentInfo.get('tat')?.invalid">
+         TAT  is required
+          </small>
+        </div>
+
+        <!-- Physical Dispatch Date and Time -->
+        <div class="form-field">
+          <input type="text" formControlName="eta" placeholder="" />
+          <label>ETA</label>
+          <small class="error" *ngIf="segmentInfo.get('eta')?.touched && segmentInfo.get('eta')?.invalid">
+           ETA is required
+          </small>
+        </div>
+
+     
+
+        <!-- Buttons -->
+        <div class="form-buttons">
+          <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
+            Cancel
+          </button>
+          <button type="submit">
+            {{ isEditMode ? 'Update Details' : 'Save' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+

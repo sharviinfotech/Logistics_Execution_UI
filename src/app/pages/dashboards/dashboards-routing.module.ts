@@ -17,9 +17,18 @@ import { ServiceChargesComponent } from './service-charges/service-charges.compo
 import { GlobalReviewEditComponent } from './global-review-edit/global-review-edit.component';
 import { ReviewNotificationComponent } from './review-notification/review-notification.component';
 import { SectorWiseComponent } from './sector-wise/sector-wise.component';
+import { OrderInfoComponent } from './order-info/order-info.component';
+import { ShipmentDetailsComponent } from './shipment-details/shipment-details.component';
+import { VechileInfoComponent } from './vechile-info/vechile-info.component';
+import { InvoiceLoadDetailsComponent } from './invoice-load-details/invoice-load-details.component';
+import { SegmentInfoComponent } from './segment-info/segment-info.component';
+import { TransitInfoComponent } from './transit-info/transit-info.component';
+import { FreightBillingComponent } from './freight-billing/freight-billing.component';
+import { TransitDamageInfoComponent } from './transit-damage-info/transit-damage-info.component';
+import { InsuranceClaimTrackingComponent } from './insurance-claim-tracking/insurance-claim-tracking.component';
 
-import { CooisComponent } from './coois/coois.component';
-import { Co11Component } from './co11/co11.component';
+// import { CooisComponent } from './coois/coois.component';
+// import { Co11Component } from './co11/co11.component';
 
 // In all files that import this component
 
@@ -85,15 +94,51 @@ const routes: Routes = [
         path: 'sectorwise',
         component: SectorWiseComponent
     },
+       {
+        path: 'order-info',
+        component: OrderInfoComponent
+    },
+     {
+        path: 'shipment-details',
+        component: ShipmentDetailsComponent
+    },
     {
-        path: 'co11',
-        component: Co11Component
+        path: 'vechile-info',
+        component: VechileInfoComponent
     },
+    {
+        path: 'invoice-load-details',
+        component: InvoiceLoadDetailsComponent
+    },
+    {
+        path: 'segment-info',
+        component: SegmentInfoComponent
+    },
+    {
+        path: 'transit-info',
+        component: TransitInfoComponent
+    },
+     {
+        path: 'freight-billing',
+        component: FreightBillingComponent
+    },
+    {
+        path: 'transit-damage-info',
+        component: TransitDamageInfoComponent
+    },
+    {
+        path: 'insurance-claim-tracking',
+        component: InsuranceClaimTrackingComponent
+    },
+    // {
+    //     path: 'co11',
+    //     component: Co11Component
+    // },
    
-        {
-        path: 'coois',
-        component: CooisComponent
-    },
+    //     {
+    //     path: 'coois',
+    //     component: CooisComponent
+    // },
 
    
     

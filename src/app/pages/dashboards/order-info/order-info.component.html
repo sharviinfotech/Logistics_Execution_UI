@@ -1,0 +1,252 @@
+<div class="">
+  <div class=" p-3">
+    <div class="card-LE">
+      <div class="card-header-LE">
+        Order Info
+
+
+      </div>
+
+      <div class="card-body-LE">
+
+
+        <form class="form-grid" [formGroup]="OrderInfo" (ngSubmit)="savePlan()">
+
+          <!-- Finance Year -->
+          <div class="form-field">
+            <input type="text" formControlName="FinanceYear" placeholder=" " />
+            <label>Finance Year</label>
+            <small class="error" *ngIf="OrderInfo.get('FinanceYear')?.touched && OrderInfo.get('FinanceYear')?.invalid">
+              Finance Year is required
+            </small>
+          </div>
+
+          <!-- System Generated Date -->
+          <div class="form-field">
+            <input type="date" formControlName="SystemGeneratedDate" placeholder=" " />
+            <label>System Generated Date</label>
+            <small class="error"
+              *ngIf="OrderInfo.get('SystemGeneratedDate')?.touched && OrderInfo.get('SystemGeneratedDate')?.invalid">
+              System generated date is required
+            </small>
+          </div>
+
+          <!-- Month & Quarter -->
+          <div class="form-field">
+            <select formControlName="MonthQuarter">
+              <option value="">Select Month & Quarter</option>
+              <option value="Q1">Q1 (Jan-Mar)</option>
+              <option value="Q2">Q2 (Apr-Jun)</option>
+              <option value="Q3">Q3 (Jul-Sep)</option>
+              <option value="Q4">Q4 (Oct-Dec)</option>
+            </select>
+            <label>Month & Quarter</label>
+            <small class="error"
+              *ngIf="OrderInfo.get('MonthQuarter')?.touched && OrderInfo.get('MonthQuarter')?.invalid">
+              Month & Quarter is required
+            </small>
+          </div>
+
+          <!-- Plant -->
+          <div class="form-field">
+            <input type="text" formControlName="Plant" placeholder=" " />
+            <label>Plant</label>
+            <small class="error" *ngIf="OrderInfo.get('Plant')?.touched && OrderInfo.get('Plant')?.invalid">
+              Plant is required
+            </small>
+          </div>
+
+          <!-- Transaction Type -->
+          <div class="form-field">
+            <select formControlName="TransactionType">
+              <option value="">Select Transaction Type</option>
+              <option value="Sale">Sale</option>
+              <option value="Purchase">Purchase</option>
+              <option value="Transfer">Transfer</option>
+              <option value="Return">Return</option>
+            </select>
+            <label>Transaction Type</label>
+            <small class="error"
+              *ngIf="OrderInfo.get('TransactionType')?.touched && OrderInfo.get('TransactionType')?.invalid">
+              Transaction type is required
+            </small>
+          </div>
+
+          <!-- Division -->
+          <div class="form-field">
+            <input type="text" formControlName="Division" placeholder=" " />
+            <label>Division</label>
+            <small class="error" *ngIf="OrderInfo.get('Division')?.touched && OrderInfo.get('Division')?.invalid">
+              Division is required
+            </small>
+          </div>
+
+          <!-- Sub Division -->
+          <div class="form-field">
+            <input type="text" formControlName="SubDivision" placeholder=" " />
+            <label>Sub Division</label>
+            <small class="error" *ngIf="OrderInfo.get('SubDivision')?.touched && OrderInfo.get('SubDivision')?.invalid">
+              Sub Division is required
+            </small>
+          </div>
+
+          <!-- SO / Ref. Number -->
+          <div class="form-field">
+            <input type="text" formControlName="RefNumber" placeholder=" " />
+            <label>SO / Ref. Number</label>
+            <small class="error" *ngIf="OrderInfo.get('RefNumber')?.touched && OrderInfo.get('RefNumber')?.invalid">
+              SO / Ref. Number is required
+            </small>
+          </div>
+
+          <!-- Customer -->
+          <div class="form-field">
+            <input type="text" formControlName="Customer" placeholder=" " />
+            <label>Customer</label>
+            <small class="error" *ngIf="OrderInfo.get('Customer')?.touched && OrderInfo.get('Customer')?.invalid">
+              Customer is required
+            </small>
+          </div>
+
+          <!-- Customer Group -->
+          <div class="form-field">
+            <select formControlName="CustomerGroup">
+              <option value="">Select Customer Group</option>
+              <option value="Corporate">Corporate</option>
+              <option value="Individual">Individual</option>
+              <option value="Government">Government</option>
+              <option value="Dealer">Dealer</option>
+            </select>
+            <label>Customer Group</label>
+            <small class="error"
+              *ngIf="OrderInfo.get('CustomerGroup')?.touched && OrderInfo.get('CustomerGroup')?.invalid">
+              Customer Group is required
+            </small>
+          </div>
+
+          <!-- C/nee (Consignee) -->
+          <div class="form-field">
+            <input type="text" formControlName="CNee" placeholder=" " />
+            <label>C/nee</label>
+            <small class="error" *ngIf="OrderInfo.get('CNee')?.touched && OrderInfo.get('CNee')?.invalid">
+              C/nee is required
+            </small>
+          </div>
+
+          <!-- Destination Location -->
+          <div class="form-field">
+            <input type="text" formControlName="DestinationLocation" placeholder=" " />
+            <label>Destination Location</label>
+            <small class="error"
+              *ngIf="OrderInfo.get('DestinationLocation')?.touched && OrderInfo.get('DestinationLocation')?.invalid">
+              Destination location is required
+            </small>
+          </div>
+
+          <!-- Destination State -->
+          <div class="form-field">
+            <select formControlName="DestinationState">
+              <option value="">Select State</option>
+              <option value="Andhra Pradesh">Andhra Pradesh</option>
+              <option value="Karnataka">Karnataka</option>
+              <option value="Tamil Nadu">Tamil Nadu</option>
+              <option value="Telangana">Telangana</option>
+              <option value="Maharashtra">Maharashtra</option>
+              <!-- Add more states as needed -->
+            </select>
+            <label>Destination State</label>
+            <small class="error"
+              *ngIf="OrderInfo.get('DestinationState')?.touched && OrderInfo.get('DestinationState')?.invalid">
+              Destination State is required
+            </small>
+          </div>
+
+          <!-- Destination Zone -->
+          <div class="form-field">
+            <select formControlName="DestinationZone">
+              <option value="">Select Zone</option>
+              <option value="North">North</option>
+              <option value="South">South</option>
+              <option value="East">East</option>
+              <option value="West">West</option>
+              <option value="Central">Central</option>
+            </select>
+            <label>Destination Zone</label>
+            <small class="error"
+              *ngIf="OrderInfo.get('DestinationZone')?.touched && OrderInfo.get('DestinationZone')?.invalid">
+              Destination Zone is required
+            </small>
+          </div>
+
+          <!-- Submit / Cancel Buttons -->
+          <div class="form-buttons">
+            <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
+              Cancel Edit
+            </button>
+            <button type="submit">
+              {{ isEditMode ? 'Update Plan' : 'Save' }}
+            </button>
+          </div>
+
+        </form>
+
+        <!-- <div class="table-responsive tableFixHead">
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Product</th>
+            <th>Planned Qty</th>
+            <th>Actual Qty</th>
+            <th>Shift</th>
+            <th>Assigned Operator</th>
+            <th>Assigned Supervisor</th>
+            <th>From Date</th>
+            <th>To Date</th>
+            <th>Machine</th>
+            <th>Plant Code</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let plan of plans; let i = index" 
+              [style.background-color]="editIndex === i ? '#e7f3ff' : ''">
+            <td>{{ plan.orderId }}</td>
+            <td>{{ plan.product }}</td>
+            <td>{{ plan.plannedQty }}</td>
+            <td>{{ plan.actualQty }}</td>
+            <td>{{ plan.shift }}</td>
+            <td>{{ plan.assignedOperator }}</td>
+            <td>{{ plan.assignedSupervisor }}</td>
+            <td>{{ plan.date }}</td>
+            <td>{{ plan.toDate }}</td>
+            <td>{{ plan.machine }}</td>
+            <td>{{ plan.plantCode }}</td>
+            <td>
+              <span class="status-badge"
+                [ngClass]="{
+                  'in-progress': plan.status === 'In Progress',
+                  'completed': plan.status === 'Completed'
+                }">
+                {{ plan.status }}
+              </span>
+            </td>
+            <td>
+              <button class="edit-btn" (click)="editPlan(i)" 
+                      [disabled]="editIndex === i">
+                {{ editIndex === i ? 'Editing...' : 'Edit' }}
+              </button>
+              <button class="delete-btn" (click)="deletePlan(i)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="plans.length === 0">No production plans added yet.</p>
+    </div> -->
+
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,238 @@
+<div class="p-3">
+    <div class="card-LE">
+        <div class="card-header-LE">Insurance Claim Tracking</div>
+        <div class="card-body-LE">
+            <form class="form-grid" [formGroup]="InsuranceClaimTracking">
+                <div class="form-field">
+                    <input type="text" formControlName="FinanceYear" placeholder=" " />
+                    <label>Finance Year</label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('FinanceYear')?.touched && InsuranceClaimTracking.get('FinanceYear')?.invalid">
+                        Finance Year is required
+                    </small>
+                </div>
+
+                <div class="form-field">
+                    <input type="date" formControlName="ReportedDate" placeholder=" " />
+                    <label>Reported Date</label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('ReportedDate')?.touched && InsuranceClaimTracking.get('ReportedDate')?.invalid">
+                        Reported Date is required
+                    </small>
+                </div>
+                <div class="form-field">
+                    <input type="text" formControlName="ClaimRef" placeholder=" " />
+                    <label>Claim Ref</label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('ClaimRef')?.touched && InsuranceClaimTracking.get('ClaimRef')?.invalid">
+                        Claim Ref is required
+                    </small>
+                </div>
+                <div class="form-field">
+                    <input type="text" formControlName="InvoiceValueBasic" placeholder=" " />
+                    <label>Invoice Value Basic</label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('InvoiceValueBasic')?.touched && InsuranceClaimTracking.get('InvoiceValueBasic')?.invalid">
+                        Invoice Value Basic is required
+                    </small>
+                </div>
+                <div class="form-field">
+                    <input type="text" formControlName="LossDeclaredRs" placeholder=" " />
+                    <label>Loss Declared Rs </label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('LossDeclaredRs')?.touched && InsuranceClaimTracking.get('LossDeclaredRs')?.invalid">
+                        Loss Declared Rs is required
+                    </small>
+                </div>
+                <div class="form-field">
+                    <input type="text" formControlName="ClaimReceivedFinalised" placeholder=" " />
+                    <label>Claim Received / Finalised(Rs) </label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('ClaimReceivedFinalised')?.touched && InsuranceClaimTracking.get('ClaimReceivedFinalised')?.invalid">
+                        Claim Received Finalised is required
+                    </small>
+                </div>
+                <div class="form-field">
+                    <input type="text" formControlName="SalvageValue" placeholder=" " />
+                    <label>Salvage Value </label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('SalvageValue')?.touched && InsuranceClaimTracking.get('SalvageValue')?.invalid">
+                        Salvage Value is required
+                    </small>
+                </div>
+
+                <div class="form-field">
+                    <input type="text" formControlName="Customer" placeholder=" " />
+                    <label>Customer </label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('Customer')?.touched && InsuranceClaimTracking.get('Customer')?.invalid">
+                        Customer is required
+                    </small>
+                </div>
+
+                <div class="form-field">
+                    <input type="text" formControlName="PONumber" placeholder=" " />
+                    <label>PO Number </label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('PONumber')?.touched && InsuranceClaimTracking.get('PONumber')?.invalid">
+                        PO Number is required
+                    </small>
+                </div>
+                <div class="form-field">
+                    <input type="text" formControlName="NoOfSets" placeholder=" " />
+                    <label>No Of Sets /Nos </label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('NoOfSets')?.touched && InsuranceClaimTracking.get('NoOfSets')?.invalid">
+                        No Of Sets is required
+                    </small>
+                </div>
+                <div class="form-field">
+                    <input type="text" formControlName="InvoiceNumber" placeholder=" " />
+                    <label>Invoice Number </label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('InvoiceNumber')?.touched && InsuranceClaimTracking.get('InvoiceNumber')?.invalid">
+                        Invoice Number is required
+                    </small>
+                </div>
+                <div class="form-field">
+                    <input type="date" formControlName="InvoiceDate" placeholder=" " />
+                    <label>Invoice Date</label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('InvoiceDate')?.touched && InsuranceClaimTracking.get('InvoiceDate')?.invalid">
+                        Invoice Date is required
+                    </small>
+                </div>
+                <div class="form-field">
+                    <input type="date" formControlName="Transporter" placeholder=" " />
+                    <label>Transporter</label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('Transporter')?.touched && InsuranceClaimTracking.get('Transporter')?.invalid">
+                        Transporter is required
+                    </small>
+                </div>
+                <div class="form-field">
+                    <input type="date" formControlName="TruckNumber" placeholder=" " />
+                    <label>Truck Number</label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('TruckNumber')?.touched && InsuranceClaimTracking.get('TruckNumber')?.invalid">
+                        Truck Number is required
+                    </small>
+                </div>
+                <div class="form-field">
+                    <input type="date" formControlName="LRNumber" placeholder=" " />
+                    <label>LR Number</label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('LRNumber')?.touched && InsuranceClaimTracking.get('LRNumber')?.invalid">
+                        LR Number is required
+                    </small>
+                </div>
+                <div class="form-field">
+                    <select formControlName="DamageRemarks">
+                        <option value="">Select</option>
+                        <option value="Packing material damage">Packing material damage</option>
+                        <option value="Pallet damage">Pallet damage</option>
+                        <option value="Cells damage">Cells damage</option>
+                        <option value="Cell Bank damage">Cell Bank damage</option>
+                        <option value="Can damage">Can damage</option>
+                        <option value="Accident">Accident</option>
+                        <option value="Prohibited material loading and seized by Police">
+                            Prohibited material loading and seized by Police
+                        </option>
+                        <option value="Damage during unloading">Damage during unloading</option>
+                        <option value="Material in wet condition">Material in wet condition</option>
+                        <option value="Damage due to other Materials loaded">
+                            Damage due to other Materials loaded
+                        </option>
+                    </select>
+
+                    <label>Damage Remarks</label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('DamageRemarks')?.touched && InsuranceClaimTracking.get('DamageRemarks')?.invalid">
+                        Damage Remarks is required
+                    </small>
+                </div>
+
+                <div class="form-field">
+                    <input type="date" formControlName="ClaimInformationSentOn" placeholder=" " />
+                    <label>Claim Information Sent On</label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('ClaimInformationSentOn')?.touched && InsuranceClaimTracking.get('ClaimInformationSentOn')?.invalid">
+                        Claim Information Sent On is required
+                    </small>
+                </div>
+                <div class="form-field">
+                    <select formControlName="ClaimStatus">
+                        <option value="">Select</option>
+                        <option value="Open">Open</option>
+                        <option value="Close">Close</option>
+
+                    </select>
+                    <label>Claim Status</label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('ClaimStatus')?.touched && InsuranceClaimTracking.get('ClaimStatus')?.invalid">
+                        Claim Status is required
+                    </small>
+                </div>
+                <div class="form-field">
+                    <select formControlName="ClaimDocumentsStatus">
+                        <option value="">Select</option>
+                        <option value="Open">Open</option>
+                        <option value="Close">Close</option>
+
+                    </select>
+                    <label>Claim Documents Status</label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('ClaimDocumentsStatus')?.touched && InsuranceClaimTracking.get('ClaimDocumentsStatus')?.invalid">
+                        Claim Documents Status is required
+                    </small>
+                </div>
+                <div class="form-field">
+                    <input type="date" formControlName="CourierDetails" placeholder=" " />
+                    <label>Courier Details</label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('CourierDetails')?.touched && InsuranceClaimTracking.get('CourierDetails')?.invalid">
+                        Courier Details is required
+                    </small>
+                </div>
+
+                <div class="form-field">
+                    <select formControlName="PaymentStatus">
+                        <option value="">Select</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Pending">Pending</option>
+
+                    </select>
+                    <label>Payment Status</label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('PaymentStatus')?.touched && InsuranceClaimTracking.get('PaymentStatus')?.invalid">
+                        Payment Status is required
+                    </small>
+                </div>
+
+                <div class="form-field">
+                    <input type="date" formControlName="PaymentInfo" placeholder=" " />
+                    <label>Payment Info</label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('PaymentInfo')?.touched && InsuranceClaimTracking.get('PaymentInfo')?.invalid">
+                        Payment Info is required
+                    </small>
+                </div>
+                <div class="form-field">
+                    <input type="date" formControlName="NEFT" placeholder=" " />
+                    <label>NEFT</label>
+                    <small class="error"
+                        *ngIf="InsuranceClaimTracking.get('NEFT')?.touched && InsuranceClaimTracking.get('NEFT')?.invalid">
+                        NEFT is required
+                    </small>
+                </div>
+                <!-- Submit / Cancel Buttons -->
+                <div class="form-buttons">
+                    <button type="button" (click)="savePlan()">
+                        Save
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

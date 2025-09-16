@@ -1,73 +1,166 @@
 <div class="dashboard-body">
- 
-  <div class="card-header">
-    Smart Manufacturing Dashboard
-  </div>
 
-  <div class="card-body">
-    
-    <section class="grid">
-
-      
-      <article class="card small-card">
-        <div class="card-title">Production Today</div>
-        <div class="kpi big">{{ productionToday }}</div>
-      </article>
-
-     
-      <article class="card small-card">
-        <div class="card-title">OEE</div>
-        <div class="kpi big">{{ oee }}%</div>
-      </article>
-
-      
-      <article class="card status-card">
-        <div class="card-title">Machine Status</div>
-        <div class="status-row">
-          <div><span class="dot green"></span> Running</div>
-          <div class="status-val">{{ machineStatus.running }}</div>
+    <div class="card-LE-Dashboard">
+        <div class="card-header-LE-Dashboard">
+            Dashboard
         </div>
-        <div class="status-row">
-          <div><span class="dot yellow"></span> Idle</div>
-          <div class="status-val">{{ machineStatus.idle }}</div>
+
+        <div class="card-body-LE-Dashboard">
+
+            <div class="full-Div">
+                <div class="left-side">
+                    <form class="form-grid" [formGroup]="dashboard1form">
+
+                        <div class="form-field">
+                            <input type="date" formControlName="date" placeholder=" " />
+                            <label>Date</label>
+                            
+                        </div>
+
+                        <!-- Month & Quarter -->
+                        <div class="form-field">
+                            <select formControlName="Months">
+                                <option value="">Select Month & Quarter</option>
+                                <option value="Q1">Q1 (Jan-Mar)</option>
+                                <option value="Q2">Q2 (Apr-Jun)</option>
+                                <option value="Q3">Q3 (Jul-Sep)</option>
+                                <option value="Q4">Q4 (Oct-Dec)</option>
+                            </select>
+                            <label>Months</label>
+                            
+                        </div>
+
+                        <div class="form-field">
+                            <select formControlName="financialYear">
+                                <option value="">Select Month & Quarter</option>
+                                <option value="26">FY-26</option>
+                                <option value="25">FY-25</option>
+                                <option value="24">FY-24</option>
+                                <option value="23">FY-23</option>
+                            </select>
+                            <label>Financial Year</label>
+                            
+                        </div>
+
+
+                        <!-- Transaction Type -->
+                        <div class="form-field">
+                            <select formControlName="customerGroup">
+                                <option value="">Select</option>
+                                <option value="Corporate">Corporate</option>
+                                <option value="Individual">Individual</option>
+                                <option value="Government">Government</option>
+                                <option value="Dealer">Dealer</option>
+                            </select>
+                            <label>Customer Group</label>
+                           
+                        </div>
+
+                       <!-- Transaction Type -->
+                        <div class="form-field">
+                            <select formControlName="batteryCondition">
+                                <option value="">Select</option>
+                                <option value="g">Good</option>
+                                <option value="e">Excelent</option>
+                                <option value="b">Bad</option>
+                                <option value="vb">Very BAd</option>
+                            </select>
+                            <label>Battery Condition</label>
+                           
+                        </div>
+
+                        
+
+
+                    </form>
+                </div>
+                <div class="right-side">
+                    <section class="grid1">
+
+
+                        <article class="card small-card">
+                            <div class="card-title">Freight Charges(Lakhs)</div>
+                            <div class="card-Data-Big">131</div>
+                        </article>
+
+
+                        <article class="card small-card">
+                            <div class="card-title">Freight Charges UnLak</div>
+                            <div class="card-Data-Big">133</div>
+                        </article>
+
+                        <article class="card small-card">
+                            <div class="card-title">Actual Load</div>
+                            <div class="card-Data-Big">2,624</div>
+                        </article>
+                        <article class="card small-card">
+                            <div class="card-title">Distance(Kilometer)</div>
+                            <div class="card-Data-Big">669K</div>
+                        </article>
+                    </section>
+                    <!-- <section class="grid2">
+                
+                <article class="card chart-card big">
+                    <div class="card-title">No of Shipments by Destination Zone</div>
+                    <canvas baseChart [data]="shipmentData" [options]="shipmentOptions" [type]="'bar'">
+                    </canvas>
+                </article>
+
+               
+                <article class="card chart-card big">
+                    <div class="card-title">Loading Factor (w.r.t weight) by Division and Financial Year</div>
+                    <canvas baseChart [data]="loadingFactorData" [options]="loadingFactorOptions" [type]="'bar'">
+                    </canvas>
+                </article>
+            </section> -->
+
+                    <section class="grid2">
+
+
+                        <article class="card small-card">
+                            <div class="card-title">Cost/ton(Acutal Load)</div>
+                            <div class="card-Data-Big">5,316</div>
+                            <div class="card-Data-small">Target 5707</div>
+
+                        </article>
+
+
+                        <article class="card small-card">
+                            <div class="card-title">Cost/KM/FTL</div>
+                            <div class="card-Data-Big">133</div>
+                            <div class="card-Data-small">Target 46.2</div>
+                        </article>
+
+                        <article class="card small-card">
+                            <div class="card-title">Cost/KG/KM/FTL</div>
+                            <div class="card-Data-Big">2,624</div>
+                            <div class="card-Data-small">Target 0.20</div>
+                        </article>
+                        <article class="card small-card">
+                            <div class="card-title">Cost/AH(FTL)</div>
+                            <div class="card-Data-Big">0.54</div>
+                        </article>
+
+                        <article class="card small-card">
+                            <div class="card-title">Cost/ton(Cargo)</div>
+                            <div class="card-Data-Big">15,675</div>
+                        </article>
+                        <article class="card small-card">
+                            <div class="card-title">Cost/KM(Cargo)</div>
+                            <div class="card-Data-Big">6</div>
+                        </article>
+                        <article class="card small-card">
+                            <div class="card-title">Freight Cost %</div>
+                            <div class="card-Data-Big">0.97 %</div>
+                        </article>
+                        <article class="card small-card">
+                            <div class="card-title">No Of Vehicles</div>
+                            <div class="card-Data-Big">279</div>
+                        </article>
+                    </section>
+                </div>
+            </div>
+
         </div>
-        <div class="status-row">
-          <div><span class="dot red"></span> Faulty</div>
-          <div class="status-val">{{ machineStatus.faulty }}</div>
-        </div>
-      </article>
-
-      
-      <article class="card alerts-small">
-        <div class="card-title">Real-time Alerts</div>
-        <ul>
-          <li *ngFor="let a of alerts">{{ a }}</li>
-        </ul>
-      </article>
-
-      
-      <article class="card chart-card big">
-        <div class="card-title">Energy Consumption</div>
-        <canvas baseChart [data]="energyData" [options]="energyOptions" chartType="line">
-        </canvas>
-      </article>
-
-      
-      <article class="card chart-card big">
-        <div class="card-title">Downtime Summary</div>
-        <canvas baseChart [data]="downtimeData" [options]="downtimeOptions" chartType="bar">
-        </canvas>
-      </article>
-
-      
-      <article class="card wide-card">
-        <div class="card-title">Real-time Alerts</div>
-        <ul>
-          <li *ngFor="let a of alerts">{{ a }}</li>
-        </ul>
-      </article>
-
-    </section>
-
-  </div>
+    </div>
 </div>

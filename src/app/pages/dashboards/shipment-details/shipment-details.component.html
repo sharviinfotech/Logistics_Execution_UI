@@ -1,0 +1,131 @@
+<div class="">
+    <div class=" p-3">
+        <div class="card-LE">
+            <div class="card-header-LE">
+                Shipment Details
+            </div>
+
+            <div class="card-body-LE">
+
+                <form class="form-grid" [formGroup]="ProductInfo" (ngSubmit)="saveProduct()">
+
+                    <!-- Product -->
+                    <div class="form-field">
+                        <input type="text" formControlName="Product" placeholder=" " />
+                        <label>Product</label>
+                        <small class="error"
+                            *ngIf="ProductInfo.get('Product')?.touched && ProductInfo.get('Product')?.invalid">
+                            Product is required
+                        </small>
+                    </div>
+
+                    <!-- Type of Material -->
+                    <div class="form-field">
+                        <select formControlName="TypeOfMaterial">
+                            <option value="">Select Type of Material</option>
+                            <option value="Raw Material">Raw Material</option>
+                            <option value="Semi Finished">Semi Finished</option>
+                            <option value="Finished Goods">Finished Goods</option>
+                            <option value="Consumables">Consumables</option>
+                            <option value="Spare Parts">Spare Parts</option>
+                        </select>
+                        <label>Type of Material</label>
+                        <small class="error"
+                            *ngIf="ProductInfo.get('TypeOfMaterial')?.touched && ProductInfo.get('TypeOfMaterial')?.invalid">
+                            Type of Material is required
+                        </small>
+                    </div>
+
+                    <!-- Material Description -->
+                    <div class="form-field">
+                        <input type="text" formControlName="MaterialDescription" placeholder=" " />
+                        
+                        <label>Material Description</label>
+                        <small class="error"
+                            *ngIf="ProductInfo.get('MaterialDescription')?.touched && ProductInfo.get('MaterialDescription')?.invalid">
+                            Material Description is required
+                        </small>
+                    </div>
+
+                    <!-- Ah loaded in the Truck -->
+                    <div class="form-field">
+                        <input type="number" formControlName="AhLoadedInTruck" placeholder=" " step="0.01" />
+                        <label>Ah loaded in the Truck</label>
+                        <small class="error"
+                            *ngIf="ProductInfo.get('AhLoadedInTruck')?.touched && ProductInfo.get('AhLoadedInTruck')?.invalid">
+                             loaded in the Truck is required
+                        </small>
+                    </div>
+
+                    <!-- Shipment Weight -->
+                    <div class="form-field">
+                        <input type="number" formControlName="ShipmentWeight" placeholder=" " step="0.01" />
+                        <label>Shipment Weight (kg)</label>
+                        <small class="error"
+                            *ngIf="ProductInfo.get('ShipmentWeight')?.touched && ProductInfo.get('ShipmentWeight')?.invalid">
+                            Shipment Weight is required
+                        </small>
+                    </div>
+
+                    <!-- Battery Condition -->
+                    <div class="form-field">
+                        <select formControlName="BatteryCondition">
+                            <option value="">Select Battery Condition</option>
+                            <option value="New">New</option>
+                            <option value="Good">Good</option>
+                            <option value="Average">Average</option>
+                            <option value="Poor">Poor</option>
+                            <option value="Damaged">Damaged</option>
+                        </select>
+                        <label>Battery Condition</label>
+                        <small class="error"
+                            *ngIf="ProductInfo.get('BatteryCondition')?.touched && ProductInfo.get('BatteryCondition')?.invalid">
+                            Battery Condition is required
+                        </small>
+                    </div>
+
+                    <!-- Inco-terms -->
+                    <div class="form-field">
+                        <select formControlName="Incoterms">
+                            <option value="">Select Inco-terms</option>
+                            <option value="EXW">EXW (Ex Works)</option>
+                            <option value="FOB">FOB (Free on Board)</option>
+                            <option value="CIF">CIF (Cost, Insurance & Freight)</option>
+                            <option value="DAP">DAP (Delivered at Place)</option>
+                            <option value="DDP">DDP (Delivered Duty Paid)</option>
+                            <option value="FCA">FCA (Free Carrier)</option>
+                            <option value="CPT">CPT (Carriage Paid To)</option>
+                        </select>
+                        <label>Inco-terms</label>
+                        <small class="error"
+                            *ngIf="ProductInfo.get('Incoterms')?.touched && ProductInfo.get('Incoterms')?.invalid">
+                            Inco-terms is required
+                        </small>
+                    </div>
+
+                    <!-- Kilometres -->
+                    <div class="form-field">
+                        <input type="number" formControlName="Kilometres" placeholder=" " step="0.1" />
+                        <label>Kilometres</label>
+                        <small class="error"
+                            *ngIf="ProductInfo.get('Kilometres')?.touched && ProductInfo.get('Kilometres')?.invalid">
+                            Kilometres is required
+                        </small>
+                    </div>
+
+                    <!-- Submit / Cancel Buttons -->
+                    <div class="form-buttons">
+                        <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
+                          Cancel Edit
+                        </button>
+                        <button type="submit">
+                          {{ isEditMode ? 'Update Plan' : 'Save' }}
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,188 @@
+<div class="p-3">
+  <div class="card-LE">
+    <div class="card-header-LE">Transit Damage Info</div>
+    <div class="card-body-LE">
+      <form class="form-grid" [formGroup]="transitDamageInfo" (ngSubmit)="savePlan()">
+
+        <!-- Incident Date -->
+        <div class="form-field floating-label">
+          <input type="date" formControlName="incidentdate" id="incidentdate" placeholder=" " />
+          <label for="incidentdate">Incident Date</label>
+          <small class="error" *ngIf="transitDamageInfo.get('incidentdate')?.touched && transitDamageInfo.get('incidentdate')?.invalid">
+            Incident Date is required
+          </small>
+        </div>
+
+        <!-- LR Number -->
+        <div class="form-field floating-label">
+          <input type="text" formControlName="lrnumber" id="lrnumber" placeholder=" " />
+          <label for="lrnumber">LR Number</label>
+          <small class="error" *ngIf="transitDamageInfo.get('lrnumber')?.touched && transitDamageInfo.get('lrnumber')?.invalid">
+            LR Number is required
+          </small>
+        </div>
+
+        <!-- Transporter Name -->
+        <div class="form-field floating-label">
+          <input type="text" formControlName="transportername" id="transportername" placeholder=" " />
+          <label for="transportername">Transporter Name</label>
+          <small class="error" *ngIf="transitDamageInfo.get('transportername')?.touched && transitDamageInfo.get('transportername')?.invalid">
+            Transporter Name is required
+          </small>
+        </div>
+
+        <!-- Vehicle Number -->
+        <div class="form-field floating-label">
+          <input type="text" formControlName="vechilenumber" id="vechilenumber" placeholder=" " />
+          <label for="vechilenumber">Vehicle Number</label>
+          <small class="error" *ngIf="transitDamageInfo.get('vechilenumber')?.touched && transitDamageInfo.get('vechilenumber')?.invalid">
+            Vehicle Number is required
+          </small>
+        </div>
+
+        <!-- FSR Report Date -->
+        <div class="form-field floating-label">
+          <input type="date" formControlName="fsrreportdate" id="fsrreportdate" placeholder=" " />
+          <label for="fsrreportdate">FSR Report Date</label>
+          <small class="error" *ngIf="transitDamageInfo.get('fsrreportdate')?.touched && transitDamageInfo.get('fsrreportdate')?.invalid">
+            FSR Report Date is required
+          </small>
+        </div>
+
+        <!-- Images Uploading -->
+        <div class="form-field floating-label">
+          <input type="file" formControlName="imagesuploading" id="imagesuploading" />
+          <label for="imagesuploading">Images Uploading</label>
+          <small class="error" *ngIf="transitDamageInfo.get('imagesuploading')?.touched && transitDamageInfo.get('imagesuploading')?.invalid">
+            Images Uploading is required
+          </small>
+        </div>
+
+        <!-- Customer -->
+        <div class="form-field floating-label">
+          <input type="text" formControlName="customer" id="customer" placeholder=" " />
+          <label for="customer">Customer</label>
+          <small class="error" *ngIf="transitDamageInfo.get('customer')?.touched && transitDamageInfo.get('customer')?.invalid">
+            Customer is required
+          </small>
+        </div>
+
+        <!-- C/nee -->
+        <div class="form-field floating-label">
+          <input type="text" formControlName="nee" id="nee" placeholder=" " />
+          <label for="nee">C/nee</label>
+          <small class="error" *ngIf="transitDamageInfo.get('nee')?.touched && transitDamageInfo.get('nee')?.invalid">
+            C/nee is required
+          </small>
+        </div>
+
+        <!-- Invoice Number -->
+        <div class="form-field floating-label">
+          <input type="text" formControlName="invoicenumber" id="invoicenumber" placeholder=" " />
+          <label for="invoicenumber">Invoice Number</label>
+          <small class="error" *ngIf="transitDamageInfo.get('invoicenumber')?.touched && transitDamageInfo.get('invoicenumber')?.invalid">
+            Invoice Number is required
+          </small>
+        </div>
+
+        <!-- Invoice Date -->
+        <div class="form-field floating-label">
+          <input type="date" formControlName="invoicedate" id="invoicedate" placeholder=" " />
+          <label for="invoicedate">Invoice Date</label>
+          <small class="error" *ngIf="transitDamageInfo.get('invoicedate')?.touched && transitDamageInfo.get('invoicedate')?.invalid">
+            Invoice Date is required
+          </small>
+        </div>
+
+        <!-- Shipment Value -->
+        <div class="form-field floating-label">
+          <input type="text" formControlName="shipmentvalue" id="shipmentvalue" placeholder=" " />
+          <label for="shipmentvalue">Shipment Value</label>
+          <small class="error" *ngIf="transitDamageInfo.get('shipmentvalue')?.touched && transitDamageInfo.get('shipmentvalue')?.invalid">
+            Shipment Value is required
+          </small>
+        </div>
+
+       <div class="form-field">
+  <select formControlName="DamageRemarks">
+    <option value="">Select</option>
+    <option value="Packing material damage">Packing material damage</option>
+    <option value="Pallet damage">Pallet damage</option>
+    <option value="Cells damage">Cells damage</option>
+    <option value="Cell Bank damage">Cell Bank damage</option>
+    <option value="Can damage">Can damage</option>
+    <option value="Accident">Accident</option>
+    <option value="Prohibited material loading and seized by Police">
+      Prohibited material loading and seized by Police
+    </option>
+    <option value="Damage during unloading">Damage during unloading</option>
+    <option value="Material in wet condition">Material in wet condition</option>
+    <option value="Damage due to other Materials loaded">
+      Damage due to other Materials loaded
+    </option>
+  </select>
+
+  <label>Damage Remarks</label>
+  <small class="error"
+    *ngIf="transitDamageInfo.get('DamageRemarks')?.touched && transitDamageInfo.get('DamageRemarks')?.invalid">
+    Damage Remarks is required
+  </small>
+</div>
+
+
+        <!-- Claim Settlement -->
+        <div class="form-field floating-label select-field">
+          <select formControlName="claimsettlement" id="claimsettlement">
+           <option value="" selected>Select</option>
+
+            <option value="Direct Deduction">Direct Deduction</option>
+            <option value="Insurance claim">Insurance claim</option>
+            <option value="Repair Locally With cost">Repair Locally With cost</option>
+            <option value="Repair Locally Without cost">Repair Locally Without cost</option>
+          </select>
+          <label for="claimsettlement">Claim Settlement</label>
+          <small class="error" *ngIf="transitDamageInfo.get('claimsettlement')?.touched && transitDamageInfo.get('claimsettlement')?.invalid">
+            Claim Settlement is required
+          </small>
+        </div>
+<!-- Status Dropdown -->
+<div class="form-field">
+  <select formControlName="status">
+    <option value="">Select</option>
+    <option value="open">open</option>
+    <option value="close">close</option>
+  </select>
+
+  <label>Status</label>
+  <small class="error"
+    *ngIf="transitDamageInfo.get('status')?.touched && transitDamageInfo.get('status')?.invalid">
+    Status is required
+  </small>
+</div>
+
+<!-- Conditionally show closing damage date when status is close -->
+<div class="form-field" *ngIf="transitDamageInfo.get('status')?.value === 'close'">
+  <input type="date" formControlName="closingdamagedate" />
+  <label>Closing Damage Date</label>
+  <small class="error"
+    *ngIf="transitDamageInfo.get('closingdamagedate')?.touched && transitDamageInfo.get('closingdamagedate')?.invalid">
+    Closing damage date is required
+  </small>
+</div>
+
+
+ 
+       
+
+        <!-- Form Buttons -->
+        <div class="form-buttons">
+          <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">Cancel</button>
+          <button type="submit" [disabled]="isSubmitting">
+            {{ isEditMode ? 'Update Details' : 'Save' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
