@@ -36,13 +36,13 @@ Vechileinfo!: FormGroup;
   createForm() {
     const today = new Date().toISOString().substring(0, 10);
     this.Vechileinfo = this.fb.group({
-      typeofshipment: ['', Validators.required],
+      typeofshipment: [, Validators.required],
       transporter: ['', Validators.required],
-      Lrno: ['', Validators.required],
+      Lrno: ['', [Validators.required,Validators.pattern(/^[A-Za-z0-9-]+$/)]],
       typeofvechile : ['', Validators.required],
       passingweight: ['', Validators.required],
     volumeofthetruck: ['', Validators.required],
-      vechilenumber: ['', Validators.required],
+      vechilenumber: ['', Validators.required,Validators.pattern(/^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/)],
       noofvechiles: ['', Validators.required],
       drivername: ['', Validators.required],
      drivermobilenumber: ['', Validators.required],

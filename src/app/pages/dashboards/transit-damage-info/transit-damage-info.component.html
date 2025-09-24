@@ -51,7 +51,7 @@
 
         <!-- Images Uploading -->
         <div class="form-field floating-label">
-          <input type="file" formControlName="imagesuploading" id="imagesuploading" />
+          <input type="file" formControlName="imagesuploading" id="imagesuploading" accept=".jpg,.jpeg,.pdf" />
           <label for="imagesuploading">Images Uploading</label>
           <small class="error" *ngIf="transitDamageInfo.get('imagesuploading')?.touched && transitDamageInfo.get('imagesuploading')?.invalid">
             Images Uploading is required

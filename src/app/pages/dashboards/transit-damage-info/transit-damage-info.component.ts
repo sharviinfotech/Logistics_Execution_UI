@@ -46,7 +46,7 @@ transitDamageInfo!: FormGroup;
       incidentdate: ['', Validators.required],
       lrnumber: ['', Validators.required],
       transportername: ['', Validators.required],
-      vechilenumber: ['', Validators.required],
+      vechilenumber: ['', Validators.required,Validators.pattern(/^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/)],
       fsrreportdate: ['', Validators.required],
       imagesuploading: ['', Validators.required],
       customer: ['', Validators.required],

@@ -23,10 +23,12 @@ ProductInfo!: FormGroup;
       Product: ['', Validators.required],
       TypeOfMaterial: ['', Validators.required],
       MaterialDescription: ['', Validators.required],
+      Noofseats: ['', Validators.required],
       AhLoadedInTruck: ['', Validators.required],
       ShipmentWeight: ['', Validators.required],
       BatteryCondition: ['', Validators.required],
       Incoterms: ['', Validators.required],
+      InsuranceScope: ['', Validators.required],
       Kilometres: ['', Validators.required],
       status: ['Active', Validators.required]
     });

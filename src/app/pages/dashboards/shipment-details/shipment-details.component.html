@@ -47,9 +47,19 @@
                         </small>
                     </div>
 
+                    <div class="form-field">
+                        <input type="text" formControlName="Noofseats" placeholder=" " />
+                        
+                        <label>No Of Seats/No (Qty)</label>
+                        <small class="error"
+                            *ngIf="ProductInfo.get('Noofseats')?.touched && ProductInfo.get('Noofseats')?.invalid">
+                            No Of Seats/No (Qty) is required
+                        </small>
+                    </div>
+
                     <!-- Ah loaded in the Truck -->
                     <div class="form-field">
-                        <input type="number" formControlName="AhLoadedInTruck" placeholder=" " step="0.01" />
+                        <input type="number" min="0"  formControlName="AhLoadedInTruck" placeholder=" " step="0.01" />
                         <label>Ah loaded in the Truck</label>
                         <small class="error"
                             *ngIf="ProductInfo.get('AhLoadedInTruck')?.touched && ProductInfo.get('AhLoadedInTruck')?.invalid">
@@ -59,7 +69,7 @@
 
                     <!-- Shipment Weight -->
                     <div class="form-field">
-                        <input type="number" formControlName="ShipmentWeight" placeholder=" " step="0.01" />
+                        <input type="number" min="0"  formControlName="ShipmentWeight" placeholder=" " step="0.01" />
                         <label>Shipment Weight (kg)</label>
                         <small class="error"
                             *ngIf="ProductInfo.get('ShipmentWeight')?.touched && ProductInfo.get('ShipmentWeight')?.invalid">
@@ -103,9 +113,24 @@
                         </small>
                     </div>
 
+                    <div class="form-field">
+                        <select formControlName="InsuranceScope">
+                            <option value="">Select Insurance Scope</option>
+                            <option value="Buyer">Buyer</option>
+                            <option value="Supplier">Supplier</option>
+                        </select>
+                        <label>Insurance Scope</label>
+                        <small class="error"
+                            *ngIf="ProductInfo.get('InsuranceScope')?.touched && ProductInfo.get('InsuranceScope')?.invalid">
+                            Insurance Scope is required
+                        </small>
+                    </div>
+
+
+
                     <!-- Kilometres -->
                     <div class="form-field">
-                        <input type="number" formControlName="Kilometres" placeholder=" " step="0.1" />
+                        <input type="number" min="0"  formControlName="Kilometres" placeholder=" " step="0.1" />
                         <label>Kilometres</label>
                         <small class="error"
                             *ngIf="ProductInfo.get('Kilometres')?.touched && ProductInfo.get('Kilometres')?.invalid">

@@ -256,9 +256,9 @@ body[data-sidebar="dark"] {
     
     .navbar-brand-box {
         // background: $sidebar-dark-bg;
-  background: url("/assets/images/bgrdashboard.png")   !important;
+//   background: url("/assets/images/bgrdashboard.png")   !important;
 //   background-image: linear-gradient(to top, #f1e7d95e, #dcd5cfa8) !important;
-  border-bottom: 1px solid white;
+//   border-bottom: 1px solid white;
         // background-image: linear-gradient(to top, #6ba3cd, #031c2e) !important;
           // background: url("/assets/images/bg3.jpg") no-repeat center center / cover !important;
         //   background: url("/assets/images/flightwhite.jpeg") no-repeat center center / cover !important;
@@ -287,18 +287,53 @@ body[data-sidebar="dark"] {
   bottom: 52px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 25px;
+  font-size: 28px;
   font-weight: 800;
-  font-family: 'Poppins', sans-serif; /* modern clean font */
-  color: #ffffff;
-  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-  letter-spacing: 2px;
+  font-family: 'Poppins', sans-serif;
   text-transform: uppercase;
-//   background: linear-gradient(90deg, #00c6ff, #0072ff); /* gradient text */
+  letter-spacing: 3px;
+
+  /* Gradient text */
+  background: linear-gradient(90deg, #00c6ff, #0072ff, #00ff88);
+  background-size: 200% auto;
   -webkit-background-clip: text;
-//   -webkit-text-fill-color: transparent;
-  animation: fadeInUp 1s ease-out;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /* Glow + shadow */
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+
+  /* Entry animation */
+  animation: fadeInUp 1s ease-out, gradientMove 3s infinite linear;
 }
+
+/* Smooth fade-up on load */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 30px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* Gradient shimmer movement */
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Hover effect */
+.navbar-brand-box .brand-text:hover {
+  text-shadow: 0 0 15px rgba(0, 255, 136, 0.7),
+               0 0 30px rgba(0, 114, 255, 0.6);
+  transform: translateX(-50%) scale(1.05);
+  transition: all 0.3s ease;
+}
+
 
 @keyframes fadeInUp {
   from {

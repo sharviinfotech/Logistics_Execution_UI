@@ -6,7 +6,7 @@
       <form class="form-grid" [formGroup]="Vechileinfo" (ngSubmit)="savePlan()">
 
         <!-- Type of Shipment -->
-        <div class="form-field">
+        <div class="form-field optional">
           <input type="text" formControlName="typeofshipment" placeholder="" />
           <label>Type of Shipment</label>
           <small class="error"
@@ -27,7 +27,7 @@
 
         <!-- LR No -->
         <div class="form-field">
-          <input type="" formControlName="Lrno" placeholder="" />
+          <input type="text" formControlName="Lrno" placeholder="" />
           <label>LR No</label>
           <small class="error"
                  *ngIf="Vechileinfo.get('Lrno')?.touched && Vechileinfo.get('Lrno')?.invalid">
@@ -80,7 +80,7 @@
 
           <!-- No of Vechiles -->
         <div class="form-field">
-          <input type="text" formControlName="noofvechiles" placeholder="" />
+          <input type="number" min="0"  formControlName="noofvechiles" placeholder="" />
           <label>No of Vechiles</label>
           <small class="error"
                  *ngIf="Vechileinfo.get('noofvechiles')?.touched && Vechileinfo.get('noofvechiles')?.invalid">
@@ -101,7 +101,7 @@
 
            <!-- Driver Mobile Number -->
         <div class="form-field">
-          <input type="text" formControlName="drivermobilenumber" placeholder="" />
+          <input type="tel" formControlName="drivermobilenumber" placeholder="" />
           <label>Driver Mobile Number</label>
           <small class="error"
                  *ngIf="Vechileinfo.get('drivermobilenumber')?.touched && Vechileinfo.get('drivermobilenumber')?.invalid">

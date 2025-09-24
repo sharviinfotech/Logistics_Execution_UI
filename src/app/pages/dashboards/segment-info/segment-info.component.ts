@@ -37,6 +37,7 @@ export class SegmentInfoComponent {
 
   buildForm() {
     this.segmentInfo = this.fb.group({
+      SalesPerson: ['', Validators.required],
       segment: ['', Validators.required],
       customerprofile: ['', Validators.required],
       branch: ['', Validators.required],

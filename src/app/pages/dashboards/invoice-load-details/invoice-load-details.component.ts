@@ -46,6 +46,8 @@ invoiceLoadDetails!: FormGroup;
       loadingfactorwrtweight: ['', [Validators.required, Validators.min(0)]],
       loadingfactorwrtvolume: ['', [Validators.required, Validators.min(0)]],
       weekwiseshipmentflow: ['', Validators.required],
+      EwayBill: ['', Validators.required],
+      EwayBillExpiryDate: ['', Validators.required],
     });
   }
 

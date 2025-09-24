@@ -10,7 +10,7 @@
 
           <!-- Freight Bill Number -->
           <div class="form-field">
-            <input type="text" formControlName="FreightBillNumber" placeholder=" " />
+            <input type="number" min="0" formControlName="FreightBillNumber" placeholder=" " />
             <label>Freight Bill Number</label>
             <small class="error"
               *ngIf="FreightBilling.get('FreightBillNumber')?.touched && FreightBilling.get('FreightBillNumber')?.invalid">
@@ -40,7 +40,7 @@
 
           <!-- Freight Charges -->
           <div class="form-field">
-            <input type="number" formControlName="FreightCharges" placeholder=" " step="0.01" />
+            <input type="number" min="0"  formControlName="FreightCharges" placeholder=" " />
             <label>Freight Charges</label>
             <small class="error"
               *ngIf="FreightBilling.get('FreightCharges')?.touched && FreightBilling.get('FreightCharges')?.invalid">
@@ -55,6 +55,15 @@
             <small class="error"
               *ngIf="FreightBilling.get('WorkOrderNumber')?.touched && FreightBilling.get('WorkOrderNumber')?.invalid">
               Work Order Number is required
+            </small>
+          </div>
+
+           <div class="form-field">
+            <input type="text" formControlName="BillSubmission" placeholder=" " />
+            <label>Bill Submission To F&A</label>
+            <small class="error"
+              *ngIf="FreightBilling.get('BillSubmission')?.touched && FreightBilling.get('BillSubmission')?.invalid">
+              Bill Submission To F&A is required
             </small>
           </div>
 

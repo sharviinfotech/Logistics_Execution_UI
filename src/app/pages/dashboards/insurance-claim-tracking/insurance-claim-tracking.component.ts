@@ -23,13 +23,15 @@ InsuranceClaimTracking!: FormGroup;
       FinanceYear: ['', Validators.required],
       ReportedDate: ['', Validators.required],
       ClaimRef: ['', Validators.required],
+      vechilenumber: ['', Validators.required,Validators.pattern(/^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/)],
       InvoiceValueBasic : ['', Validators.required],
       LossDeclaredRs: ['', Validators.required],
       ClaimReceivedFinalised: ['', Validators.required],
       SalvageValue: ['', Validators.required],
       Customer: ['', Validators.required],
       PONumber: ['', Validators.required],
-     NoOfSets: ['', Validators.required],
+      AhLoadedInTruck: ['', Validators.required],
+      NoOfSets: ['', Validators.required],
       Location: ['', Validators.required],
       InvoiceNumber:['',Validators.required],
       InvoiceDate:['',Validators.required],
@@ -43,6 +45,8 @@ InsuranceClaimTracking!: FormGroup;
       CourierDetails:['',Validators.required],
       PaymentStatus:['',Validators.required],
       PaymentInfo:['',Validators.required],
+      UTR:['',Validators.required],
+      ClaimSettlementDate:['',Validators.required],
       NEFT:['',Validators.required]
     });
   }

@@ -24,7 +24,9 @@ export class FreightBillingComponent {
       FreightBillDate: ['', Validators.required],
       FreightBillPhysicalSubmissionDate: ['', Validators.required],
       FreightCharges: ['', [Validators.required, Validators.min(0)]],
-      WorkOrderNumber: ['', Validators.required]
+      WorkOrderNumber: ['', Validators.required],
+      BillSubmission: ['', Validators.required]
+      
     });
   }
 

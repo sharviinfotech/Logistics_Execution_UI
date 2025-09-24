@@ -4,6 +4,14 @@
     <div class="card-body-LE">
       <form class="form-grid" [formGroup]="segmentInfo" (ngSubmit)="savePlan()">
 
+         <div class="form-field">
+          <input type="text" formControlName="SalesPerson" placeholder="" />
+          <label>Sales Person</label>
+          <small class="error" *ngIf="segmentInfo.get('SalesPerson')?.touched && segmentInfo.get('SalesPerson')?.invalid">
+           Sales Person is required
+          </small>
+        </div>
+
         <!-- Segment -->
         <div class="form-field">
           <input type="text" formControlName="segment" placeholder="" />
@@ -25,9 +33,9 @@
         <!-- Invoice Date -->
         <div class="form-field">
           <input type="text" formControlName="branch" placeholder="" />
-          <label>branch</label>
+          <label>Branch</label>
           <small class="error" *ngIf="segmentInfo.get('branch')?.touched && segmentInfo.get('branch')?.invalid">
-          branch  is required
+          Branch  is required
           </small>
         </div>
 
