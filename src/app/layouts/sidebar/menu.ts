@@ -11,21 +11,21 @@ export const MENU: MenuItem[] = [
                 label: 'Dashboard',
                 link: '/dashboard',
                 parentId: 2,
-                icon: 'bx-home-circle',
+                icon: 'bxs-dashboard',
             },
              {
                 id: 2,
                 label: 'Order Info',
                 link: '/order-info',
                 parentId: 2,
-                icon: 'bx-home-circle',
+                icon: 'bx-receipt',
             },
                {
                 id: 2,
                 label: 'Shipment Details',
                 link: '/shipment-details',
                 parentId: 2,
-                icon: 'bx-home-circle',
+                icon: 'bx-package',
             },
             //  {
             //     id: 2,
@@ -39,49 +39,49 @@ export const MENU: MenuItem[] = [
                 label: 'Invoice & Load Details',
                 link: '/invoice-load-details',
                 parentId: 2,
-                icon: 'bx-home-circle',
+                icon: 'bx-file',
             },
                   {
                 id: 2,
                 label: 'Segment Info',
                 link: '/segment-info',
                 parentId: 2,
-                icon: 'bx-home-circle',
+                icon: 'bx-sitemap',
             },
             {
                 id: 2,
                 label: 'Vechile Info',
                 link: '/vechile-info',
                 parentId: 2,
-                icon: 'bx-home-circle',
+                icon: 'bxs-truck',
             },
                 {
                 id: 2,
                 label: 'Transit Info',
                 link: '/transit-info',
                 parentId: 2,
-                icon: 'bx-home-circle',
+                icon: 'bx-error-circle',
             },
                {
                 id: 2,
                 label: 'Freight Billing',
                 link: '/freight-billing',
                 parentId: 2,
-                icon: 'bx-home-circle',
+                icon: 'bx-credit-card',
             },
               {
                 id: 2,
                 label: 'Transit Damage Info',
                 link: '/transit-damage-info',
                 parentId: 2,
-                icon: 'bx-home-circle',
+                icon: 'bx-map-alt',
             },
             {
                 id: 2,
                 label: 'Insurance Claim Tracking',
                 link: '/insurance-claim-tracking',
                 parentId: 2,
-                icon: 'bx-home-circle',
+                icon: 'bx-shield',
             },
             //   {
             //     id: 2,
@@ -364,5 +364,23 @@ export const MENU: MenuItem[] = [
     //         },
     //     ]
     // }
+
+
+
+
+    // {
+    //     id: 67,
+    //     label: 'contacts',
+    //     icon: 'bx-user-circle',
+    //     subItems: [
+    //         {
+    //             id: 68,
+    //             label: 'Profile',
+    //             link: 'contacts/profile',
+    //             parentId: 67
+    //         },
+            
+    //     ]
+    // },
 ];
 

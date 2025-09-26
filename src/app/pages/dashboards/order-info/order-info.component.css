@@ -168,13 +168,7 @@ button[type="submit"]:hover {
   background-color: #5a6268;
 }
 
-.form-buttons {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: flex-end;
-  gap: 15px;
-  margin-top: 20px;
-}
+
 
 .form-radio.optional + br {
   display: none; /* Hide the <br> tag after the radio buttons */

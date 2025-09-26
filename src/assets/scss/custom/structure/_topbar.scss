@@ -111,13 +111,19 @@
 .page-content {
     padding: calc(#{$header-height} + #{$grid-gutter-width}) calc(#{$grid-gutter-width} * 0.75) $footer-height calc(#{$grid-gutter-width} * 0.75);
     // background: #96a3a7;
-    background: url("/assets/images/bg5.jpg") no-repeat center center / cover !important;
+      min-height: 300vh;
+    // background: url("/assets/images/bg5.jpg") no-repeat center center / cover !important;
+   // background-color: #d2e2f3;
+        // background: url("/assets/images/bg-glass-transparent.png") no-repeat center center / cover !important;
+
+ background: url("/assets/images/bg-glass-transparent-1.png")  !important;
+
 
 
 }
 
 .header-item {
-    height: $header-height;
+    // height: $header-height;
     box-shadow: none !important;
     // color: var(--#{$prefix}header-item-color);
     color: white !important;
@@ -261,11 +267,7 @@ body[data-sidebar="dark"] {
 //   border-bottom: 1px solid white;
         // background-image: linear-gradient(to top, #6ba3cd, #031c2e) !important;
           // background: url("/assets/images/bg3.jpg") no-repeat center center / cover !important;
-        //   background: url("/assets/images/flightwhite.jpeg") no-repeat center center / cover !important;
-
-
-        height: 288px !important;
-    margin-top: 10px !important;
+        //   background: url("/assets/images/flightwhite.jpeg") no-repeat center center / cover !important
     }
 
     .logo-dark {

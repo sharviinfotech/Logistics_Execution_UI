@@ -84,12 +84,15 @@
         li {
             a {
                 display: block;
-                padding: .625rem 1.5rem;
+                padding: 10px;
                 color: $sidebar-menu-item-color;
                 position: relative;
-                font-size: 16px;
+                font-size: 14px;
                 transition: all .4s;
                 font-weight: bold;
+                font-family: emoji;
+                letter-spacing: 0.1px;
+                
 
                 i {
                     display: inline-block;

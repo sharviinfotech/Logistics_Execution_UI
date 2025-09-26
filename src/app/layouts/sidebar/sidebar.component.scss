@@ -2,7 +2,9 @@
   Main sidebar and menu container
 */
 .vertical-menu {
-  background-color: #8f1e42;
+  // background-color: #8f1e42;
+  background: linear-gradient(135deg, #8f1e42 0%, #8f1e42 100%) center center / cover !important;
+
   box-shadow: 2px 0 15px rgba(0, 0, 0, 0.45);
   font-family: 'Poppins', sans-serif;
 }
@@ -27,8 +29,8 @@
   gap: 12px;
   color: #fff;
   padding: 12px 20px;
-  border-radius: 8px;
-  margin: 4px 10px;
+  // border-radius: 8px;
+  // margin: 4px 10px;
   transition: all 0.3s ease;
   font-size: 15px;
   font-weight: 500;
@@ -55,16 +57,19 @@
 /* Active menu */
 .vertical-menu li.mm-active > a,
 .sub-menu .active {
-  background-color: white !important;
+  // background-color: white !important;
+      background-image: linear-gradient(to top, #ea89897d, #ab888845) !important;
   color: #333 !important; /* Changed text color for readability */
   font-weight: 600;
-  // border-left: 3px solid #ff6a00;
+  border-left: 7px solid #13c333;
   box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1); /* Adjusted for a lighter background */
 }
 
 /* Active hover */
 .sub-menu .active:hover {
-  background-color: white !important;
+  // background-color: white !important;
+      background-image: linear-gradient(to top, #ea89897d, #ab888845) !important;
+
 }
 
 /* Sub-menu */

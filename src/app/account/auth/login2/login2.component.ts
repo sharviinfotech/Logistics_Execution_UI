@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,Inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { AuthenticationService } from '../../../core/services/auth.service';
 import { AuthfakeauthenticationService } from '../../../core/services/authfake.service';
@@ -6,8 +6,7 @@ import { login } from 'src/app/store/Authentication/authentication.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { FormBuilder, FormGroup} from '@angular/forms';
-
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import { SlickCarouselModule } from 'ngx-slick-carousel';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
@@ -40,7 +39,7 @@ export class Login2Component implements OnInit {
   currentIndex = 0;
   successMessage: string;
   errorMessage: string;
-  constructor(private formBuilder: UntypedFormBuilder, private route: ActivatedRoute, private router: Router, private authenticationService: AuthenticationService,
+  constructor(@Inject(DOCUMENT) private document: any,private formBuilder: UntypedFormBuilder, private route: ActivatedRoute, private router: Router, private authenticationService: AuthenticationService,
     private authFackservice: AuthfakeauthenticationService, public store: Store, private service: GeneralserviceService, private toaster: ToastrService,private spinner: NgxSpinnerService) { }
     loginForm: FormGroup;
     forgotPasswordForm: FormGroup;
@@ -52,6 +51,7 @@ export class Login2Component implements OnInit {
     fieldTextType = false;
     year = new Date().getFullYear();
     interval: any;
+    element: any;
   ngOnInit(): void {
     document.body.classList.add("auth-body-bg");
     this.loginForm = this.formBuilder.group({
@@ -175,7 +175,7 @@ export class Login2Component implements OnInit {
  
       // Login Api
       // this.store.dispatch(login({ userName: userName, password: password }));
-     
+     this.fullscreen()
         const  response   ={
             "message": "Login Successful",
             "status": 200,
@@ -193,7 +193,7 @@ export class Login2Component implements OnInit {
           localStorage.setItem('currentUser', JSON.stringify(response || { token: response.token }));
           const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
           this.router.navigate([returnUrl], { skipLocationChange: true });
- 
+       
       // this.login(userName, password)
     }
    
@@ -273,7 +273,7 @@ export class Login2Component implements OnInit {
       this.spinner.hide();
       return;
     }
-  
+  this.fullscreen()
     const loginPayload = {
       userName: userName,
       userPassword: password
@@ -302,6 +302,7 @@ export class Login2Component implements OnInit {
               timer: 5000, // 10 seconds
               timerProgressBar: true, // Shows a progress bar
             });
+            
           } 
           else if (response.status === 200 && response.data.isValid === false) {
             Swal.fire('Login Failed', `${response.message}`, 'error');
@@ -323,7 +324,32 @@ export class Login2Component implements OnInit {
       }
     );
   }
-  
+fullscreen() {
+  const elem = document.documentElement; // or document.body
+
+  if (!document.fullscreenElement) {
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if ((elem as any).mozRequestFullScreen) {
+      (elem as any).mozRequestFullScreen();
+    } else if ((elem as any).webkitRequestFullscreen) {
+      (elem as any).webkitRequestFullscreen();
+    } else if ((elem as any).msRequestFullscreen) {
+      (elem as any).msRequestFullscreen();
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if ((document as any).mozCancelFullScreen) {
+      (document as any).mozCancelFullScreen();
+    } else if ((document as any).webkitExitFullscreen) {
+      (document as any).webkitExitFullscreen();
+    } else if ((document as any).msExitFullscreen) {
+      (document as any).msExitFullscreen();
+    }
+  }
+}
+
   
   
 

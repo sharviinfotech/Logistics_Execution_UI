@@ -241,7 +241,10 @@ mustMatch(controlName: string, matchingControlName: string) {
       }
     }
   }
-
+goToProfile(): void {
+  // Add logic to close dropdown here if necessary
+  this.router.navigate(['/contacts/profile']);
+}
   changeLayout(layoutMode: string) {
     this.theme = layoutMode;
     this.store.dispatch(changesLayout({ layoutMode }));

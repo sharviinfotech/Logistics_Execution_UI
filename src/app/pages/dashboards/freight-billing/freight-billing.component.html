@@ -1,12 +1,10 @@
-<div class="">
-  <div class="p-3">
-    <div class="card-LE">
+<div class="card-LE">
       <div class="card-header-LE">
         Freight billing
       </div>
 
       <div class="card-body-LE">
-        <form class="form-grid" [formGroup]="FreightBilling" (ngSubmit)="saveFreightBill()">
+        <form class="form-grid" [formGroup]="FreightBilling" >
 
           <!-- Freight Bill Number -->
           <div class="form-field">
@@ -67,20 +65,18 @@
             </small>
           </div>
 
-          <!-- Submit / Cancel Buttons -->
-          <div class="form-buttons">
-            <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
-              Cancel Edit
-            </button>
-            <button type="submit">
-              {{ isEditMode ? 'Update Plan' : 'Save' }}
-            </button>
-          </div>
+         
 
         </form>
+        <div class="text-right">
+          <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-md btn-raised btnSave" (click)="saveFreightBill()">
+           Save
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
 

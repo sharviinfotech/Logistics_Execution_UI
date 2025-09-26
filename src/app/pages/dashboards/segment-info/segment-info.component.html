@@ -1,8 +1,7 @@
-<div class="p-3">
-  <div class="card-LE">
+<div class="card-LE">
     <div class="card-header-LE">Segment Info</div>
     <div class="card-body-LE">
-      <form class="form-grid" [formGroup]="segmentInfo" (ngSubmit)="savePlan()">
+      <form class="form-grid" [formGroup]="segmentInfo" >
 
          <div class="form-field">
           <input type="text" formControlName="SalesPerson" placeholder="" />
@@ -68,18 +67,18 @@
 
      
 
-        <!-- Buttons -->
-        <div class="form-buttons">
+        
+
+      </form>
+      <!-- Buttons -->
+        <div class="text-right">
           <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
             Cancel
           </button>
-          <button type="submit">
-            {{ isEditMode ? 'Update Details' : 'Save' }}
+          <button type="submit" class="btn btn-md btn-raised btnSave" (click)="savePlan()">
+           Save
           </button>
         </div>
-
-      </form>
     </div>
   </div>
-</div>
 

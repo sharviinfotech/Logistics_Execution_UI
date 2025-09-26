@@ -1,9 +1,7 @@
-
-<div class="p-3">
   <div class="card-LE">
     <div class="card-header-LE">Vehicle Info</div>
     <div class="card-body-LE">
-      <form class="form-grid" [formGroup]="Vechileinfo" (ngSubmit)="savePlan()">
+      <form class="form-grid" [formGroup]="Vechileinfo" >
 
         <!-- Type of Shipment -->
         <div class="form-field optional">
@@ -121,17 +119,16 @@
         </div>
      
 
-         <!-- Submit / Cancel Buttons -->
-        <div class="form-buttons">
-          <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
-            Cancel Edit
-          </button>
-          <button type="submit">
-            {{ isEditMode ? 'Update Plan' : 'Save' }}
-          </button>
-        </div>
+        
 
       </form>
+      <div class="text-right">
+          <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-md btn-raised btnSave" (click)="savePlan()">
+           Save 
+          </button>
+        </div>
     </div>
   </div>
-</div>

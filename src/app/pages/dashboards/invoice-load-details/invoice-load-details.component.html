@@ -1,8 +1,7 @@
-<div class="p-3">
-  <div class="card-LE">
+<div class="card-LE">
     <div class="card-header-LE">Invoice Load Details</div>
     <div class="card-body-LE">
-      <form class="form-grid" [formGroup]="invoiceLoadDetails" (ngSubmit)="savePlan()">
+      <form class="form-grid" [formGroup]="invoiceLoadDetails">
 
         
         <!-- <div class="form-field">
@@ -60,7 +59,7 @@
 
         <!-- Vehicle Number -->
         <div class="form-field">
-          <input type="number" min="0"  formControlName="actualloadintons"  placeholder="Enter weight in tons"  min="0" step="1" />
+          <input type="number" min="0"  formControlName="actualloadintons"  placeholder=""  min="0" step="1" />
           <label>Actual load in tons</label>
           <small class="error" *ngIf="invoiceLoadDetails.get('actualloadintons')?.touched && invoiceLoadDetails.get('actualloadintons')?.invalid">
             Actual load in tons is required
@@ -133,18 +132,17 @@
 
         
 
-        <!-- Save / Cancel Buttons -->
-        <div class="form-buttons">
+        
+
+      </form>
+      <div class="text-right">
           <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
             Cancel
           </button>
-          <button type="submit">
-            {{ isEditMode ? 'Update Details' : 'Save' }}
+          <button type="submit" class="btn btn-md btn-raised btnSave" (click)="savePlan()">
+           Save
           </button>
         </div>
-
-      </form>
     </div>
   </div>
-</div>
 
