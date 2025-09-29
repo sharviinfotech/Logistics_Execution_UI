@@ -59,6 +59,7 @@
     padding: 30px 0 30px 0;
     // margin-top: 85px !important;
     backdrop-filter: blur(0px) brightness(0.9);
+    background: #8f1e42 !important;
     // background: url("/assets/images/flightAndSky.jpg") no-repeat center center / cover !important;
 
     .mm-active {
@@ -89,8 +90,8 @@
                 position: relative;
                 font-size: 14px;
                 transition: all .4s;
-                font-weight: bold;
-                font-family: emoji;
+                font-weight: 500;
+                font-family: Inter, Roboto, sans-serif;
                 letter-spacing: 0.1px;
                 
 

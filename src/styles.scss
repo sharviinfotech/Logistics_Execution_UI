@@ -809,3 +809,36 @@ table th {
     border: 1px solid #057e1b !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow on hover */
 }
+.tableFixHead {
+  overflow-y: auto; /* Enables vertical scrolling */
+  max-height: 45vh; /* Reduce height to make it smaller */
+  margin-top: 3px;
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: #ccc transparent; /* Light scrollbar color */
+
+  /* Smart Scroll - Hide scrollbar when not scrolling */
+  transition: max-height 0.3s ease-in-out;
+}
+
+/* For WebKit Browsers (Chrome, Safari) */
+.tableFixHead::-webkit-scrollbar {
+  width: 6px; /* Make scrollbar thin */
+}
+
+.tableFixHead::-webkit-scrollbar-track {
+  background: transparent; /* Hide scrollbar background */
+}
+
+.tableFixHead::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2); /* Light scrollbar color */
+  border-radius: 3px; /* Rounded edges */
+}
+
+.tableFixHead:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.4); /* Darken when hovering */
+}
+
+.tableFixHead thead th {
+  position: sticky;
+  top: -2px;
+}
