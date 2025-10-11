@@ -8,13 +8,35 @@
         <form class="form-grid" [formGroup]="ProductInfo">
 
             <!-- Product -->
-            <div class="form-field">
-                <input type="text" formControlName="Product" placeholder=" " />
+           <div class="form-field">
+                <select formControlName="Product">
+                    <option value="">Select Type of Product</option>
+                    <option value="FUZE BATTERY">FUZE BATTERY</option>
+                    <option value="IPS">IPS</option>
+                    <option value="IPS SYSTEM">IPS SYSTEM</option>
+                    <option value="LI-ION BATTERY">LI-ION BATTERY</option>
+                    <option value="NCFP BATTERY">NCFP BATTERY</option>
+                    <option value="NCFP BATTERY/ NI -CD BATTERY">NCFP BATTERY/ NI -CD BATTERY</option>
+                    <option value="NCFP BATTERY / PE">NCFP BATTERY / PE</option>
+                    <option value="NCPP BATTERY">NCPP BATTERY</option>
+                    <option value="NCPP BATTERY /PE">NCPP BATTERY /PE</option>
+                    <option value="NCSP BATTERY">NCSP BATTERY</option>
+                    <option value="NI -CD BATTERY">NI -CD BATTERY</option>
+                    <option value="NI -CD BATTERY / NCFP">NI -CD BATTERY / NCFP</option>
+                    <option value="NI -CD BATTERY / PE">NI -CD BATTERY / PE</option>
+                    <option value="NI -CD BATTERY / NCFP BATTERY">NI -CD BATTERY / NCFP BATTERY</option>
+                    <option value="PE">PE</option>
+                    <option value="RAW MATERIAL">RAW MATERIAL</option>
+                    <option value="SILVER BATTERY">SILVER BATTERY</option>
+                    <option value="THERMAL BATTERY">THERMAL BATTERY</option>
+                </select>
+                
                 <label>Product</label>
                 <small class="error" *ngIf="ProductInfo.get('Product')?.touched && ProductInfo.get('Product')?.invalid">
                     Product is required
                 </small>
-            </div>
+                </div>
+
 
             <!-- Type of Material -->
             <div class="form-field">
@@ -78,11 +100,11 @@
             <div class="form-field">
                 <select formControlName="BatteryCondition">
                     <option value="">Select Battery Condition</option>
-                    <option value="New">New</option>
-                    <option value="Good">Good</option>
-                    <option value="Average">Average</option>
-                    <option value="Poor">Poor</option>
-                    <option value="Damaged">Damaged</option>
+                    <option value="DRY & DISCHARGED">DRY & DISCHARGED</option>
+                    <option value="FILLED & DISCHARGED">FILLED & DISCHARGED</option>
+                    <option value="NA">NA</option>
+                    <!-- <option value="Poor">Poor</option>
+                    <option value="Damaged">Damaged</option> -->
                 </select>
                 <label>Battery Condition</label>
                 <small class="error"

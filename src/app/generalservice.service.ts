@@ -119,4 +119,11 @@ getLoginResponse(){
     return this.http.post(environment.baseUrl+'api/external/orderconfirmation/coois',obj);
  
   }
+  OrderinfoOutward(obj){
+  return this.http.post(environment.baseUrl+'api/external/LE/orderInfo/Outward/fetchInvoiceList',obj);
+}
+OrderInfoOutwardSave(obj){
+  return this.http.post(environment.baseUrl+'api/external/LE/orderInfo/Outward/fetchInvoiceList/Save',obj);
+}
+
 }
