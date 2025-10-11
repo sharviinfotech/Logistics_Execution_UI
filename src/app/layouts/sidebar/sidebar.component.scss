@@ -44,8 +44,8 @@
 
 /* Hover effect */
 .vertical-menu ul li a:hover {
-  background-color: white; /* Changed to white */
-  color: #333 !important; /* Changed text color for readability */
+  // background-color: white; 
+  color: white !important; /* Changed text color for readability */
   transform: translateX(6px);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); /* Adjusted for a lighter background */
 }
@@ -58,11 +58,12 @@
 .vertical-menu li.mm-active > a,
 .sub-menu .active {
   // background-color: white !important;
-   background-image: linear-gradient(to top, #9e5f73c9, #a80f40) !important;
+  //  background-image: linear-gradient(to top, #9e5f73c9, #a80f40) !important;
   color:white !important; /* Changed text color for readability */
   font-weight: 500;
-  border-left: 7px solid #b30f43;
-  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1); /* Adjusted for a lighter background */
+  border-left: 7px solid #b2516f;
+  // box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1);
+   box-shadow: inset 10px 10px 10px 10px rgb(255 255 255 / 10%);
 }
 
 /* Active hover */
