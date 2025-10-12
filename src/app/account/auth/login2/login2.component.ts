@@ -193,7 +193,12 @@ export class Login2Component implements OnInit {
           localStorage.setItem('currentUser', JSON.stringify(response || { token: response.token }));
           const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
           this.router.navigate([returnUrl], { skipLocationChange: true });
-       
+       setTimeout(() => {
+              const menuButton = document.getElementById('vertical-menu-btn');
+              if (menuButton) {
+                menuButton.click(); // simulate toggle
+              }
+            }, 500); // wait a second for layout to render
       // this.login(userName, password)
     }
    
@@ -289,6 +294,10 @@ export class Login2Component implements OnInit {
         // Ensure UI update completes before showing Swal
         setTimeout(() => {
           if (response.status === 200 && response.data.isValid) {
+            const menuButton = document.getElementById('vertical-menu-btn');
+              if (menuButton) {
+                menuButton.click(); // simulate toggle
+              }
             localStorage.setItem('currentUser', JSON.stringify(response || { token: response.token }));
             const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
             this.router.navigate([returnUrl], { skipLocationChange: true });
@@ -302,6 +311,12 @@ export class Login2Component implements OnInit {
               timer: 5000, // 10 seconds
               timerProgressBar: true, // Shows a progress bar
             });
+            setTimeout(() => {
+              const menuButton = document.getElementById('vertical-menu-btn');
+              if (menuButton) {
+                menuButton.click(); // simulate toggle
+              }
+            }, 1000); // wait a second for layout to render
             
           } 
           else if (response.status === 200 && response.data.isValid === false) {

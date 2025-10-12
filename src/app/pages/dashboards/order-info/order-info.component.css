@@ -28,8 +28,8 @@ input[type="radio"] {
   display: flex;
   align-items: center;
   gap: 40px;
-  padding: 20px 30px;
-  margin-bottom: 25px;
+  padding:10px;
+  /* margin-bottom: 25px; */
   /* background: linear-gradient(135deg, #ffffff 0%, #f3dce0 40%, #eed3d8 100%); */
   /* border-radius: 16px; */
   /* border: 1px solid rgba(139, 35, 50, 0.2); */
