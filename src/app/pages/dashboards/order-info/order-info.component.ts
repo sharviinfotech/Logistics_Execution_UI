@@ -61,6 +61,29 @@ export class OrderInfoComponent implements OnInit {
     this.fetchpdb();
   }
 
+  // Helper to check SAP mode
+  isSap(): boolean {
+    return this.sapType === 'SAP';
+  }
+
+  onPlantChange(): void {
+    const code = this.OrderInfo.get('Plant')?.value;
+    const selected = this.plantList.find((p: any) => p.PLANT === code);
+    this.OrderInfo.patchValue({ Plantdescription: selected?.PLANT_DESC || '' });
+  }
+
+  onDivisionChange(): void {
+    const code = this.OrderInfo.get('Division')?.value;
+    const selected = this.divisionList.find((d: any) => d.DIVISION === code);
+    this.OrderInfo.patchValue({ Divisiondescription: selected?.DIVISION_DESC || '' });
+  }
+
+  onBillingTypeChange(): void {
+    const code = this.OrderInfo.get('BillingTransactionType')?.value;
+    const selected = this.billintypeList.find((b: any) => b.BILL_TYPE === code);
+    this.OrderInfo.patchValue({ Billingdescription: selected?.BILL_TYPE_DESC || '' });
+  }
+
   onOrderTypeChange(): void {
     if (this.previousOrderType !== null && this.previousOrderType !== this.orderType) {
       this.sapType = '';
@@ -71,18 +94,17 @@ export class OrderInfoComponent implements OnInit {
   }
 
   onSapTypeChange(): void {
-    this.showForm == false;
+    this.showForm = false;
     if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
       this.resetConditionalFields();
     }
     this.previousSapType = this.sapType;
 
-    console.log("sapType", this.sapType)
-    if (this.sapType == "SAP") {
-      this.fetchNonSAPData();
-    }
-    else {
-      this.showForm == true;
+    console.log("sapType", this.sapType);
+    if (this.sapType === "SAP") {
+      this.fetchNonSAPData(); // can be replaced with SAP master fetch if available
+    } else {
+      this.showForm = true;
     }
   }
 
@@ -169,7 +191,6 @@ export class OrderInfoComponent implements OnInit {
   }
 
   saveOutwardInvoiceData(): void {
-    console.log("sapType", this.sapType)
     const formValue = this.OrderInfo.value;
     const record = {
       INV_VBELN: formValue.TaxInvoice,
@@ -195,18 +216,16 @@ export class OrderInfoComponent implements OnInit {
       DEST_STATE: formValue.DestinationState,
       DEST_ZONE: formValue.DestinationZone
     };
-    if (this.sapType == "SAP") {
-      this.service.OrderInfoOutwardSave({ SAVE: [record] }).subscribe({
-        next: (res: any) => alert('Saved successfully!'),
-        error: (err) => alert('Failed to save data.')
-      });
-    }
 
-    else {
-      console.log("withoutsap")
+    if (this.sapType === "SAP") {
+      this.service.OrderInfoOutwardSave({ SAVE: [record] }).subscribe({
+        next: () => alert('Saved successfully!'),
+        error: () => alert('Failed to save data.')
+      });
+    } else {
       this.service.OrderInfoNonSap({ CREATE: [record] }).subscribe({
-        next: (res: any) => alert('Saved successfully!'),
-        error: (err) => alert('Failed to save data.')
+        next: () => alert('Saved successfully!'),
+        error: () => alert('Failed to save data.')
       });
     }
   }
@@ -253,9 +272,9 @@ export class OrderInfoComponent implements OnInit {
   fetchpdb() {
     this.service.getpdb().subscribe((res: any) => {
       console.log("PDB Data:", res);
-      this.plantList = res[0].PLANT
-      this.divisionList = res[0].DIVISION
-      this.billintypeList = res[0].BILLING_TYPE
+      this.plantList = res[0].PLANT;
+      this.divisionList = res[0].DIVISION;
+      this.billintypeList = res[0].BILLING_TYPE;
     });
   }
 }

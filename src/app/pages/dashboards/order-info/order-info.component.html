@@ -87,11 +87,11 @@
       <label>Basic Shipment Value</label>
     </div>
 
-    <!-- Item Number -->
+    <!-- Item Number
     <div class="form-field">
       <input type="text" formControlName="Itemnumber" placeholder=" " />
       <label>Item Number</label>
-    </div>
+    </div> -->
 
     <!-- Invoice With GST -->
     <div class="form-field">
@@ -117,7 +117,7 @@
       <label>Fiscal Quarter</label>
     </div>
 
-    <!-- Month -->
+    <!-- Month
     <div class="form-field">
       <select formControlName="Month">
         <option value="">Select Month</option>
@@ -126,7 +126,34 @@
         </option>
       </select>
       <label>Month</label>
+    </div> -->
+    <!-- Month -->
+    <!-- <div class="form-field">
+      <input type="month" formControlName="Month" />
+      <label>Month</label>
+    </div> -->
+    <!-- Month Dropdown -->
+    <div class="form-field">
+      <select formControlName="Month">
+        <option value="">Select Month</option>
+        <option value="January">January</option>
+        <option value="February">February</option>
+        <option value="March">March</option>
+        <option value="April">April</option>
+        <option value="May">May</option>
+        <option value="June">June</option>
+        <option value="July">July</option>
+        <option value="August">August</option>
+        <option value="September">September</option>
+        <option value="October">October</option>
+        <option value="November">November</option>
+        <option value="December">December</option>
+      </select>
+      <label>Month</label>
     </div>
+
+
+
 
     <!-- Physical Dispatch -->
     <div class="form-field">
@@ -134,7 +161,7 @@
       <label>Physical Dispatch Date & Time</label>
     </div>
 
-    <!-- Plant Dropdown -->
+    <!-- Plant Dropdown
     <div class="form-field">
       <select formControlName="Plant" (change)="onPlantChange()">
         <option value="">Select Plant</option>
@@ -143,8 +170,25 @@
       <label>Plant</label>
     </div>
     <div class="form-field">
-      <!-- remove [value] -->
-      <input type="text" formControlName="Plantdescription" placeholder=" " readonly />
+      remove [value] -->
+    <!-- <input type="text" formControlName="Plantdescription" placeholder=" " readonly />
+      <label>Plant Description</label>
+    </div> -->
+    <!-- 🌿 Plant -->
+    <div class="form-field">
+      <ng-container *ngIf="!isSap(); else sapPlant">
+        <select formControlName="Plant" (change)="onPlantChange()">
+          <option value="">Select Plant</option>
+          <option *ngFor="let p of plantList" [value]="p.PLANT">{{ p.PLANT }} - {{ p.PLANT_DESC }}</option>
+        </select>
+      </ng-container>
+      <ng-template #sapPlant>
+        <input type="text" formControlName="Plant" readonly />
+      </ng-template>
+      <label>Plant</label>
+    </div>
+    <div class="form-field" *ngIf="!isSap()">
+      <input type="text" formControlName="Plantdescription" readonly />
       <label>Plant Description</label>
     </div>
 
@@ -164,24 +208,43 @@
       <label>Transaction Type</label>
     </div>
 
-    <!-- Billing Type Dropdown -->
+    <!-- Billing Type Dropdown
     <div class="form-field">
       <select formControlName="BillingTransactionType" (change)="onBillingTypeChange()">
         <option value="">Select Billing Type</option>
-        <option *ngFor="let b of billingTypes" [value]="b.BILL_TYPE">{{ b.BILL_TYPE }}</option>
+        <option *ngFor="let b of billintypeList" [value]="b.BILL_TYPE">{{ b.BILL_TYPE }}</option>
       </select>
       <label>Billing Transaction Type</label>
     </div>
     <div class="form-field">
       <input type="text" formControlName="Billingdescription" [value]="selectedBillingDesc" placeholder=" " readonly />
       <label>Billing Description</label>
+    </div> -->
+    <!-- 🧾 Billing Type -->
+    <div class="form-field">
+      <ng-container *ngIf="!isSap(); else sapBilling">
+        <select formControlName="BillingTransactionType" (change)="onBillingTypeChange()">
+          <option value="">Select Billing Type</option>
+          <option *ngFor="let b of billintypeList" [value]="b.BILL_TYPE">
+            {{ b.BILL_TYPE }} - {{ b.BILL_TYPE_DESC }}
+          </option>
+        </select>
+      </ng-container>
+      <ng-template #sapBilling>
+        <input type="text" formControlName="BillingTransactionType" readonly />
+      </ng-template>
+      <label>Billing Transaction Type</label>
+    </div>
+    <div class="form-field" *ngIf="!isSap()">
+      <input type="text" formControlName="Billingdescription" readonly />
+      <label>Billing Description</label>
     </div>
 
     <!-- Division Dropdown -->
-    <div class="form-field">
+    <!-- <div class="form-field">
       <select formControlName="Division" (change)="onDivisionChange()">
         <option value="">Select Division</option>
-        <option *ngFor="let d of divisions" [value]="d.DIVISION">{{ d.DIVISION }}</option>
+        <option *ngFor="let data of divisionList" [value]="data.DIVISION">{{ data.DIVISION }}</option>
       </select>
       <label>Division</label>
     </div>
@@ -189,13 +252,42 @@
       <input type="text" formControlName="Divisiondescription" [value]="selectedDivisionDesc" placeholder=" "
         readonly />
       <label>Division Description</label>
+    </div> -->
+    <!-- 🏢 Division -->
+    <div class="form-field">
+      <ng-container *ngIf="!isSap(); else sapDivision">
+        <select formControlName="Division" (change)="onDivisionChange()">
+          <option value="">Select Division</option>
+          <option *ngFor="let d of divisionList" [value]="d.DIVISION">{{ d.DIVISION }} - {{ d.DIVISION_DESC }}</option>
+        </select>
+      </ng-container>
+      <ng-template #sapDivision>
+        <input type="text" formControlName="Division" readonly />
+      </ng-template>
+      <label>Division</label>
+    </div>
+    <div class="form-field" *ngIf="!isSap()">
+      <input type="text" formControlName="Divisiondescription" readonly />
+      <label>Division Description</label>
     </div>
 
     <!-- Sub Division -->
     <div class="form-field">
       <select formControlName="SubDivision">
         <option value="">Select Sub Division</option>
-        <option *ngFor="let s of subDivisions" [value]="s">{{ s }}</option>
+        <option value="FUZE">FUZE</option>
+        <option value="IPS SYSTEM">IPS SYSTEM</option>
+        <option value="LITHIUM">LITHIUM</option>
+        <option value="NCFP">NCFP</option>
+        <option value="NCPP">NCPP</option>
+        <option value="NCPP-VSEZ">NCPP-VSEZ</option>
+        <option value="NCPP/ETP">NCPP/ETP</option>
+        <option value="NCSP">NCSP</option>
+        <option value="PE">PE</option>
+        <option value="SILVER ZINC">SILVER ZINC</option>
+        <option value="SYSTEM ORDERS">SYSTEM ORDERS</option>
+        <option value="THERMAL">THERMAL</option>
+        <option value="THERMAL,FUZE,SZ">THERMAL,FUZE,SZ</option>
       </select>
       <label>Sub Division</label>
     </div>
