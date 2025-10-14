@@ -24,6 +24,7 @@ export class OrderInfoComponent implements OnInit {
   plantList: any;
   divisionList: any;
   billintypeList: any;
+  statesList: any;
 
   constructor(private fb: FormBuilder, private service: GeneralserviceService) { }
 
@@ -68,6 +69,7 @@ export class OrderInfoComponent implements OnInit {
 
   onPlantChange(): void {
     const code = this.OrderInfo.get('Plant')?.value;
+    console.log("code", code)
     const selected = this.plantList.find((p: any) => p.PLANT === code);
     this.OrderInfo.patchValue({ Plantdescription: selected?.PLANT_DESC || '' });
   }
@@ -197,7 +199,7 @@ export class OrderInfoComponent implements OnInit {
       INV_ODNO: formValue.ODN,
       INV_DATE: formValue.InvoiceData,
       BASIC_SHIP_VALUE: formValue.BasicShipment,
-      POSNR: formValue.Itemnumber,
+
       INV_VALUE_GST: formValue.InvoiceWithGst,
       PHYS_DISPATCH: formValue.PhysicalDispatchDateTime,
       FISCAL_YEAR: formValue.FinanceYear,
@@ -275,6 +277,20 @@ export class OrderInfoComponent implements OnInit {
       this.plantList = res[0].PLANT;
       this.divisionList = res[0].DIVISION;
       this.billintypeList = res[0].BILLING_TYPE;
+      this.statesList = res[0].STATES;
     });
+  }
+  fetchzonechange() {
+    if (this.OrderInfo.value.DestinationState) {
+      let obj = {
+        "STATE": this.OrderInfo.value.DestinationState
+      }
+      this.service.fetchzone(obj).subscribe((res: any) => {
+        this.OrderInfo.patchValue({
+          "DestinationZone": res.ZONE
+        })
+      });
+    }
+
   }
 }

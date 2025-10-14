@@ -179,7 +179,7 @@
       <ng-container *ngIf="!isSap(); else sapPlant">
         <select formControlName="Plant" (change)="onPlantChange()">
           <option value="">Select Plant</option>
-          <option *ngFor="let p of plantList" [value]="p.PLANT">{{ p.PLANT }} - {{ p.PLANT_DESC }}</option>
+          <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">{{ p.PLANT }} - {{ p.PLANT_DESC }}</option>
         </select>
       </ng-container>
       <ng-template #sapPlant>
@@ -187,10 +187,10 @@
       </ng-template>
       <label>Plant</label>
     </div>
-    <div class="form-field" *ngIf="!isSap()">
+    <!-- <div class="form-field" *ngIf="!isSap()">
       <input type="text" formControlName="Plantdescription" readonly />
       <label>Plant Description</label>
-    </div>
+    </div> -->
 
     <!-- Transaction Type -->
     <div class="form-field">
@@ -225,7 +225,7 @@
       <ng-container *ngIf="!isSap(); else sapBilling">
         <select formControlName="BillingTransactionType" (change)="onBillingTypeChange()">
           <option value="">Select Billing Type</option>
-          <option *ngFor="let b of billintypeList" [value]="b.BILL_TYPE">
+          <option *ngFor="let b of billintypeList" [value]="b.BILL_TYPE_DESC">
             {{ b.BILL_TYPE }} - {{ b.BILL_TYPE_DESC }}
           </option>
         </select>
@@ -235,10 +235,10 @@
       </ng-template>
       <label>Billing Transaction Type</label>
     </div>
-    <div class="form-field" *ngIf="!isSap()">
+    <!-- <div class="form-field" *ngIf="!isSap()">
       <input type="text" formControlName="Billingdescription" readonly />
       <label>Billing Description</label>
-    </div>
+    </div> -->
 
     <!-- Division Dropdown -->
     <!-- <div class="form-field">
@@ -258,7 +258,8 @@
       <ng-container *ngIf="!isSap(); else sapDivision">
         <select formControlName="Division" (change)="onDivisionChange()">
           <option value="">Select Division</option>
-          <option *ngFor="let d of divisionList" [value]="d.DIVISION">{{ d.DIVISION }} - {{ d.DIVISION_DESC }}</option>
+          <option *ngFor="let d of divisionList" [value]="d.DIVISION_DESC">{{ d.DIVISION }} - {{ d.DIVISION_DESC }}
+          </option>
         </select>
       </ng-container>
       <ng-template #sapDivision>
@@ -266,10 +267,10 @@
       </ng-template>
       <label>Division</label>
     </div>
-    <div class="form-field" *ngIf="!isSap()">
+    <!-- <div class="form-field" *ngIf="!isSap()">
       <input type="text" formControlName="Divisiondescription" readonly />
       <label>Division Description</label>
-    </div>
+    </div> -->
 
     <!-- Sub Division -->
     <div class="form-field">
@@ -323,9 +324,19 @@
     </div>
 
     <!-- Destination State -->
+
     <div class="form-field">
-      <input type="text" formControlName="DestinationState" placeholder=" " />
-      <label>Destination State</label>
+      <ng-container *ngIf="!isSap(); else sapDivision">
+        <select formControlName="DestinationState" (change)="fetchzonechange()">
+          <option value="">Select State</option>
+          <option *ngFor="let d of statesList" [value]="d.STATE">{{ d.STATE }}
+          </option>
+        </select>
+      </ng-container>
+      <ng-template #sapDivision>
+        <input type="text" formControlName="DestinationState" readonly />
+      </ng-template>
+      <label>Designation State</label>
     </div>
 
     <!-- Destination Zone -->

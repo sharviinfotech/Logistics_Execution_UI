@@ -131,5 +131,9 @@ export class GeneralserviceService {
   getpdb() {
     return this.http.get(environment.baseUrl + 'api/external/LE/orderInfo/plant_division_Biltype',);
   }
+  fetchzone(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/orderInfo/Outward/withoutsap/fetchzone', obj);
+  }
+
 
 }
