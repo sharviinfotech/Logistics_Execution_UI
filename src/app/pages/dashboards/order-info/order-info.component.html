@@ -4,364 +4,249 @@
   </div>
 
   <div class="card-body-LE">
-  <div class="form-radio optional">
-        <label>
-          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
-          <span>Inward</span>
-        </label>
-        <label>
-          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
-          <span>Outward</span>
-        </label>
-      </div>
-      <br />
-
-      <!-- SAP Type + Input -->
-      <div class="sap-row" *ngIf="orderType" style="display: flex !important;">
-        <!-- With / Without SAP -->
-        <div class="form-radio optional sap-radio">
-          <label>
-            <input type="radio" [(ngModel)]="sapType" (ngModelChange)="onSapTypeChange()"
-              [ngModelOptions]="{standalone: true}" value="SAP" />
-            <span>With SAP</span>
-          </label>
-          <label>
-            <input type="radio" [(ngModel)]="sapType" (ngModelChange)="onSapTypeChange()"
-              [ngModelOptions]="{standalone: true}" value="Non-SAP" />
-            <span>Without SAP</span>
-          </label>
-        </div>
-
-        <!-- Input + GET Button -->
-        <div class="input-row" *ngIf="sapType" >
-
-        <!-- Inward -->
-
-          <div *ngIf="orderType === 'Inward'" class="input-flex">
-            <div class="form-field flex-1">
-              <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" " (input)="onInputChange('purchase')" />
-              <label>PO Number</label>
-            </div>
-            <button type="button" class="btn-get" (click)="getForm('purchase')" [disabled]="!ponumber || ponumber.trim()===''">GET</button>
-          </div>
-
-            
-            <div *ngIf="orderType === 'Outward'" class="input-flex">
-              <div class="form-field flex-1">
-                <input type="text" name="invoicenumber" [(ngModel)]="invoicenumber" placeholder=" " (input)="onInputChange('invoice')" />
-                <label>Invoice Number</label>
-              </div>
-              <button type="button" class="btn-get" (click)="getForm('invoice')" [disabled]="!invoicenumber || invoicenumber.trim()===''">GET</button>
-            </div>
-
-        </div>
-      </div>
+    <!-- Order Type -->
+    <div class="form-radio optional">
+      <label>
+        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
+        <span>Inward</span>
+      </label>
+      <label>
+        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
+        <span>Outward</span>
+      </label>
     </div>
-    <form class="form-grid" [formGroup]="OrderInfo" *ngIf="showForm">
-    
-  
-        <!-- Tax Invoice -->
-        <div class="form-field">
-          <input type="text" formControlName="TaxInvoice" placeholder=" " />
-          <label>Tax Invoice Number</label>
-          <small class="error" *ngIf="OrderInfo.get('TaxInvoice')?.touched && OrderInfo.get('TaxInvoice')?.invalid">
-            Tax Invoice Number is required
-          </small>
+
+    <br />
+
+    <!-- SAP Type + Input -->
+    <div *ngIf="orderType" class="sap-row" style="display: flex !important;">
+      <!-- SAP Radio -->
+      <div class="form-radio optional sap-radio">
+        <label>
+          <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
+          <span>With SAP</span>
+        </label>
+        <label>
+          <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
+          <span>Without SAP</span>
+        </label>
+      </div>
+
+      <!-- Input + GET (only for SAP) -->
+      <div class="input-row" *ngIf="sapType === 'SAP'">
+        <div *ngIf="orderType === 'Inward'" class="input-flex">
+          <div class="form-field flex-1">
+            <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" "
+              (input)="onInputChange('purchase')" />
+            <label>PO Number</label>
+          </div>
+          <button type="button" class="btn-get" (click)="getForm('purchase')"
+            [disabled]="!ponumber || ponumber.trim()===''">
+            GET
+          </button>
         </div>
 
-        <!-- ODN -->
-        <div class="form-field">
-          <input type="text" formControlName="ODN" placeholder=" " />
-          <label>ODN Number</label>
-          <small class="error" *ngIf="OrderInfo.get('ODN')?.touched && OrderInfo.get('ODN')?.invalid">
-            ODN Number is required
-          </small>
+        <div *ngIf="orderType === 'Outward'" class="input-flex">
+          <div class="form-field flex-1">
+            <input type="text" name="invoicenumber" [(ngModel)]="invoicenumber" placeholder=" "
+              (input)="onInputChange('invoice')" />
+            <label>Invoice Number</label>
+          </div>
+          <button type="button" class="btn-get" (click)="getForm('invoice')"
+            [disabled]="!invoicenumber || invoicenumber.trim()===''">
+            GET
+          </button>
         </div>
-
-        <!-- Invoice Data -->
-        <div class="form-field">
-          <input type="text" formControlName="InvoiceData" placeholder=" " />
-          <label>Invoice Date</label>
-          <small class="error" *ngIf="OrderInfo.get('InvoiceData')?.touched && OrderInfo.get('InvoiceData')?.invalid">
-            Invoice Date is required
-          </small>
-        </div>
-
-        <!-- Basic Shipment -->
-        <div class="form-field">
-          <input type="text" formControlName="BasicShipment" placeholder=" " />
-          <label>Basic Shipment Value</label>
-          <small class="error"
-            *ngIf="OrderInfo.get('BasicShipment')?.touched && OrderInfo.get('BasicShipment')?.invalid">
-            Basic Shipment Value is required
-          </small>
-        </div>
-         <div class="form-field">
-          <input type="text" formControlName="Itemnumber" placeholder=" " />
-          <label>Item Number</label>
-          <small class="error"
-            *ngIf="OrderInfo.get('Itemnumber')?.touched && OrderInfo.get('Itemnumber')?.invalid">
-            Item Number is required
-          </small>
-        </div>
-
-        <!-- Invoice With GST -->
-        <div class="form-field">
-          <input type="text" formControlName="InvoiceWithGst" placeholder=" " />
-          <label>Invoice Value With GST</label>
-          <small class="error"
-            *ngIf="OrderInfo.get('InvoiceWithGst')?.touched && OrderInfo.get('InvoiceWithGst')?.invalid">
-            Invoice Value With GST is required
-          </small>
-        </div>
-
-        <!-- Finance Year -->
-        <div class="form-field">
-          <input type="text" formControlName="FinanceYear" placeholder=" " />
-          <label>Fiscal Year</label>
-          <small class="error" *ngIf="OrderInfo.get('FinanceYear')?.touched && OrderInfo.get('FinanceYear')?.invalid">
-           Fiscal Year is required
-          </small>
-        </div>
-
-        <!-- System Generated Date -->
-        <!-- <div class="form-field">
-          <input type="date" formControlName="SystemGeneratedDate" placeholder=" " />
-          <label>System Generated Date</label>
-          <small class="error"
-            *ngIf="OrderInfo.get('SystemGeneratedDate')?.touched && OrderInfo.get('SystemGeneratedDate')?.invalid">
-            System Generated Date is required
-          </small>
-        </div> -->
-
-        <!-- Fiscal Year -->
-        <!-- <div class="form-field">
-          <select formControlName="FiscalYear">
-            <option value="">Select Financial Year</option>
-            <option value="2023-2024">2023-2024</option>
-            <option value="2024-2025">2024-2025</option>
-            <option value="2025-2026">2025-2026</option>
-            <option value="2026-2027">2026-2027</option>
-          </select>
-          <label>Fiscal Year</label>
-          <small class="error" *ngIf="OrderInfo.get('FiscalYear')?.touched && OrderInfo.get('FiscalYear')?.invalid">
-            Fiscal Year is required
-          </small>
-        </div> -->
-
-        <!-- Fiscal Quarter -->
-        <div class="form-field">
-          <select formControlName="FiscalQuarter">
-            <option value="">Select Quarter</option>
-            <option value="Q1">Q1 (Apr - Jun)</option>
-            <option value="Q2">Q2 (Jul - Sep)</option>
-            <option value="Q3">Q3 (Oct - Dec)</option>
-            <option value="Q4">Q4 (Jan - Mar)</option>
-          </select>
-          <label>Fiscal Quarter</label>
-          <small class="error"
-            *ngIf="OrderInfo.get('FiscalQuarter')?.touched && OrderInfo.get('FiscalQuarter')?.invalid">
-            Fiscal Quarter is required
-          </small>
-        </div>
-
-        <!-- Month -->
-        <div class="form-field">
-          <select formControlName="Month">
-            <option value="">Select Month</option>
-            <option
-              *ngFor="let m of ['January','February','March','April','May','June','July','August','September','October','November','December']"
-              [value]="m">{{ m }}</option>
-          </select>
-          <label>Month</label>
-          <small class="error" *ngIf="OrderInfo.get('Month')?.touched && OrderInfo.get('Month')?.invalid">
-            Month is required
-          </small>
-        </div>
-
-
-        <div class="form-field">
-          <input 
-            type="datetime-local" 
-            formControlName="PhysicalDispatchDateTime" 
-            id="physicalDispatchDateTime"
-            placeholder=" " 
-          />
-          <label for="physicalDispatchDateTime">Physical Dispatch Date and Time</label>
-          <small 
-            class="error"
-            *ngIf="OrderInfo.get('PhysicalDispatchDateTime')?.touched && OrderInfo.get('PhysicalDispatchDateTime')?.invalid">
-            Physical Dispatch Date and Time is required
-          </small>
-        </div>
-
-        
-
-
-
-        <!-- Plant -->
-        <div class="form-field">
-          <input type="text" formControlName="Plant" placeholder=" " />
-          <label>Plant</label>
-          <small class="error" *ngIf="OrderInfo.get('Plant')?.touched && OrderInfo.get('Plant')?.invalid">
-            Plant is required
-          </small>
-        </div>
-
-        <!-- Transaction Type -->
-        <div class="form-field">
-          <select formControlName="TransactionType">
-            <option value="">Select Mode of Transport</option>
-            <option value="FULLTRUCKLOAD">FULL TRUCK LOAD</option>
-            <option value="CARGO">CARGO</option>
-            <option value="RATECONTRACT">RATE CONTRACT</option>
-            <option value="LOCALTRANSPORTATION">LOCAL TRANSPORTATION</option>
-            <option value="CUSTOMERTRANSPORTER">CUSTOMER TRANSPORTER</option>
-            <option value="COMPANYVEHICLE">COMPANY VEHICLE</option>
-            <option value="COURIER">COURIER</option>
-            <option value="BYHAND">BY HAND</option>
-          </select>
-          <label>Transaction Type</label>
-          <small class="error"
-            *ngIf="OrderInfo.get('TransactionType')?.touched && OrderInfo.get('TransactionType')?.invalid">
-            Transaction Type is required
-          </small>
-        </div>
-
-
-        <!-- Billing Transaction Type -->
-        <div class="form-field">
-          <input type="text" formControlName="BillingTransactionType" placeholder=" " />
-          <label>Billing Transaction Type</label>
-          <small class="error"
-            *ngIf="OrderInfo.get('BillingTransactionType')?.touched && OrderInfo.get('BillingTransactionType')?.invalid">
-            Billing Transaction Type is required
-          </small>
-        </div>
-
-        <!-- Division -->
-        <div class="form-field">
-          <input type="text" formControlName="Division" placeholder=" " />
-          <label>Division</label>
-          <small class="error" *ngIf="OrderInfo.get('Division')?.touched && OrderInfo.get('Division')?.invalid">
-            Division is required
-          </small>
-        </div>
-
-        <!-- Sub Division -->
-        <div class="form-field">
-          <select formControlName="SubDivision">
-            <option value="">Select Sub Division</option>
-            <option value="FUZE">FUZE</option>
-            <option value="IPS SYSTEM">IPS SYSTEM</option>
-            <option value="LITHIUM">LITHIUM</option>
-            <option value="NCFP">NCFP</option>
-            <option value="NCPP">NCPP</option>
-            <option value="NCPP-VSEZ">NCPP-VSEZ</option>
-            <option value="NCPP/ETP">NCPP/ETP</option>
-            <option value="NCSP">NCSP</option>
-            <option value="PE">PE</option>
-            <option value="SILVER ZINC">SILVER ZINC</option>
-            <option value="SYSTEM ORDERS">SYSTEM ORDERS</option>
-            <option value="THERMAL">THERMAL</option>
-            <option value="THERMAL,FUZE,SZ">THERMAL, FUZE, SZ</option>
-          </select>
-          <label>Sub Division</label>
-          <small class="error"
-            *ngIf="OrderInfo.get('SubDivision')?.touched && OrderInfo.get('SubDivision')?.invalid">
-            Sub Division is required
-          </small>
-        </div>
-
-
-        <!-- Ref Number -->
-        <div class="form-field">
-          <input type="text" formControlName="RefNumber" placeholder=" " />
-          <label>SO / Ref. Number</label>
-          <small class="error" *ngIf="OrderInfo.get('RefNumber')?.touched && OrderInfo.get('RefNumber')?.invalid">
-            SO / Ref. Number is required
-          </small>
-        </div>
-
-        <!-- Customer -->
-        <div class="form-field">
-          <input type="text" formControlName="Customer" placeholder=" " />
-          <label>Customer</label>
-          <small class="error" *ngIf="OrderInfo.get('Customer')?.touched && OrderInfo.get('Customer')?.invalid">
-            Customer is required
-          </small>
-        </div>
-
-        <!-- Customer Group -->
-        <div class="form-field">
-          <input type="text" formControlName="CustomerGroup" placeholder=" " />
-          <label>Customer Group</label>
-          <small class="error"
-            *ngIf="OrderInfo.get('CustomerGroup')?.touched && OrderInfo.get('CustomerGroup')?.invalid">
-            Customer Group is required
-          </small>
-        </div>
-
-        <!-- C/nee -->
-        <div class="form-field">
-          <input type="text" formControlName="CNee" placeholder=" " />
-          <label>C/nee</label>
-          <small class="error" *ngIf="OrderInfo.get('CNee')?.touched && OrderInfo.get('CNee')?.invalid">
-            C/nee is required
-          </small>
-        </div>
-
-        <!-- Destination Location -->
-        <div class="form-field">
-          <input type="text" formControlName="DestinationLocation" placeholder=" " />
-          <label>Destination Location</label>
-          <small class="error"
-            *ngIf="OrderInfo.get('DestinationLocation')?.touched && OrderInfo.get('DestinationLocation')?.invalid">
-            Destination Location is required
-          </small>
-        </div>
-
-        <!-- Destination State -->
-        <div class="form-field">
-          <input type="text" formControlName="DestinationState" placeholder=" " />
-          <label>Destination State</label>
-          <small class="error"
-            *ngIf="OrderInfo.get('DestinationState')?.touched && OrderInfo.get('DestinationState')?.invalid">
-            Destination State is required
-          </small>
-        </div>
-
-        <!-- Destination Zone -->
-        <div class="form-field">
-          <input type="text" formControlName="DestinationZone" placeholder=" " />
-          <label>Destination Zone</label>
-          <small class="error"
-            *ngIf="OrderInfo.get('DestinationZone')?.touched && OrderInfo.get('DestinationZone')?.invalid">
-            Destination Zone is required
-          </small>
-        </div>
-
-        <!-- Status -->
-        <!-- <div class="form-field">
-          <select formControlName="status">
-            <option value="">Select Status</option>
-            <option value="Pending">Pending</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
-          </select>
-          <label>Status</label>
-          <small class="error" *ngIf="OrderInfo.get('status')?.touched && OrderInfo.get('status')?.invalid">
-            Status is required
-          </small>
-        </div> -->
-
-
-      <!-- end showForm -->
-    </form>
-    <!-- 🔹 Form Buttons -->
-    <div class="text-right" *ngIf="showForm">
-      <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">Cancel</button>
-      <button type="submit" class="btn btn-md btn-raised btnSave" (click)="saveOutwardInvoiceData()">Save</button>
+      </div>
     </div>
   </div>
 
+  <!-- Form Section -->
+  <form class="form-grid" [formGroup]="OrderInfo" *ngIf="showForm">
+    <!-- Tax Invoice -->
+    <div class="form-field">
+      <input type="text" formControlName="TaxInvoice" placeholder=" " />
+      <label>Tax Invoice Number</label>
+    </div>
+
+    <!-- ODN -->
+    <div class="form-field">
+      <input type="text" formControlName="ODN" placeholder=" " />
+      <label>ODN Number</label>
+    </div>
+
+    <!-- Invoice Date -->
+    <div class="form-field">
+      <input type="text" formControlName="InvoiceData" placeholder=" " />
+      <label>Invoice Date</label>
+    </div>
+
+    <!-- Basic Shipment -->
+    <div class="form-field">
+      <input type="text" formControlName="BasicShipment" placeholder=" " />
+      <label>Basic Shipment Value</label>
+    </div>
+
+    <!-- Item Number -->
+    <div class="form-field">
+      <input type="text" formControlName="Itemnumber" placeholder=" " />
+      <label>Item Number</label>
+    </div>
+
+    <!-- Invoice With GST -->
+    <div class="form-field">
+      <input type="text" formControlName="InvoiceWithGst" placeholder=" " />
+      <label>Invoice Value With GST</label>
+    </div>
+
+    <!-- Fiscal Year -->
+    <div class="form-field">
+      <input type="text" formControlName="FinanceYear" placeholder=" " />
+      <label>Fiscal Year</label>
+    </div>
+
+    <!-- Fiscal Quarter -->
+    <div class="form-field">
+      <select formControlName="FiscalQuarter">
+        <option value="">Select Quarter</option>
+        <option value="Q1">Q1 (Apr - Jun)</option>
+        <option value="Q2">Q2 (Jul - Sep)</option>
+        <option value="Q3">Q3 (Oct - Dec)</option>
+        <option value="Q4">Q4 (Jan - Mar)</option>
+      </select>
+      <label>Fiscal Quarter</label>
+    </div>
+
+    <!-- Month -->
+    <div class="form-field">
+      <select formControlName="Month">
+        <option value="">Select Month</option>
+        <option *ngFor="let m of months" [value]="m">
+          {{ m }}
+        </option>
+      </select>
+      <label>Month</label>
+    </div>
+
+    <!-- Physical Dispatch -->
+    <div class="form-field">
+      <input type="datetime-local" formControlName="PhysicalDispatchDateTime" placeholder=" " />
+      <label>Physical Dispatch Date & Time</label>
+    </div>
+
+    <!-- Plant Dropdown -->
+    <div class="form-field">
+      <select formControlName="Plant" (change)="onPlantChange()">
+        <option value="">Select Plant</option>
+        <option *ngFor="let data of plantList" [value]="data.PLANT">{{ data.PLANT }}</option>
+      </select>
+      <label>Plant</label>
+    </div>
+    <div class="form-field">
+      <!-- remove [value] -->
+      <input type="text" formControlName="Plantdescription" placeholder=" " readonly />
+      <label>Plant Description</label>
+    </div>
+
+    <!-- Transaction Type -->
+    <div class="form-field">
+      <select formControlName="TransactionType">
+        <option value="">Select Mode of Transport</option>
+        <option value="FULLTRUCKLOAD">FULL TRUCK LOAD</option>
+        <option value="CARGO">CARGO</option>
+        <option value="RATECONTRACT">RATE CONTRACT</option>
+        <option value="LOCALTRANSPORTATION">LOCAL TRANSPORTATION</option>
+        <option value="CUSTOMERTRANSPORTER">CUSTOMER TRANSPORTER</option>
+        <option value="COMPANYVEHICLE">COMPANY VEHICLE</option>
+        <option value="COURIER">COURIER</option>
+        <option value="BYHAND">BY HAND</option>
+      </select>
+      <label>Transaction Type</label>
+    </div>
+
+    <!-- Billing Type Dropdown -->
+    <div class="form-field">
+      <select formControlName="BillingTransactionType" (change)="onBillingTypeChange()">
+        <option value="">Select Billing Type</option>
+        <option *ngFor="let b of billingTypes" [value]="b.BILL_TYPE">{{ b.BILL_TYPE }}</option>
+      </select>
+      <label>Billing Transaction Type</label>
+    </div>
+    <div class="form-field">
+      <input type="text" formControlName="Billingdescription" [value]="selectedBillingDesc" placeholder=" " readonly />
+      <label>Billing Description</label>
+    </div>
+
+    <!-- Division Dropdown -->
+    <div class="form-field">
+      <select formControlName="Division" (change)="onDivisionChange()">
+        <option value="">Select Division</option>
+        <option *ngFor="let d of divisions" [value]="d.DIVISION">{{ d.DIVISION }}</option>
+      </select>
+      <label>Division</label>
+    </div>
+    <div class="form-field">
+      <input type="text" formControlName="Divisiondescription" [value]="selectedDivisionDesc" placeholder=" "
+        readonly />
+      <label>Division Description</label>
+    </div>
+
+    <!-- Sub Division -->
+    <div class="form-field">
+      <select formControlName="SubDivision">
+        <option value="">Select Sub Division</option>
+        <option *ngFor="let s of subDivisions" [value]="s">{{ s }}</option>
+      </select>
+      <label>Sub Division</label>
+    </div>
+
+    <!-- Ref Number -->
+    <div class="form-field">
+      <input type="text" formControlName="RefNumber" placeholder=" " />
+      <label>SO / Ref. Number</label>
+    </div>
+
+    <!-- Customer -->
+    <div class="form-field">
+      <input type="text" formControlName="Customer" placeholder=" " />
+      <label>Customer</label>
+    </div>
+
+    <!-- Customer Group -->
+    <div class="form-field">
+      <input type="text" formControlName="CustomerGroup" placeholder=" " />
+      <label>Customer Group</label>
+    </div>
+
+    <!-- C/nee -->
+    <div class="form-field">
+      <input type="text" formControlName="CNee" placeholder=" " />
+      <label>C/nee</label>
+    </div>
+
+    <!-- Destination Location -->
+    <div class="form-field">
+      <input type="text" formControlName="DestinationLocation" placeholder=" " />
+      <label>Destination Location</label>
+    </div>
+
+    <!-- Destination State -->
+    <div class="form-field">
+      <input type="text" formControlName="DestinationState" placeholder=" " />
+      <label>Destination State</label>
+    </div>
+
+    <!-- Destination Zone -->
+    <div class="form-field">
+      <input type="text" formControlName="DestinationZone" placeholder=" " />
+      <label>Destination Zone</label>
+    </div>
+  </form>
+
+  <!-- Buttons -->
+  <div class="text-right" *ngIf="showForm">
+    <button type="submit" class="btn btn-md btn-raised btnSave" (click)="saveOutwardInvoiceData()">
+      Save
+    </button>
+  </div>
+</div>

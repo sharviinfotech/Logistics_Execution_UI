@@ -15,19 +15,20 @@ export class OrderInfoComponent implements OnInit {
   showForm = false;
   isEditMode = false;
 
-  // ngModel properties
-  orderType: string = '';   // 'Inward' or 'Outward'
+  orderType: string = '';
   sapType: string = '';
   ponumber: string = '';
   invoicenumber: string = '';
   previousOrderType: string | null = null;
   previousSapType: string | null = null;
+  plantList: any;
+  divisionList: any;
+  billintypeList: any;
 
-  constructor(private fb: FormBuilder, private service: GeneralserviceService) {}
+  constructor(private fb: FormBuilder, private service: GeneralserviceService) { }
 
   ngOnInit(): void {
     this.OrderInfo = this.fb.group({
-      // reactive fields (kept reactive for the rest of form)
       TaxInvoice: [''],
       ODN: [''],
       InvoiceData: [''],
@@ -40,9 +41,12 @@ export class OrderInfoComponent implements OnInit {
       FiscalQuarter: [''],
       Month: [''],
       BillingTransactionType: [''],
+      Billingdescription: [''],
       Plant: [''],
+      Plantdescription: [''],
       TransactionType: [''],
       Division: [''],
+      Divisiondescription: [''],
       SubDivision: [''],
       RefNumber: [''],
       Customer: [''],
@@ -54,9 +58,9 @@ export class OrderInfoComponent implements OnInit {
       status: [''],
       PhysicalDispatchDateTime: ['']
     });
+    this.fetchpdb();
   }
 
-  // called when user changes the radio Order Type
   onOrderTypeChange(): void {
     if (this.previousOrderType !== null && this.previousOrderType !== this.orderType) {
       this.sapType = '';
@@ -66,159 +70,152 @@ export class OrderInfoComponent implements OnInit {
     this.previousOrderType = this.orderType;
   }
 
-  // called when sapType changes
   onSapTypeChange(): void {
+    this.showForm == false;
     if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
       this.resetConditionalFields();
     }
     this.previousSapType = this.sapType;
+
+    console.log("sapType", this.sapType)
+    if (this.sapType == "SAP") {
+      this.fetchNonSAPData();
+    }
+    else {
+      this.showForm == true;
+    }
   }
 
-  // GET handler (uses ngModel values, not reactive controls)
   getForm(type: 'purchase' | 'invoice'): void {
     const value = type === 'purchase' ? this.ponumber : this.invoicenumber;
-
-    // simple client-side validation
     if (!value || value.trim() === '') {
       this.showForm = false;
-      console.log(`${type} is required.`);
       return;
     }
-
-    // enable validators on remaining fields (if you want to make them required after GET)
     this.setValidatorsOnFormFields();
 
-    // call API
-    this.fetchOutwardInvoicenumberdata(type);
+    if (this.sapType === 'SAP') {
+      this.fetchSAPData(type);
+    } else if (this.sapType === 'Non-SAP') {
+      this.fetchNonSAPData();
+    }
   }
 
-  // Calls the outward API (your service has only OrderinfoOutward)
-  fetchOutwardInvoicenumberdata(type: 'purchase' | 'invoice'): void {
-    const vb = type === 'purchase' ? this.ponumber : this.invoicenumber;
+  fetchSAPData(type: 'purchase' | 'invoice'): void {
     const obj = { VBELN: this.invoicenumber };
-
     this.showForm = true;
-    console.log('Calling API with:', obj);
-    this.service.OrderinfoOutward(obj).subscribe(
-      (res: any) => {
-        console.log('API response:', res);
-       
-        if (res) {
-          this.OrderInfo.patchValue({
-            TaxInvoice: res[0].INV_VBELN || '',
-            ODN: res[0].INV_ODNO || '',
-            InvoiceData: this.formatToDDMMYYYY(res[0].INV_DATE) || '',
-            BasicShipment: res[0].BASIC_SHIP_VALUE || '',
-            Itemnumber: res[0].POSNR || '',
-            InvoiceWithGst: res[0].INV_VALUE_GST || '',
-            FinanceYear: res[0].FISCAL_YEAR || '',
-            FiscalQuarter: res[0].FISCAL_QUARTER || '',
-            Month: res[0].MONTH || '',     
-            PhysicalDispatchDateTime: res[0]. PHYS_DISPATCH || '',
-            Plant: res[0].PLANT_NAME || '',
-            TransactionType: res[0].TRAN_TYPE || '',
-            BillingTransactionType: res[0].TRAN_TEXT_BILL || '', 
-            Division: res[0].DIVISION_TEXT || '',
-            SubDivision: res[0].SUB_DIVISION || '',
-            RefNumber: res[0].SO_REF_NO || '',
-            Customer: res[0].CUST_NAME || '',
-            CustomerGroup: res[0].CUST_GROUP || '',
-            CNee: res[0].CNEE_NAME || '',
-            DestinationLocation: res[0].DEST_LOC || '',
-            DestinationState: res[0].DEST_STATE || '',
-            DestinationZone: res[0].DEST_ZONE || '',
-            // status: res[0].INV_STATUS || ''
-
-
-            // map other fields you need...
-          });
+    this.service.OrderinfoOutward(obj).subscribe({
+      next: (res: any) => {
+        if (res && res.length > 0) {
+          this.patchForm(res[0]);
         }
       },
-      (err) => {
-        console.error('API error', err);
+      error: (err) => {
+        console.error('SAP API error:', err);
         this.showForm = false;
       }
-    );
+    });
   }
-  saveOutwardInvoiceData(): void {
-  console.log('Save button clicked');
 
-  // Prepare mapped payload
-  const formValue = this.OrderInfo.value;
-
-  const record = {
-    INV_VBELN: formValue.TaxInvoice,
-    INV_ODNO: formValue.ODN,
-    INV_DATE: formValue.InvoiceData,
-    BASIC_SHIP_VALUE: formValue.BasicShipment,
-    POSNR: formValue.Itemnumber,
-    INV_VALUE_GST: formValue.InvoiceWithGst,
-    PHYS_DISPATCH: formValue.PhysicalDispatchDateTime,
-    FISCAL_YEAR: formValue.FinanceYear,
-    FISCAL_QUARTER: formValue.FiscalQuarter,
-    MONTH: formValue.Month,
-    PLANT_NAME: formValue.Plant,
-    TRAN_TYPE: formValue.TransactionType,
-    TRAN_TEXT_BILL: formValue.BillingTransactionType,
-    DIVISION: formValue.Division,               // ✅ changed from DIVISION_TEXT to DIVISION
-    SUB_DIVISION: formValue.SubDivision,
-    SO_REF_NO: formValue.RefNumber,
-    CUST_NAME: formValue.Customer,
-    CUST_GROUP: formValue.CustomerGroup,
-    CNEE_NAME: formValue.CNee,
-    DEST_LOC: formValue.DestinationLocation,
-    DEST_STATE: formValue.DestinationState,
-    DEST_ZONE: formValue.DestinationZone
-  };
-
-  // Final payload matches backend
-  const payload = {
-    SAVE: [record]
-  };
-
-  console.log('Final Save Payload:', payload);
-
-  this.service.OrderInfoOutwardSave(payload).subscribe({
-    next: (res: any) => {
-      console.log('Save API Response:', res);
-      // Handle success or confirmation
-      if (res && (res.status === 'Success' || res.message?.toLowerCase().includes('success'))) {
-        alert('Outward Invoice saved successfully!');
-      } else {
-        alert('Save API executed — check backend to confirm.');
+  fetchNonSAPData(): void {
+    const obj = {
+      orderType: this.orderType,
+      sapType: this.sapType,
+      RefNumber: this.OrderInfo.get('RefNumber')?.value || '',
+      Customer: this.OrderInfo.get('Customer')?.value || ''
+    };
+    this.showForm = true;
+    this.service.OrderInfoNonSap(obj).subscribe({
+      next: (res: any) => {
+        if (res && res.length > 0) {
+          this.patchForm(res[0]);
+        } else {
+          this.resetExtraFields();
+        }
+      },
+      error: (err) => {
+        console.error('Non-SAP API error:', err);
+        this.showForm = false;
       }
-    },
-    error: (err) => {
-      console.error('Save API Error:', err);
-      alert('Failed to save Outward Invoice data.');
-    },
-  });
-}
+    });
+  }
 
+  private patchForm(data: any): void {
+    this.OrderInfo.patchValue({
+      TaxInvoice: data.INV_VBELN || '',
+      ODN: data.INV_ODNO || '',
+      InvoiceData: this.formatToDDMMYYYY(data.INV_DATE) || '',
+      BasicShipment: data.BASIC_SHIP_VALUE || '',
+      Itemnumber: data.POSNR || '',
+      InvoiceWithGst: data.INV_VALUE_GST || '',
+      FinanceYear: data.FISCAL_YEAR || '',
+      FiscalQuarter: data.FISCAL_QUARTER || '',
+      Month: data.MONTH || '',
+      PhysicalDispatchDateTime: data.PHYS_DISPATCH || '',
+      Plant: data.PLANT_NAME || '',
+      TransactionType: data.TRAN_TYPE || '',
+      BillingTransactionType: data.TRAN_TEXT_BILL || '',
+      Division: data.DIVISION_TEXT || data.DIVISION || '',
+      SubDivision: data.SUB_DIVISION || '',
+      RefNumber: data.SO_REF_NO || '',
+      Customer: data.CUST_NAME || '',
+      CustomerGroup: data.CUST_GROUP || '',
+      CNee: data.CNEE_NAME || '',
+      DestinationLocation: data.DEST_LOC || '',
+      DestinationState: data.DEST_STATE || '',
+      DestinationZone: data.DEST_ZONE || ''
+    });
+    this.showForm = true;
+  }
 
+  saveOutwardInvoiceData(): void {
+    console.log("sapType", this.sapType)
+    const formValue = this.OrderInfo.value;
+    const record = {
+      INV_VBELN: formValue.TaxInvoice,
+      INV_ODNO: formValue.ODN,
+      INV_DATE: formValue.InvoiceData,
+      BASIC_SHIP_VALUE: formValue.BasicShipment,
+      POSNR: formValue.Itemnumber,
+      INV_VALUE_GST: formValue.InvoiceWithGst,
+      PHYS_DISPATCH: formValue.PhysicalDispatchDateTime,
+      FISCAL_YEAR: formValue.FinanceYear,
+      FISCAL_QUARTER: formValue.FiscalQuarter,
+      MONTH: formValue.Month,
+      PLANT_NAME: formValue.Plant,
+      TRAN_TYPE: formValue.TransactionType,
+      TRAN_TEXT_BILL: formValue.BillingTransactionType,
+      DIVISION: formValue.Division,
+      SUB_DIVISION: formValue.SubDivision,
+      SO_REF_NO: formValue.RefNumber,
+      CUST_NAME: formValue.Customer,
+      CUST_GROUP: formValue.CustomerGroup,
+      CNEE_NAME: formValue.CNee,
+      DEST_LOC: formValue.DestinationLocation,
+      DEST_STATE: formValue.DestinationState,
+      DEST_ZONE: formValue.DestinationZone
+    };
+    if (this.sapType == "SAP") {
+      this.service.OrderInfoOutwardSave({ SAVE: [record] }).subscribe({
+        next: (res: any) => alert('Saved successfully!'),
+        error: (err) => alert('Failed to save data.')
+      });
+    }
 
-  // helper to format many possible date representations into DD-MM-YYYY
+    else {
+      console.log("withoutsap")
+      this.service.OrderInfoNonSap({ CREATE: [record] }).subscribe({
+        next: (res: any) => alert('Saved successfully!'),
+        error: (err) => alert('Failed to save data.')
+      });
+    }
+  }
+
   private formatToDDMMYYYY(value: any): string {
-    if (!value && value !== 0) return '';
-
-    // If value already looks like DD-MM-YYYY, return as-is
-    if (typeof value === 'string' && /^\d{2}-\d{2}-\d{4}$/.test(value)) return value;
-
-    // If value is in YYYYMMDD (common in SAP e.g. 20251009)
+    if (!value) return '';
     if (typeof value === 'string' && /^\d{8}$/.test(value)) {
-      const y = value.substr(0,4);
-      const m = value.substr(4,2);
-      const d = value.substr(6,2);
-      return `${d}-${m}-${y}`;
+      return `${value.substr(6, 2)}-${value.substr(4, 2)}-${value.substr(0, 4)}`;
     }
-
-    // If value is a number like 20251009
-    if (typeof value === 'number') {
-      const s = value.toString();
-      if (/^\d{8}$/.test(s)) return `${s.substr(6,2)}-${s.substr(4,2)}-${s.substr(0,4)}`;
-    }
-
-    // Try Date parsing for ISO or timestamp
     const date = new Date(value);
     if (!isNaN(date.getTime())) {
       const dd = String(date.getDate()).padStart(2, '0');
@@ -226,148 +223,39 @@ export class OrderInfoComponent implements OnInit {
       const yyyy = date.getFullYear();
       return `${dd}-${mm}-${yyyy}`;
     }
-
-    // fallback: return original value as string
     return String(value);
   }
 
-  // hide form / clear fields when input cleared
   onInputChange(type: 'purchase' | 'invoice'): void {
     const value = type === 'purchase' ? this.ponumber : this.invoicenumber;
     if (!value || value.trim() === '') {
       this.showForm = false;
-      this.clearValidatorsOnFormFields();
       this.resetExtraFields();
     }
   }
 
-  // reset everything
-  resetForm(): void {
+  resetExtraFields(): void {
     this.OrderInfo.reset();
-    this.orderType = '';
-    this.sapType = '';
-    this.previousOrderType = null;
-    this.previousSapType = null;
-    this.ponumber = '';
-    this.invoicenumber = '';
+  }
+
+  resetConditionalFields(): void {
     this.showForm = false;
-    this.isEditMode = false;
-    this.clearValidatorsOnFormFields();
+    this.OrderInfo.reset();
   }
 
-  // reset conditional fields and hide form
-  private resetConditionalFields(): void {
-    this.showForm = false;
-    this.clearValidatorsOnFormFields();
-    this.OrderInfo.patchValue({
-      TaxInvoice: '',
-      ODN: '',
-      InvoiceData: '',
-      BasicShipment: '',
-      Itemnumber: '',
-      InvoiceWithGst: '',
-      FinanceYear: '',
-      SystemGeneratedDate: '',
-      FiscalYear: '',
-      FiscalQuarter: '',
-      Month: '',
-      BillingTransactionType: '',
-      PhysicalDispatchDateTime: '',
-      Plant: '',
-      TransactionType: '',
-      Division: '',
-      SubDivision: '',
-      RefNumber: '',
-      Customer: '',
-      CustomerGroup: '',
-      CNee: '',
-      DestinationLocation: '',
-      DestinationState: '',
-      DestinationZone: '',
-      status: ''
+  setValidatorsOnFormFields(): void {
+    Object.keys(this.OrderInfo.controls).forEach(c => {
+      this.OrderInfo.get(c)?.setValidators(Validators.required);
+      this.OrderInfo.get(c)?.updateValueAndValidity();
     });
   }
 
-  // reset only the extra fields when input cleared
-  private resetExtraFields(): void {
-    this.OrderInfo.patchValue({
-      TaxInvoice: '',
-      ODN: '',
-      InvoiceData: '',
-      BasicShipment: '',
-      Itemnumber: '',
-      InvoiceWithGst: '',
-      FinanceYear: '',
-      SystemGeneratedDate: '',
-      FiscalYear: '',
-      FiscalQuarter: '',
-      Month: '',
-      BillingTransactionType: '',
-      PhysicalDispatchDateTime: '',
-      Plant: '',
-      TransactionType: '',
-      Division: '',
-      SubDivision: '',
-      RefNumber: '',
-      Customer: '',
-      CustomerGroup: '',
-      CNee: '',
-      DestinationLocation: '',
-      DestinationState: '',
-      DestinationZone: '',
-      status: ''
+  fetchpdb() {
+    this.service.getpdb().subscribe((res: any) => {
+      console.log("PDB Data:", res);
+      this.plantList = res[0].PLANT
+      this.divisionList = res[0].DIVISION
+      this.billintypeList = res[0].BILLING_TYPE
     });
   }
-
-  // set required validators on the rest of the form fields after successful GET
-  private setValidatorsOnFormFields(): void {
-    const controls = [
-      'TaxInvoice','ODN','InvoiceData','BasicShipment','InvoiceWithGst','FinanceYear','SystemGeneratedDate',
-      'FiscalYear','FiscalQuarter','Month','BillingTransactionType','Plant','TransactionType','Division',
-      'SubDivision','RefNumber','Customer','CustomerGroup','CNee','DestinationLocation','DestinationState',
-      'DestinationZone','status','PhysicalDispatchDateTime', 'Itemnumber'
-    ];
-    controls.forEach(controlName => {
-      this.OrderInfo.get(controlName)?.setValidators(Validators.required);
-      this.OrderInfo.get(controlName)?.updateValueAndValidity();
-    });
-  }
-
-  // clear validators
-  private clearValidatorsOnFormFields(): void {
-    const controls = [
-      'TaxInvoice','ODN','InvoiceData','BasicShipment','InvoiceWithGst','FinanceYear','SystemGeneratedDate',
-      'FiscalYear','FiscalQuarter','Month','BillingTransactionType','Plant','TransactionType','Division',
-      'SubDivision','RefNumber','Customer','CustomerGroup','CNee','DestinationLocation','DestinationState',
-      'DestinationZone','status','PhysicalDispatchDateTime', 'Itemnumber'
-    ];
-    controls.forEach(controlName => {
-      this.OrderInfo.get(controlName)?.clearValidators();
-      this.OrderInfo.get(controlName)?.updateValueAndValidity();
-    });
-  }
-
-  // Save (submit) handler
-  savePlan(): void {
-    if (this.OrderInfo.valid) {
-      const formData = {
-        ...this.OrderInfo.value,
-        orderType: this.orderType,
-        sapType: this.sapType
-      };
-      console.log('Order Info Data:', formData);
-      this.resetForm();
-    } else {
-      Object.keys(this.OrderInfo.controls).forEach(key => {
-        this.OrderInfo.get(key)?.markAsTouched();
-      });
-      console.log('Form is invalid. Please fill out all required fields.');
-    }
-  }
-
-  // Cancel edit
-  cancelEdit(): void {
-    this.resetForm();
-  }
-  
 }

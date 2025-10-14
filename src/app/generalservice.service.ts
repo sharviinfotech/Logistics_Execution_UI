@@ -10,120 +10,126 @@ export class GeneralserviceService {
   page: number = 1;
   pageSize: number = 10; // Adjust as needed
   data: any;
- 
+
   resetPasswordData(): any {
     throw new Error('Method not implemented.');
   }
- 
+
   setLoginDataList: any;
   userList: any;
   loginResponse: any;
   setTableData: any;
-  
 
-  
+
+
   constructor(private http: HttpClient) { }
 
-  setLoginResponse(data){
+  setLoginResponse(data) {
     this.loginResponse = data;
-}
-
-getLoginResponse(){
-   return this.loginResponse;
-}
-  getAllInvoice(obj){
-    return this.http.post(environment.baseUrl+'api/invoice/getAllInvoices',obj);
-  }
-  CreateInvoice(obj){
-    return this.http.post(environment.baseUrl+'api/invoice/createNewInvoice',obj);
-  }
-  
-  UpdateInvoice(obj,invoiceRefNo){
-    return this.http.put(environment.baseUrl+'api/updateInvoiceByReferenceNo/'+invoiceRefNo,obj);
-  }
-  getstateList(){
-    return this.http.get(environment.baseUrl+'api/invoice/stateList');
   }
 
-  invoiceTemplate(obj){
-    return this.http.post(environment.baseUrl+'api/invoice/invoiceTemplate',obj);
-
+  getLoginResponse() {
+    return this.loginResponse;
   }
-  userNewCreation(obj){
-    return this.http.post(environment.baseUrl+'api/invoice/userNewCreation',obj);
-
+  getAllInvoice(obj) {
+    return this.http.post(environment.baseUrl + 'api/invoice/getAllInvoices', obj);
   }
-  getAllUserList(){
-    return this.http.get(environment.baseUrl+'api/invoice/getAllUserList');
+  CreateInvoice(obj) {
+    return this.http.post(environment.baseUrl + 'api/invoice/createNewInvoice', obj);
   }
 
-  submitLogin(obj){
-    return this.http.post('http://14.99.143.250:3001/api/invoice/authenticationLogin',obj);
+  UpdateInvoice(obj, invoiceRefNo) {
+    return this.http.put(environment.baseUrl + 'api/updateInvoiceByReferenceNo/' + invoiceRefNo, obj);
   }
-  updateExitUser(obj,userUniqueId){
-    return this.http.put(environment.baseUrl+'api/invoice/updateExitUser/'+userUniqueId,obj);
-  }
-  invoiceApprovedOrRejected(obj){
-    return this.http.post(environment.baseUrl+'api/invoice/invoiceApprovedOrRejected',obj);
-  }
-  forgotPassword(obj){
-    return this.http.post(environment.baseUrl+'api/invoice/forgotPassword',obj);
-  }
-  getAllCustomerList(){
-    return this.http.get(environment.baseUrl+'api/invoice/getAllCustomerList');
-  }
-  savecustomerCreation(obj){
-    return this.http.post(environment.baseUrl+'api/invoice/SaveCustomerCreation',obj);
- 
-  }
-  updateExitCustomer(obj,customerUniqueId){
-    return this.http.put(environment.baseUrl+'api/invoice/updateExitCustomer/'+customerUniqueId,obj);
- 
-  }
-  reviewedUpadte(obj){
-    return this.http.post(environment.baseUrl+'api/invoice/reviewedUpadte',obj);
- 
-  }
-  SaveCharges(data){
-    return this.http.post(environment.baseUrl+'api/invoice/SaveCharges',data)
-
-  }
-  getAllCharges(){
-    return this.http.get(environment.baseUrl+'api/invoice/getAllCharges');
-
-
-  }
-  resetpassword(obj){
-    return this.http.post(environment.baseUrl+'api/invoice/resetPassword',obj);
- 
-  }
-  UpdateCharges(data){
-    return this.http.post(environment.baseUrl+'api/invoice/UpdateCharges',data)
-
-  }
-  verifyedAndUpdated(obj){
-    return this.http.post(environment.baseUrl+'api/invoice/verifyedAndUpdated',obj);
- 
-  }
-  deteleGlobal(obj){
-    return this.http.post(environment.baseUrl+'api/invoice/deteleGlobal',obj);
- 
-  }
- sectorwiseSave(obj){
-    return this.http.post(environment.baseUrl+'api/invoice/sectorWiseSave',obj);
- 
+  getstateList() {
+    return this.http.get(environment.baseUrl + 'api/invoice/stateList');
   }
 
+  invoiceTemplate(obj) {
+    return this.http.post(environment.baseUrl + 'api/invoice/invoiceTemplate', obj);
 
-  coois(obj){
-    return this.http.post(environment.baseUrl+'api/external/orderconfirmation/coois',obj);
- 
   }
-  OrderinfoOutward(obj){
-  return this.http.post(environment.baseUrl+'api/external/LE/orderInfo/Outward/fetchInvoiceList',obj);
-}
-OrderInfoOutwardSave(obj){
-  return this.http.post(environment.baseUrl+'api/external/LE/orderInfo/Outward/fetchInvoiceList/Save',obj);
-}
+  userNewCreation(obj) {
+    return this.http.post(environment.baseUrl + 'api/invoice/userNewCreation', obj);
+
+  }
+  getAllUserList() {
+    return this.http.get(environment.baseUrl + 'api/invoice/getAllUserList');
+  }
+
+  submitLogin(obj) {
+    return this.http.post('http://14.99.143.250:3001/api/invoice/authenticationLogin', obj);
+  }
+  updateExitUser(obj, userUniqueId) {
+    return this.http.put(environment.baseUrl + 'api/invoice/updateExitUser/' + userUniqueId, obj);
+  }
+  invoiceApprovedOrRejected(obj) {
+    return this.http.post(environment.baseUrl + 'api/invoice/invoiceApprovedOrRejected', obj);
+  }
+  forgotPassword(obj) {
+    return this.http.post(environment.baseUrl + 'api/invoice/forgotPassword', obj);
+  }
+  getAllCustomerList() {
+    return this.http.get(environment.baseUrl + 'api/invoice/getAllCustomerList');
+  }
+  savecustomerCreation(obj) {
+    return this.http.post(environment.baseUrl + 'api/invoice/SaveCustomerCreation', obj);
+
+  }
+  updateExitCustomer(obj, customerUniqueId) {
+    return this.http.put(environment.baseUrl + 'api/invoice/updateExitCustomer/' + customerUniqueId, obj);
+
+  }
+  reviewedUpadte(obj) {
+    return this.http.post(environment.baseUrl + 'api/invoice/reviewedUpadte', obj);
+
+  }
+  SaveCharges(data) {
+    return this.http.post(environment.baseUrl + 'api/invoice/SaveCharges', data)
+
+  }
+  getAllCharges() {
+    return this.http.get(environment.baseUrl + 'api/invoice/getAllCharges');
+
+
+  }
+  resetpassword(obj) {
+    return this.http.post(environment.baseUrl + 'api/invoice/resetPassword', obj);
+
+  }
+  UpdateCharges(data) {
+    return this.http.post(environment.baseUrl + 'api/invoice/UpdateCharges', data)
+
+  }
+  verifyedAndUpdated(obj) {
+    return this.http.post(environment.baseUrl + 'api/invoice/verifyedAndUpdated', obj);
+
+  }
+  deteleGlobal(obj) {
+    return this.http.post(environment.baseUrl + 'api/invoice/deteleGlobal', obj);
+
+  }
+  sectorwiseSave(obj) {
+    return this.http.post(environment.baseUrl + 'api/invoice/sectorWiseSave', obj);
+
+  }
+
+
+  coois(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/orderconfirmation/coois', obj);
+
+  }
+  OrderinfoOutward(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/orderInfo/Outward/fetchInvoiceList', obj);
+  }
+  OrderInfoOutwardSave(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/orderInfo/Outward/withsap/Save', obj);
+  }
+  OrderInfoNonSap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/orderInfo/Outward/withoutsap/Save', obj);
+  }
+  getpdb() {
+    return this.http.get(environment.baseUrl + 'api/external/LE/orderInfo/plant_division_Biltype',);
+  }
 
 }
