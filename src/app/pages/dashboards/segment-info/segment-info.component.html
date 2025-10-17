@@ -1,84 +1,108 @@
 <div class="card-LE">
-    <div class="card-header-LE">Segment Info</div>
-    <div class="card-body-LE">
-      <form class="form-grid" [formGroup]="segmentInfo" >
+  <div class="card-header-LE">Segment Info</div>
+  <div class="card-body-LE">
+    <!-- Order Type -->
+    <div class="form-radio optional">
+      <label>
+        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
+        <span>Inward</span>
+      </label>
+      <label>
+        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
+        <span>Outward</span>
+      </label>
+    </div>
 
-         <div class="form-field">
-          <input type="text" formControlName="SalesPerson" placeholder="" />
-          <label>Sales Person</label>
-          <small class="error" *ngIf="segmentInfo.get('SalesPerson')?.touched && segmentInfo.get('SalesPerson')?.invalid">
-           Sales Person is required
-          </small>
-        </div>
+    <br />
 
-        <!-- Segment -->
-        <div class="form-field">
-          <input type="text" formControlName="segment" placeholder="" />
-          <label>Segment</label>
-          <small class="error" *ngIf="segmentInfo.get('segment')?.touched && segmentInfo.get('segment')?.invalid">
-            Segment is required
-          </small>
-        </div>
+    <!-- SAP Type + Input -->
+    <div *ngIf="orderType" class="sap-row" style="display: flex !important;">
+      <!-- SAP Radio -->
+      <div class="form-radio optional sap-radio">
+        <label>
+          <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
+          <span>With SAP</span>
+        </label>
+        <label>
+          <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
+          <span>Without SAP</span>
+        </label>
+      </div>
 
-        <!-- ODN Number -->
-        <div class="form-field">
-          <input type="text" formControlName="customerprofile" placeholder="" />
-          <label>Customer Profile</label>
-          <small class="error" *ngIf="segmentInfo.get('customerprofile')?.touched && segmentInfo.get('customerprofile')?.invalid">
-            Customer Profile is required
-          </small>
-        </div>
-
-        <!-- Invoice Date -->
-        <div class="form-field">
-          <input type="text" formControlName="branch" placeholder="" />
-          <label>Branch</label>
-          <small class="error" *ngIf="segmentInfo.get('branch')?.touched && segmentInfo.get('branch')?.invalid">
-          Branch  is required
-          </small>
-        </div>
-
-        <!-- Basic Shipment Value -->
-        <div class="form-field">
-          <input type="text" formControlName="branchzone" placeholder="" />
-          <label>Branch Zone</label>
-          <small class="error" *ngIf="segmentInfo.get('branchzone')?.touched && segmentInfo.get('branchzone')?.invalid">
-          Branch Zone  is required
-          </small>
-        </div>
-
-        <!-- Invoice Value with GST -->
-        <div class="form-field">
-          <input type="text" formControlName="tat" placeholder="" />
-          <label>TAT</label>
-          <small class="error" *ngIf="segmentInfo.get('tat')?.touched && segmentInfo.get('tat')?.invalid">
-         TAT  is required
-          </small>
-        </div>
-
-        <!-- Physical Dispatch Date and Time -->
-        <div class="form-field">
-          <input type="text" formControlName="eta" placeholder="" />
-          <label>ETA</label>
-          <small class="error" *ngIf="segmentInfo.get('eta')?.touched && segmentInfo.get('eta')?.invalid">
-           ETA is required
-          </small>
-        </div>
-
-     
-
-        
-
-      </form>
-      <!-- Buttons -->
-        <div class="text-right">
-          <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
-            Cancel
-          </button>
-          <button type="submit" class="btn btn-md btn-raised btnSave" (click)="savePlan()">
-           Save
+      <!-- Input + GET (only for SAP) -->
+      <div class="input-row" *ngIf="sapType === 'SAP'">
+        <div *ngIf="orderType === 'Inward'" class="input-flex">
+          <div class="form-field flex-1">
+            <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" "
+              (input)="onInputChange('purchase')" />
+            <label>PO Number</label>
+          </div>
+          <button type="button" class="btn-get" (click)="getForm('purchase')"
+            [disabled]="!ponumber || ponumber.trim() === ''">
+            GET
           </button>
         </div>
+
+        <div *ngIf="orderType === 'Outward'" class="input-flex">
+          <div class="form-field flex-1">
+            <input type="text" name="invoicenumber" [(ngModel)]="invoicenumber" placeholder=" "
+              (input)="onInputChange('invoice')" />
+            <label>Invoice Number</label>
+          </div>
+          <button type="button" class="btn-get" (click)="getForm('invoice')"
+            [disabled]="!invoicenumber || invoicenumber.trim() === ''">
+            GET
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- Form Section -->
+  <form class="form-grid" [formGroup]="segmentInfo" *ngIf="showForm">
+    <div class="form-field">
+      <input type="text" formControlName="SALES_EMP" placeholder="" />
+      <label>Sales Person</label>
+      <small class="error" *ngIf="segmentInfo.get('SALES_EMP')?.touched && segmentInfo.get('SALES_EMP')?.invalid">
+        Sales Person is required
+      </small>
+    </div>
+
+    <div class="form-field">
+      <input type="text" formControlName="SEGMENT" placeholder="" />
+      <label>Segment</label>
+    </div>
+
+    <div class="form-field">
+      <input type="text" formControlName="CUST_PROF" placeholder="" />
+      <label>Customer Profile</label>
+    </div>
+
+    <div class="form-field">
+      <input type="text" formControlName="BRANCH" placeholder="" />
+      <label>Branch</label>
+    </div>
+
+    <div class="form-field">
+      <input type="text" formControlName="BRANCH_ZONE" placeholder="" />
+      <label>Branch Zone</label>
+    </div>
+
+    <div class="form-field">
+      <input type="text" formControlName="TAT_DAYS" placeholder="" />
+      <label>TAT</label>
+    </div>
+
+    <div class="form-field">
+      <input type="text" formControlName="ETA_DATE" placeholder="" />
+      <label>ETA</label>
+    </div>
+
+  </form>
+
+  <!-- Buttons -->
+  <div class="text-right" *ngIf="showForm">
+    <!-- <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">Cancel</button> -->
+    <button type="submit" class="btn btn-md btn-raised btnSave" (click)="saveSegmentInfoWithSAP()">Save</button>
+  </div>
+</div>

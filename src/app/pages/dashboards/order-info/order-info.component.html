@@ -77,7 +77,7 @@
 
     <!-- Invoice Date -->
     <div class="form-field">
-      <input type="text" formControlName="InvoiceData" placeholder=" " />
+      <input type="date" formControlName="InvoiceData" placeholder=" " />
       <label>Invoice Date</label>
     </div>
 
@@ -300,16 +300,44 @@
     </div>
 
     <!-- Customer -->
-    <div class="form-field">
+    <!-- <div class="form-field">
       <input type="text" formControlName="Customer" placeholder=" " />
       <label>Customer</label>
-    </div>
+    </div> -->
+
+    <!-- <div class="form-field">
+      <ng-container *ngIf="!isSap(); else sapDivision">
+        <select formControlName="Customer" (change)="custgroupchange()">
+          <option value="">Select Customer</option>
+          <option *ngFor="let d of custList" [value]="d.CUST">{{ d.CUST }}
+          </option>
+        </select>
+      </ng-container>
+      <ng-template #sapDivision>
+        <input type="text" formControlName="Customer" readonly />
+      </ng-template>
+      <label>Customer</label>
+    </div> -->
 
     <!-- Customer Group -->
     <div class="form-field">
       <input type="text" formControlName="CustomerGroup" placeholder=" " />
       <label>Customer Group</label>
     </div>
+    <!-- <div class="form-field">
+      <select formControlName="Customer" (change)="custgroupchange()">
+        <option value="">Select Customer</option>
+        <option *ngFor="let d of custList" [value]="d.customer">{{ d.customer }}</option>
+      </select>
+      <label>Customer</label>
+    </div> -->
+
+    <div class="form-field">
+      <input type="text" formControlName="CustomerGroup" readonly />
+      <label>Customer Group</label>
+    </div>
+
+
 
     <!-- C/nee -->
     <div class="form-field">

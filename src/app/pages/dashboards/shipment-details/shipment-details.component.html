@@ -1,173 +1,139 @@
 <div class="card-LE">
-    <div class="card-header-LE">
-        Shipment Details
-    </div>
+    <div class="card-header-LE">Shipment Details</div>
 
     <div class="card-body-LE">
-
-        <form class="form-grid" [formGroup]="ProductInfo">
-
-            <!-- Product -->
-           <div class="form-field">
-                <select formControlName="Product">
-                    <option value="">Select Type of Product</option>
-                    <option value="FUZE BATTERY">FUZE BATTERY</option>
-                    <option value="IPS">IPS</option>
-                    <option value="IPS SYSTEM">IPS SYSTEM</option>
-                    <option value="LI-ION BATTERY">LI-ION BATTERY</option>
-                    <option value="NCFP BATTERY">NCFP BATTERY</option>
-                    <option value="NCFP BATTERY/ NI -CD BATTERY">NCFP BATTERY/ NI -CD BATTERY</option>
-                    <option value="NCFP BATTERY / PE">NCFP BATTERY / PE</option>
-                    <option value="NCPP BATTERY">NCPP BATTERY</option>
-                    <option value="NCPP BATTERY /PE">NCPP BATTERY /PE</option>
-                    <option value="NCSP BATTERY">NCSP BATTERY</option>
-                    <option value="NI -CD BATTERY">NI -CD BATTERY</option>
-                    <option value="NI -CD BATTERY / NCFP">NI -CD BATTERY / NCFP</option>
-                    <option value="NI -CD BATTERY / PE">NI -CD BATTERY / PE</option>
-                    <option value="NI -CD BATTERY / NCFP BATTERY">NI -CD BATTERY / NCFP BATTERY</option>
-                    <option value="PE">PE</option>
-                    <option value="RAW MATERIAL">RAW MATERIAL</option>
-                    <option value="SILVER BATTERY">SILVER BATTERY</option>
-                    <option value="THERMAL BATTERY">THERMAL BATTERY</option>
-                </select>
-                
-                <label>Product</label>
-                <small class="error" *ngIf="ProductInfo.get('Product')?.touched && ProductInfo.get('Product')?.invalid">
-                    Product is required
-                </small>
-                </div>
-
-
-            <!-- Type of Material -->
-            <div class="form-field">
-                <select formControlName="TypeOfMaterial">
-                    <option value="">Select Type of Material</option>
-                    <option value="Raw Material">Raw Material</option>
-                    <option value="Semi Finished">Semi Finished</option>
-                    <option value="Finished Goods">Finished Goods</option>
-                    <option value="Consumables">Consumables</option>
-                    <option value="Spare Parts">Spare Parts</option>
-                </select>
-                <label>Type of Material</label>
-                <small class="error"
-                    *ngIf="ProductInfo.get('TypeOfMaterial')?.touched && ProductInfo.get('TypeOfMaterial')?.invalid">
-                    Type of Material is required
-                </small>
-            </div>
-
-            <!-- Material Description -->
-            <div class="form-field">
-                <input type="text" formControlName="MaterialDescription" placeholder=" " />
-
-                <label>Material Description</label>
-                <small class="error"
-                    *ngIf="ProductInfo.get('MaterialDescription')?.touched && ProductInfo.get('MaterialDescription')?.invalid">
-                    Material Description is required
-                </small>
-            </div>
-
-            <div class="form-field">
-                <input type="text" formControlName="Noofseats" placeholder=" " />
-
-                <label>No Of Seats/No (Qty)</label>
-                <small class="error"
-                    *ngIf="ProductInfo.get('Noofseats')?.touched && ProductInfo.get('Noofseats')?.invalid">
-                    No Of Seats/No (Qty) is required
-                </small>
-            </div>
-
-            <!-- Ah loaded in the Truck -->
-            <div class="form-field">
-                <input type="number" min="0" formControlName="AhLoadedInTruck" placeholder=" " step="0.01" />
-                <label>Ah loaded in the Truck</label>
-                <small class="error"
-                    *ngIf="ProductInfo.get('AhLoadedInTruck')?.touched && ProductInfo.get('AhLoadedInTruck')?.invalid">
-                    loaded in the Truck is required
-                </small>
-            </div>
-
-            <!-- Shipment Weight -->
-            <div class="form-field">
-                <input type="number" min="0" formControlName="ShipmentWeight" placeholder=" " step="0.01" />
-                <label>Shipment Weight (kg)</label>
-                <small class="error"
-                    *ngIf="ProductInfo.get('ShipmentWeight')?.touched && ProductInfo.get('ShipmentWeight')?.invalid">
-                    Shipment Weight is required
-                </small>
-            </div>
-
-            <!-- Battery Condition -->
-            <div class="form-field">
-                <select formControlName="BatteryCondition">
-                    <option value="">Select Battery Condition</option>
-                    <option value="DRY & DISCHARGED">DRY & DISCHARGED</option>
-                    <option value="FILLED & DISCHARGED">FILLED & DISCHARGED</option>
-                    <option value="NA">NA</option>
-                    <!-- <option value="Poor">Poor</option>
-                    <option value="Damaged">Damaged</option> -->
-                </select>
-                <label>Battery Condition</label>
-                <small class="error"
-                    *ngIf="ProductInfo.get('BatteryCondition')?.touched && ProductInfo.get('BatteryCondition')?.invalid">
-                    Battery Condition is required
-                </small>
-            </div>
-
-            <!-- Inco-terms -->
-            <div class="form-field">
-                <select formControlName="Incoterms">
-                    <option value="">Select Inco-terms</option>
-                    <option value="EXW">EXW (Ex Works)</option>
-                    <option value="FOB">FOB (Free on Board)</option>
-                    <option value="CIF">CIF (Cost, Insurance & Freight)</option>
-                    <option value="DAP">DAP (Delivered at Place)</option>
-                    <option value="DDP">DDP (Delivered Duty Paid)</option>
-                    <option value="FCA">FCA (Free Carrier)</option>
-                    <option value="CPT">CPT (Carriage Paid To)</option>
-                </select>
-                <label>Inco-terms</label>
-                <small class="error"
-                    *ngIf="ProductInfo.get('Incoterms')?.touched && ProductInfo.get('Incoterms')?.invalid">
-                    Inco-terms is required
-                </small>
-            </div>
-
-            <div class="form-field">
-                <select formControlName="InsuranceScope">
-                    <option value="">Select Insurance Scope</option>
-                    <option value="Buyer">Buyer</option>
-                    <option value="Supplier">Supplier</option>
-                </select>
-                <label>Insurance Scope</label>
-                <small class="error"
-                    *ngIf="ProductInfo.get('InsuranceScope')?.touched && ProductInfo.get('InsuranceScope')?.invalid">
-                    Insurance Scope is required
-                </small>
-            </div>
-
-
-
-            <!-- Kilometres -->
-            <div class="form-field">
-                <input type="number" min="0" formControlName="Kilometres" placeholder=" " step="0.1" />
-                <label>Kilometres</label>
-                <small class="error"
-                    *ngIf="ProductInfo.get('Kilometres')?.touched && ProductInfo.get('Kilometres')?.invalid">
-                    Kilometres is required
-                </small>
-            </div>
-
-
-
-        </form>
-        <div class="text-right">
-            <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
-                Cancel
-            </button>
-            <button type="submit" class="btn btn-md btn-raised btn-glass-save" (click)="saveProduct()">
-                Save
-            </button>
+        <!-- Order Type -->
+        <div class="form-radio optional">
+            <label>
+                <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" />
+                <span>Inward</span>
+            </label>
+            <label>
+                <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" />
+                <span>Outward</span>
+            </label>
         </div>
 
+        <br />
+
+        <!-- SAP Type Selection -->
+        <div *ngIf="orderType" class="sap-row" style="display: flex !important;">
+            <div class="form-radio optional sap-radio">
+                <label>
+                    <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeSelection()" />
+                    <span>With SAP</span>
+                </label>
+                <label>
+                    <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeSelection()" />
+                    <span>Without SAP</span>
+                </label>
+            </div>
+
+            <!-- Input fields for PO / Invoice if With SAP -->
+            <div class="input-row" *ngIf="sapType === 'SAP'">
+                <div *ngIf="orderType === 'Inward'" class="input-flex">
+                    <div class="form-field flex-1">
+                        <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" " />
+                        <label>PO Number</label>
+                    </div>
+                    <button type="button" class="btn-get" (click)="fetchInvoiceDetails()"
+                        [disabled]="!ponumber || ponumber.trim() === ''">GET</button>
+                </div>
+
+                <div *ngIf="orderType === 'Outward'" class="input-flex">
+                    <div class="form-field flex-1">
+                        <input type="text" name="invoicenumber" [(ngModel)]="invoicenumber" placeholder=" " />
+                        <label>Invoice Number</label>
+                    </div>
+                    <button type="button" class="btn-get" (click)="fetchInvoiceDetails()"
+                        [disabled]="!invoicenumber || invoicenumber.trim() === ''">GET</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Product Form -->
+        <div *ngIf="showForm" class="table-responsive">
+            <form [formGroup]="ProductInfo" class="form-grid">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Product *</th>
+                            <th>Type of Material *</th>
+                            <th>Battery Condition</th>
+                            <th>Incoterms *</th>
+                            <th>Insurance Scope</th>
+                            <th>Material Description *</th>
+                            <th>Qty/Seats *</th>
+                            <th>Ah Loaded *</th>
+                            <th>Weight (kg) *</th>
+                            <th>Action </th>
+                        </tr>
+                    </thead>
+
+                    <tbody formArrayName="items">
+                        <tr *ngFor="let itemGroup of items.controls; let i = index" [formGroupName]="i">
+                            <td>{{ i + 1 }}</td>
+
+                            <td>
+                                <select formControlName="Product">
+                                    <option value="">Select Product</option>
+                                    <option *ngFor="let option of productOptions" [value]="option">{{ option }}</option>
+                                </select>
+                            </td>
+
+                            <td>
+                                <select formControlName="TypeOfMaterial">
+                                    <option value="">Select Type</option>
+                                    <option *ngFor="let option of materialTypeOptions" [value]="option">{{ option }}
+                                    </option>
+                                </select>
+                            </td>
+
+                            <td>
+                                <select formControlName="BatteryCondition"
+                                    *ngIf="itemGroup.get('Product')?.value === 'Batteries'">
+                                    <option value="">Select Condition</option>
+                                    <option *ngFor="let option of batteryConditionOptions" [value]="option">{{ option }}
+                                    </option>
+                                </select>
+                            </td>
+
+                            <td>
+                                <select formControlName="Incoterms">
+                                    <option value="">Select Term</option>
+                                    <option *ngFor="let option of incotermOptions" [value]="option">{{ option }}
+                                    </option>
+                                </select>
+                            </td>
+
+                            <td>
+                                <select formControlName="InsuranceScope">
+                                    <option *ngFor="let option of insuranceScopeOptions" [value]="option">{{ option }}
+                                    </option>
+                                </select>
+                            </td>
+
+                            <td><input type="text" formControlName="MaterialDescription" placeholder=" " /></td>
+                            <td><input type="number" formControlName="Noofseats" min="1" /></td>
+                            <td><input type="number" formControlName="AhLoadedInTruck" min="0" /></td>
+                            <td><input type="number" formControlName="ShipmentWeight" min="0.01" step="0.01" /></td>
+
+                            <td class="d-flex">
+                                <button class="form-field" type="button" (click)="addRow()">+</button>
+                                <button class="btn-remove" type="button" (click)="removeRow(i)"
+                                    [disabled]="items.length === 1">✖</button>
+                            </td>
+                        </tr>
+
+                        <!-- Save Button -->
+
+
+                    </tbody>
+                </table>
+            </form>
+        </div>
+        <div *ngIf="showForm" class="text-right"> <button type="button" class="btn btn-md btn-raised btnSave"
+                (click)="saveInvoice()">Save</button></div>
     </div>
 </div>

@@ -25,6 +25,8 @@ export class OrderInfoComponent implements OnInit {
   divisionList: any;
   billintypeList: any;
   statesList: any;
+  custList: any;
+  customerGroup: string = '';
 
   constructor(private fb: FormBuilder, private service: GeneralserviceService) { }
 
@@ -34,20 +36,20 @@ export class OrderInfoComponent implements OnInit {
       ODN: [''],
       InvoiceData: [''],
       BasicShipment: [''],
-      Itemnumber: [''],
+      // Itemnumber: [''],
       InvoiceWithGst: [''],
       FinanceYear: [''],
-      SystemGeneratedDate: [''],
+      // SystemGeneratedDate: [''],
       FiscalYear: [''],
       FiscalQuarter: [''],
       Month: [''],
       BillingTransactionType: [''],
-      Billingdescription: [''],
+      // Billingdescription: [''],
       Plant: [''],
-      Plantdescription: [''],
+      // Plantdescription: [''],
       TransactionType: [''],
       Division: [''],
-      Divisiondescription: [''],
+      // Divisiondescription: [''],
       SubDivision: [''],
       RefNumber: [''],
       Customer: [''],
@@ -56,7 +58,7 @@ export class OrderInfoComponent implements OnInit {
       DestinationLocation: [''],
       DestinationState: [''],
       DestinationZone: [''],
-      status: [''],
+      // status: [''],
       PhysicalDispatchDateTime: ['']
     });
     this.fetchpdb();
@@ -293,4 +295,62 @@ export class OrderInfoComponent implements OnInit {
     }
 
   }
+  // custgroupchange() {
+  //   if (this.OrderInfo.value.Customer) {
+  //     let obj = {
+  //       "CUST": {
+  //         "customer": this.OrderInfo.value.Customer
+  //       }
+  //     }
+  //     this.service.custgroup(obj).subscribe((res: any) => {
+  //       this.OrderInfo.patchValue({
+  //         "CustomerGroup": res.CUSTOMER_GRP
+  //       })
+  //     });
+  //   }
+
+  // }
+
+  // custgroupchange() {
+  //   const customer = this.OrderInfo.value.Customer;
+
+  //   if (customer) {
+  //     // ✅ Properly wrap payload for your service
+  //     const payload = {
+  //       CUST: {
+  //         customer: customer
+  //       }
+  //     };
+
+  //     console.log('➡️ Sending Payload:', payload);
+
+  //     this.service.custgroup(payload).subscribe({
+  //       next: (res: any) => {
+  //         console.log('✅ API Response:', res);
+
+  //         if (res && res.CUSTOMER_GRP) {
+  //           this.OrderInfo.patchValue({
+  //             CustomerGroup: res.CUSTOMER_GRP
+  //           });
+  //         } else {
+  //           console.warn('⚠️ CUSTOMER_GRP missing in response:', res);
+  //           this.OrderInfo.patchValue({ CustomerGroup: '' });
+  //         }
+  //       },
+  //       error: (err) => {
+  //         console.error('❌ API Error:', err);
+  //         this.OrderInfo.patchValue({ CustomerGroup: '' });
+  //       }
+  //     });
+  //   } else {
+  //     console.warn('⚠️ No customer selected');
+  //     this.OrderInfo.patchValue({ CustomerGroup: '' });
+  //   }
+  // }
+
+
+
+
+
+
 }

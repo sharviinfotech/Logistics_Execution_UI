@@ -330,3 +330,8 @@ input[type="radio"] {
   color: #4a90e2;
   font-weight: 500;
 }
+
+.no-asterisk::after {
+  content: none !important;
+  /* Forces the removal of the pseudo-element content */
+}

@@ -134,6 +134,21 @@ export class GeneralserviceService {
   fetchzone(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/orderInfo/Outward/withoutsap/fetchzone', obj);
   }
+  custgroup(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/orderInfo/Outward/withoutsap/custgroup', obj);
+  }
+  shipmentdetailsfetch(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/ShipmentDetails/Outword/sapfetch', obj);
+  }
+  ShipmentOutwardSave(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/ShipmentDetails/Outward/Save', obj);
+  }
+  SegmentInfoInwardOutward(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/fetchInvoiceList', obj);
+  }
+  SegmentInfoOutwardSave(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/withsap/Save', obj);
+  }
 
 
 }

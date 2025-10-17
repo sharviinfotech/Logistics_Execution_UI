@@ -1,74 +1,189 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormArray, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { GeneralserviceService } from 'src/app/generalservice.service';
 
 @Component({
   selector: 'app-shipment-details',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './shipment-details.component.html',
-  styleUrl: './shipment-details.component.css'
+  styleUrls: ['./shipment-details.component.css']
 })
-export class ShipmentDetailsComponent {
-ProductInfo!: FormGroup;
-  isEditMode = false;
-  isSubmitting = false;
-  editIndex: number | null = null;
+export class ShipmentDetailsComponent implements OnInit {
 
-  constructor(private fb: FormBuilder) {
-  }
+  // Dropdown options
+  productOptions = ['Batteries', 'Electronics', 'Fuze', 'Cement Poles and Piles', 'Raw Materials', 'Job Work Material', 'Machinery', 'Others'];
+  materialTypeOptions = ['Raw Material', 'Semi Finished', 'Finished Goods', 'Consumables', 'Spare Parts'];
+  batteryConditionOptions = ['DRY & DISCHARGED', 'DRY & DISCHARGE', 'FILLED & DISCHARGED', 'FILLED & CHARGE', 'FILLED & FORMED NO FREE ACID', 'LEAD ACID BATTERIES(DRY)', 'LEAD ACID BATTERIES(Filled)'];
+  incotermOptions = ['EXW', 'FOB', 'CIF', 'DAP', 'DDP', 'FCA', 'CPT'];
+  insuranceScopeOptions = ['Buyer', 'Supplier'];
+
+  // Form and variables
+  ProductInfo!: FormGroup;
+  isEditMode = false;
+  showForm = false;
+  orderType: string = '';     // Inward / Outward
+  sapType: string = '';       // SAP / Non-SAP
+  ponumber: string = '';      // For Inward SAP
+  invoicenumber: string = ''; // For Outward SAP
+
+  constructor(private fb: FormBuilder, private service: GeneralserviceService) { }
 
   ngOnInit(): void {
     this.ProductInfo = this.fb.group({
+      items: this.fb.array([])
+    });
+    this.addRow();
+  }
+
+  // Getter for FormArray
+  get items(): FormArray {
+    return this.ProductInfo.get('items') as FormArray;
+  }
+
+  // Create one item row
+  createItemRow(): FormGroup {
+    return this.fb.group({
       Product: ['', Validators.required],
       TypeOfMaterial: ['', Validators.required],
       MaterialDescription: ['', Validators.required],
-      Noofseats: ['', Validators.required],
-      AhLoadedInTruck: ['', Validators.required],
-      ShipmentWeight: ['', Validators.required],
-      BatteryCondition: ['', Validators.required],
+      Noofseats: [null, [Validators.required, Validators.min(1)]],
+      AhLoadedInTruck: [null, [Validators.required, Validators.min(0)]],
+      ShipmentWeight: [null, [Validators.required, Validators.min(0.01)]],
+      BatteryCondition: [''],
       Incoterms: ['', Validators.required],
-      InsuranceScope: ['', Validators.required],
-      Kilometres: ['', Validators.required],
-      status: ['Active', Validators.required]
+      InsuranceScope: ['Buyer'],
+      Kilometres: [null, Validators.required]
     });
   }
 
-  // This method will be called by your save button
-  saveProduct() {
-    if (this.ProductInfo.valid) {
-      this.isSubmitting = true;
-      
-      // Your save logic here
-      console.log('Product Data:', this.ProductInfo.value);
-      
-      // Simulate API call
-      setTimeout(() => {
-        this.isSubmitting = false;
-        this.resetForm();
-      }, 1000);
-    } else {
-      // Mark all fields as touched to show validation errors
-      Object.keys(this.ProductInfo.controls).forEach(key => {
-        this.ProductInfo.get(key)?.markAsTouched();
-      });
-    }
+  // Add/Remove rows
+  addRow() {
+    this.items.push(this.createItemRow());
   }
 
-  // Cancel edit mode
-  // cancelEdit() {
-  //   this.isEditMode = false;
-  //   this.editIndex = null;
-  //   this.resetForm();
-  // }
+  removeRow(index: number) {
+    if (this.items.length > 1) {
+      this.items.removeAt(index);
+    } else {
+      alert('Cannot delete the last row.');
+    }
+  }
 
   // Reset form
   resetForm() {
     this.ProductInfo.reset();
-    this.ProductInfo.patchValue({
-      status: 'Active'
+    this.items.clear();
+    this.addRow();
+    this.showForm = false;
+    this.ponumber = '';
+    this.invoicenumber = '';
+    this.sapType = '';
+    this.orderType = '';
+  }
+
+  // SAP type change
+  onSapTypeSelection() {
+    if (this.sapType === 'Non-SAP') {
+      this.showForm = true; // show directly
+    } else {
+      this.showForm = false;
+      this.ponumber = '';
+      this.invoicenumber = '';
+    }
+  }
+
+  // GET data for Inward or Outward
+  fetchInvoiceDetails() {
+    if (this.sapType !== 'SAP') {
+      alert('Please select "With SAP" first.');
+      return;
+    }
+
+    const referenceNumber =
+      this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+
+    if (!referenceNumber || referenceNumber.trim() === '') {
+      alert(`Please enter a valid ${this.orderType === 'Inward' ? 'PO' : 'Invoice'} Number`);
+      return;
+    }
+
+    const payload = {
+      INV_GET: referenceNumber
+    };
+
+    console.log('Fetching SAP Data with payload:', payload);
+
+    this.service.shipmentdetailsfetch(payload).subscribe({
+      next: (res: any) => {
+        console.log('GET Response:', res);
+        if (res && Array.isArray(res) && res.length > 0) {
+          this.items.clear();
+          res.forEach((item: any) => {
+            this.items.push(this.fb.group({
+              Product: [item.ZPRODUCT],
+              TypeOfMaterial: [item.MTART],
+              MaterialDescription: [item.MTBEZ],
+              Noofseats: [item.ZSETS, [Validators.min(1)]],
+              AhLoadedInTruck: [item.ZAH, [Validators.min(0)]],
+              ShipmentWeight: [item.ZSHIP_WT, [Validators.min(0.01)]],
+              BatteryCondition: [item.ZBATCOND],
+              Incoterms: [item.ZINCO],
+              InsuranceScope: [item.ZINS_SCPOE || 'Buyer'],
+              Kilometres: [item.ZKM]
+
+            }));
+          });
+          this.showForm = true;
+        } else {
+          alert('No data found for this reference.');
+        }
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Error fetching data.');
+      }
     });
-    this.isEditMode = false;
-    this.editIndex = null;
+  }
+
+  // Save data
+  saveInvoice() {
+    if (!this.ProductInfo.valid) {
+      this.ProductInfo.markAllAsTouched();
+      alert('Please fill all required fields.');
+      return;
+    }
+
+    const payload = this.items.value.map((item: any) => ({
+      ZPRODUCT: item.Product,
+      MTART: item.TypeOfMaterial,
+      MTBEZ: item.MaterialDescription,
+      ZSETS: item.Noofseats,
+      ZAH: item.AhLoadedInTruck,
+      ZSHIP_WT: item.ShipmentWeight,
+      ZBATCOND: item.BatteryCondition,
+      ZINCO: item.Incoterms,
+      ZINS_SCPOE: item.InsuranceScope,
+      ZKM: item.Kilometres
+    }));
+
+    console.log('Saving payload:', payload);
+
+    this.service.ShipmentOutwardSave(payload).subscribe({
+      next: (res: any) => {
+        console.log('Save Response:', res);
+        if (res.NUMBER === '200' || res.status === 'success') {
+          alert(res.MSG || 'Shipment saved successfully!');
+          this.resetForm();
+        } else {
+          alert(res.MSG || 'Failed to save data.');
+        }
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Error saving data.');
+      }
+    });
   }
 }

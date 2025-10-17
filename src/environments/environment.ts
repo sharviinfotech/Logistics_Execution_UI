@@ -15,12 +15,12 @@ export const environment = {
     appId: "",
     measurementId: ""
   },
-  baseUrl:'http://localhost:3000/',
+  baseUrl: 'http://localhost:3000/',
   // baseUrl:'http://125.22.172.147:3000/',
   // baseUrl:'http://192.168.1.18:3000/', // with vpn
 
-    // baseUrl:'http://14.99.143.250:3001/', // public ip production
-  };
+  // baseUrl:'http://14.99.143.250:3001/', // public ip production
+};
 
 /*
  * For easier debugging in development mode, you can import the following file
