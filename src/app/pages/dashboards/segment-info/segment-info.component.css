@@ -207,7 +207,7 @@ input[type="radio"] {
 .form-field input[type="text"]:not(:placeholder-shown)+label {
     top: -8px;
     font-size: 12px;
-    color: #2196f3;
+    color: black;
     font-weight: 600;
 }
 

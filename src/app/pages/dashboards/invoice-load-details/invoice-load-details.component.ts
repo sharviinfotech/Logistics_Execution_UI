@@ -53,6 +53,7 @@ invoiceLoadDetails!: FormGroup;
 
   // Save method
   savePlan() {
+    this.invoiceLoadDetails.markAllAsTouched();
     if (this.invoiceLoadDetails.valid) {
       this.isSubmitting = true;
 

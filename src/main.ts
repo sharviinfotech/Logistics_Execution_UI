@@ -7,7 +7,7 @@ import { environment } from './environments/environment';
 import { enableProdMode } from '@angular/core';
 import { initFirebaseBackend } from './app/authUtils';
 import { FakeBackendInterceptor } from './app/core/helpers/fake-backend';
-import { HTTP_INTERCEPTORS, provideHttpClient } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient,withInterceptorsFromDi  } from '@angular/common/http';
 import { JwtInterceptor } from './app/core/helpers/jwt.interceptor';
 import { ErrorInterceptor } from './app/core/helpers/error.interceptor';
 import { provideRouter } from '@angular/router';
@@ -17,6 +17,13 @@ import { importProvidersFrom } from '@angular/core';
 // ** Update Firebase Imports **
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
+
+
+// ✅ Import Translate dependencies
+import { HttpClient } from '@angular/common/http';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+
 
 // Enable production mode if in production environment
 if (environment.production) {
@@ -45,19 +52,36 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 // Initialize Firebase Authentication
 const auth = getAuth(firebaseApp);
+// ✅ Function for ngx-translate HttpLoader
+export function HttpLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideHttpClient(), // Required for API calls
-    importProvidersFrom(NgxSpinnerModule), // Import Spinner Module Here 
+    provideHttpClient(withInterceptorsFromDi()),
+
+    // ✅ Import TranslateModule globally
+    importProvidersFrom(
+      TranslateModule.forRoot({
+        defaultLanguage: 'en',
+        loader: {
+          provide: TranslateLoader,
+          useFactory: HttpLoaderFactory,
+          deps: [HttpClient],
+        },
+      }),
+      NgxSpinnerModule // already using spinner
+    ),
+
     provideRouter([]),
-    provideHttpClient(),
+
+    // ✅ Your interceptors
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: FakeBackendInterceptor, multi: true },
+
     ...appConfig.providers,
-    importProvidersFrom(NgxSpinnerModule) // Add ngx-spinner globally
-    
   ],
 })
   .catch((err) =>

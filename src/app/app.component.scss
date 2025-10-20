@@ -1,0 +1,86 @@
+.spinner-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(17, 24, 39, 0.93);
+}
+
+.spinner-overlay {
+  position: relative;
+  z-index: 10000;
+  background: url('/assets/images/world_image.png') center/cover no-repeat;
+  border-radius: 20px;
+  padding: 60px 40px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+.spinner-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  backdrop-filter: blur(2px) !important;
+}
+
+.spinner-circle {
+  width: 120px;
+  height: 120px;
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.spinner-track {
+  stroke: #212B3A;
+  stroke-width: 10;
+  fill: none;
+  opacity: 0.2;
+}
+
+.spinner-progress {
+  stroke-width: 10;
+  fill: none;
+  stroke-dasharray: 314;
+  stroke-dashoffset: 50;
+  stroke-linecap: round;
+  animation: spinner 1.2s linear infinite;
+}
+
+@keyframes spinner {
+  to { stroke-dashoffset: -264; }
+}
+
+.circle-loading { stroke: white; }
+.circle-success { stroke: #37D843; animation: none; transition: stroke 0.2s; }
+.circle-error   { stroke: #D84343; animation: none; transition: stroke 0.2s; }
+
+.truck-icon {
+  position: relative;
+  z-index: 3;
+  margin-top: 5px;
+  transition: transform 0.7s ease-in-out;
+}
+
+.truck-center { transform: translateX(0); }
+.truck-right  { transform: translateX(60px); }
+.truck-left   { transform: translateX(-60px); }
+
+.spinner-text {
+  margin-top: 140px;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: center;
+  z-index: 3;
+}

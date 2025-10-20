@@ -456,11 +456,12 @@ body[data-sidebar="dark"] {
 
                         &:hover {
                             >a {
-                                background: lighten($sidebar-dark-bg, 2%);
-                                color: $sidebar-dark-menu-item-hover-color;
+                              background: linear-gradient(135deg, #8f1e42 0%, #8f1e42 100%) center center / cover !important;
+;
+                                color: white !important;
 
                                 i {
-                                    color: $sidebar-dark-menu-item-hover-color;
+                                    color: white !important;
                                 }
                             }
 

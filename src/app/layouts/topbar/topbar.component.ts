@@ -166,6 +166,7 @@ mustMatch(controlName: string, matchingControlName: string) {
 
 
   setLanguage(text: string, lang: string, flag: string) {
+    console.log("text",text,"lang",lang,"flag",flag)
     this.countryName = text;
     this.flagvalue = flag;
     this.cookieValue = lang;

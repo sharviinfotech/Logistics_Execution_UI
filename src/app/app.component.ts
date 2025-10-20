@@ -6,6 +6,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 import { SessionServiceService } from './pages/ui/session-service.service';
 import { NotificationService } from './notification.service';
 import { GeneralserviceService } from './generalservice.service';
+import { SpinnerService } from './spinner.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -15,8 +16,10 @@ import { GeneralserviceService } from './generalservice.service';
 })
 export class AppComponent implements OnInit {
   data: any[] = []
-  constructor(private spinner: NgxSpinnerService,private sessionService:SessionServiceService,private notificationService: NotificationService,private service:GeneralserviceService) {}
+  showSpinner = false;
+  constructor(private spinner: NgxSpinnerService,private sessionService:SessionServiceService,private notificationService: NotificationService,private service:GeneralserviceService,public spinnerService: SpinnerService) {}
   ngOnInit() {
+   
     // this.spinner.show(undefined, {
     //   type: 'square-jelly-box',
     //   size: 'medium',

@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GeneralserviceService } from 'src/app/generalservice.service';
+import { NgxSpinnerService } from 'ngx-spinner';
+import Swal from 'sweetalert2';
+import { SpinnerService } from 'src/app/spinner.service';
 
 @Component({
   selector: 'app-order-info',
@@ -28,40 +31,40 @@ export class OrderInfoComponent implements OnInit {
   custList: any;
   customerGroup: string = '';
 
-  constructor(private fb: FormBuilder, private service: GeneralserviceService) { }
+  constructor(private fb: FormBuilder, private service: GeneralserviceService, private spinner: NgxSpinnerService,public spinnerService: SpinnerService) { }
 
   ngOnInit(): void {
     this.OrderInfo = this.fb.group({
-      TaxInvoice: [''],
-      ODN: [''],
-      InvoiceData: [''],
-      BasicShipment: [''],
+      TaxInvoice: ['',Validators.required],
+      ODN: ['',Validators.required],
+      InvoiceData: ['',Validators.required],
+      BasicShipment: ['',Validators.required],
       // Itemnumber: [''],
-      InvoiceWithGst: [''],
+      InvoiceWithGst: ['',Validators.required],
       FinanceYear: [''],
       // SystemGeneratedDate: [''],
-      FiscalYear: [''],
-      FiscalQuarter: [''],
-      Month: [''],
-      BillingTransactionType: [''],
+      FiscalYear: ['',Validators.required],
+      FiscalQuarter: ['',Validators.required],
+      Month: ['',Validators.required],
+      BillingTransactionType: ['',Validators.required],
       // Billingdescription: [''],
-      Plant: [''],
+      Plant: ['',Validators.required],
       // Plantdescription: [''],
-      TransactionType: [''],
-      Division: [''],
+      TransactionType: ['',Validators.required],
+      Division: ['',Validators.required],
       // Divisiondescription: [''],
-      SubDivision: [''],
-      RefNumber: [''],
-      Customer: [''],
-      CustomerGroup: [''],
-      CNee: [''],
-      DestinationLocation: [''],
-      DestinationState: [''],
-      DestinationZone: [''],
+      SubDivision: ['',Validators.required],
+      RefNumber: ['',Validators.required],
+      Customer: ['',Validators.required],
+      CustomerGroup: ['',Validators.required],
+      CNee: ['',Validators.required],
+      DestinationLocation: ['',Validators.required],
+      DestinationState: ['',Validators.required],
+      DestinationZone: ['',Validators.required],
       // status: [''],
-      PhysicalDispatchDateTime: ['']
+      PhysicalDispatchDateTime: ['',Validators.required]
     });
-    this.fetchpdb();
+    
   }
 
   // Helper to check SAP mode
@@ -98,6 +101,7 @@ export class OrderInfoComponent implements OnInit {
   }
 
   onSapTypeChange(): void {
+    this.fetchpdb();
     this.showForm = false;
     if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
       this.resetConditionalFields();
@@ -129,17 +133,34 @@ export class OrderInfoComponent implements OnInit {
 
   fetchSAPData(type: 'purchase' | 'invoice'): void {
     const obj = { VBELN: this.invoicenumber };
-    this.showForm = true;
-    this.service.OrderinfoOutward(obj).subscribe({
-      next: (res: any) => {
-        if (res && res.length > 0) {
-          this.patchForm(res[0]);
-        }
-      },
-      error: (err) => {
-        console.error('SAP API error:', err);
+
+    this.spinner.show()
+    this.service.OrderinfoOutward(obj).subscribe((res: any) => {
+      console.log("res Fetch", res)
+      if (res && res.length > 0) {
+        this.patchForm(res[0]);
+        this.showForm = true;
+        this.spinner.hide()
+        // setTimeout(() => {
+        // this.spinner.show('success', 'right');
+        // setTimeout(() => this.spinner.hide(), 900);
+      // }, 50); 
+      } else {
         this.showForm = false;
+        this.spinner.hide()
+      //    setTimeout(() => {
+      //   this.spinner.show('error', 'left');
+      //   setTimeout(() => this.spinner.hide(), 900);
+      // }, 50);
       }
+    }, error => {
+        this.showForm = false;
+        this.spinner.hide()
+    // this.spinnerErrorMsg = 'Internal Server Error. Please try again later.';
+    // setTimeout(() => {
+    //     this.spinner.show('error', 'left');
+    //     setTimeout(() => this.spinner.hide(), 900);
+    //   }, 50);
     });
   }
 
@@ -150,19 +171,19 @@ export class OrderInfoComponent implements OnInit {
       RefNumber: this.OrderInfo.get('RefNumber')?.value || '',
       Customer: this.OrderInfo.get('Customer')?.value || ''
     };
-    this.showForm = true;
-    this.service.OrderInfoNonSap(obj).subscribe({
-      next: (res: any) => {
-        if (res && res.length > 0) {
+    
+    this.service.OrderInfoNonSap(obj).subscribe((res:any)=>{
+
+      console.log("non sap save ",res)
+      if (res && res.length > 0) {
           this.patchForm(res[0]);
+          this.showForm = true;
         } else {
           this.resetExtraFields();
+          this.showForm = false;
         }
-      },
-      error: (err) => {
-        console.error('Non-SAP API error:', err);
-        this.showForm = false;
-      }
+    },error =>{
+      this.showForm = false;
     });
   }
 
@@ -192,9 +213,25 @@ export class OrderInfoComponent implements OnInit {
       DestinationZone: data.DEST_ZONE || ''
     });
     this.showForm = true;
+    this.OrderInfo.markAllAsTouched();
   }
 
   saveOutwardInvoiceData(): void {
+
+
+    this.OrderInfo.markAllAsTouched();
+
+  // Stop if form is invalid
+  if (this.OrderInfo.invalid) {
+    Swal.fire({
+      title: 'Validation Error',
+      text: 'Please fill all required fields before saving.',
+      icon: 'warning',
+      confirmButtonText: 'Ok',
+      timer: 4000
+    });
+    return;
+  }
     const formValue = this.OrderInfo.value;
     const record = {
       INV_VBELN: formValue.TaxInvoice,
@@ -222,14 +259,87 @@ export class OrderInfoComponent implements OnInit {
     };
 
     if (this.sapType === "SAP") {
-      this.service.OrderInfoOutwardSave({ SAVE: [record] }).subscribe({
-        next: () => alert('Saved successfully!'),
-        error: () => alert('Failed to save data.')
+      this.spinner.show()
+      this.service.OrderInfoOutwardSave({ SAVE: [record] }).subscribe((res: any) => {
+        console.log("res SAP", res)
+
+        if (res.STATUS == "true" || res.NUMBER == "200") {
+          Swal.fire({
+            title: '',
+            text: res.MESSAGE,
+            icon: 'success',
+            cancelButtonText: 'Ok',
+            timer: 5000
+          }).then((result) => {
+            if (result) {
+              // Handle confirmation if needed
+            } else {
+              // Handle cancel if needed
+            }
+          });
+          this.OrderInfo.reset()
+          this.spinner.hide()
+          this.showForm = false;
+        } else {
+          Swal.fire({
+            title: '',
+            text: res.MESSAGE,
+            icon: 'success',
+            cancelButtonText: 'Ok',
+            timer: 5000
+          }).then((result) => {
+            if (result) {
+              // Handle confirmation if needed
+            } else {
+              // Handle cancel if needed
+            }
+            this.spinner.hide()
+          });
+          this.spinner.hide()
+        }
+
+
+      }, error => {
+        this.spinner.hide()
       });
     } else {
-      this.service.OrderInfoNonSap({ CREATE: [record] }).subscribe({
-        next: () => alert('Saved successfully!'),
-        error: () => alert('Failed to save data.')
+      this.service.OrderInfoNonSap({ CREATE: [record] }).subscribe((res: any) => {
+        console.log("res non SAP", res)
+        if (res.STATUS == "true" || res.NUMBER == "200") {
+          Swal.fire({
+            title: '',
+            text: res.MESSAGE,
+            icon: 'success',
+            cancelButtonText: 'Ok',
+            timer: 5000
+          }).then((result) => {
+            if (result) {
+              // Handle confirmation if needed
+            } else {
+              // Handle cancel if needed
+            }
+          });
+          this.OrderInfo.reset()
+          this.spinner.hide()
+          this.showForm = true;
+        } else {
+          Swal.fire({
+            title: '',
+            text: res.MESSAGE,
+            icon: 'success',
+            cancelButtonText: 'Ok',
+            timer: 5000
+          }).then((result) => {
+            if (result) {
+              // Handle confirmation if needed
+            } else {
+              // Handle cancel if needed
+            }
+          });
+          this.spinner.hide()
+        }
+      },error=>{
+        this.spinner.hide()
       });
     }
   }
@@ -274,12 +384,17 @@ export class OrderInfoComponent implements OnInit {
   }
 
   fetchpdb() {
+
+    this.spinner.show()
     this.service.getpdb().subscribe((res: any) => {
       console.log("PDB Data:", res);
       this.plantList = res[0].PLANT;
       this.divisionList = res[0].DIVISION;
       this.billintypeList = res[0].BILLING_TYPE;
       this.statesList = res[0].STATES;
+      this.spinner.hide()
+    }, error => {
+      this.spinner.hide()
     });
   }
   fetchzonechange() {
@@ -287,10 +402,14 @@ export class OrderInfoComponent implements OnInit {
       let obj = {
         "STATE": this.OrderInfo.value.DestinationState
       }
+      this.spinner.show()
       this.service.fetchzone(obj).subscribe((res: any) => {
         this.OrderInfo.patchValue({
           "DestinationZone": res.ZONE
         })
+        this.spinner.hide()
+      }, error => {
+        this.spinner.hide()
       });
     }
 

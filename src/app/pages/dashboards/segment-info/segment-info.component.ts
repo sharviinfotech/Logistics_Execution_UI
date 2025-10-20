@@ -112,6 +112,7 @@ export class SegmentInfoComponent implements OnInit {
     this.showForm = true;
   }
   saveSegmentInfoWithSAP(): void {
+    this.segmentInfo.markAllAsTouched();
     const requiredFields = ['INV_VBELN', 'SALES_EMP'];
     let missing = requiredFields.filter(f => !this.segmentInfo.get(f)?.value);
 

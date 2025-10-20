@@ -123,6 +123,9 @@
 //     font-size: 20px;
 //   }
 
+@import '~dropzone/dist/min/dropzone.min.css';
+@import '../node_modules/ngx-spinner/animations/line-scale-pulse-out-rapid.css';
+
 .radioBig{
     width: 13px !important; /* Adjust size */
   height: 14px !important; /* Adjust size */
@@ -593,7 +596,7 @@ table th {
     padding: 12px;
     font-size: 18px;
     border: 1px solid #ced4da;
-    border-radius: 4px;
+    // border-radius: 4px;
     outline: none;
     background: #ffffff;
     transition: border-color 0.3s ease;
@@ -619,14 +622,15 @@ table th {
     top: -8px;
     left: 8px;
     font-size: 12px;
-    color: #4a90e2;
+    color: black;
     font-weight: 500;
   }
 
   /* Focus border effect */
   .form-field input:focus,
   .form-field select:focus {
-    border-color: #4a90e2;
+    // border-color: #4a90e2;
+    border-color: #e2e5e9;
     box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
   }
 
@@ -679,25 +683,25 @@ table th {
   /* Error state styling */
   .form-field input.ng-invalid.ng-touched,
   .form-field select.ng-invalid.ng-touched {
-    border-color: #dc3545;
+    border-color: #8f1e42;
     box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
   }
 
   .form-field input.ng-invalid.ng-touched + label,
   .form-field select.ng-invalid.ng-touched + label {
-    color: #dc3545 !important;
+    color: #8f1e42 !important;
   }
 
   /* Enhanced error styling for empty required select fields */
   .form-field select.ng-invalid.ng-touched:invalid {
-    border-color: #dc3545;
+    border-color: #8f1e42;
     background-color: #fff5f5;
   }
 
   /* Make sure error messages are visible */
   .form-field .error {
     display: block;
-    color: #dc3545;
+    color: #8f1e42;
     font-size: 12px;
     margin-top: 5px;
     font-weight: 400;
@@ -754,7 +758,7 @@ table th {
     background-color: #8f1e42;
     height: 50px;
   }
-    .login-headers-bottom{
+    .login-headers-bottom{  
     background-color: #8f1e42;
     height: 50px;
   }
@@ -844,3 +848,97 @@ table th {
   position: sticky;
   top: -2px;
 }
+
+// global css new
+.form-field input[type="text"],
+.form-field input[type="datetime-local"],
+.form-field select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  // border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  background: #ffffff;
+  color: #333;
+  outline: none;
+}
+
+/* Focus state */
+.form-field input[type="text"]:focus,
+.form-field input[type="datetime-local"]:focus,
+.form-field select:focus {
+  // border-color: #2196f3;
+  border-color: #dee3e8;
+  box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1);
+  transform: translateY(-2px);
+}
+
+/* ----------------------------
+   🟢 Valid state (filled or fetched)
+   ---------------------------- */
+
+/* When form control is valid and touched or dirty */
+.form-field input.ng-valid.ng-touched,
+.form-field input.ng-valid.ng-dirty,
+.form-field select.ng-valid.ng-touched,
+.form-field select.ng-valid.ng-dirty,
+.form-field input.ng-valid:not(.ng-touched):not(.ng-untouched),
+.form-field select.ng-valid:not(.ng-touched):not(.ng-untouched) {
+  // border-left-color: #00A651; /* Green */
+  box-shadow: 0 0 5px rgba(0, 166, 81, 0.25);
+  border-left: 3px solid #00A651 !important;
+}
+
+/* ----------------------------
+   🔴 Invalid state (empty when submitted)
+   ---------------------------- */
+
+/* Invalid field after being touched or dirty */
+.form-field input.ng-invalid.ng-touched,
+.form-field input.ng-invalid.ng-dirty,
+.form-field select.ng-invalid.ng-touched,
+.form-field select.ng-invalid.ng-dirty {
+  // border-left-color: #8f1e42; /* Red */
+  box-shadow: 0 0 5px rgba(255, 59, 48, 0.25);
+  border-left: 3px solid #8f1e42 !important;
+}
+
+/* ----------------------------
+   🟠 When form is submitted and invalid
+   ---------------------------- */
+
+/* Highlight invalid inputs when form submitted */
+.ng-submitted .form-field input.ng-invalid,
+.ng-submitted .form-field select.ng-invalid {
+  // border-left-color: #FF3B30 !important;
+  box-shadow: 0 0 5px rgba(255, 59, 48, 0.3);
+  border-left: 3px solid #8f1e42 !important;
+}
+
+
+.form-field label {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px;
+  color: #757575;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  background: white;
+  padding: 0 4px;
+}
+
+.form-field input[type="text"]:focus+label,
+.form-field input[type="text"]:not(:placeholder-shown)+label,
+.form-field input[type="datetime-local"]:valid+label,
+.form-field select:focus+label,
+.form-field select.ng-valid+label {
+  top: -8px;
+  font-size: 12px;
+  color: #2196f3;
+  font-weight: 600;
+}
+
+

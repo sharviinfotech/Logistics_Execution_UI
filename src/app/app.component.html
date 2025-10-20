@@ -1,3 +1,41 @@
+<!-- <div *ngIf="spinnerService.spinner$ | async" class="spinner-bg">
+  <div class="spinner-overlay">
+    <svg class="spinner-circle" viewBox="0 0 120 120">
+      <circle class="spinner-track" cx="60" cy="60" r="50" />
+      <circle
+        class="spinner-progress"
+        [ngClass]="{
+          'circle-loading': (spinnerService.status$ | async) === 'loading',
+          'circle-success': (spinnerService.status$ | async) === 'success',
+          'circle-error': (spinnerService.status$ | async) === 'error'
+        }"
+        cx="60" cy="60" r="50"
+      />
+    </svg>
+    <div
+      class="truck-icon"
+      [ngClass]="{
+        'truck-center': (spinnerService.direction$ | async) === 'center',
+        'truck-right': (spinnerService.direction$ | async) === 'right',
+        'truck-left': (spinnerService.direction$ | async) === 'left'
+      }">
+      <svg width="60" height="40" viewBox="0 0 60 40" fill="none">
+        <rect x="8" y="15" width="34" height="15" rx="3" fill="#43BDFB"/>
+        <rect x="42" y="20" width="10" height="10" rx="2" fill="#43BDFB"/>
+        <circle cx="18" cy="33" r="3" fill="#212B3A"/>
+        <circle cx="44" cy="33" r="3" fill="#212B3A"/>
+        <rect x="36" y="19" width="6" height="2" fill="#43BDFB"/>
+        <rect x="25" y="19" width="8" height="2" fill="#43BDFB"/>
+        <line x1="0" y1="28" x2="4" y2="28" stroke="#43BDFB" stroke-width="2"/>
+        <line x1="0" y1="24" x2="8" y2="24" stroke="#43BDFB" stroke-width="2"/>
+      </svg>
+    </div>
+    <div class="spinner-text">
+      Please Wait Loading...
+    </div>
+  </div>
+</div> -->
+
 <router-outlet></router-outlet>
 
 <!-- Pulse Spinner -->
@@ -5,7 +43,9 @@
   bdColor="rgba(0, 0, 0, 0.8)"
   size="medium"
   color="#fff"
-  type="square-jelly-box"
+  type="line-scale-pulse-out-rapid"
   [fullScreen]="true">
   <p style="color: white"> Please Wait Loading... </p>
 </ngx-spinner>
+
+

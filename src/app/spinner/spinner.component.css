@@ -1,0 +1,70 @@
+.spinner-bg {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: url('/assets/images/world_image') center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+   backdrop-filter: blur(10px);
+  
+}
+
+.spinner-overlay {
+  position: relative;
+  z-index: 2;
+  background: rgba(17, 24, 39, 0.7);
+  border-radius: 20px;
+  padding: 60px 40px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.spinner-circle {
+  width: 120px;
+  height: 120px;
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.spinner-track {
+  stroke: #212B3A;
+  stroke-width: 10;
+  fill: none;
+  opacity: 0.2;
+}
+
+.spinner-progress {
+  stroke: white;
+  stroke-width: 10;
+  fill: none;
+  stroke-dasharray: 314;
+  stroke-dashoffset: 50;
+  stroke-linecap: round;
+  animation: spinner 1.2s linear infinite;
+}
+
+@keyframes spinner {
+  to {
+    stroke-dashoffset: -264;
+  }
+}
+
+.truck-icon {
+  position: relative;
+  z-index: 3;
+  margin-top: 60px;
+}
+
+.spinner-text {
+  margin-top: 120px;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: center;
+  z-index: 3;
+}

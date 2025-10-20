@@ -129,7 +129,7 @@ export class GeneralserviceService {
     return this.http.put(environment.baseUrl + 'api/external/LE/orderInfo/Outward/withoutsap/Save', obj);
   }
   getpdb() {
-    return this.http.get(environment.baseUrl + 'api/external/LE/orderInfo/plant_division_Biltype',);
+    return this.http.get(environment.baseUrl + 'api/external/LE/orderInfo/f4_getAllDetails',);
   }
   fetchzone(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/orderInfo/Outward/withoutsap/fetchzone', obj);
@@ -138,7 +138,7 @@ export class GeneralserviceService {
     return this.http.put(environment.baseUrl + 'api/external/LE/orderInfo/Outward/withoutsap/custgroup', obj);
   }
   shipmentdetailsfetch(obj) {
-    return this.http.post(environment.baseUrl + 'api/external/LE/ShipmentDetails/Outword/sapfetch', obj);
+    return this.http.post(environment.baseUrl + 'api/external/LE/ShipmentDetails/Outword/fetchInvoiceList', obj);
   }
   ShipmentOutwardSave(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/ShipmentDetails/Outward/Save', obj);
