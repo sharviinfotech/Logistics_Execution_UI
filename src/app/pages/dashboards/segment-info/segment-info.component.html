@@ -60,39 +60,83 @@
 
   <!-- Form Section -->
   <form class="form-grid" [formGroup]="segmentInfo" *ngIf="showForm">
-    <div class="form-field">
-      <input type="text" formControlName="SALES_EMP" placeholder="" />
-      <label>Sales Person</label>
-      <small class="error" *ngIf="segmentInfo.get('SALES_EMP')?.touched && segmentInfo.get('SALES_EMP')?.invalid">
-        Sales Person is required
-      </small>
-    </div>
 
     <div class="form-field">
-      <input type="text" formControlName="SEGMENT" placeholder="" />
+      <ng-container *ngIf="sapType === 'Non-SAP'; else sapSales">
+        <select formControlName="SALES_EMP">
+          <option value="">Select Sales Person</option>
+          <option *ngFor="let s of supplierList" [value]="s.SUPPLIER_NAME">
+            {{ s.SUPPLIER }} - {{ s.SUPPLIER_NAME }}
+          </option>
+        </select>
+      </ng-container>
+      <ng-template #sapSales>
+        <input type="text" formControlName="SALES_EMP" readonly />
+      </ng-template>
+      <label>Sales Person</label>
+    </div>
+
+    <!-- Segment -->
+    <div class="form-field">
+      <ng-container *ngIf="sapType === 'Non-SAP'; else sapSegment">
+        <select formControlName="SEGMENT">
+          <option value="">Select Segment</option>
+          <option *ngFor="let seg of segmentList" [value]="seg.SEGMENT_DESC">
+            {{ seg.SEGMENT }} - {{ seg.SEGMENT_DESC }}
+          </option>
+        </select>
+      </ng-container>
+      <ng-template #sapSegment>
+        <input type="text" formControlName="SEGMENT" readonly />
+      </ng-template>
       <label>Segment</label>
     </div>
 
+    <!-- Customer Profile -->
     <div class="form-field">
-      <input type="text" formControlName="CUST_PROF" placeholder="" />
+      <ng-container *ngIf="sapType === 'Non-SAP'; else sapCustProf">
+        <select formControlName="CUST_PROF">
+          <option value="">Select Customer Profile</option>
+          <option *ngFor="let c of custGrpList" [value]="c.CUST_GRP_DESC">
+            {{ c.CUST_GRP }} - {{ c.CUST_GRP_DESC }}
+          </option>
+        </select>
+      </ng-container>
+      <ng-template #sapCustProf>
+        <input type="text" formControlName="CUST_PROF" readonly />
+      </ng-template>
       <label>Customer Profile</label>
     </div>
 
+    <!-- Branch -->
     <div class="form-field">
-      <input type="text" formControlName="BRANCH" placeholder="" />
+      <ng-container *ngIf="sapType === 'Non-SAP'; else sapBranch">
+        <select formControlName="BRANCH">
+          <option value="">Select Branch</option>
+          <option *ngFor="let b of branchList" [value]="b.BRANCH_DESC">
+            {{ b.BRANCH }} - {{ b.BRANCH_DESC }}
+          </option>
+        </select>
+      </ng-container>
+      <ng-template #sapBranch>
+        <input type="text" formControlName="BRANCH" readonly />
+      </ng-template>
       <label>Branch</label>
     </div>
 
+    <!-- Branch Zone -->
     <div class="form-field">
       <input type="text" formControlName="BRANCH_ZONE" placeholder="" />
       <label>Branch Zone</label>
     </div>
 
+    <!-- TAT -->
     <div class="form-field">
       <input type="text" formControlName="TAT_DAYS" placeholder="" />
       <label>TAT</label>
     </div>
 
+    <!-- ETA -->
     <div class="form-field">
       <input type="text" formControlName="ETA_DATE" placeholder="" />
       <label>ETA</label>
@@ -102,7 +146,9 @@
 
   <!-- Buttons -->
   <div class="text-right" *ngIf="showForm">
-    <!-- <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">Cancel</button> -->
-    <button type="submit" class="btn btn-md btn-raised btnSave" (click)="saveSegmentInfoWithSAP()">Save</button>
+    <button type="submit" class="btn btn-md btn-raised btnSave" (click)="savePlan()" [disabled]="isSubmitting">
+      {{ sapType === 'SAP' ? 'Save ' : 'Save ' }}
+    </button>
   </div>
+
 </div>
