@@ -44,9 +44,9 @@ export class SegmentInfoComponent implements OnInit {
       BRANCH: ['', Validators.required],
       BRANCH_ZONE: [''],
       TAT_DAYS: [''],
-      ETA_DATE: [''],
-      SUPPLIER: [''],
-      CUST_GRP: ['']
+      ETA_DATE: ['', Validators.required],
+      // SUPPLIER: [''],
+      // CUST_GRP: ['']
     });
   }
 
@@ -121,25 +121,23 @@ export class SegmentInfoComponent implements OnInit {
       TAT_DAYS: data.TAT_DAYS || '',
       ETA_DATE: data.ETA_DATE || ''
     });
+    this.segmentInfo.markAllAsTouched();
   }
 
   // Fetch dropdown data for Non-SAP
   fetchDropdownData() {
     this.spinner.show();
-    this.service.getssc().subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        const data = res[0];
-        this.supplierList = data.SUPPLIERS || [];
-        this.segmentList = data.SEGMENTS || [];
-        this.custGrpList = data.CUST_GRPS || [];
-        this.branchList = data.BRANCH || [];
-      },
-      error: () => {
-        this.spinner.hide();
-        Swal.fire('Failed to load dropdown data', '', 'error');
-      }
-    });
+    this.service.getssc().subscribe((res: any) => {
+      this.spinner.hide();
+      const data = res[0];
+      this.supplierList = data.SUPPLIERS || [];
+      this.segmentList = data.SEGMENTS || [];
+      this.custGrpList = data.CUST_GRPS || [];
+      this.branchList = data.BRANCH || [];
+    }, error => {
+      this.spinner.hide();
+    })
+
   }
 
   // Save button handler
@@ -152,6 +150,19 @@ export class SegmentInfoComponent implements OnInit {
   }
 
   saveSegmentInfoWithSAP(): void {
+    this.segmentInfo.markAllAsTouched();
+
+    // Stop if form is invalid
+    if (this.segmentInfo.invalid) {
+      Swal.fire({
+        title: 'Validation Error',
+        text: 'Please fill all required fields before saving.',
+        icon: 'warning',
+        confirmButtonText: 'Ok',
+        timer: 4000
+      });
+      return;
+    }
     const formValue = this.segmentInfo.value;
     const payload = {
       SAVE: [
@@ -170,13 +181,40 @@ export class SegmentInfoComponent implements OnInit {
     this.spinner.show();
     this.service.SegmentInfoOutwardSave(payload).subscribe({
       next: (res: any) => {
-        this.spinner.hide();
-        if (res.STATUS === 'TRUE') {
-          Swal.fire('Saved successfully!', res.MESSAGE, 'success');
-          this.segmentInfo.reset();
+
+        if (res.STATUS == "true" || res.NUMBER == "200") {
+          Swal.fire({
+            title: '',
+            text: res.MESSAGE,
+            icon: 'success',
+            cancelButtonText: 'Ok',
+            timer: 5000
+          }).then((result) => {
+            if (result) {
+              // Handle confirmation if needed
+            } else {
+              // Handle cancel if needed
+            }
+          });
+          this.segmentInfo.reset()
+          this.spinner.hide()
           this.showForm = false;
         } else {
-          Swal.fire('Save failed', res.MESSAGE, 'error');
+          Swal.fire({
+            title: '',
+            text: res.MESSAGE,
+            icon: 'success',
+            cancelButtonText: 'Ok',
+            timer: 5000
+          }).then((result) => {
+            if (result) {
+              // Handle confirmation if needed
+            } else {
+              // Handle cancel if needed
+            }
+            this.spinner.hide()
+          });
+          this.spinner.hide()
         }
       },
       error: () => {
@@ -187,6 +225,19 @@ export class SegmentInfoComponent implements OnInit {
   }
 
   saveSegmentInfoWithoutSAP(): void {
+    this.segmentInfo.markAllAsTouched();
+
+    // Stop if form is invalid
+    if (this.segmentInfo.invalid) {
+      Swal.fire({
+        title: 'Validation Error',
+        text: 'Please fill all required fields before saving.',
+        icon: 'warning',
+        confirmButtonText: 'Ok',
+        timer: 4000
+      });
+      return;
+    }
     const formValue = this.segmentInfo.value;
     const payload = {
       CREATE: [
@@ -204,11 +255,41 @@ export class SegmentInfoComponent implements OnInit {
     };
     this.spinner.show();
     this.service.SegmentInfoNonSap(payload).subscribe({
-      next: () => {
-        this.spinner.hide();
-        Swal.fire('Non-SAP data saved!', '', 'success');
-        this.segmentInfo.reset();
-        this.showForm = false;
+      next: (res: any) => {
+        if (res.STATUS == "true" || res.NUMBER == "200") {
+          Swal.fire({
+            title: '',
+            text: res.MESSAGE,
+            icon: 'success',
+            cancelButtonText: 'Ok',
+            timer: 5000
+          }).then((result) => {
+            if (result) {
+              // Handle confirmation if needed
+            } else {
+              // Handle cancel if needed
+            }
+          });
+          this.segmentInfo.reset()
+          this.spinner.hide()
+          this.showForm = false;
+        } else {
+          Swal.fire({
+            title: '',
+            text: res.MESSAGE,
+            icon: 'success',
+            cancelButtonText: 'Ok',
+            timer: 5000
+          }).then((result) => {
+            if (result) {
+              // Handle confirmation if needed
+            } else {
+              // Handle cancel if needed
+            }
+            this.spinner.hide()
+          });
+          this.spinner.hide()
+        }
       },
       error: () => {
         this.spinner.hide();
@@ -216,4 +297,77 @@ export class SegmentInfoComponent implements OnInit {
       }
     });
   }
+
+  // fetchzonechange() {
+  //   const branchDesc = this.segmentInfo.value.BRANCH;
+
+  //   if (!branchDesc) {
+  //     this.segmentInfo.patchValue({
+  //       BRANCH_ZONE: '',
+  //       TAT_DAYS: ''
+  //     });
+  //     return;
+  //   }
+
+  //   const obj = { STATE: branchDesc };  // Send branchDesc as STATE
+
+  //   this.spinner.show();
+  //   this.service.fetchzoneTat(obj).subscribe({
+  //     next: (res: any) => {
+  //       this.spinner.hide();
+  //       this.segmentInfo.patchValue({
+  //         BRANCH_ZONE: res.ZZONE || '',
+  //         TAT_DAYS: res.ZZTAT || ''
+  //       });
+  //     },
+  //     error: () => {
+  //       this.spinner.hide();
+  //       Swal.fire('Error fetching Zone & TAT', '', 'error');
+  //       this.segmentInfo.patchValue({
+  //         BRANCH_ZONE: '',
+  //         TAT_DAYS: ''
+  //       });
+  //     }
+  //   });
+  // }
+  fetchzonechange() {
+    // Only execute for Non-SAP orders
+    if (this.sapType !== 'Non-SAP') {
+      return;
+    }
+
+    const branchDesc = this.segmentInfo.value.BRANCH;
+
+    // Reset if no branch is selected
+    if (!branchDesc) {
+      this.segmentInfo.patchValue({
+        BRANCH_ZONE: '',
+        TAT_DAYS: ''
+      });
+      return;
+    }
+
+    const obj = { STATE: branchDesc };  // Send branchDesc as STATE
+
+    this.spinner.show();
+    this.service.fetchzoneTat(obj).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        this.segmentInfo.patchValue({
+          BRANCH_ZONE: res.ZZONE || '',
+          TAT_DAYS: res.ZZTAT || ''
+        });
+      },
+      error: () => {
+        this.spinner.hide();
+        Swal.fire('Error fetching Zone & TAT', '', 'error');
+        this.segmentInfo.patchValue({
+          BRANCH_ZONE: '',
+          TAT_DAYS: ''
+        });
+      }
+    });
+  }
+
+
 }

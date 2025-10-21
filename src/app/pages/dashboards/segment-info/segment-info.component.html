@@ -61,6 +61,7 @@
   <!-- Form Section -->
   <form class="form-grid" [formGroup]="segmentInfo" *ngIf="showForm">
 
+    <!-- Sales Person -->
     <div class="form-field">
       <ng-container *ngIf="sapType === 'Non-SAP'; else sapSales">
         <select formControlName="SALES_EMP">
@@ -77,7 +78,7 @@
     </div>
 
     <!-- Segment -->
-    <div class="form-field">
+    <!-- <div class="form-field">
       <ng-container *ngIf="sapType === 'Non-SAP'; else sapSegment">
         <select formControlName="SEGMENT">
           <option value="">Select Segment</option>
@@ -90,7 +91,27 @@
         <input type="text" formControlName="SEGMENT" readonly />
       </ng-template>
       <label>Segment</label>
+    </div> -->
+    <!-- Segment -->
+    <div class="form-field">
+      <ng-container *ngIf="sapType === 'Non-SAP'; else sapSegment">
+        <!-- Dropdown for Non-SAP (F4 search) -->
+        <select formControlName="SEGMENT">
+          <option value="">Select Segment</option>
+          <option *ngFor="let seg of segmentList" [value]="seg.SEGMENT_DESC">
+            {{ seg.SEGMENT }} - {{ seg.SEGMENT_DESC }}
+          </option>
+        </select>
+      </ng-container>
+
+      <!-- Input for SAP -->
+      <ng-template #sapSegment>
+        <input type="text" formControlName="SEGMENT" placeholder=" " />
+      </ng-template>
+
+      <label>Segment</label>
     </div>
+
 
     <!-- Customer Profile -->
     <div class="form-field">
@@ -111,10 +132,10 @@
     <!-- Branch -->
     <div class="form-field">
       <ng-container *ngIf="sapType === 'Non-SAP'; else sapBranch">
-        <select formControlName="BRANCH">
-          <option value="">Select Branch</option>
+        <select formControlName="BRANCH" (change)="fetchzonechange()">
+          <option value="">Select Branch (State)</option>
           <option *ngFor="let b of branchList" [value]="b.BRANCH_DESC">
-            {{ b.BRANCH }} - {{ b.BRANCH_DESC }}
+            {{ b.BRANCH_DESC }}
           </option>
         </select>
       </ng-container>
@@ -126,14 +147,14 @@
 
     <!-- Branch Zone -->
     <div class="form-field">
-      <input type="text" formControlName="BRANCH_ZONE" placeholder="" />
+      <input type="text" formControlName="BRANCH_ZONE" placeholder=" " readonly />
       <label>Branch Zone</label>
     </div>
 
-    <!-- TAT -->
+    <!-- TAT Days -->
     <div class="form-field">
-      <input type="text" formControlName="TAT_DAYS" placeholder="" />
-      <label>TAT</label>
+      <input type="text" formControlName="TAT_DAYS" placeholder=" " readonly />
+      <label>TAT (Days)</label>
     </div>
 
     <!-- ETA -->
@@ -144,11 +165,10 @@
 
   </form>
 
-  <!-- Buttons -->
+  <!-- Save Button -->
   <div class="text-right" *ngIf="showForm">
     <button type="submit" class="btn btn-md btn-raised btnSave" (click)="savePlan()" [disabled]="isSubmitting">
-      {{ sapType === 'SAP' ? 'Save ' : 'Save ' }}
+      Save
     </button>
   </div>
-
 </div>
