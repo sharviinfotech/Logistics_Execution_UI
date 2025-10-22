@@ -57,16 +57,17 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Product *</th>
-                            <th>Type of Material *</th>
+                            <th>SI.No.</th>
+                            <th>Product</th>
+                            <th>Type of Material</th>
+                            <th>Material Description</th>
+                            <th>No of Sets/No (Qty)</th>                           
+                            <th>Ah Loaded in Truck</th>
+                             <th>Shipment Weight(kg)</th>
                             <th>Battery Condition</th>
-                            <th>Incoterms *</th>
+                            <th>Incoterms</th>
                             <th>Insurance Scope</th>
-                            <th>Material Description *</th>
-                            <th>Qty/Seats *</th>
-                            <th>Ah Loaded *</th>
-                            <th>Weight (kg) *</th>
+                             <th>Kilometres</th>                                                                                             
                             <th>Action </th>
                         </tr>
                     </thead>
@@ -82,13 +83,12 @@
                                 </select>
                             </td>
 
-                            <td>
-                                <select formControlName="TypeOfMaterial">
-                                    <option value="">Select Type</option>
-                                    <option *ngFor="let option of materialTypeOptions" [value]="option">{{ option }}
-                                    </option>
-                                </select>
-                            </td>
+                            
+                            <td><input type="text" formControlName="TypeOfMaterial"></td>
+                            <td><input type="text" formControlName="MaterialDescription"></td>
+                            <td><input type="number" formControlName="Noofseats" min="0" /></td>
+                            <td><input type="number" formControlName="AhLoadedInTruck" min="0" /></td>
+                            <td><input type="number" formControlName="ShipmentWeight"   /></td>
 
                             <td>
                                 <select formControlName="BatteryCondition"
@@ -98,14 +98,9 @@
                                     </option>
                                 </select>
                             </td>
+                            <td><input type="text" formControlName="Incoterms"></td>
 
-                            <td>
-                                <select formControlName="Incoterms">
-                                    <option value="">Select Term</option>
-                                    <option *ngFor="let option of incotermOptions" [value]="option">{{ option }}
-                                    </option>
-                                </select>
-                            </td>
+                            
 
                             <td>
                                 <select formControlName="InsuranceScope">
@@ -113,11 +108,12 @@
                                     </option>
                                 </select>
                             </td>
+                            <td><input type="number" formControlName="Kilometres"  min="0" /></td>
 
-                            <td><input type="text" formControlName="MaterialDescription" placeholder=" " /></td>
-                            <td><input type="number" formControlName="Noofseats" min="1" /></td>
-                            <td><input type="number" formControlName="AhLoadedInTruck" min="0" /></td>
-                            <td><input type="number" formControlName="ShipmentWeight" min="0.01" step="0.01" /></td>
+                            
+                            
+                            
+                            
 
                             <td class="d-flex">
                                 <button class="form-field" type="button" (click)="addRow()">+</button>
@@ -134,6 +130,6 @@
             </form>
         </div>
         <div *ngIf="showForm" class="text-right"> <button type="button" class="btn btn-md btn-raised btnSave"
-                (click)="saveInvoice()">Save</button></div>
+                (click)="saveShipmentOutward()">Save</button></div>
     </div>
 </div>

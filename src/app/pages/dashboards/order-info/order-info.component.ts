@@ -37,7 +37,7 @@ export class OrderInfoComponent implements OnInit {
     this.OrderInfo = this.fb.group({
       TaxInvoice: ['',Validators.required],
       ODN: ['',Validators.required],
-      InvoiceData: ['',Validators.required],
+      InvoiceDate: ['',Validators.required],
       BasicShipment: ['',Validators.required],
       // Itemnumber: [''],
       InvoiceWithGst: ['',Validators.required],
@@ -236,7 +236,7 @@ export class OrderInfoComponent implements OnInit {
     const record = {
       INV_VBELN: formValue.TaxInvoice,
       INV_ODNO: formValue.ODN,
-      INV_DATE: formValue.InvoiceData,
+      INV_DATE: formValue.InvoiceDate,
       BASIC_SHIP_VALUE: formValue.BasicShipment,
 
       INV_VALUE_GST: formValue.InvoiceWithGst,
@@ -284,7 +284,7 @@ export class OrderInfoComponent implements OnInit {
           Swal.fire({
             title: '',
             text: res.MESSAGE,
-            icon: 'success',
+            icon: 'error',
             cancelButtonText: 'Ok',
             timer: 5000
           }).then((result) => {
