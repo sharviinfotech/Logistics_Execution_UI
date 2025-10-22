@@ -149,6 +149,14 @@ export class GeneralserviceService {
   SegmentInfoOutwardSave(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/withsap/Save', obj);
   }
-
+  SegmentInfoNonSap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/withoutsap/Save', obj);
+  }
+  getssc() {
+    return this.http.get(environment.baseUrl + 'api/external/LE/segmentInfo/f4_getAllDetails',);
+  }
+  fetchzoneTat(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/withoutsap/fetchzone', obj);
+  }
 
 }
