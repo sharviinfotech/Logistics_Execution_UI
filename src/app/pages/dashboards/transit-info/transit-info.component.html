@@ -1,7 +1,71 @@
 <div class="card-LE">
     <div class="card-header-LE">Transit Info</div>
     <div class="card-body-LE">
-      <form class="form-grid" [formGroup]="transitInfo" >
+
+      <div class="form-radio optional">
+      <label>
+        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
+        <span>Inward</span>
+      </label>
+      <label>
+        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()"/>
+        <span>Outward</span>
+      </label>
+    </div>
+
+    <br />
+
+    <!-- SAP Type Selection -->
+    <div *ngIf="orderType" class="sap-row" style="display: flex !important;">
+      <div class="form-radio optional sap-radio">
+        <label>
+          <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
+          <span>With SAP</span>
+        </label>
+        <label>
+          <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
+          <span>Without SAP</span>
+        </label>
+      </div>
+
+      <!-- Input fields for PO / Invoice if With SAP -->
+      <!-- <div class="input-row" *ngIf="sapType === 'SAP'">
+        <div *ngIf="orderType === 'Inward'" class="input-flex">
+          <div class="form-field">
+            <input type="text" name="ponumber" formControlName="ponumber" placeholder=" " />
+            <label>PO Number</label>
+          </div>
+          
+         
+        </div>
+
+        <div *ngIf="orderType === 'Outward'" class="input-flex">
+          <div class="form-field">
+            <input type="text" name="invoicenumber" formControlName="InvoiceNumber" placeholder=" " />
+            <label>Invoice Number</label>
+          </div>
+        </div>
+      </div> -->
+    </div>
+
+
+      <form class="form-grid" [formGroup]="transitInfo" *ngIf="showForm">
+
+        <div *ngIf="orderType === 'Inward'" class="form-field">
+        <input type="text" formControlName="ponumber" placeholder=" " />
+        <label>PO Number</label>
+        <small class="error" *ngIf="transitInfo.get('ponumber')?.touched && transitInfo.get('ponumber')?.invalid">
+          PO Number is required
+        </small>
+      </div>
+
+      <div *ngIf="orderType === 'Outward'" class="form-field">
+        <input type="text" formControlName="invoicenumber" placeholder=" " />
+        <label>Invoice Number</label>
+        <small class="error" *ngIf="transitInfo.get('invoicenumber')?.touched && transitInfo.get('invoicenumber')?.invalid">
+          Invoice Number is required
+        </small>
+      </div>
 
         <!-- Segment -->
         <div class="form-field">
@@ -51,7 +115,7 @@
           <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
             Cancel
           </button>
-          <button type="submit" class="btn btn-md btn-raised btnSave" (click)="savePlan()">
+          <button type="submit" class="btn btn-md btn-raised btnSave" (click)="saveTransitInfo()">
            Save
           </button>
         </div>

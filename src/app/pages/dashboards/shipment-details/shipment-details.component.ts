@@ -29,7 +29,8 @@ export class ShipmentDetailsComponent implements OnInit {
   orderType: string = '';     // Inward / Outward
   sapType: string = '';       // SAP / Non-SAP
   ponumber: string = '';      // For Inward SAP
-  invoicenumber: string = ''; // For Outward SAP
+  invoicenumber: string = '';
+  TypeofmaterialList: any = ''; // For Outward SAP
 
   constructor(private fb: FormBuilder, private service: GeneralserviceService , private spinner: NgxSpinnerService,public spinnerService: SpinnerService) { }
 
@@ -38,6 +39,7 @@ export class ShipmentDetailsComponent implements OnInit {
       items: this.fb.array([])
     });
     this.addRow();
+    this.fetchTypeofmaterial();
   }
 
   // Getter for FormArray
@@ -227,6 +229,22 @@ export class ShipmentDetailsComponent implements OnInit {
     }
   });
 }
+fetchTypeofmaterial() {
+  this.spinner.show();
+  this.service.getTypeofmaterial(1).subscribe({
+    next: (res: any) => {
+      console.log("Material Data:", res);
+      this.TypeofmaterialList = res;
+      this.spinner.hide();
+    },
+    error: (err) => {
+      console.error("Error fetching Type of Material:", err);
+      this.spinner.hide();
+    }
+  });
+}
+
+
 
 
 }

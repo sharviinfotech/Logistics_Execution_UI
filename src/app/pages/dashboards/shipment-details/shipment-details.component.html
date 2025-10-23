@@ -84,7 +84,23 @@
                             </td>
 
                             
+                          <!-- <td>
+                                <ng-container *ngIf="!isSap(); else sapType">
+                                <select formControlName="TypeOfMaterial" (change)="onTypeOfMaterialChange()">
+                                    <option value="">Select Type</option>
+                                    <option *ngFor="let m of TypeofmaterialList" [value]="m.MTART">
+                                    {{ m.MTART }} - {{ m.MTBEZ }}
+                                    </option>
+                                </select>
+                                </ng-container>
+                                <ng-template #sapType>
+                                <input type="text" formControlName="TypeOfMaterial" readonly />
+                                </ng-template>
+                                <label>Type of Material</label>
+                            </td> -->
                             <td><input type="text" formControlName="TypeOfMaterial"></td>
+
+
                             <td><input type="text" formControlName="MaterialDescription"></td>
                             <td><input type="number" formControlName="Noofseats" min="0" /></td>
                             <td><input type="number" formControlName="AhLoadedInTruck" min="0" /></td>

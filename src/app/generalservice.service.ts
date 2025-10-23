@@ -158,5 +158,15 @@ export class GeneralserviceService {
   fetchzoneTat(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/withoutsap/fetchzone', obj);
   }
+   getTypeofmaterial(obj: any) {
+    return this.http.put(environment.baseUrl + '/LE/ShipmentDetails/Nonsap/f4_Typeofmaterial', obj);
+  }
+   TransitInfoSave(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/TransitInfo/Outward/WithSap/Save', obj);
+  }
+  TransitInfoNonSap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/TransitInfo/NonSap/Save', obj);
+  }
+  
 
 }
