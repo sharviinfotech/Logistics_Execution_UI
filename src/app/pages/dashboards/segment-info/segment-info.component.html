@@ -62,7 +62,7 @@
   <form class="form-grid" [formGroup]="segmentInfo" *ngIf="showForm">
 
     <!-- Sales Person -->
-    <div class="form-field">
+    <!-- <div class="form-field">
       <ng-container *ngIf="sapType === 'Non-SAP'; else sapSales">
         <select formControlName="SALES_EMP">
           <option value="">Select Sales Person</option>
@@ -74,6 +74,23 @@
       <ng-template #sapSales>
         <input type="text" formControlName="SALES_EMP" readonly />
       </ng-template>
+      <label>Sales Person</label>
+    </div> -->
+    <div class="form-field">
+      <ng-container *ngIf="sapType === 'Non-SAP'; else sapSales">
+        <ng-select [items]="supplierList" bindLabel="SUPPLIER_NAME" bindValue="SUPPLIER_NAME"
+          formControlName="SALES_EMP" [searchable]="true" [virtualScroll]="true" placeholder="Select Sales Person"
+          class="w-full">
+          <ng-template ng-option-tmp let-item="item">
+            {{ item.SUPPLIER }} - {{ item.SUPPLIER_NAME }}
+          </ng-template>
+        </ng-select>
+      </ng-container>
+
+      <ng-template #sapSales>
+        <input type="text" formControlName="SALES_EMP" readonly />
+      </ng-template>
+
       <label>Sales Person</label>
     </div>
 

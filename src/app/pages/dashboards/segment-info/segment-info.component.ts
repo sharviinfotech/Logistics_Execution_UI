@@ -4,11 +4,12 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { GeneralserviceService } from 'src/app/generalservice.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import Swal from 'sweetalert2';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-segment-info',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule,NgSelectModule],
   templateUrl: './segment-info.component.html',
   styleUrls: ['./segment-info.component.css']
 })
@@ -129,6 +130,7 @@ export class SegmentInfoComponent implements OnInit {
     this.spinner.show();
     this.service.getssc().subscribe((res: any) => {
       this.spinner.hide();
+      console.log("fetchDropdownData res",res)
       const data = res[0];
       this.supplierList = data.SUPPLIERS || [];
       this.segmentList = data.SEGMENTS || [];
@@ -272,7 +274,7 @@ export class SegmentInfoComponent implements OnInit {
           });
           this.segmentInfo.reset()
           this.spinner.hide()
-          this.showForm = false;
+          this.showForm = true;
         } else {
           Swal.fire({
             title: '',
