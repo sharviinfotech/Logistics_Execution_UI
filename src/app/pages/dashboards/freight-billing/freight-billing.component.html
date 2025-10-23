@@ -4,65 +4,108 @@
       </div>
 
       <div class="card-body-LE">
-        <form class="form-grid" [formGroup]="FreightBilling" >
+
+        <div class="form-radio optional">
+      <label>
+        <input
+          type="radio"
+          name="orderType"
+          [(ngModel)]="orderType"
+          value="Inward"
+          (change)="onOrderTypeChange()"
+        />
+        <span>Inward</span>
+      </label>
+      <label>
+        <input
+          type="radio"
+          name="orderType"
+          [(ngModel)]="orderType"
+          value="Outward"
+          (change)="onOrderTypeChange()"
+        />
+        <span>Outward</span>
+      </label>
+    </div>
+
+    <br />
+
+    <!-- SAP Type Selection -->
+    <div *ngIf="orderType" class="sap-row" style="display: flex !important;">
+      <div class="form-radio optional sap-radio">
+        <label>
+          <input
+            type="radio"
+            [(ngModel)]="sapType"
+            value="SAP"
+            (change)="onSapTypeChange()"
+          />
+          <span>With SAP</span>
+        </label>
+        <label>
+          <input
+            type="radio"
+            [(ngModel)]="sapType"
+            value="Non-SAP"
+            (change)="onSapTypeChange()"
+          />
+          <span>Without SAP</span>
+        </label>
+      </div>
+    </div>
+        <form class="form-grid" [formGroup]="FreightBilling" *ngIf="showForm" >
+
+          <div *ngIf="orderType === 'Inward'" class="form-field">
+        <input type="text" formControlName="ponumber" placeholder=" " />
+        <label>PO Number</label>
+        <small class="error" *ngIf="transitInfo.get('ponumber')?.touched && transitInfo.get('ponumber')?.invalid">
+          PO Number is required
+        </small>
+      </div>
+
+      <div *ngIf="orderType === 'Outward'" class="form-field">
+        <input type="text" formControlName="invoicenumber" placeholder=" " />
+        <label>Invoice Number</label> 
+      </div>
 
           <!-- Freight Bill Number -->
           <div class="form-field">
-            <input type="number" min="0" formControlName="FreightBillNumber" placeholder=" " />
+            <input type="number" min="0" formControlName="FreightBillNumber" placeholder=" " required/>
             <label>Freight Bill Number</label>
-            <small class="error"
-              *ngIf="FreightBilling.get('FreightBillNumber')?.touched && FreightBilling.get('FreightBillNumber')?.invalid">
-              Freight Bill Number is required
-            </small>
           </div>
 
           <!-- Freight Bill Date -->
           <div class="form-field">
             <input type="date" formControlName="FreightBillDate" placeholder=" " />
             <label>Freight Bill Date</label>
-            <small class="error"
-              *ngIf="FreightBilling.get('FreightBillDate')?.touched && FreightBilling.get('FreightBillDate')?.invalid">
-              Freight Bill Date is required
-            </small>
+            
           </div>
 
           <!-- Freight Bill Physical Submission Date -->
           <div class="form-field">
             <input type="date" formControlName="FreightBillPhysicalSubmissionDate" placeholder=" " />
             <label>Freight Bill Physical Submission Date</label>
-            <small class="error"
-              *ngIf="FreightBilling.get('FreightBillPhysicalSubmissionDate')?.touched && FreightBilling.get('FreightBillPhysicalSubmissionDate')?.invalid">
-              Freight Bill Physical Submission Date is required
-            </small>
+            
           </div>
 
           <!-- Freight Charges -->
           <div class="form-field">
-            <input type="number" min="0"  formControlName="FreightCharges" placeholder=" " />
+            <input type="number" min="0"  formControlName="FreightCharges" placeholder=" "  required/>
             <label>Freight Charges</label>
-            <small class="error"
-              *ngIf="FreightBilling.get('FreightCharges')?.touched && FreightBilling.get('FreightCharges')?.invalid">
-              Freight Charges are required
-            </small>
+            
           </div>
 
           <!-- Work Order Number -->
           <div class="form-field">
             <input type="text" formControlName="WorkOrderNumber" placeholder=" " />
             <label>Work Order Number</label>
-            <small class="error"
-              *ngIf="FreightBilling.get('WorkOrderNumber')?.touched && FreightBilling.get('WorkOrderNumber')?.invalid">
-              Work Order Number is required
-            </small>
+            
           </div>
 
            <div class="form-field">
             <input type="text" formControlName="BillSubmission" placeholder=" " />
             <label>Bill Submission To F&A</label>
-            <small class="error"
-              *ngIf="FreightBilling.get('BillSubmission')?.touched && FreightBilling.get('BillSubmission')?.invalid">
-              Bill Submission To F&A is required
-            </small>
+           
           </div>
 
          
@@ -72,7 +115,7 @@
           <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
             Cancel
           </button>
-          <button type="submit" class="btn btn-md btn-raised btnSave" (click)="saveFreightBill()">
+          <button type="submit" class="btn btn-md btn-raised btnSave" (click)="saveFreightBilling()">
            Save
           </button>
         </div>

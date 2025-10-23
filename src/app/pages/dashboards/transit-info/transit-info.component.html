@@ -2,6 +2,8 @@
     <div class="card-header-LE">Transit Info</div>
     <div class="card-body-LE">
 
+      
+
       <div class="form-radio optional">
       <label>
         <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
@@ -61,15 +63,12 @@
 
       <div *ngIf="orderType === 'Outward'" class="form-field">
         <input type="text" formControlName="invoicenumber" placeholder=" " />
-        <label>Invoice Number</label>
-        <small class="error" *ngIf="transitInfo.get('invoicenumber')?.touched && transitInfo.get('invoicenumber')?.invalid">
-          Invoice Number is required
-        </small>
+        <label>Invoice Number</label> 
       </div>
 
         <!-- Segment -->
         <div class="form-field">
-          <input type="date" formControlName="physicalarrivedatdestinationdateandtime" placeholder="" />
+          <input type="date" formControlName="physicalarrivedatdestinationdateandtime"  placeholder="" />
           <label>Physical arrived at destination date</label>
           <small class="error" *ngIf="transitInfo.get('physicalarrivedatdestinationdateandtime')?.touched && transitInfo.get('physicalarrivedatdestinationdateandtime')?.invalid">
           Physical arrived at destination  is required
@@ -78,7 +77,7 @@
 
         <!-- Customer Profile -->
         <div class="form-field">
-          <input type="datetime-local" formControlName="unloadingdateandtime" placeholder="" />
+          <input type="datetime-local" formControlName="unloadingdateandtime"(change)="updateSIT()" placeholder="" />
           <label>Unloading date and time</label>
           <small class="error" *ngIf="transitInfo.get('unloadingdateandtime')?.touched && transitInfo.get('unloadingdateandtime')?.invalid">
           Unloading date and time is required
@@ -86,7 +85,7 @@
         </div>
 
         <div class="form-field">
-          <input type="datetime-local" formControlName="podscanreceiveddateandtime" placeholder="" />
+          <input type="datetime-local" formControlName="podscanreceiveddateandtime" (change)="updateSIT()" placeholder="" />
           <label>POD scan received date and time</label>
           <small class="error" *ngIf="transitInfo.get('podscanreceiveddateandtime')?.touched && transitInfo.get('podscanreceiveddateandtime')?.invalid">
            POD scan received date and time is required
@@ -95,7 +94,7 @@
 
         <!-- Branch -->
         <div class="form-field">
-          <input type="text" formControlName="sit" placeholder="" />
+          <input type="text" formControlName="sit" readonly placeholder="" />
           <label>SIT/SALE</label>
           <small class="error" *ngIf="transitInfo.get('sit')?.touched && transitInfo.get('sit')?.invalid">
            SIT/SALE is required
@@ -115,8 +114,8 @@
           <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
             Cancel
           </button>
-          <button type="submit" class="btn btn-md btn-raised btnSave" (click)="saveTransitInfo()">
-           Save
+          <button type="button" class="btn btn-md btn-raised btnSave" (click)="saveTransitInfo()">
+            Save
           </button>
         </div>
     </div>
