@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 @Injectable({
   providedIn: 'root'
@@ -143,6 +143,18 @@ export class GeneralserviceService {
   ShipmentOutwardSave(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/ShipmentDetails/Outward/Save', obj);
   }
+   getTypeofmaterial() {
+    return this.http.get<any>(environment.baseUrl + 'api/external/LE/ShipmentDetails/Nonsap/f4_Typeofmaterial');
+  }
+  Incoterms(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/ShipmentDetails/Nonsap/f4_Incoterms', obj);
+  }
+  shipmentdetailsNonSapSave(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/ShipmentDetails/Nonsap/Save', obj);
+  }
+  shipmentdetailsNonSapReports(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/ShipmentDetails/Nonsap/Reports', obj);
+  }
   SegmentInfoInwardOutward(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/fetchInvoiceList', obj);
   }
@@ -157,9 +169,6 @@ export class GeneralserviceService {
   }
   fetchzoneTat(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/withoutsap/fetchzone', obj);
-  }
-   getTypeofmaterial() {
-    return this.http.get<any>(environment.baseUrl + 'api/external/LE/ShipmentDetails/Nonsap/f4_Typeofmaterial');
   }
    TransitInfoSave(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/TransitInfo/Outward/WithSap/Save', obj);

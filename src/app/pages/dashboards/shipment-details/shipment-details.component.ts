@@ -2,14 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, FormArray, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { GeneralserviceService } from 'src/app/generalservice.service';
-import { NgxSpinnerService } from 'ngx-spinner';
+import { NgxSpinnerService, NgxSpinnerModule } from 'ngx-spinner';
 import Swal from 'sweetalert2';
 import { SpinnerService } from 'src/app/spinner.service';
 
 @Component({
   selector: 'app-shipment-details',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, NgxSpinnerModule],
   templateUrl: './shipment-details.component.html',
   styleUrls: ['./shipment-details.component.css']
 })
@@ -17,9 +17,7 @@ export class ShipmentDetailsComponent implements OnInit {
 
   // Dropdown options
   productOptions = ['Batteries', 'Electronics', 'Fuze', 'Cement Poles and Piles', 'Raw Materials', 'Job Work Material', 'Machinery', 'Others'];
-  // materialTypeOptions = ['Raw Material', 'Semi Finished', 'Finished Goods', 'Consumables', 'Spare Parts'];
   batteryConditionOptions = ['Dry and discharge with solid electrolyte', 'Dry and discharge with Liquid electrolyte', 'Filled and discharges', 'Filled and charges', 'Filled and formed no free Acid', 'Lead acid batteries (Dry)', 'Lead acid batteries (Filled)'];
-  // incotermOptions = ['EXW', 'FOB', 'CIF', 'DAP', 'DDP', 'FCA', 'CPT'];
   insuranceScopeOptions = ['Buyer', 'Supplier'];
 
   // Form and variables
@@ -30,9 +28,16 @@ export class ShipmentDetailsComponent implements OnInit {
   sapType: string = '';       // SAP / Non-SAP
   ponumber: string = '';      // For Inward SAP
   invoicenumber: string = '';
-  TypeofmaterialList: any = ''; // For Outward SAP
+  TypeofmaterialList: any = [];
+  IncotermsList: any[] = [];
+  Incoterms: string = '';     // For Outward SAP
 
-  constructor(private fb: FormBuilder, private service: GeneralserviceService , private spinner: NgxSpinnerService,public spinnerService: SpinnerService) { }
+  constructor(
+    private fb: FormBuilder,
+    private service: GeneralserviceService,
+    private spinner: NgxSpinnerService,
+    public spinnerService: SpinnerService
+  ) {}
 
   ngOnInit(): void {
     this.ProductInfo = this.fb.group({
@@ -40,6 +45,7 @@ export class ShipmentDetailsComponent implements OnInit {
     });
     this.addRow();
     this.fetchTypeofmaterial();
+    this.fetchIncoterms(); // ✅ Fetch Incoterms on init
   }
 
   // Getter for FormArray
@@ -88,161 +94,278 @@ export class ShipmentDetailsComponent implements OnInit {
     this.orderType = '';
   }
 
-  // SAP type change
+  previousOrderType: string | null = null;
+  previousSapType: string | null = null;
+
+  // SAP type change (enhanced behavior like OrderInfo)
   onSapTypeSelection() {
-    if (this.sapType === 'Non-SAP') {
-      this.showForm = true; // show directly
-    } else {
+    // Reset visibility and conditional fields when switching sap type
+    if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
+      this.resetConditionalFields();
+    }
+    this.previousSapType = this.sapType;
+
+    if (this.sapType === 'SAP') {
+      // For SAP: require user to enter PO/Invoice and click GET
       this.showForm = false;
+      // clear any local ref numbers
       this.ponumber = '';
       this.invoicenumber = '';
+    } else {
+      // For Non-SAP: show form directly
+      this.showForm = true;
     }
   }
 
-  // GET data for Inward or Outward
- fetchInvoiceDetails() {
-  if (this.sapType !== 'SAP') {
-    alert('Please select "With SAP" first.');
-    return;
+  // When Order Type changes, clear SAP selection and reset conditional fields
+  onOrderTypeChange(): void {
+    if (this.previousOrderType !== null && this.previousOrderType !== this.orderType) {
+      this.sapType = '';
+      this.previousSapType = null;
+      this.resetConditionalFields();
+    }
+    this.previousOrderType = this.orderType;
   }
 
-  const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
-  if (!referenceNumber?.trim()) {
-    alert(`Please enter a valid ${this.orderType === 'Inward' ? 'PO' : 'Invoice'} Number`);
-    return;
+  // Reset conditional fields when switching modes
+  resetConditionalFields(): void {
+    this.showForm = false;
+    this.ProductInfo.reset();
+    this.items.clear();
+    this.addRow();
   }
 
-  const payload = { INV_GET: referenceNumber.trim() };
-  console.log('Fetching SAP Data with payload:', payload);
+  // Apply required validators to product item fields
+  setValidatorsOnProductFields(): void {
+    this.items.controls.forEach((ctrl) => {
+      const group = ctrl as FormGroup;
+      Object.keys(group.controls).forEach((c) => {
+        const control = group.get(c);
+        if (control) {
+          control.setValidators(Validators.required);
+          control.updateValueAndValidity();
+        }
+      });
+    });
+  }
 
-  this.service.shipmentdetailsfetch(payload).subscribe({
-    next: (res: any) => {
-      console.log('Raw response from service:', res);
-      const result = Array.isArray(res) ? res : (res?.data || []);
+  // GET data for Inward or Outward (SAP)
+  fetchInvoiceDetails() {
+    if (this.sapType !== 'SAP') {
+      alert('Please select "With SAP" first.');
+      return;
+    }
 
-      if (result.length > 0) {
-        this.items.clear();
-        result.forEach((item: any) => {
-          this.items.push(this.fb.group({
-            Product: [item.ZPRODUCT || ''],
-            TypeOfMaterial: [item.MTBEZ || ''],
-            MaterialDescription: [item.MAKTX ||  ''],
-            Noofseats: [item.ZSETS || 0, [Validators.min(1)]],
-            AhLoadedInTruck: [item.ZAH || 0, [Validators.min(0)]],
-            ShipmentWeight: [item.ZSHIP_WT || 0, [Validators.min(0)]],
-            BatteryCondition: [item.ZBATCOND || ''],
-            Incoterms: [item.ZINCO || ''],
-            InsuranceScope: [item.ZINS_SCPOE || 'Buyer'],
-            Kilometres: [item.ZKM || 0]
-          }));
-        });
-        this.showForm = true;
-      } else {
-        alert('No data found for this reference.');
+    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+    if (!referenceNumber?.trim()) {
+      alert(`Please enter a valid ${this.orderType === 'Inward' ? 'PO' : 'Invoice'} Number`);
+      return;
+    }
+
+    const payload = { INV_GET: referenceNumber.trim() };
+    console.log('Fetching SAP Data with payload:', payload);
+
+    this.service.shipmentdetailsfetch(payload).subscribe({
+      next: (res: any) => {
+        console.log('Raw response from service:', res);
+        const result = Array.isArray(res) ? res : (res?.data || []);
+
+        if (result.length > 0) {
+          this.items.clear();
+          result.forEach((item: any) => {
+            this.items.push(this.fb.group({
+              Product: [item.ZPRODUCT || ''],
+              TypeOfMaterial: [item.MTBEZ || ''],
+              MaterialDescription: [item.MAKTX || ''],
+              Noofseats: [item.ZSETS || 0, [Validators.min(1)]],
+              AhLoadedInTruck: [item.ZAH || 0, [Validators.min(0)]],
+              ShipmentWeight: [item.ZSHIP_WT || 0, [Validators.min(0)]],
+              BatteryCondition: [item.ZBATCOND || ''],
+              Incoterms: [item.ZINCO || ''],
+              InsuranceScope: [item.ZINS_SCPOE || 'Buyer'],
+              Kilometres: [item.ZKM || 0]
+            }));
+          });
+          this.showForm = true;
+        } else {
+          alert('No data found for this reference.');
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching data:', err);
+        alert('Error fetching data from SAP.');
       }
-    },
-    error: (err) => {
-      console.error('Error fetching data:', err);
-      alert('Error fetching data from SAP.');
-    }
-  });
-}
-
-
+    });
+  }
 
   // Save data
- saveShipmentOutward(): void {
+  saveShipmentOutward(): void {
+    this.ProductInfo.markAllAsTouched();
 
-  this.ProductInfo.markAllAsTouched();
+    if (this.ProductInfo.invalid) {
+      Swal.fire({
+        title: 'Validation Error',
+        text: 'Please fill all required fields before saving.',
+        icon: 'warning',
+        confirmButtonText: 'Ok',
+        timer: 4000
+      });
+      return;
+    }
 
-  if (this.ProductInfo.invalid) {
-    Swal.fire({
-      title: 'Validation Error',
-      text: 'Please fill all required fields before saving.',
-      icon: 'warning',
-      confirmButtonText: 'Ok',
-      timer: 4000
-    });
-    return;
-  }
+    // Prepare the data based on SAP type
+    const itemsData = this.items.value.map((item: any, index: number) => {
+      const baseData = {
+        MANDT: "234",
+        VBELN: this.invoicenumber || '',
+        POSNR: (index + 1) * 10,
+        ZPRODUCT: item.Product || '',
+        MTART: item.TypeOfMaterial || '',
+        MAKTX: item.MaterialDescription || '',
+        ZSETS: parseFloat(item.Noofseats) || 0,
+        ZAH: parseFloat(item.AhLoadedInTruck) || 0,
+        ZSHIP_WT: parseFloat(item.ShipmentWeight) || 0,
+        ZBATCOND: item.BatteryCondition || '',
+        ZINCO: item.Incoterms || '',
+        ZINS_SCPOE: item.InsuranceScope || 'Supplier',
+        ZKM: parseFloat(item.Kilometres) || 0
+      };
 
-  // Get all items from FormArray
-  const itemsData = this.items.value.map((item: any, index: number) => ({
-    MANDT: "234",                         // static or from your environment if needed
-    VBELN: this.invoicenumber || '',       // Invoice number from parent form
-    POSNR: (index + 1) * 10,               // Line number 10, 20, etc.
-    ZPRODUCT: item.Product || '',
-    MTART: item.TypeOfMaterial || '',
-    MTBEZ: item.MaterialDescription || '',
-    MAKTX: item.MaterialDescription || '',
-    ZSETS: item.Noofseats || 0,
-    ZAH: item.AhLoadedInTruck || 0,
-    ZSHIP_WT: item.ShipmentWeight || 0,
-    ZBATCOND: item.BatteryCondition || '',
-    ZINCO: item.Incoterms || '',
-    ZINS_SCPOE: item.InsuranceScope || '',
-    // ZPIN_PLT: this.plantCode || '',        // Add these if available
-    // ZPIN_STP: this.storageLoc || '',
-    ZKM: item.Kilometres || 0
-  }));
-
-  console.log("Final payload for Save:", itemsData);
-
-  this.spinner.show();
-
-  this.service.ShipmentOutwardSave(itemsData).subscribe({
-    next: (res: any) => {
-      console.log("Save Response:", res);
-
-      if (res.NUMBER == "200" ) {
-        Swal.fire({
-          title: '',
-          text: res.MSG || 'Record(s) Saved Successfully',
-          icon: 'success',
-          confirmButtonText: 'Ok',
-          timer: 4000
-        });
-        this.ProductInfo.reset();
-        this.items.clear();
-        this.showForm = false;
-      } else {
-        Swal.fire({
-          title: '',
-          text: res.MSG || 'Save Failed',
-          icon: 'error',
-          confirmButtonText: 'Ok',
-          timer: 4000
-        });
+      // For SAP, include MTBEZ field
+      if (this.sapType === 'SAP') {
+        return {
+          ...baseData,
+          MTBEZ: item.MaterialDescription || ''
+        };
       }
 
-      this.spinner.hide();
-    },
-    error: (err) => {
-      console.error("Save Error:", err);
-      Swal.fire({
-        title: 'Error',
-        text: 'Something went wrong while saving shipment details.',
-        icon: 'error',
-        confirmButtonText: 'Ok'
-      });
-      this.spinner.hide();
-    }
-  });
-}
-  fetchTypeofmaterial() {
+      return baseData;
+    });
+
+    console.log("Final payload for Save:", itemsData);
     this.spinner.show();
-    this.service.getTypeofmaterial().subscribe({
+
+    // Choose the appropriate service method based on SAP type
+    console.log('SAP Type:', this.sapType);
+    console.log('Using endpoint:', this.sapType === 'SAP' ? 'ShipmentOutwardSave' : 'shipmentdetailsNonSapSave');
+
+    // Log the request payload for debugging
+    if (this.sapType !== 'SAP') {
+      console.log('[DEBUG] Non-SAP Save Payload:', itemsData);
+    }
+
+    const saveOperation = this.sapType === 'SAP' 
+      ? this.service.ShipmentOutwardSave(itemsData)
+      : this.service.shipmentdetailsNonSapSave(itemsData);
+
+    // Log the request being made
+    console.log('Making request with payload:', {
+      endpoint: this.sapType === 'SAP' ? 'ShipmentOutwardSave' : 'shipmentdetailsNonSapSave',
+      data: itemsData
+    });
+
+    saveOperation.subscribe({
       next: (res: any) => {
-        console.log("Material Data:", res);
-        this.TypeofmaterialList = res;
+        // Log the response for debugging
+        if (this.sapType !== 'SAP') {
+          console.log('[DEBUG] Non-SAP Save Response:', res);
+        } else {
+          console.log('Save Response:', res);
+        }
+
+        if (res.NUMBER == "200") {
+          Swal.fire({
+            title: '',
+            text: res.MSG || 'Record(s) Saved Successfully',
+            icon: 'success',
+            confirmButtonText: 'Ok',
+            timer: 4000
+          });
+          this.ProductInfo.reset();
+          this.items.clear();
+          this.showForm = false;
+          this.sapType = '';
+          this.invoicenumber = '';
+        } else {
+          Swal.fire({
+            title: '',
+            text: res.MSG || 'Save Failed',
+            icon: 'error',
+            confirmButtonText: 'Ok',
+            timer: 4000
+          });
+        }
+
         this.spinner.hide();
       },
       error: (err) => {
-        console.error("Error fetching Type of Material:", err);
+        console.error("Save Error:", err);
+        console.error("Error details:", {
+          status: err.status,
+          statusText: err.statusText,
+          error: err.error,
+          message: err.message
+        });
+        
+        let errorMessage = 'Something went wrong while saving shipment details.';
+        if (err.error && err.error.MSG) {
+          errorMessage = err.error.MSG;
+        } else if (err.error && typeof err.error === 'string') {
+          errorMessage = err.error;
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
+
+        Swal.fire({
+          title: 'Error',
+          text: errorMessage,
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
         this.spinner.hide();
       }
     });
   }
+
+  // Fetch Type of Material (GET)
+  fetchTypeofmaterial() {
+  this.spinner.show();
+  this.service.getTypeofmaterial().subscribe({
+    next: (res: any) => {
+      console.log("Type of Material Response:", res);
+      this.TypeofmaterialList = Array.isArray(res) ? res : (res?.data || []);
+      this.spinner.hide();
+    },
+    error: (err) => {
+      console.error("Error fetching Type of Material:", err);
+      this.spinner.hide();
+    }
+  });
+}
+
+
+  // ✅ Fetch Incoterms (PUT)
+ fetchIncoterms() {
+  this.spinner.show();
+
+  const payload = {
+    INCO1: "",
+    BEZEI: ""
+  };
+
+  this.service.Incoterms(payload).subscribe({
+    next: (res: any) => {
+      console.log("Incoterms Response:", res);
+      this.IncotermsList = Array.isArray(res) ? res : (res?.data || []);
+      this.spinner.hide();
+    },
+    error: (err) => {
+      console.error("Error fetching Incoterms:", err);
+      this.spinner.hide();
+    }
+  });
+}
+
 
   isSap(): boolean {
     return this.sapType === 'SAP';
@@ -252,18 +375,52 @@ export class ShipmentDetailsComponent implements OnInit {
     console.log('Type of Material changed');
   }
 
-  openTypeOfMaterialF4(rowIndex: number) {
-    if (!this.isSap()) {
-      this.fetchTypeofmaterial();
-      const currentRow = this.items.at(rowIndex);
-      if (currentRow) {
-        // You can show a modal or dropdown here with TypeofmaterialList
-        console.log('Opening F4 for Type of Material at row:', rowIndex);
+  // Fetch Non-SAP Reports
+ fetchNonSapReports(): void {
+  const payload = { REPORT: "X" };
+  this.spinner.show();
+
+  this.service.shipmentdetailsNonSapReports(payload).subscribe({
+    next: (res: any) => {
+      console.log("Non-SAP Reports Response:", res);
+      if (Array.isArray(res)) {
+        this.items.clear();
+        res.forEach((item: any) => {
+          this.items.push(this.fb.group({
+            Product: [item.ZPRODUCT || ''],
+            TypeOfMaterial: [item.MTART || ''],
+            MaterialDescription: [item.MAKTX || ''],
+            Noofseats: [item.ZSETS || 0, [Validators.min(1)]],
+            AhLoadedInTruck: [item.ZAH || 0, [Validators.min(0)]],
+            ShipmentWeight: [item.ZSHIP_WT || 0, [Validators.min(0)]],
+            BatteryCondition: [item.ZBATCOND || ''],
+            Incoterms: [item.ZINCO || ''],
+            InsuranceScope: [item.ZINS_SCPOE || 'Supplier'],
+            Kilometres: [item.ZKM || 0]
+          }));
+        });
+        this.showForm = true;
+      } else {
+        Swal.fire({
+          title: 'Warning',
+          text: 'No report data found',
+          icon: 'warning',
+          confirmButtonText: 'Ok',
+          timer: 4000
+        });
       }
+      this.spinner.hide();
+    },
+    error: (err) => {
+      console.error("Error fetching Non-SAP Reports:", err);
+      Swal.fire({
+        title: 'Error',
+        text: 'Failed to fetch Non-SAP reports',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
+      this.spinner.hide();
     }
-  }
-
-
-
-
+  });
+}
 }

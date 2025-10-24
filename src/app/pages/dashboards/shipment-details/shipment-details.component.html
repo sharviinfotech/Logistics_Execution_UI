@@ -5,11 +5,11 @@
         <!-- Order Type -->
         <div class="form-radio optional">
             <label>
-                <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" />
+                <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
                 <span>Inward</span>
             </label>
             <label>
-                <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" />
+                <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
                 <span>Outward</span>
             </label>
         </div>
@@ -127,7 +127,26 @@
                                     </option>
                                 </select>
                             </td>
-                            <td><input type="text" formControlName="Incoterms"></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <ng-container *ngIf="!isSap(); else sapInco">
+                                    <select formControlName="Incoterms">
+                                        <option value="">Select Incoterm</option>
+                                        <option *ngFor="let i of IncotermsList" [value]="i.INCO1">
+                                        {{ i.INCO1 }} - {{ i.BEZEI }}
+                                        </option>
+                                    </select>
+                                    </ng-container>
+
+                                    <ng-template #sapInco>
+                                    <input type="text" formControlName="Incoterms" readonly />
+                                    </ng-template>
+                                </div>
+                            </td>
+
+                            
+
+                            <!-- <td><input type="text" formControlName="Incoterms"></td> -->
 
                             
 
