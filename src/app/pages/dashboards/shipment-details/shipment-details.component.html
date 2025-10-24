@@ -84,26 +84,39 @@
                             </td>
 
                             
-                          <!-- <td>
-                                <ng-container *ngIf="!isSap(); else sapType">
-                                <select formControlName="TypeOfMaterial" (change)="onTypeOfMaterialChange()">
-                                    <option value="">Select Type</option>
-                                    <option *ngFor="let m of TypeofmaterialList" [value]="m.MTART">
-                                    {{ m.MTART }} - {{ m.MTBEZ }}
-                                    </option>
-                                </select>
-                                </ng-container>
-                                <ng-template #sapType>
-                                <input type="text" formControlName="TypeOfMaterial" readonly />
-                                </ng-template>
-                                <label>Type of Material</label>
-                            </td> -->
-                            <td><input type="text" formControlName="TypeOfMaterial"></td>
+                          <td>
+                                <div class="d-flex align-items-center">
+                                    <ng-container *ngIf="!isSap(); else sapType">
+                                        <div class="input-group">
+                                            <select formControlName="TypeOfMaterial" (change)="onTypeOfMaterialChange()">
+                                                <option value="">Select Type</option>
+                                                <option *ngFor="let m of TypeofmaterialList" [value]="m.MTART">
+                                                    {{ m.MTART }} - {{ m.MTBEZ }}
+                                                </option>
+                                            </select>
+                                            <!-- <button type="button" class="btn btn-f4" (click)="openTypeOfMaterialF4(i)">F4</button> -->
+                                        </div>
+                                    </ng-container>
+                                    <ng-template #sapType>
+                                        <input type="text" formControlName="TypeOfMaterial" readonly />
+                                    </ng-template>
+                                </div>
+                                <!-- <label>Type of Material</label> -->
+                            </td>
+                            <!-- <td><input type="text" formControlName="TypeOfMaterial"></td> -->
 
 
                             <td><input type="text" formControlName="MaterialDescription"></td>
                             <td><input type="number" formControlName="Noofseats" min="0" /></td>
-                            <td><input type="number" formControlName="AhLoadedInTruck" min="0" /></td>
+                            <td>
+                                <input
+                                    type="number"
+                                    formControlName="AhLoadedInTruck"
+                                    min="0"
+                                    *ngIf="itemGroup.get('Product')?.value === 'Batteries'"
+                                    placeholder="Ah Loaded"
+                                />
+                             </td>
                             <td><input type="number" formControlName="ShipmentWeight"   /></td>
 
                             <td>

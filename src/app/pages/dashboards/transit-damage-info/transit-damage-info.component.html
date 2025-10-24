@@ -2,7 +2,7 @@
     <div class="card-header-LE">Transit Damage Info</div>
     <div class="card-body-LE">
       <form class="form-grid" [formGroup]="transitDamageInfo">
-
+ 
         <!-- Incident Date -->
         <div class="form-field floating-label">
           <input type="date" formControlName="incidentdate" id="incidentdate" placeholder=" " />
@@ -12,7 +12,7 @@
             Incident Date is required
           </small>
         </div>
-
+ 
         <!-- LR Number -->
         <div class="form-field floating-label">
           <input type="text" formControlName="lrnumber" id="lrnumber" placeholder=" " />
@@ -22,7 +22,7 @@
             LR Number is required
           </small>
         </div>
-
+ 
         <!-- Transporter Name -->
         <div class="form-field floating-label">
           <input type="text" formControlName="transportername" id="transportername" placeholder=" " />
@@ -32,7 +32,7 @@
             Transporter Name is required
           </small>
         </div>
-
+ 
         <!-- Vehicle Number -->
         <div class="form-field floating-label">
           <input type="text" formControlName="vechilenumber" id="vechilenumber" placeholder=" " />
@@ -42,7 +42,7 @@
             Vehicle Number is required
           </small>
         </div>
-
+ 
         <!-- FSR Report Date -->
         <div class="form-field floating-label">
           <input type="date" formControlName="fsrreportdate" id="fsrreportdate" placeholder=" " />
@@ -52,7 +52,7 @@
             FSR Report Date is required
           </small>
         </div>
-
+ 
         <!-- Images Uploading -->
         <div class="form-field floating-label">
           <input type="file" formControlName="imagesuploading" id="imagesuploading" accept=".jpg,.jpeg,.pdf" />
@@ -62,7 +62,7 @@
             Images Uploading is required
           </small>
         </div>
-
+ 
         <!-- Customer -->
         <div class="form-field floating-label">
           <input type="text" formControlName="customer" id="customer" placeholder=" " />
@@ -72,7 +72,7 @@
             Customer is required
           </small>
         </div>
-
+ 
         <!-- C/nee -->
         <div class="form-field floating-label">
           <input type="text" formControlName="nee" id="nee" placeholder=" " />
@@ -81,7 +81,7 @@
             C/nee is required
           </small>
         </div>
-
+ 
         <!-- Invoice Number -->
         <div class="form-field floating-label">
           <input type="text" formControlName="invoicenumber" id="invoicenumber" placeholder=" " />
@@ -91,7 +91,7 @@
             Invoice Number is required
           </small>
         </div>
-
+ 
         <!-- Invoice Date -->
         <div class="form-field floating-label">
           <input type="date" formControlName="invoicedate" id="invoicedate" placeholder=" " />
@@ -101,7 +101,7 @@
             Invoice Date is required
           </small>
         </div>
-
+ 
         <!-- Shipment Value -->
         <div class="form-field floating-label">
           <input type="text" formControlName="shipmentvalue" id="shipmentvalue" placeholder=" " />
@@ -111,7 +111,7 @@
             Shipment Value is required
           </small>
         </div>
-
+ 
         <div class="form-field">
           <select formControlName="DamageRemarks">
             <option value="">Select</option>
@@ -130,20 +130,20 @@
               Damage due to other Materials loaded
             </option>
           </select>
-
+ 
           <label>Damage Remarks</label>
           <small class="error"
             *ngIf="transitDamageInfo.get('DamageRemarks')?.touched && transitDamageInfo.get('DamageRemarks')?.invalid">
             Damage Remarks is required
           </small>
         </div>
-
-
+ 
+ 
         <!-- Claim Settlement -->
         <div class="form-field floating-label select-field">
           <select formControlName="claimsettlement" id="claimsettlement">
             <option value="" selected>Select</option>
-
+ 
             <option value="Direct Deduction">Direct Deduction</option>
             <option value="Insurance claim">Insurance claim</option>
             <option value="Repair Locally With cost">Repair Locally With cost</option>
@@ -162,14 +162,14 @@
             <option value="open">open</option>
             <option value="close">close</option>
           </select>
-
+ 
           <label>Status</label>
           <small class="error"
             *ngIf="transitDamageInfo.get('status')?.touched && transitDamageInfo.get('status')?.invalid">
             Status is required
           </small>
         </div>
-
+ 
         <!-- Conditionally show closing damage date when status is close -->
         <div class="form-field" *ngIf="transitDamageInfo.get('status')?.value === 'close'">
           <input type="date" formControlName="closingdamagedate" />
@@ -179,7 +179,7 @@
             Closing damage date is required
           </small>
         </div>
-
+ 
       </form>
       <div class="text-right">
           <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">

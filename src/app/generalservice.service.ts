@@ -158,15 +158,30 @@ export class GeneralserviceService {
   fetchzoneTat(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/withoutsap/fetchzone', obj);
   }
-   getTypeofmaterial(obj: any) {
-    return this.http.put(environment.baseUrl + '/LE/ShipmentDetails/Nonsap/f4_Typeofmaterial', obj);
+  getTypeofmaterial() {
+    return this.http.get<any>(environment.baseUrl + 'api/external/LE/ShipmentDetails/Nonsap/f4_Typeofmaterial');
   }
-   TransitInfoSave(obj) {
+  TransitInfoSave(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/TransitInfo/Outward/WithSap/Save', obj);
   }
   TransitInfoNonSap(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/TransitInfo/NonSap/Save', obj);
   }
-  
+  FreightBillingSave(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/FreightBilling/Outward/WithSap/Save', obj);
+  }
+  FreightBillingNonSap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/FreightBilling/Outward/NonSap/Create', obj);
+  }
+  VehicleInfofetch(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/Vehicleinfo/Outward/fetchInvoiceList', obj);
+  }
+  VehicleInfosave(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/Vehicleinfo/Outward/Save', obj);
+  }
+  VehicleInfoNonSap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/Vehicleinfo/NonSap/Save', obj);
+  }
+
 
 }

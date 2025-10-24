@@ -229,20 +229,39 @@ export class ShipmentDetailsComponent implements OnInit {
     }
   });
 }
-fetchTypeofmaterial() {
-  this.spinner.show();
-  this.service.getTypeofmaterial(1).subscribe({
-    next: (res: any) => {
-      console.log("Material Data:", res);
-      this.TypeofmaterialList = res;
-      this.spinner.hide();
-    },
-    error: (err) => {
-      console.error("Error fetching Type of Material:", err);
-      this.spinner.hide();
+  fetchTypeofmaterial() {
+    this.spinner.show();
+    this.service.getTypeofmaterial().subscribe({
+      next: (res: any) => {
+        console.log("Material Data:", res);
+        this.TypeofmaterialList = res;
+        this.spinner.hide();
+      },
+      error: (err) => {
+        console.error("Error fetching Type of Material:", err);
+        this.spinner.hide();
+      }
+    });
+  }
+
+  isSap(): boolean {
+    return this.sapType === 'SAP';
+  }
+
+  onTypeOfMaterialChange() {
+    console.log('Type of Material changed');
+  }
+
+  openTypeOfMaterialF4(rowIndex: number) {
+    if (!this.isSap()) {
+      this.fetchTypeofmaterial();
+      const currentRow = this.items.at(rowIndex);
+      if (currentRow) {
+        // You can show a modal or dropdown here with TypeofmaterialList
+        console.log('Opening F4 for Type of Material at row:', rowIndex);
+      }
     }
-  });
-}
+  }
 
 
 
