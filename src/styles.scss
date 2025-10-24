@@ -14,7 +14,7 @@
 //     align-items: center;
 //     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
 //   }
-   
+
 //   .scrolling-background {
 //     height: 100vh;
 //     width: 100vw; /* Make sure the container covers the full screen */
@@ -24,7 +24,7 @@
 //     background-position: 0 0;
 //     animation: scroll-background 75s linear infinite;
 //   }
-   
+
 //   @keyframes scroll-background {
 //     0% {
 //         background-position: 0 0; /* Start at the left */
@@ -33,7 +33,7 @@
 //         background-position: -100vw 0; /* Move to the left by the width of the viewport */
 //     }
 //   }
-   
+
 //   /* Style the login form */
 //   .login-form {
 //     background: rgba(0, 0, 0, 0.6);
@@ -46,16 +46,16 @@
 //     display: flex;
 //     flex-direction: column;
 //   }
-   
+
 //   h2 {
 //     margin-bottom: 20px;
 //   }
-   
+
 //   .input-container {
 //     display: flex;
 //     margin-bottom: 15px;
 //   }
-   
+
 //   .icon {
 //     padding: 10px;
 //     background: #333;
@@ -63,7 +63,7 @@
 //     min-width: 40px;
 //     text-align: center;
 //   }
-   
+
 //   input[type="email"],
 //   input[type="password"] {
 //     width: 100%;
@@ -73,17 +73,17 @@
 //     outline: none;
 //     background-color: #f1f1f1;
 //   }
-   
+
 //   input[type="email"]:focus,
 //   input[type="password"]:focus {
 //     background-color: #ddd;
 //   }
-   
+
 //   .remember-me {
 //     margin-bottom: 20px;
 //     text-align: left;
 //   }
-   
+
 //   button {
 //     background-color: #007bff;
 //     color: white;
@@ -92,33 +92,33 @@
 //     padding: 10px;
 //     cursor: pointer;
 //   }
-   
+
 //   button:hover {
 //     background-color: #0056b3;
 //   }
-   
+
 //   .login-footer {
 //     margin-top: 20px;
 //   }
-   
+
 //   .login-footer a {
 //     color: white;
 //   }
-   
+
 //   .social-login {
 //     margin-top: 10px;
 //   }
-   
+
 //   .social-login span {
 //     display: block;
 //     margin-bottom: 10px;
 //   }
-   
+
 //   .social-login a {
 //     color: white;
 //     margin: 0 5px;
 //   }
-   
+
 //   .social-login a i {
 //     font-size: 20px;
 //   }
@@ -126,54 +126,69 @@
 @import '~dropzone/dist/min/dropzone.min.css';
 @import '../node_modules/ngx-spinner/animations/line-scale-pulse-out-rapid.css';
 
-.radioBig{
-    width: 13px !important; /* Adjust size */
-  height: 14px !important; /* Adjust size */
-  transform: scale(1.5) !important; /* Scales the radio button */
-  margin: 0 !important; /* Ensure proper alignment */
-  }
- 
-.table thead th{
-    vertical-align: middle !important;
-    padding: 5px !important;
-    border-bottom: 0px solid #a9a9a9;
-    // background-color:#722a40 !important;
-    background-color: #2c75c4 !important;
-    color: white;
-    font-weight: 500;
-    text-align: center !important;
-  }
-  
+.radioBig {
+  width: 13px !important;
+  /* Adjust size */
+  height: 14px !important;
+  /* Adjust size */
+  transform: scale(1.5) !important;
+  /* Scales the radio button */
+  margin: 0 !important;
+  /* Ensure proper alignment */
+}
+
+.table thead th {
+  vertical-align: middle !important;
+  padding: 5px !important;
+  border-bottom: 0px solid #a9a9a9;
+  // background-color:#722a40 !important;
+  background-color: #2c75c4 !important;
+  color: white;
+  font-weight: 500;
+  text-align: center !important;
+}
+
 
 
 .table-striped tbody tr:nth-of-type(odd) {
-    background-color: #f8f9fa !important; /* Light grey for odd rows */
+  background-color: #f8f9fa !important;
+  /* Light grey for odd rows */
 }
 
 .table-striped tbody tr:nth-of-type(even) {
-    background-color: #ffffff !important; /* White for even rows */
+  background-color: #ffffff !important;
+  /* White for even rows */
 }
+
 .table-striped tbody tr:hover {
-    background-color: #e9ecef !important; /* Light blue-grey when hovered */
+  background-color: #e9ecef !important;
+  /* Light blue-grey when hovered */
 }
+
 .text-underline {
-    color: #007bff  !important; /* Blue color */
-    text-decoration: underline !important; /* Ensures underline is applied */
-    cursor: pointer !important; /* Changes cursor to indicate clickability */
+  color: #007bff !important;
+  /* Blue color */
+  text-decoration: underline !important;
+  /* Ensures underline is applied */
+  cursor: pointer !important;
+  /* Changes cursor to indicate clickability */
 }
 
 .mat-mdc-dialog-container .mdc-dialog__surface {
-    border-radius: 16px !important;
-    padding: 10px !important;
+  border-radius: 16px !important;
+  padding: 10px !important;
 }
-.buttonCross{
-    padding: 5px 8px 5px 8px !important;
-    font-size: 12px !important;
-  }
-  .nowrap{
+
+.buttonCross {
+  padding: 5px 8px 5px 8px !important;
+  font-size: 12px !important;
+}
+
+.nowrap {
   white-space: nowrap !important;
   color: blue
-  }
+}
+
 // button{
 //     padding: 5px 8px 5px 8px !important;
 //     font-size: 12px !important;
@@ -181,275 +196,300 @@
 
 
 .mat-mdc-dialog-container .mat-mdc-dialog-title {
-    color: var(--mdc-dialog-subhead-color, rgba(0, 0, 0, 0.87));
-    font-family: var(--mdc-dialog-subhead-font, Roboto, sans-serif);
-    line-height: var(--mdc-dialog-subhead-line-height, 1.5rem);
-    font-size: var(--mdc-dialog-subhead-size, 1rem);
-    /* font-weight: var(--mdc-dialog-subhead-weight, 400); */
-    letter-spacing: var(--mdc-dialog-subhead-tracking, 0.03125em);
-    font-size: 20px !important;
-    background-color: #2c75c4 !important;
-    color: white !important;
+  color: var(--mdc-dialog-subhead-color, rgba(0, 0, 0, 0.87));
+  font-family: var(--mdc-dialog-subhead-font, Roboto, sans-serif);
+  line-height: var(--mdc-dialog-subhead-line-height, 1.5rem);
+  font-size: var(--mdc-dialog-subhead-size, 1rem);
+  /* font-weight: var(--mdc-dialog-subhead-weight, 400); */
+  letter-spacing: var(--mdc-dialog-subhead-tracking, 0.03125em);
+  font-size: 20px !important;
+  background-color: #2c75c4 !important;
+  color: white !important;
 }
 
 .modal-content {
-    background-color: #2c75c4 !important;
-    padding: 20px;
-    border-radius: 8px;
-    max-height: 80vh;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
+  background-color: #2c75c4 !important;
+  padding: 20px;
+  border-radius: 8px;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .mat-mdc-dialog-container-with-actions .mat-mdc-dialog-content {
-    padding: 10px !important;
+  padding: 10px !important;
 }
+
 table th {
-    position: sticky;
-    // top: -1px;
-    z-index: 10;
-    background-color: #2c75c4 !important; /* Keep your existing color */
-    color: #ffffff !important;
-    padding: 15px !important;
-    text-align: center;
-    white-space: nowrap !important;
-  }
-
-
-  .card {
-    border-radius: 8px !important;
-    // margin-bottom: 20px !important;
-    background-color: #ffffff ;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-  }
-   
-  .card-header {
-    // background-color: #f8f9fa !important; 
-    font-size: 20px !important;
-    font-weight: bold !important;
-    /* height: 36px; */
-    /* padding: 15px; */
-    padding: 10px;
-    border-bottom: 2px solid green;
-    color: brown;
-    background-color: #d2e2f3 !important;
-  }
-   
-  .card-body {
-    padding: 20px !important;
-    // background-color: #f9f9f9;
-    // border-radius: 8px !important;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    background-color: #d2e2f3;
-  }
-  
-
-  .btnAuthorize{
-    padding: 10px 10px;
-    background: #ee3e08 !important;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-    color: white;
+  position: sticky;
+  // top: -1px;
+  z-index: 10;
+  background-color: #2c75c4 !important;
+  /* Keep your existing color */
+  color: #ffffff !important;
+  padding: 15px !important;
+  text-align: center;
+  white-space: nowrap !important;
 }
- 
-  .btnAuthorize:hover {
-    background-color: #ee3e08 !important;
-    color: white !important;
-  }
- 
-  .btnAuthorize.disabled-icon {
-    background-color: #176429 !important; /* Green */
-    cursor: not-allowed;
-    pointer-events: none;
-    opacity: 0.9;
-  }
 
-.btnSave{
-    padding: 10px 10px;
-    background: #00A651 !important;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-    color: white !important;
-  }
-  .btnSave:hover {
-    background-color: white !important;
-    color: red !important;
-    border: 1px solid red !important;
-  }
-  .btnEdit{
-    // padding: 7px;
-    background: #411bcc ;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-    color: white;
-  }
-   
-  .btnEdit:hover {
-    background-color: white !important;
-    color: #411bcc !important;
-    border: 1px solid #411bcc !important;
-  }
-  .btnAdd{
-    // padding: 7px;
-    background: #411bcc ;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-    color: white;
-  }
-   
-  .btnAdd:hover {
-    background-color: white !important;
-    color: #411bcc !important;
-    border: 1px solid #411bcc !important;
-  }
-  .btnBack{
-    padding: 10px 10px;
-    background: #433eb1 ;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-    color: white;
-  }
-  .btnBack:hover{
-    background-color: white !important;
-    color: #433eb1 !important;
-    border: 1px solid #433eb1 !important;
-  }
-  .btnCross{
-    margin-top: 0px;
-    background: red !important;
-    color: white;
-    border: none;
-    padding: 10px !important;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-   .btnBack:hover{
-    background-color: white !important;
-    color: red !important;
-    border: 1px solid red !important;
-  }
-  .btnDelete{
-    margin-top: 15px !important;
-    background: red !important;
-    color: white;
-    border: none;
-    padding: 10px !important;
-    border-radius: 5px;
-  }
-   .btnDelete:hover{
-    background-color: white !important;
-    color: red !important;
-    border: 1px solid red !important;
-  }
-  .btnReset{
-    margin-top: 15px;
-    background: #1226c9;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-  }
-   .btnReset:hover{
-    background-color: white !important;
-    color: #1226c9 !important;
-    border: 1px solid #1226c9 !important;
-  }
-   
-  .btnCancel{
-    padding: 10px 20px;
-    background:rgb(201, 9, 54) !important;
-    
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-    color: white;
-  }
-    .btnReset:hover{
-    background-color: white !important;
-    color: rgb(201, 9, 54) !important;
-    border: 1px solid rgb(201, 9, 54) !important;
-  }
-  .btnSumaaryprint{
-    padding: 10px 10px;
-    background: #2c75c4 ;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-    color: white;
-  }
-  .btnSumaaryprint:hover {
-    background-color: #2c75c4;
-    color: white !important;
-  }
-  .btnRemarks{
-    padding: 10px 10px;
-    background: #2c75c4 ;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-    color: white;
-  }
-  .btnRemarks:hover {
-    background-color: #2c75c4;
-    color: white !important;
-  }
-  .btnCalculate{
-    padding: 10px 10px;
-    background: #c56420 ;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-    color: white;
-  }
-  .btnCalculate:hover {
-    background-color: #c56420;
-    color: white !important;
-  }
 
- 
+.card {
+  border-radius: 8px !important;
+  // margin-bottom: 20px !important;
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
 
-  .btnCreate{
-    padding: 10px 10px !important;
-    background: #2c75c4 !important;
-    border: 1px solid #ddd !important;
-    border-radius: 4px !important;
-    cursor: pointer;
-    color: white !important;
-  }
-  .btnCreate:hover {
-    background-color: #2c75c4 !important;
-    color: white ;
-  }
+.card-header {
+  // background-color: #f8f9fa !important; 
+  font-size: 20px !important;
+  font-weight: bold !important;
+  /* height: 36px; */
+  /* padding: 15px; */
+  padding: 10px;
+  border-bottom: 2px solid green;
+  color: brown;
+  background-color: #d2e2f3 !important;
+}
 
-  
- 
+.card-body {
+  padding: 20px !important;
+  // background-color: #f9f9f9;
+  // border-radius: 8px !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #d2e2f3;
+}
 
-  .btnExcel{
-    padding: 10px 10px;
-    background:blue !important;
-    border: 1px solid #ddd !important;
-    border-radius: 4px !important;
-    cursor: pointer;
-    color: white !important;
-  }
-  .btnExcel:hover {
-    background-color: blue  !important;
-    color: white ;
-  }
-   
-  .btn {
-    padding: 5px 10px 5px 10px !important;;
-    font-size: 14px !important;
-    cursor: pointer !important;
-    border: none !important;
-    
-  }
+
+.btnAuthorize {
+  padding: 10px 10px;
+  background: #ee3e08 !important;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white;
+}
+
+.btnAuthorize:hover {
+  background-color: #ee3e08 !important;
+  color: white !important;
+}
+
+.btnAuthorize.disabled-icon {
+  background-color: #176429 !important;
+  /* Green */
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.btnSave {
+  padding: 10px 10px;
+  background: #00A651 !important;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white !important;
+}
+
+.btnSave:hover {
+  background-color: white !important;
+  color: red !important;
+  border: 1px solid red !important;
+}
+
+.btnEdit {
+  // padding: 7px;
+  background: #411bcc;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white;
+}
+
+.btnEdit:hover {
+  background-color: white !important;
+  color: #411bcc !important;
+  border: 1px solid #411bcc !important;
+}
+
+.btnAdd {
+  // padding: 7px;
+  background: #411bcc;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white;
+}
+
+.btnAdd:hover {
+  background-color: white !important;
+  color: #411bcc !important;
+  border: 1px solid #411bcc !important;
+}
+
+.btnBack {
+  padding: 10px 10px;
+  background: #433eb1;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white;
+}
+
+.btnBack:hover {
+  background-color: white !important;
+  color: #433eb1 !important;
+  border: 1px solid #433eb1 !important;
+}
+
+.btnCross {
+  margin-top: 0px;
+  background: red !important;
+  color: white;
+  border: none;
+  padding: 10px !important;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btnBack:hover {
+  background-color: white !important;
+  color: red !important;
+  border: 1px solid red !important;
+}
+
+.btnDelete {
+  margin-top: 15px !important;
+  background: red !important;
+  color: white;
+  border: none;
+  padding: 10px !important;
+  border-radius: 5px;
+}
+
+.btnDelete:hover {
+  background-color: white !important;
+  color: red !important;
+  border: 1px solid red !important;
+}
+
+.btnReset {
+  margin-top: 15px;
+  background: #1226c9;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.btnReset:hover {
+  background-color: white !important;
+  color: #1226c9 !important;
+  border: 1px solid #1226c9 !important;
+}
+
+.btnCancel {
+  padding: 10px 20px;
+  background: rgb(201, 9, 54) !important;
+
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white;
+}
+
+.btnReset:hover {
+  background-color: white !important;
+  color: rgb(201, 9, 54) !important;
+  border: 1px solid rgb(201, 9, 54) !important;
+}
+
+.btnSumaaryprint {
+  padding: 10px 10px;
+  background: #2c75c4;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white;
+}
+
+.btnSumaaryprint:hover {
+  background-color: #2c75c4;
+  color: white !important;
+}
+
+.btnRemarks {
+  padding: 10px 10px;
+  background: #2c75c4;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white;
+}
+
+.btnRemarks:hover {
+  background-color: #2c75c4;
+  color: white !important;
+}
+
+.btnCalculate {
+  padding: 10px 10px;
+  background: #c56420;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white;
+}
+
+.btnCalculate:hover {
+  background-color: #c56420;
+  color: white !important;
+}
+
+
+
+.btnCreate {
+  padding: 10px 10px !important;
+  background: #2c75c4 !important;
+  border: 1px solid #ddd !important;
+  border-radius: 4px !important;
+  cursor: pointer;
+  color: white !important;
+}
+
+.btnCreate:hover {
+  background-color: #2c75c4 !important;
+  color: white;
+}
+
+
+
+
+.btnExcel {
+  padding: 10px 10px;
+  background: blue !important;
+  border: 1px solid #ddd !important;
+  border-radius: 4px !important;
+  cursor: pointer;
+  color: white !important;
+}
+
+.btnExcel:hover {
+  background-color: blue !important;
+  color: white;
+}
+
+.btn {
+  padding: 5px 10px 5px 10px !important;
+  ;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  border: none !important;
+
+}
+
 .btnLogout {
   // background-color: rgb(201, 9, 54);
   border: 1px solid white !important;
@@ -497,16 +537,17 @@ table th {
 ::ng-deep .mat-calendar-table-header,
 ::ng-deep .mat-calendar-controls,
 ::ng-deep .mat-calendar-table {
-    background-color: white !important;
+  background-color: white !important;
 }
 
 .sideBar {
-  background-image: linear-gradient(to bottom, rgba(0,212,255,1),rgba(2,0,36,1)) !important ;
+  background-image: linear-gradient(to bottom, rgba(0, 212, 255, 1), rgba(2, 0, 36, 1)) !important;
   // background: url('/images/logo/sidebar.png') no-repeat center center / cover !important;
 
 }
-.topBar{
-  background-image: linear-gradient(to right, rgba(0,212,255,1),rgba(2,0,36,1)) !important 
+
+.topBar {
+  background-image: linear-gradient(to right, rgba(0, 212, 255, 1), rgba(2, 0, 36, 1)) !important
 }
 
 
@@ -516,7 +557,7 @@ table th {
 //     background-color: #ffffff ;
 //     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
 //   }
-   
+
 //   .card-header-LE {
 //     // background-color: #f8f9fa !important; 
 //     font-size: 20px !important;
@@ -530,7 +571,7 @@ table th {
 //     text-align: center;
 //     font-family: 'Times New Roman', Times, serif !important;
 //   }
-   
+
 //   .card-body-LE {
 //     padding: 10px !important;
 //     // box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -545,283 +586,315 @@ table th {
 //   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 //   }
 
-  /* 🔹 UPDATED: Changed from 3 columns to 4 columns per row */
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-bottom: 20px; /* 🔹 REDUCED: Reduced margin to move button up */
-  }
+/* 🔹 UPDATED: Changed from 3 columns to 4 columns per row */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+  /* 🔹 REDUCED: Reduced margin to move button up */
+}
 
-  
-  /* 🔹 REMOVED: Date fields special styling since we want individual fields in 4-column grid */
 
-  /* 🔹 FLOATING LABEL FORM FIELDS - COMPLETE SOLUTION */
-  .form-field {
-    position: relative;
-    margin-bottom: 5px;
-    display: flex;
-    flex-direction: column;
-  }
+/* 🔹 REMOVED: Date fields special styling since we want individual fields in 4-column grid */
 
-  .form-field label {
-    position: absolute;
-    left: 12px;
-    top: 12px;
-    font-size: 16px;
-    color: #666;
-    background: #ffffff;
-    padding: 0 4px;
-    transition: all 0.3s ease;
-    pointer-events: none;
-    font-weight: 400;
-    font-family: 'Times New Roman', Times, serif !important;
-   
-  }
+/* 🔹 FLOATING LABEL FORM FIELDS - COMPLETE SOLUTION */
+.form-field {
+  position: relative;
+  margin-bottom: 5px;
+  display: flex;
+  flex-direction: column;
+}
 
-  /* Required field indicator - only for required fields */
-  .form-field label::after {
-    content: '*';
-    color: #dc3545;
-    margin-left: 2px;
-  }
+.form-field label {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  font-size: 16px;
+  color: #666;
+  background: #ffffff;
+  padding: 0 4px;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  font-weight: 400;
+  font-family: 'Times New Roman', Times, serif !important;
 
-  /* Remove asterisk for optional fields */
-  .form-field.optional label::after {
-    content: '';
-  }
+}
 
-  .form-field input,
-  .form-field select {
-    padding: 12px;
-    font-size: 18px;
-    border: 1px solid #ced4da;
-    // border-radius: 4px;
-    outline: none;
-    background: #ffffff;
-    transition: border-color 0.3s ease;
-    width: 100%;
-    box-sizing: border-box;
-    height: 48px;
-    color: #333;
-  }
+// /* Required field indicator - only for required fields */
+// .form-field label::after {
+//   content: '*';
+//   color: #dc3545;
+//   margin-left: 2px;
+// }
 
-  /* Floating label animation - when focused */
-  .form-field input:focus + label,
-  .form-field select:focus + label {
-    top: -8px;
-    left: 8px;
-    font-size: 12px;
-    color: #4a90e2;
-    font-weight: 500;
-  }
-  ng-select
+// /* Remove asterisk for optional fields */
+// .form-field.optional label::after {
+//   content: '';
+// }
+/* Add * only for required fields */
+.form-field input[required]+label::after {
+  content: '*';
+  color: #dc3545;
+  margin-left: 2px;
+}
 
-  /* Floating label animation - when has content */
-  .form-field input:not(:placeholder-shown) + label,
-  .form-field select:not([value=""]):valid + label {
-    top: -8px;
-    left: 8px;
-    font-size: 12px;
-    color: black;
-    font-weight: 500;
-  }
+/* Optional fields: no asterisk */
+.form-field input:not([required])+label::after {
+  content: '';
+}
 
-  /* Focus border effect */
-  .form-field input:focus,
-  .form-field select:focus {
-    // border-color: #4a90e2;
-    border-color: #e2e5e9;
-    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
-  }
+.form-field input,
+.form-field select {
+  padding: 12px;
+  font-size: 18px;
+  border: 1px solid #ced4da;
+  // border-radius: 4px;
+  outline: none;
+  background: #ffffff;
+  transition: border-color 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  height: 48px;
+  color: #333;
+}
 
-  /* Select dropdown styling */
-  .form-field select {
-    cursor: pointer;
-    appearance: none;
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 16px;
-    padding-right: 40px;
-    font-family: emoji;
-  }
+/* Floating label animation - when focused */
+.form-field input:focus+label,
+.form-field select:focus+label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #4a90e2;
+  font-weight: 500;
+}
 
-  /* Select options styling */
-  .form-field select option {
-    padding: 8px 12px;
-    background-color: #ffffff;
-    color: #333;
-  }
 
-  /* Special handling for select elements */
-  .form-field select:valid:not([value=""]) + label {
-    top: -8px;
-    left: 8px;
-    font-size: 16px;
-    color: #4a90e2;
-    font-weight: 500;
-  }
+/* Floating label animation - when has content */
+.form-field input:not(:placeholder-shown)+label,
+.form-field select:not([value=""]):valid+label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: black;
+  font-weight: 500;
+}
 
-  /* Date inputs - always show floating label */
-  .form-field input[type="date"]:not(:placeholder-shown) + label,
-  .form-field input[type="date"]:focus + label,
-  .form-field input[type="date"]:valid + label {
-    top: -8px;
-    left: 8px;
-    font-size: 12px;
-    color: #4a90e2;
-    font-weight: 500;
-  }
+/* Focus border effect */
+.form-field input:focus,
+.form-field select:focus {
+  // border-color: #4a90e2;
+  border-color: #e2e5e9;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
 
-  /* Error Messages */
-  .error {
-    color: #dc3545;
-    font-size: 12px;
-    margin-top: 5px;
-    font-weight: 400;
-  }
+/* Select dropdown styling */
+.form-field select {
+  cursor: pointer;
+  appearance: none;
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 40px;
+  font-family: emoji;
+}
 
-  /* Error state styling */
-  .form-field input.ng-invalid.ng-touched,
-  .form-field select.ng-invalid.ng-touched {
-    border-color: #8f1e42;
-    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
-  }
+/* Select options styling */
+.form-field select option {
+  padding: 8px 12px;
+  background-color: #ffffff;
+  color: #333;
+}
 
-  .form-field input.ng-invalid.ng-touched + label,
-  .form-field select.ng-invalid.ng-touched + label {
-    color: #8f1e42 !important;
-  }
+/* Special handling for select elements */
+.form-field select:valid:not([value=""])+label {
+  top: -8px;
+  left: 8px;
+  font-size: 16px;
+  color: #4a90e2;
+  font-weight: 500;
+}
 
-  /* Enhanced error styling for empty required select fields */
-  .form-field select.ng-invalid.ng-touched:invalid {
-    border-color: #8f1e42;
-    background-color: #fff5f5;
-  }
+/* Date inputs - always show floating label */
+.form-field input[type="date"]:not(:placeholder-shown)+label,
+.form-field input[type="date"]:focus+label,
+.form-field input[type="date"]:valid+label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #4a90e2;
+  font-weight: 500;
+}
 
-  /* Make sure error messages are visible */
-  .form-field .error {
-    display: block;
-    color: #8f1e42;
-    font-size: 12px;
-    margin-top: 5px;
-    font-weight: 400;
-  }
- /* 🔹 Save Button - Enterprise style */
-  .form-buttons {
-    grid-column: span 4; /* 🔹 UPDATED: Changed from span 4 to span 4 for 4-column grid */
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 10px; /* 🔹 REDUCED: Reduced margin to move button up */
-    gap: 10px;
-  }
+/* Error Messages */
+.error {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 5px;
+  font-weight: 400;
+}
 
-  .form-buttons button {
-    padding: 12px 25px;
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background-color 0.3s ease;
-    height: 48px;
-  }
 
-  .form-buttons button:hover {
-    background: #218838;
-  }
 
-  .form-buttons .btn-secondary {
-    background: #6c757d;
-    color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background-color 0.3s ease;
-    height: 48px;
-    margin-right: 10px;
-  }
+/* Enhanced error styling for empty required select fields */
+.form-field select.ng-invalid.ng-touched:invalid {
+  border-color: #8f1e42;
+  background-color: #fff5f5;
+}
 
-  .form-buttons .btn-secondary:hover {
-    background: #5a6268;
-  }
-  .text-right{
-    text-align: end !important;
-    margin-bottom: 10px;
-    margin-right: 10px;
-  }
-  .login-headers-top{
-    background-color: #8f1e42;
-    height: 50px;
-  }
-    .login-headers-bottom{  
-    background-color: #8f1e42;
-    height: 50px;
-  }
-  /* NEW STYLES FOR THE TRANSPARENT GLASS BUTTON */
-  /* Styling for the overall card container */
+/* Make sure error messages are visible */
+.form-field .error {
+  display: block;
+  color: #8f1e42;
+  font-size: 12px;
+  margin-top: 5px;
+  font-weight: 400;
+}
+
+/* 🔹 Save Button - Enterprise style */
+.form-buttons {
+  grid-column: span 4;
+  /* 🔹 UPDATED: Changed from span 4 to span 4 for 4-column grid */
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+  /* 🔹 REDUCED: Reduced margin to move button up */
+  gap: 10px;
+}
+
+.form-buttons button {
+  padding: 12px 25px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  height: 48px;
+}
+
+.form-buttons button:hover {
+  background: #218838;
+}
+
+.form-buttons .btn-secondary {
+  background: #6c757d;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  height: 48px;
+  margin-right: 10px;
+}
+
+.form-buttons .btn-secondary:hover {
+  background: #5a6268;
+}
+
+.text-right {
+  text-align: end !important;
+  margin-bottom: 10px;
+  margin-right: 10px;
+}
+
+.login-headers-top {
+  background-color: #8f1e42;
+  height: 50px;
+}
+
+.login-headers-bottom {
+  background-color: #8f1e42;
+  height: 50px;
+}
+
+/* NEW STYLES FOR THE TRANSPARENT GLASS BUTTON */
+/* Styling for the overall card container */
 .card-LE {
-    border-radius: 16px !important; /* Slightly more rounded corners for modern look */
-    background-color: rgba(255, 255, 255, 0.15); /* Semi-transparent white background */
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important; /* Stronger shadow for depth */
-    backdrop-filter: blur(10px); /* Frosted glass effect */
-    -webkit-backdrop-filter: blur(10px); /* For Safari */
-    border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle white border */
-    // margin: 20px; /* Add some margin around the card */
+  border-radius: 16px !important;
+  /* Slightly more rounded corners for modern look */
+  background-color: rgba(255, 255, 255, 0.15);
+  /* Semi-transparent white background */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+  /* Stronger shadow for depth */
+  backdrop-filter: blur(10px);
+  /* Frosted glass effect */
+  -webkit-backdrop-filter: blur(10px);
+  /* For Safari */
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  /* Subtle white border */
+  // margin: 20px; /* Add some margin around the card */
 }
 
 /* Header styling, keeping original colors but adjusting for glassmorphism background */
 .card-header-LE {
-    font-size: 20px !important;
-    font-weight: bold !important; 
-    padding: 15px 20px; /* Adjusted padding */
-     border-bottom: 2px solid #8f1e42;
-    color: #8f1e42;
-    background: transparent; /* Make header background transparent to show backdrop-filter */
-    text-align: center;
-    font-family: 'Times New Roman', Times, serif !important;
+  font-size: 20px !important;
+  font-weight: bold !important;
+  padding: 15px 20px;
+  /* Adjusted padding */
+  border-bottom: 2px solid #8f1e42;
+  color: #8f1e42;
+  background: transparent;
+  /* Make header background transparent to show backdrop-filter */
+  text-align: center;
+  font-family: 'Times New Roman', Times, serif !important;
 }
-   
+
 /* Card body styling - already had good glassmorphism properties, just harmonizing */
 .card-body-LE {
-    padding: 10px !important; /* Adjusted padding */
-    background: transparent; /* Make body background transparent to show backdrop-filter */
+  padding: 10px !important;
+  /* Adjusted padding */
+  background: transparent;
+  /* Make body background transparent to show backdrop-filter */
 }
-.btn-glass-save {
-    /* Glassmorphism Effect */
-    background: rgba(255, 255, 255, 0.15) !important; /* Semi-transparent background */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px); /* For Safari support */
-   border: 1px solid rgb(183 163 163 / 51%) !important;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 
-    /* Typography and Size (reusing from your original .btnSave) */
-    padding: 10px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    color: #bf1e1e !important;
-    font-weight: bold; /* Make it stand out */
-    transition: all 0.3s ease; /* Smooth transition for hover */
+.btn-glass-save {
+  /* Glassmorphism Effect */
+  background: rgba(255, 255, 255, 0.15) !important;
+  /* Semi-transparent background */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  /* For Safari support */
+  border: 1px solid rgb(183 163 163 / 51%) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* Subtle shadow for depth */
+
+  /* Typography and Size (reusing from your original .btnSave) */
+  padding: 10px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #bf1e1e !important;
+  font-weight: bold;
+  /* Make it stand out */
+  transition: all 0.3s ease;
+  /* Smooth transition for hover */
 }
 
 .btn-glass-save:hover {
-    /* Change on hover for feedback */
-    background-color: white !important;
-    color: #057e1b !important; /* Change text color to the original save color */
-    border: 1px solid #057e1b !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow on hover */
+  /* Change on hover for feedback */
+  background-color: white !important;
+  color: #057e1b !important;
+  /* Change text color to the original save color */
+  border: 1px solid #057e1b !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  /* Slightly stronger shadow on hover */
 }
+
 .tableFixHead {
-  overflow-y: auto; /* Enables vertical scrolling */
-  max-height: 45vh; /* Reduce height to make it smaller */
+  overflow-y: auto;
+  /* Enables vertical scrolling */
+  max-height: 45vh;
+  /* Reduce height to make it smaller */
   margin-top: 3px;
-  scrollbar-width: thin; /* For Firefox */
-  scrollbar-color: #ccc transparent; /* Light scrollbar color */
+  scrollbar-width: thin;
+  /* For Firefox */
+  scrollbar-color: #ccc transparent;
+  /* Light scrollbar color */
 
   /* Smart Scroll - Hide scrollbar when not scrolling */
   transition: max-height 0.3s ease-in-out;
@@ -829,20 +902,25 @@ table th {
 
 /* For WebKit Browsers (Chrome, Safari) */
 .tableFixHead::-webkit-scrollbar {
-  width: 6px; /* Make scrollbar thin */
+  width: 6px;
+  /* Make scrollbar thin */
 }
 
 .tableFixHead::-webkit-scrollbar-track {
-  background: transparent; /* Hide scrollbar background */
+  background: transparent;
+  /* Hide scrollbar background */
 }
 
 .tableFixHead::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2); /* Light scrollbar color */
-  border-radius: 3px; /* Rounded edges */
+  background-color: rgba(0, 0, 0, 0.2);
+  /* Light scrollbar color */
+  border-radius: 3px;
+  /* Rounded edges */
 }
 
 .tableFixHead:hover::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.4); /* Darken when hovering */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Darken when hovering */
 }
 
 .tableFixHead thead th {
@@ -942,4 +1020,95 @@ table th {
   font-weight: 600;
 }
 
+
+
+// new css 
+
+/* 🌟 Required field asterisk */
+.form-field input[required] + label::after,
+.form-field select[required] + label::after,
+.form-field textarea[required] + label::after {
+  content: ' *';
+  color: #dc3545; /* red */
+  font-weight: bold;
+}
+
+/* Base styling */
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  background: #ffffff;
+  color: #333;
+  outline: none;
+}
+
+/* Floating label positioning */
+.form-field label {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px;
+  color: #757575;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  background: white;
+  padding: 0 4px;
+}
+
+/* Label floats when field is valid, focused, or has value */
+.form-field input:focus + label,
+.form-field input:not(:placeholder-shown) + label,
+.form-field input:valid + label,
+.form-field select:focus + label,
+.form-field select.ng-valid + label {
+  top: -8px;
+  font-size: 12px;
+  color: #2196f3;
+  font-weight: 600;
+}
+
+/* 🔴 Red border for invalid (required) fields after touch or submit */
+.form-field input[required].ng-invalid.ng-touched,
+.form-field select[required].ng-invalid.ng-touched,
+.form-field textarea[required].ng-invalid.ng-touched {
+  border-color: #dc3545;
+  box-shadow: 0 0 5px rgba(220, 53, 69, 0.25);
+}
+
+/* 🟢 Green border for valid (filled) fields */
+.form-field input[required].ng-valid.ng-touched,
+.form-field select[required].ng-valid.ng-touched,
+.form-field textarea[required].ng-valid.ng-touched {
+  border-color: #00a651;
+  box-shadow: 0 0 5px rgba(0, 166, 81, 0.25);
+}
+
+/* 🔴 For regular HTML select or input */
+.form-field input.ng-invalid.ng-touched,
+.form-field input.ng-invalid.ng-dirty,
+.form-field select.ng-invalid.ng-touched,
+.form-field select.ng-invalid.ng-dirty {
+  border-left: 3px solid #8f1e42 !important;
+  box-shadow: 0 0 5px rgba(255, 59, 48, 0.25);
+}
+
+/* 🔴 For NG-SELECT invalid state */
+ng-select.ng-invalid.ng-touched .ng-select-container,
+ng-select.ng-invalid.ng-dirty .ng-select-container {
+  border-left: 3px solid #8f1e42 !important;
+  box-shadow: 0 0 5px rgba(255, 59, 48, 0.25);
+}
+
+/* 🟢 For NG-SELECT valid state (optional, if you want green for valid ones) */
+ng-select.ng-valid.ng-touched .ng-select-container,
+ng-select.ng-valid.ng-dirty .ng-select-container {
+  border-left: 3px solid #00a651 !important;
+  box-shadow: 0 0 5px rgba(0, 166, 81, 0.25);
+}
 
