@@ -1,134 +1,97 @@
-  <div class="card-LE">
-    <div class="card-header-LE">Vehicle Info</div>
-    <div class="card-body-LE">
-      <form class="form-grid" [formGroup]="Vechileinfo" >
+<div class="card-LE">
+  <div class="card-header-LE">Vehicle Info</div>
 
-        <!-- Type of Shipment -->
-        <div class="form-field optional">
-          <input type="text" formControlName="typeofshipment" placeholder="" />
-          <label>Type of Shipment</label>
-          <small class="error"
-                 *ngIf="Vechileinfo.get('typeofshipment')?.touched && Vechileinfo.get('typeofshipment')?.invalid">
-            Type of Shipment is required
-          </small>
-        </div>
+  <div class="card-body-LE">
 
-        <!-- Transporter -->
-        <div class="form-field">
-          <input type="text" formControlName="transporter" placeholder="" />
-          <label>Transporter</label>
-          <small class="error"
-                 *ngIf="Vechileinfo.get('transporter')?.touched && Vechileinfo.get('transporter')?.invalid">
-           Transporter  is required
-          </small>
-        </div>
-
-        <!-- LR No -->
-        <div class="form-field">
-          <input type="text" formControlName="Lrno" placeholder="" />
-          <label>LR No</label>
-          <small class="error"
-                 *ngIf="Vechileinfo.get('Lrno')?.touched && Vechileinfo.get('Lrno')?.invalid">
-            LR No is required
-          </small>
-        </div>
-
-       <!-- Type of Vechile -->
-        <div class="form-field">
-          <input type="text" formControlName="typeofvechile" placeholder="" />
-          <label>Type of Vechile</label>
-          <small class="error"
-                 *ngIf="Vechileinfo.get('typeofvechile')?.touched && Vechileinfo.get('typeofvechile')?.invalid">
-            Type of Vechile is required
-          </small>
-        </div>
-
-      <!-- Passing Weight -->
-        <div class="form-field">
-          <input type="text" formControlName="passingweight" placeholder="" />
-          <label>Passing Weight</label>
-          <small class="error"
-                 *ngIf="Vechileinfo.get('passingweight')?.touched && Vechileinfo.get('passingweight')?.invalid">
-           Passing Weight is required
-          </small>
-        </div>
-     
-
-      <!-- Volume of the truck -->
-        <div class="form-field">
-          <input type="text" formControlName="volumeofthetruck" placeholder="" />
-          <label>Volume of the truck</label>
-          <small class="error"
-                 *ngIf="Vechileinfo.get('volumeofthetruck')?.touched && Vechileinfo.get('volumeofthetruck')?.invalid">
-          Volume of the truck is required
-          </small>
-        </div>
-       
-        
-      <!-- Vechile Number -->
-        <div class="form-field">
-          <input type="text" formControlName="vechilenumber" placeholder="" />
-          <label>Vechile Number</label>
-          <small class="error"
-                 *ngIf="Vechileinfo.get('vechilenumber')?.touched && Vechileinfo.get('vechilenumber')?.invalid">
-        Vechile Number is required
-          </small>
-        </div>
-          
-
-          <!-- No of Vechiles -->
-        <div class="form-field">
-          <input type="number" min="0"  formControlName="noofvechiles" placeholder="" />
-          <label>No of Vechiles</label>
-          <small class="error"
-                 *ngIf="Vechileinfo.get('noofvechiles')?.touched && Vechileinfo.get('noofvechiles')?.invalid">
-       No of Vechiles is required
-          </small>
-        </div>
-
-       
-          <!-- Driver Name -->
-        <div class="form-field">
-          <input type="text" formControlName="drivername" placeholder="" />
-          <label>Driver Name</label>
-          <small class="error"
-                 *ngIf="Vechileinfo.get('drivername')?.touched && Vechileinfo.get('drivername')?.invalid">
-       Driver Name is required
-          </small>
-        </div>
-
-           <!-- Driver Mobile Number -->
-        <div class="form-field">
-          <input type="tel" formControlName="drivermobilenumber" placeholder="" />
-          <label>Driver Mobile Number</label>
-          <small class="error"
-                 *ngIf="Vechileinfo.get('drivermobilenumber')?.touched && Vechileinfo.get('drivermobilenumber')?.invalid">
-       Driver Mobile Number is required
-          </small>
-        </div>
-
-       
-           <!-- Transparent Group -->
-        <div class="form-field">
-          <input type="text" formControlName="transparentgroup" placeholder="" />
-          <label>Transparent Group</label>
-          <small class="error"
-                 *ngIf="Vechileinfo.get('transparentgroup')?.touched && Vechileinfo.get('transparentgroup')?.invalid">
-      Transparent Group is required
-          </small>
-        </div>
-     
-
-        
-
-      </form>
-      <div class="text-right">
-          <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
-            Cancel
-          </button>
-          <button type="submit" class="btn btn-md btn-raised btnSave" (click)="savePlan()">
-           Save 
-          </button>
-        </div>
+    <!-- Order Type -->
+    <div class="form-radio optional">
+      <label>
+        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" />
+        <span>Inward</span>
+      </label>
+      <label>
+        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" />
+        <span>Outward</span>
+      </label>
     </div>
+
+    <br />
+
+    <!-- SAP Type -->
+    <div *ngIf="orderType" class="sap-row" style="display: flex !important;">
+      <div class="form-radio optional sap-radio">
+        <label>
+          <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeSelection()" />
+          <span>With SAP</span>
+        </label>
+        <label>
+          <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeSelection()" />
+          <span>Without SAP</span>
+        </label>
+      </div>
+
+      <!-- Invoice Input -->
+      <div class="input-row" *ngIf="sapType === 'SAP'">
+        <div class="input-flex">
+          <div class="form-field flex-1">
+            <input type="text" name="invoicenumber" [(ngModel)]="invoicenumber" placeholder=" " />
+            <label>Invoice Number</label>
+          </div>
+          <button type="button" class="btn-get" (click)="fetchVehicleDetails()"
+            [disabled]="!invoicenumber || invoicenumber.trim() === ''">GET</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div *ngIf="showTable" class="table-responsive mt-3">
+      <form [formGroup]="VehicleForm">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>SI.No</th>
+              <th>Type of Shipment</th>
+              <th>Type of transporter</th>
+              <th>LR No</th>
+              <th>Type of Vehicle</th>
+              <th>Passing Weight</th>
+              <th>Volume of Truck</th>
+              <th>Vehicle Number</th>
+              <th>No of Vehicles</th>
+              <th>Driver Name</th>
+              <th>Driver Mobile No</th>
+              <!-- <th>Transporter group</th> -->
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody formArrayName="vehicles">
+            <tr *ngFor="let group of vehicles.controls; let i = index" [formGroupName]="i">
+              <td>{{ i + 1 }}</td>
+              <td><input type="text" formControlName="ZTRX_TYPE" /></td>
+              <td><input type="text" formControlName="ZTRANSPOTER" /></td>
+              <td><input type="text" formControlName="ZLRNO" /></td>
+              <td><input type="text" formControlName="ZTRUC_TYPE" /></td>
+              <td><input type="text" formControlName="ZTRUC_WT" /></td>
+              <td><input type="number" formControlName="ZTRUC_VOL" /></td>
+              <td><input type="text" formControlName="ZVEH_NUM" /></td>
+              <td><input type="number" formControlName="ZNOOFVEH" min="1" /></td>
+              <td><input type="text" formControlName="ZDNAME" /></td>
+              <td><input type="text" formControlName="ZDNUMBER" /></td>
+              <!-- <td><input type="text" formControlName="ZTRANSPOTER" /></td> -->
+              <td class="d-flex">
+                <button type="button" (click)="addRow()">+</button>
+                <button type="button" (click)="removeRow(i)" [disabled]="vehicles.length === 1">✖</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+    </div>
+
+    <!-- Save Button -->
+    <div *ngIf="showTable" class="text-right">
+      <button type="button" class="btn btn-md btn-raised btnSave" (click)="saveVehicleInfo()">Save</button>
+    </div>
+
   </div>
+</div>
