@@ -5,11 +5,11 @@ import { GeneralserviceService } from 'src/app/generalservice.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import Swal from 'sweetalert2';
 import { SpinnerService } from 'src/app/spinner.service';
-
+import { SharedModule } from '../saas/shared/shared.module';
 @Component({
   selector: 'app-order-info',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule,SharedModule],
   templateUrl: './order-info.component.html',
   styleUrls: ['./order-info.component.css']
 })
@@ -31,40 +31,39 @@ export class OrderInfoComponent implements OnInit {
   custList: any;
   customerGroup: string = '';
 
-  constructor(private fb: FormBuilder, private service: GeneralserviceService, private spinner: NgxSpinnerService,public spinnerService: SpinnerService) { }
+  constructor(private fb: FormBuilder, private service: GeneralserviceService, private spinner: NgxSpinnerService, public spinnerService: SpinnerService) { }
 
   ngOnInit(): void {
     this.OrderInfo = this.fb.group({
-      TaxInvoice: ['',Validators.required],
-      ODN: ['',Validators.required],
-      InvoiceDate: ['',Validators.required],
-      BasicShipment: ['',Validators.required],
+      TaxInvoice: ['', Validators.required],
+      ODN: ['', Validators.required],
+      InvoiceDate: ['', Validators.required],
+      BasicShipment: ['', Validators.required],
       // Itemnumber: [''],
-      InvoiceWithGst: ['',Validators.required],
-      FinanceYear: [''],
+      InvoiceWithGst: ['', Validators.required],
       // SystemGeneratedDate: [''],
-      FiscalYear: ['',Validators.required],
-      FiscalQuarter: ['',Validators.required],
-      Month: ['',Validators.required],
-      BillingTransactionType: ['',Validators.required],
+      FiscalYear: [''],
+      FiscalQuarter: ['', Validators.required],
+      Month: ['', Validators.required],
+      BillingTransactionType: ['', Validators.required],
       // Billingdescription: [''],
-      Plant: ['',Validators.required],
+      Plant: ['', Validators.required],
       // Plantdescription: [''],
-      TransactionType: ['',Validators.required],
-      Division: ['',Validators.required],
+      TransactionType: ['', Validators.required],
+      Division: ['', Validators.required],
       // Divisiondescription: [''],
-      SubDivision: ['',Validators.required],
-      RefNumber: ['',Validators.required],
-      Customer: ['',Validators.required],
-      CustomerGroup: ['',Validators.required],
-      CNee: ['',Validators.required],
-      DestinationLocation: ['',Validators.required],
-      DestinationState: ['',Validators.required],
-      DestinationZone: ['',Validators.required],
+      SubDivision: ['', Validators.required],
+      RefNumber: ['', Validators.required],
+      Customer: ['', Validators.required],
+      CustomerGroup: ['', Validators.required],
+      CNee: ['', Validators.required],
+      DestinationLocation: ['', Validators.required],
+      DestinationState: ['', Validators.required],
+      DestinationZone: ['', Validators.required],
       // status: [''],
-      PhysicalDispatchDateTime: ['',Validators.required]
+      PhysicalDispatchDateTime: ['', Validators.required]
     });
-    
+
   }
 
   // Helper to check SAP mode
@@ -110,7 +109,7 @@ export class OrderInfoComponent implements OnInit {
 
     console.log("sapType", this.sapType);
     if (this.sapType === "SAP") {
-      this.fetchNonSAPData(); // can be replaced with SAP master fetch if available
+      // this.fetchNonSAPData(); // can be replaced with SAP master fetch if available
     } else {
       this.showForm = true;
     }
@@ -128,6 +127,7 @@ export class OrderInfoComponent implements OnInit {
       this.fetchSAPData(type);
     } else if (this.sapType === 'Non-SAP') {
       this.fetchNonSAPData();
+      this.showForm=true
     }
   }
 
@@ -144,23 +144,34 @@ export class OrderInfoComponent implements OnInit {
         // setTimeout(() => {
         // this.spinner.show('success', 'right');
         // setTimeout(() => this.spinner.hide(), 900);
-      // }, 50); 
+        // }, 50); 
       } else {
         this.showForm = false;
         this.spinner.hide()
-      //    setTimeout(() => {
-      //   this.spinner.show('error', 'left');
-      //   setTimeout(() => this.spinner.hide(), 900);
-      // }, 50);
+         Swal.fire({
+        text: 'No Data',
+        icon: 'warning',
+        timer: 5000
+      });
+        //    setTimeout(() => {
+        //   this.spinner.show('error', 'left');
+        //   setTimeout(() => this.spinner.hide(), 900);
+        // }, 50);
       }
     }, error => {
-        this.showForm = false;
-        this.spinner.hide()
-    // this.spinnerErrorMsg = 'Internal Server Error. Please try again later.';
-    // setTimeout(() => {
-    //     this.spinner.show('error', 'left');
-    //     setTimeout(() => this.spinner.hide(), 900);
-    //   }, 50);
+      this.showForm = false;
+      this.spinner.hide()
+
+      Swal.fire({
+        text: 'Internal Server Error. Please try again later.',
+        icon: 'error',
+        timer: 5000
+      });
+      // this.spinnerErrorMsg = 'Internal Server Error. Please try again later.';
+      // setTimeout(() => {
+      //     this.spinner.show('error', 'left');
+      //     setTimeout(() => this.spinner.hide(), 900);
+      //   }, 50);
     });
   }
 
@@ -171,18 +182,18 @@ export class OrderInfoComponent implements OnInit {
       RefNumber: this.OrderInfo.get('RefNumber')?.value || '',
       Customer: this.OrderInfo.get('Customer')?.value || ''
     };
-    
-    this.service.OrderInfoNonSap(obj).subscribe((res:any)=>{
 
-      console.log("non sap save ",res)
+    this.service.OrderInfoNonSap(obj).subscribe((res: any) => {
+
+      console.log("non sap save ", res)
       if (res && res.length > 0) {
-          this.patchForm(res[0]);
-          this.showForm = true;
-        } else {
-          this.resetExtraFields();
-          this.showForm = false;
-        }
-    },error =>{
+        this.patchForm(res[0]);
+        this.showForm = true;
+      } else {
+        this.resetExtraFields();
+        this.showForm = false;
+      }
+    }, error => {
       this.showForm = false;
     });
   }
@@ -195,7 +206,7 @@ export class OrderInfoComponent implements OnInit {
       BasicShipment: data.BASIC_SHIP_VALUE || '',
       Itemnumber: data.POSNR || '',
       InvoiceWithGst: data.INV_VALUE_GST || '',
-      FinanceYear: data.FISCAL_YEAR || '',
+      FiscalYear: data.FISCAL_YEAR || '',
       FiscalQuarter: data.FISCAL_QUARTER || '',
       Month: data.MONTH || '',
       PhysicalDispatchDateTime: data.PHYS_DISPATCH || '',
@@ -220,18 +231,18 @@ export class OrderInfoComponent implements OnInit {
 
 
     this.OrderInfo.markAllAsTouched();
-
-  // Stop if form is invalid
-  if (this.OrderInfo.invalid) {
-    Swal.fire({
-      title: 'Validation Error',
-      text: 'Please fill all required fields before saving.',
-      icon: 'warning',
-      confirmButtonText: 'Ok',
-      timer: 4000
-    });
-    return;
-  }
+    console.log("this.OrderInfo", this.OrderInfo)
+    // Stop if form is invalid
+    if (this.OrderInfo.invalid) {
+      Swal.fire({
+        title: 'Validation Error',
+        text: 'Please fill all required fields before saving.',
+        icon: 'warning',
+        confirmButtonText: 'Ok',
+        timer: 4000
+      });
+      return;
+    }
     const formValue = this.OrderInfo.value;
     const record = {
       INV_VBELN: formValue.TaxInvoice,
@@ -241,7 +252,7 @@ export class OrderInfoComponent implements OnInit {
 
       INV_VALUE_GST: formValue.InvoiceWithGst,
       PHYS_DISPATCH: formValue.PhysicalDispatchDateTime,
-      FISCAL_YEAR: formValue.FinanceYear,
+      FISCAL_YEAR: formValue.FiscalYear,
       FISCAL_QUARTER: formValue.FiscalQuarter,
       MONTH: formValue.Month,
       PLANT_NAME: formValue.Plant,
@@ -338,7 +349,7 @@ export class OrderInfoComponent implements OnInit {
           });
           this.spinner.hide()
         }
-      },error=>{
+      }, error => {
         this.spinner.hide()
       });
     }

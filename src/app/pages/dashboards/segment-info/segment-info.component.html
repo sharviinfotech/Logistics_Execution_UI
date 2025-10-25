@@ -78,7 +78,7 @@
     </div> -->
     <div class="form-field">
       <ng-container *ngIf="sapType === 'Non-SAP'; else sapSales">
-        <ng-select [items]="supplierList" bindLabel="SUPPLIER_NAME" bindValue="SUPPLIER_NAME"
+        <ng-select [items]="supplierList" bindLabel="SUPPLIER_NAME" bindValue="SUPPLIER_NAME" required
           formControlName="SALES_EMP" [searchable]="true" [virtualScroll]="true" placeholder="Select Sales Person"
           class="w-full">
           <ng-template ng-option-tmp let-item="item">
@@ -113,7 +113,7 @@
     <div class="form-field">
       <ng-container *ngIf="sapType === 'Non-SAP'; else sapSegment">
         <!-- Dropdown for Non-SAP (F4 search) -->
-        <select formControlName="SEGMENT">
+        <select formControlName="SEGMENT" required>
           <option value="">Select Segment</option>
           <option *ngFor="let seg of segmentList" [value]="seg.SEGMENT_DESC">
             {{ seg.SEGMENT }} - {{ seg.SEGMENT_DESC }}
@@ -176,7 +176,7 @@
 
     <!-- ETA -->
     <div class="form-field">
-      <input type="text" formControlName="ETA_DATE" placeholder="" />
+      <input type="text" formControlName="ETA_DATE" placeholder=""  />
       <label>ETA</label>
     </div>
 

@@ -7,12 +7,13 @@ import { SessionServiceService } from './pages/ui/session-service.service';
 import { NotificationService } from './notification.service';
 import { GeneralserviceService } from './generalservice.service';
 import { SpinnerService } from './spinner.service';
+import { SharedModule } from './cyptolanding/shared/shared.module';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   standalone: true,
-  imports: [RouterOutlet,CommonModule,NgxSpinnerModule],
+  imports: [RouterOutlet,CommonModule,NgxSpinnerModule,SharedModule],
 })
 export class AppComponent implements OnInit {
   data: any[] = []
