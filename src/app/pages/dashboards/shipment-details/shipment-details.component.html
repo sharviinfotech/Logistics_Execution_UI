@@ -57,6 +57,9 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
+                            <th>
+                                <input type="checkbox"  (change)="toggleAllSelection($event)"[checked]="isAllSelected"/>
+                            </th>
                             <th>SI.No.</th>
                             <th>Product</th>
                             <th>Type of Material</th>
@@ -74,6 +77,9 @@
 
                     <tbody formArrayName="items">
                         <tr *ngFor="let itemGroup of items.controls; let i = index" [formGroupName]="i">
+                            <td>
+                                <input type="checkbox" formControlName="selected"  (change)="onRowCheckboxChange()">
+                            </td>
                             <td>{{ i + 1 }}</td>
 
                             <td>
