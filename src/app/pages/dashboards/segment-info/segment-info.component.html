@@ -62,7 +62,7 @@
   <form class="form-grid" [formGroup]="segmentInfo" *ngIf="showForm">
 
     <!-- Sales Person -->
-    <!-- <div class="form-field">
+    <div class="form-field">
       <ng-container *ngIf="sapType === 'Non-SAP'; else sapSales">
         <select formControlName="SALES_EMP">
           <option value="">Select Sales Person</option>
@@ -75,8 +75,8 @@
         <input type="text" formControlName="SALES_EMP" readonly />
       </ng-template>
       <label>Sales Person</label>
-    </div> -->
-    <div class="form-field">
+    </div>
+    <!-- <div class="form-field">
       <ng-container *ngIf="sapType === 'Non-SAP'; else sapSales">
         <ng-select [items]="supplierList" bindLabel="SUPPLIER_NAME" bindValue="SUPPLIER_NAME" required
           formControlName="SALES_EMP" [searchable]="true" [virtualScroll]="true" placeholder="Select Sales Person"
@@ -92,7 +92,7 @@
       </ng-template>
 
       <label>Sales Person</label>
-    </div>
+    </div> -->
 
     <!-- Segment -->
     <!-- <div class="form-field">
@@ -110,17 +110,16 @@
       <label>Segment</label>
     </div> -->
     <!-- Segment -->
-    <div class="form-field">
+    <!-- Segment -->
+    <div class="form-field" [class.filled]="segmentInfo.get('SEGMENT')?.value">
       <ng-container *ngIf="sapType === 'Non-SAP'; else sapSegment">
-        <!-- Dropdown for Non-SAP (F4 search) -->
         <select formControlName="SEGMENT" required>
-          <option value="">Select Segment</option>
+          <option value="" disabled hidden>Select Segment</option>
           <option *ngFor="let seg of segmentList" [value]="seg.SEGMENT_DESC">
             {{ seg.SEGMENT }} - {{ seg.SEGMENT_DESC }}
           </option>
         </select>
       </ng-container>
-
       <!-- Input for SAP -->
       <ng-template #sapSegment>
         <input type="text" formControlName="SEGMENT" placeholder=" " />
@@ -128,7 +127,6 @@
 
       <label>Segment</label>
     </div>
-
 
     <!-- Customer Profile -->
     <div class="form-field">
@@ -176,7 +174,7 @@
 
     <!-- ETA -->
     <div class="form-field">
-      <input type="text" formControlName="ETA_DATE" placeholder=""  />
+      <input type="text" formControlName="ETA_DATE" placeholder="" />
       <label>ETA</label>
     </div>
 

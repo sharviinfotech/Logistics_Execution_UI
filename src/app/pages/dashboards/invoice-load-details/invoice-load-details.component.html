@@ -1,10 +1,10 @@
 <div class="card-LE">
-    <div class="card-header-LE">Invoice Load Details</div>
-    <div class="card-body-LE">
-      <form class="form-grid" [formGroup]="invoiceLoadDetails">
+  <div class="card-header-LE">Invoice Load Details</div>
+  <div class="card-body-LE">
+    <form class="form-grid" [formGroup]="invoiceLoadDetails">
 
-        
-        <!-- <div class="form-field">
+
+      <!-- <div class="form-field">
           <input type="text" formControlName="gstinvoicenumber" placeholder="" />
           <label>GST invoice Number</label>
           <small class="error" *ngIf="invoiceLoadDetails.get('gstinvoicenumber')?.touched && invoiceLoadDetails.get('gstinvoicenumber')?.invalid">
@@ -57,52 +57,57 @@
           </small>
         </div> -->
 
-        <!-- Vehicle Number -->
-        <div class="form-field">
-          <input type="number" min="0"  formControlName="actualloadintons"  placeholder=""  min="0" step="1" />
-          <label>Actual load in tons</label>
-          <small class="error" *ngIf="invoiceLoadDetails.get('actualloadintons')?.touched && invoiceLoadDetails.get('actualloadintons')?.invalid">
-            Actual load in tons is required
-          </small>
-        </div>
+      <!-- Vehicle Number -->
+      <div class="form-field">
+        <input type="number" min="0" formControlName="actualloadintons" placeholder="" min="0" step="1" />
+        <label>Actual load in tons</label>
+        <small class="error"
+          *ngIf="invoiceLoadDetails.get('actualloadintons')?.touched && invoiceLoadDetails.get('actualloadintons')?.invalid">
+          Actual load in tons is required
+        </small>
+      </div>
 
-        <!-- Number of Vehicles -->
-        <div class="form-field">
-          <input type="text" formControlName="actualvolumeoccupied" placeholder="" />
-          <label>Actual volume Occupied</label>
-          <small class="error" *ngIf="invoiceLoadDetails.get('actualvolumeoccupied')?.touched && invoiceLoadDetails.get('actualvolumeoccupied')?.invalid">
-            Actual volume Occupied is required
-          </small>
-        </div>
+      <!-- Number of Vehicles -->
+      <div class="form-field">
+        <input type="text" formControlName="actualvolumeoccupied" placeholder="" />
+        <label>Actual volume Occupied</label>
+        <small class="error"
+          *ngIf="invoiceLoadDetails.get('actualvolumeoccupied')?.touched && invoiceLoadDetails.get('actualvolumeoccupied')?.invalid">
+          Actual volume Occupied is required
+        </small>
+      </div>
 
-        <div class="form-field">
-          <input type="text" formControlName="loadingfactorwrtvolume" placeholder="" />
-          <label>Loading factor w.r.t Volume</label>
-          <small class="error" *ngIf="invoiceLoadDetails.get('loadingfactorwrtvolume')?.touched && invoiceLoadDetails.get('loadingfactorwrtvolume')?.invalid">
-           Loading factor w.r.t Volume is required
-          </small>
-        </div>
+      <div class="form-field">
+        <input type="text" formControlName="loadingfactorwrtvolume" placeholder="" />
+        <label>Loading factor w.r.t Volume</label>
+        <small class="error"
+          *ngIf="invoiceLoadDetails.get('loadingfactorwrtvolume')?.touched && invoiceLoadDetails.get('loadingfactorwrtvolume')?.invalid">
+          Loading factor w.r.t Volume is required
+        </small>
+      </div>
 
-        <!-- Driver Mobile Number -->
-        <div class="form-field">
-          <input type="text" formControlName="loadingfactorwrtweight" placeholder="" />
-          <label>Loading factor w.r.t Weight</label>
-          <small class="error" *ngIf="invoiceLoadDetails.get('loadingfactorwrtweight')?.touched && invoiceLoadDetails.get('loadingfactorwrtweight')?.invalid">
-            Loading factor w.r.t Weight is required
-          </small>
-        </div>
+      <!-- Driver Mobile Number -->
+      <div class="form-field">
+        <input type="text" formControlName="loadingfactorwrtweight" placeholder="" />
+        <label>Loading factor w.r.t Weight</label>
+        <small class="error"
+          *ngIf="invoiceLoadDetails.get('loadingfactorwrtweight')?.touched && invoiceLoadDetails.get('loadingfactorwrtweight')?.invalid">
+          Loading factor w.r.t Weight is required
+        </small>
+      </div>
 
-        <!-- Transport Group -->
-        <div class="form-field">
-          <input type="text" formControlName="weekwiseshipmentflow" placeholder="" />
-          <label>Week wise Shipment flow</label>
-          <small class="error" *ngIf="invoiceLoadDetails.get('weekwiseshipmentflow')?.touched && invoiceLoadDetails.get('weekwiseshipmentflow')?.invalid">
-            Week wise Shipment flow is required
-          </small>
-        </div>
+      <!-- Transport Group -->
+      <div class="form-field">
+        <input type="text" formControlName="weekwiseshipmentflow" placeholder="" />
+        <label>Week wise Shipment flow</label>
+        <small class="error"
+          *ngIf="invoiceLoadDetails.get('weekwiseshipmentflow')?.touched && invoiceLoadDetails.get('weekwiseshipmentflow')?.invalid">
+          Week wise Shipment flow is required
+        </small>
+      </div>
 
-        <!-- Driver Name -->
-        <!-- <div class="form-field">
+      <!-- Driver Name -->
+      <!-- <div class="form-field">
           <input type="text" formControlName="shipmentvolume" placeholder="" />
           <label>Shipment volume</label>
           <small class="error" *ngIf="invoiceLoadDetails.get('shipmentvolume')?.touched && invoiceLoadDetails.get('shipmentvolume')?.invalid">
@@ -110,39 +115,40 @@
           </small>
         </div> -->
 
-        
-           <div class="form-field">
-              <input type="number" min="0"  formControlName="EwayBill" placeholder=" "  />
-              <label>Eway Bill Number</label>
-              <small class="error" *ngIf="invoiceLoadDetails.get('EwayBill')?.touched && invoiceLoadDetails.get('EwayBill')?.invalid">
-                Week wise Shipment flow is required
-              </small>
-           </div>
 
-           <div class="form-field">
-              <input type="date" formControlName="EwayBillExpiryDate" placeholder=" "  />
-              <label>Eway Bill Expiry Date</label>
-              <small class="error" *ngIf="invoiceLoadDetails.get('EwayBillExpiryDate')?.touched && invoiceLoadDetails.get('EwayBillExpiryDate')?.invalid">
-                Eway Bill Expiry Date flow is required
-              </small>
-           </div>
+      <div class="form-field">
+        <input type="number" min="0" formControlName="EwayBill" placeholder=" " />
+        <label>Eway Bill Number</label>
+        <small class="error"
+          *ngIf="invoiceLoadDetails.get('EwayBill')?.touched && invoiceLoadDetails.get('EwayBill')?.invalid">
+          Week wise Shipment flow is required
+        </small>
+      </div>
+
+      <div class="form-field">
+        <input type="date" formControlName="EwayBillExpiryDate" placeholder=" " />
+        <label>Eway Bill Expiry Date</label>
+        <small class="error"
+          *ngIf="invoiceLoadDetails.get('EwayBillExpiryDate')?.touched && invoiceLoadDetails.get('EwayBillExpiryDate')?.invalid">
+          Eway Bill Expiry Date flow is required
+        </small>
+      </div>
 
 
-        
 
-        
 
-        
 
-      </form>
-      <div class="text-right">
-          <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
-            Cancel
-          </button>
-          <button type="submit" class="btn btn-md btn-raised btnSave" (click)="savePlan()">
-           Save
-          </button>
-        </div>
+
+
+
+    </form>
+    <div class="text-right">
+      <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-md btn-raised btnSave" (click)="savePlan()">
+        Save
+      </button>
     </div>
   </div>
-
+</div>

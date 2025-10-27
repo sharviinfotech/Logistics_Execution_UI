@@ -9,7 +9,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 @Component({
   selector: 'app-segment-info',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule,NgSelectModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, NgSelectModule],
   templateUrl: './segment-info.component.html',
   styleUrls: ['./segment-info.component.css']
 })
@@ -61,12 +61,24 @@ export class SegmentInfoComponent implements OnInit {
     this.previousOrderType = this.orderType;
   }
 
-  // Handle SAP Type (With / Without)
+  // // Handle SAP Type (With / Without)
+  // onSapTypeChange() {
+  //   if (this.sapType === 'Non-SAP') {
+  //     this.showForm = true;
+  //     this.fetchDropdownData();
+  //   } else {
+  //     this.showForm = false;
+  //   }
+  // }
   onSapTypeChange() {
     if (this.sapType === 'Non-SAP') {
+      // Clear old SAP data before showing Non-SAP form
+      this.segmentInfo.reset();
       this.showForm = true;
       this.fetchDropdownData();
-    } else {
+    } else if (this.sapType === 'SAP') {
+      // Reset form when switching back to SAP mode
+      this.segmentInfo.reset();
       this.showForm = false;
     }
   }
@@ -88,6 +100,7 @@ export class SegmentInfoComponent implements OnInit {
       this.fetchSAPData(type);
     }
   }
+
 
   // Fetch SAP data
   fetchSAPData(type: 'purchase' | 'invoice') {
@@ -130,7 +143,7 @@ export class SegmentInfoComponent implements OnInit {
     this.spinner.show();
     this.service.getssc().subscribe((res: any) => {
       this.spinner.hide();
-      console.log("fetchDropdownData res",res)
+      console.log("fetchDropdownData res", res)
       const data = res[0];
       this.supplierList = data.SUPPLIERS || [];
       this.segmentList = data.SEGMENTS || [];
