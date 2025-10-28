@@ -52,26 +52,23 @@ export class FreightBillingComponent implements OnInit {
   }
 
   onSapTypeChange(): void {
-    this.showForm = !!(this.orderType && this.sapType);
-
-    // reset values
-    this.FreightBilling.patchValue({
-      ponumber: '',
-      invoicenumber: ''
-    });
-
-    // set required fields dynamically
-    if (this.orderType === 'Inward') {
-      this.FreightBilling.get('ponumber')?.setValidators([Validators.required]);
-      this.FreightBilling.get('invoicenumber')?.clearValidators();
-    } else if (this.orderType === 'Outward') {
-      this.FreightBilling.get('invoicenumber')?.setValidators([Validators.required]);
-      this.FreightBilling.get('ponumber')?.clearValidators();
-    }
-
-    this.FreightBilling.get('ponumber')?.updateValueAndValidity();
-    this.FreightBilling.get('invoicenumber')?.updateValueAndValidity();
+  this.FreightBilling.reset();
+  this.showForm = !!(this.orderType && this.sapType);
+  if (this.orderType === 'Inward') {
+    this.FreightBilling.get('ponumber')?.setValidators([Validators.required]);
+    this.FreightBilling.get('invoicenumber')?.clearValidators();
+  } else if (this.orderType === 'Outward') {
+    this.FreightBilling.get('invoicenumber')?.setValidators([Validators.required]);
+    this.FreightBilling.get('ponumber')?.clearValidators();
+  } else {
+    this.FreightBilling.get('ponumber')?.clearValidators();
+    this.FreightBilling.get('invoicenumber')?.clearValidators();
   }
+  this.FreightBilling.get('ponumber')?.updateValueAndValidity();
+  this.FreightBilling.get('invoicenumber')?.updateValueAndValidity();
+  console.log('SAP Type changed to:', this.sapType, '| Form reset done.');
+}
+
 
   cancelEdit(): void {
     this.resetForm();

@@ -58,9 +58,6 @@
           <div *ngIf="orderType === 'Inward'" class="form-field">
         <input type="text" formControlName="ponumber" placeholder=" " />
         <label>PO Number</label>
-        <small class="error" *ngIf="transitInfo.get('ponumber')?.touched && transitInfo.get('ponumber')?.invalid">
-          PO Number is required
-        </small>
       </div>
 
       <div *ngIf="orderType === 'Outward'" class="form-field">
@@ -70,7 +67,7 @@
 
           <!-- Freight Bill Number -->
           <div class="form-field">
-            <input type="number" min="0" formControlName="FreightBillNumber" placeholder=" " required/>
+            <input type="number" min="0" formControlName="FreightBillNumber" placeholder=" " />
             <label>Freight Bill Number</label>
           </div>
 
@@ -90,7 +87,7 @@
 
           <!-- Freight Charges -->
           <div class="form-field">
-            <input type="number" min="0"  formControlName="FreightCharges" placeholder=" "  required/>
+            <input type="number" min="0"  formControlName="FreightCharges" placeholder=" "  />
             <label>Freight Charges</label>
             
           </div>
@@ -111,7 +108,7 @@
          
 
         </form>
-        <div class="text-right">
+        <div class="text-right" *ngIf="showForm">
           <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
             Cancel
           </button>

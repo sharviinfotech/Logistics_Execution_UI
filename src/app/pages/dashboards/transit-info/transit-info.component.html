@@ -56,9 +56,7 @@
         <div *ngIf="orderType === 'Inward'" class="form-field">
         <input type="text" formControlName="ponumber" placeholder=" " />
         <label>PO Number</label>
-        <small class="error" *ngIf="transitInfo.get('ponumber')?.touched && transitInfo.get('ponumber')?.invalid">
-          PO Number is required
-        </small>
+        
       </div>
 
       <div *ngIf="orderType === 'Outward'" class="form-field">
@@ -70,35 +68,27 @@
         <div class="form-field">
           <input type="date" formControlName="physicalarrivedatdestinationdateandtime"  placeholder="" />
           <label>Physical arrived at destination date</label>
-          <small class="error" *ngIf="transitInfo.get('physicalarrivedatdestinationdateandtime')?.touched && transitInfo.get('physicalarrivedatdestinationdateandtime')?.invalid">
-          Physical arrived at destination  is required
-          </small>
+          
         </div>
 
         <!-- Customer Profile -->
         <div class="form-field">
           <input type="datetime-local" formControlName="unloadingdateandtime"(change)="updateSIT()" placeholder="" />
           <label>Unloading date and time</label>
-          <small class="error" *ngIf="transitInfo.get('unloadingdateandtime')?.touched && transitInfo.get('unloadingdateandtime')?.invalid">
-          Unloading date and time is required
-          </small>
+          
         </div>
 
         <div class="form-field">
           <input type="datetime-local" formControlName="podscanreceiveddateandtime" (change)="updateSIT()" placeholder="" />
           <label>POD scan received date and time</label>
-          <small class="error" *ngIf="transitInfo.get('podscanreceiveddateandtime')?.touched && transitInfo.get('podscanreceiveddateandtime')?.invalid">
-           POD scan received date and time is required
-          </small>
+          
         </div>
 
         <!-- Branch -->
         <div class="form-field">
           <input type="text" formControlName="sit" readonly placeholder="" />
           <label>SIT/SALE</label>
-          <small class="error" *ngIf="transitInfo.get('sit')?.touched && transitInfo.get('sit')?.invalid">
-           SIT/SALE is required
-          </small>
+          
         </div>
 
         <!-- Branch Zone -->
@@ -110,7 +100,7 @@
        
 
       </form>
-      <div class="text-right">
+      <div class="text-right" *ngIf="showForm" >
           <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
             Cancel
           </button>

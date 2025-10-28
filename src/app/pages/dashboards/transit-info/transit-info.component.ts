@@ -18,7 +18,7 @@ export class TransitInfoComponent implements OnInit {
 
   orderType: string = ''; // Inward / Outward
   sapType: string = '';   // With SAP / Without SAP
-  showForm: boolean = false;
+  showForm = false;
   isEditMode: boolean = false;
 
   constructor(
@@ -64,26 +64,36 @@ export class TransitInfoComponent implements OnInit {
     this.transitInfo.reset();
   }
 
-  // ✅ SAP Type change (With / Without SAP)
-  onSapTypeChange(): void {
-    this.showForm = !!(this.orderType && this.sapType);
+  
+ // SAP Type change (With / Without SAP)
+onSapTypeChange(): void {
+  // 1) Fully reset the form to clear any previous values
+  this.transitInfo.reset();
 
-    this.transitInfo.patchValue({
-      ponumber: '',
-      invoicenumber: ''
-    });
+  // 2) Set view flag only when both orderType and sapType are selected
+  this.showForm = !!(this.orderType && this.sapType);
 
-    if (this.orderType === 'Inward') {
-      this.transitInfo.get('ponumber')?.setValidators([Validators.required]);
-      this.transitInfo.get('invoicenumber')?.clearValidators();
-    } else if (this.orderType === 'Outward') {
-      this.transitInfo.get('invoicenumber')?.setValidators([Validators.required]);
-      this.transitInfo.get('ponumber')?.clearValidators();
-    }
-
-    this.transitInfo.get('ponumber')?.updateValueAndValidity();
-    this.transitInfo.get('invoicenumber')?.updateValueAndValidity();
+  // 3) Reapply validators based on order type
+  if (this.orderType === 'Inward') {
+    this.transitInfo.get('ponumber')?.setValidators([Validators.required]);
+    this.transitInfo.get('invoicenumber')?.clearValidators();
+  } else if (this.orderType === 'Outward') {
+    this.transitInfo.get('invoicenumber')?.setValidators([Validators.required]);
+    this.transitInfo.get('ponumber')?.clearValidators();
+  } else {
+    // no order selected — clear validators
+    this.transitInfo.get('ponumber')?.clearValidators();
+    this.transitInfo.get('invoicenumber')?.clearValidators();
   }
+
+  // 4) Update validity so UI errors / touched status are consistent
+  this.transitInfo.get('ponumber')?.updateValueAndValidity();
+  this.transitInfo.get('invoicenumber')?.updateValueAndValidity();
+
+  // 5) Optional: console log to debug flow
+  console.log('onSapTypeChange -> sapType:', this.sapType, ' showForm:', this.showForm);
+}
+
 
   // ✅ Format helpers
   private formatDate(date: string): string {

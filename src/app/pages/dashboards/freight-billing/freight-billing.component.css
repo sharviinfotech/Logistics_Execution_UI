@@ -312,6 +312,13 @@ input[type="radio"] {
   color: #4a90e2;
   font-weight: 500;
 }
+input:focus + label,
+input:not(:placeholder-shown) + label {
+  top: -8px;
+  font-size: 12px;
+  color: #2196f3;
+  font-weight: 600;
+}
 
 .no-asterisk::after {
   content: none !important;
@@ -325,95 +332,3 @@ input[type="radio"] {
    ---------------------------- */
 
 /* Base input and select styling */
-.form-field input[type="text"],
-.form-field input[type="datetime-local"],
-.form-field select {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e0e0e0;
-  /* border-radius: 8px; */
-  font-size: 15px;
-  transition: all 0.3s ease;
-  background: #ffffff;
-  color: #333;
-  outline: none;
-}
-
-/* Focus state */
-.form-field input[type="text"]:focus,
-.form-field input[type="datetime-local"]:focus,
-.form-field select:focus {
-  border-color: #dedfe0;
-  box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1);
-  transform: translateY(-2px);
-}
-
-/* ----------------------------
-   🟢 Valid state (filled or fetched)
-   ---------------------------- */
-
-/* When form control is valid and touched or dirty */
-.form-field input.ng-valid.ng-touched,
-.form-field input.ng-valid.ng-dirty,
-.form-field select.ng-valid.ng-touched,
-.form-field select.ng-valid.ng-dirty,
-.form-field input.ng-valid:not(.ng-touched):not(.ng-untouched),
-.form-field select.ng-valid:not(.ng-touched):not(.ng-untouched) {
-  border-left-color: #00A651; /* Green */
-  box-shadow: 0 0 5px rgba(0, 166, 81, 0.25);
-}
-
-/* ----------------------------
-   🔴 Invalid state (empty when submitted)
-   ---------------------------- */
-
-/* Invalid field after being touched or dirty */
-.form-field input.ng-invalid.ng-touched,
-.form-field input.ng-invalid.ng-dirty,
-.form-field select.ng-invalid.ng-touched,
-.form-field select.ng-invalid.ng-dirty {
-  border-left-color: #8f1e42; /* Red */
-  box-shadow: 0 0 5px rgba(255, 59, 48, 0.25);
-}
-
-/* ----------------------------
-   🟠 When form is submitted and invalid
-   ---------------------------- */
-
-/* Highlight invalid inputs when form submitted */
-.ng-submitted .form-field input.ng-invalid,
-.ng-submitted .form-field select.ng-invalid {
-  border-left-color: #FF3B30 !important;
- box-shadow: 0 0 5px white;
-}
-
-
-.form-field label {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 15px;
-  color: #757575;
-  pointer-events: none;
-  transition: all 0.3s ease;
-  background: white;
-  padding: 0 4px;
-}
-
-.form-field input[type="text"]:focus+label,
-.form-field input[type="text"]:not(:placeholder-shown)+label,
-.form-field input[type="datetime-local"]:valid+label,
-.form-field select:focus+label,
-.form-field select.ng-valid+label {
-  top: -8px;
-  font-size: 12px;
-  color: #2196f3;
-  font-weight: 600;
-}
-input:focus + label,
-input:not(:placeholder-shown) + label {
-  top: -10px;
-  font-size: 12px;
-  color: #000;
-}
