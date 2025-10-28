@@ -143,7 +143,7 @@ export class GeneralserviceService {
   ShipmentOutwardSave(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/ShipmentDetails/Outward/Save', obj);
   }
-   getTypeofmaterial() {
+  getTypeofmaterial() {
     return this.http.get<any>(environment.baseUrl + 'api/external/LE/ShipmentDetails/Nonsap/f4_Typeofmaterial');
   }
   Incoterms(obj) {
@@ -170,8 +170,8 @@ export class GeneralserviceService {
   fetchzoneTat(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/withoutsap/fetchzone', obj);
   }
- 
-   TransitInfoSave(obj) {
+
+  TransitInfoSave(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/TransitInfo/Outward/WithSap/Save', obj);
   }
   TransitInfoNonSap(obj) {
@@ -192,6 +192,17 @@ export class GeneralserviceService {
   VehicleInfoNonSap(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/Vehicleinfo/NonSap/Save', obj);
   }
-
+  Invoiceloaddetailsfetch(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/InvoiceloadDetails/Outward/fetchInvoiceList', obj);
+  }
+  sapget(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/InvoiceloadDetails/Outward/sapget', obj);
+  }
+  InvoiceloaddetailsSave(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/InvoiceloadDetails/Outward/save', obj);
+  }
+  InvoiceloaddetailsNonSap(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/InvoiceloadDetails/NonSap/Save', obj);
+  }
 
 }
