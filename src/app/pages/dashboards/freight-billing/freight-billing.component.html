@@ -1,29 +1,17 @@
 <div class="card-LE">
-      <div class="card-header-LE">
-        Freight billing
-      </div>
+  <div class="card-header-LE">
+    Freight billing
+  </div>
 
-      <div class="card-body-LE">
+  <div class="card-body-LE">
 
-        <div class="form-radio optional">
+    <div class="form-radio optional">
       <label>
-        <input
-          type="radio"
-          name="orderType"
-          [(ngModel)]="orderType"
-          value="Inward"
-          (change)="onOrderTypeChange()"
-        />
+        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
         <span>Inward</span>
       </label>
       <label>
-        <input
-          type="radio"
-          name="orderType"
-          [(ngModel)]="orderType"
-          value="Outward"
-          (change)="onOrderTypeChange()"
-        />
+        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
         <span>Outward</span>
       </label>
     </div>
@@ -34,89 +22,169 @@
     <div *ngIf="orderType" class="sap-row" style="display: flex !important;">
       <div class="form-radio optional sap-radio">
         <label>
-          <input
-            type="radio"
-            [(ngModel)]="sapType"
-            value="SAP"
-            (change)="onSapTypeChange()"
-          />
+          <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
           <span>With SAP</span>
         </label>
         <label>
-          <input
-            type="radio"
-            [(ngModel)]="sapType"
-            value="Non-SAP"
-            (change)="onSapTypeChange()"
-          />
+          <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
           <span>Without SAP</span>
         </label>
       </div>
     </div>
-        <form class="form-grid" [formGroup]="FreightBilling" *ngIf="showForm" >
+    <form class="form-grid" [formGroup]="FreightBilling" *ngIf="showForm">
 
-          <div *ngIf="orderType === 'Inward'" class="form-field">
+      <div *ngIf="orderType === 'Inward'" class="form-field">
         <input type="text" formControlName="ponumber" placeholder=" " />
         <label>PO Number</label>
       </div>
 
       <div *ngIf="orderType === 'Outward'" class="form-field">
         <input type="text" formControlName="invoicenumber" placeholder=" " />
-        <label>Invoice Number</label> 
+        <label>Invoice Number</label>
       </div>
 
-          <!-- Freight Bill Number -->
-          <div class="form-field">
-            <input type="number" min="0" formControlName="FreightBillNumber" placeholder=" " />
-            <label>Freight Bill Number</label>
-          </div>
-
-          <!-- Freight Bill Date -->
-          <div class="form-field">
-            <input type="date" formControlName="FreightBillDate" placeholder=" " />
-            <label>Freight Bill Date</label>
-            
-          </div>
-
-          <!-- Freight Bill Physical Submission Date -->
-          <div class="form-field">
-            <input type="date" formControlName="FreightBillPhysicalSubmissionDate" placeholder=" " />
-            <label>Freight Bill Physical Submission Date</label>
-            
-          </div>
-
-          <!-- Freight Charges -->
-          <div class="form-field">
-            <input type="number" min="0"  formControlName="FreightCharges" placeholder=" "  />
-            <label>Freight Charges</label>
-            
-          </div>
-
-          <!-- Work Order Number -->
-          <div class="form-field">
-            <input type="text" formControlName="WorkOrderNumber" placeholder=" " />
-            <label>Work Order Number</label>
-            
-          </div>
-
-           <div class="form-field">
-            <input type="text" formControlName="BillSubmission" placeholder=" " />
-            <label>Bill Submission To F&A</label>
-           
-          </div>
-
-         
-
-        </form>
-        <div class="text-right" *ngIf="showForm">
-          <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
-            Cancel
-          </button>
-          <button type="submit" class="btn btn-md btn-raised btnSave" (click)="saveFreightBilling()">
-           Save
-          </button>
-        </div>
+      <!-- Freight Bill Number -->
+      <div class="form-field">
+        <input type="number" min="0" formControlName="FreightBillNumber" placeholder=" " />
+        <label>Freight Bill Number</label>
       </div>
+
+      <!-- Freight Bill Date -->
+      <div class="form-field">
+        <input type="date" formControlName="FreightBillDate" placeholder=" " />
+        <label>Freight Bill Date</label>
+
+      </div>
+
+      <!-- Freight Bill Physical Submission Date -->
+      <div class="form-field">
+        <input type="date" formControlName="FreightBillPhysicalSubmissionDate" placeholder=" " />
+        <label>Freight Bill Physical Submission Date</label>
+
+      </div>
+
+      <!-- Freight Charges -->
+      <div class="form-field">
+        <input type="number" min="0" formControlName="FreightCharges" (click)="openModal(calculateTotalpopup)"
+          (keyup)="onKeyUpFreight($event)" (keydown.enter)="onEnterFreight($event)" (keydown.tab)="onTabFreight($event)"
+          (blur)="onBlurFreight($event)" placeholder=" " />
+        <label>Freight Charges</label>
+
+      </div>
+
+      <!-- Work Order Number -->
+      <div class="form-field">
+        <input type="text" formControlName="WorkOrderNumber" placeholder=" " />
+        <label>Work Order Number</label>
+
+      </div>
+
+      <div class="form-field">
+        <input type="text" formControlName="BillSubmission" placeholder=" " />
+        <label>Bill Submission To F&A</label>
+
+      </div>
+
+
+
+    </form>
+    <div class="text-right" *ngIf="showForm">
+      <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-md btn-raised btnSave" (click)="saveFreightBilling()">
+        Save
+      </button>
     </div>
+  </div>
+</div>
+
+<ng-template #calculateTotalpopup let-c="close">
+  <div class="modal-header">
+    Detailed Freight Charges Input
+  </div>
+  <div class="modal-body">
+
+    <form class="form-grid">
+      <div class="form-field">
+
+        <input type="text" [(ngModel)]="freightDetails.basicFreight" [ngModelOptions]="{standalone: true}"
+          (ngModelChange)="calculateTotal()">
+        <label>Basic freight</label>
+      </div>
+
+      <div class="form-field">
+
+        <input type="text" [(ngModel)]="freightDetails.detentionLoading" [ngModelOptions]="{standalone: true}"
+          (ngModelChange)="calculateTotal()">
+        <label>Detention charges at loading point</label>
+      </div>
+
+      <div class="form-field">
+
+        <input type="text" [(ngModel)]="freightDetails.detentionUnloading" [ngModelOptions]="{standalone: true}"
+          (ngModelChange)="calculateTotal()">
+        <label>Detention charges at unloading point</label>
+      </div>
+
+      <div class="form-field">
+
+        <input type="text" [(ngModel)]="freightDetails.loadingCharges" [ngModelOptions]="{standalone: true}"
+          (ngModelChange)="calculateTotal()">
+        <label>Loading charges</label>
+      </div>
+
+      <div class="form-field">
+
+        <input type="text" [(ngModel)]="freightDetails.unloadingCharges" [ngModelOptions]="{standalone: true}"
+          (ngModelChange)="calculateTotal()">
+        <label>Unloading charges</label>
+      </div>
+
+      <div class="form-field">
+
+        <input type="text" [(ngModel)]="freightDetails.routeChangeCharges" [ngModelOptions]="{standalone: true}"
+          (ngModelChange)="calculateTotal()">
+        <label>Route change charges</label>
+      </div>
+
+      <div class="form-field">
+
+        <input type="text" [(ngModel)]="freightDetails.transhipmentCharges" [ngModelOptions]="{standalone: true}"
+          (ngModelChange)="calculateTotal()">
+        <label>Transhipment charges</label>
+      </div>
+
+      <div class="form-field">
+
+        <input type="text" [(ngModel)]="freightDetails.otherCharges" [ngModelOptions]="{standalone: true}"
+          (ngModelChange)="calculateTotal()">
+        <label>Other charges</label>
+      </div>
+
+      <hr>
+
+      <div class="form-field deduction">
+
+        <input type="text" [(ngModel)]="freightDetails.deduction" [ngModelOptions]="{standalone: true}"
+          (ngModelChange)="calculateTotal()">
+        <label>Deduction if any</label>
+      </div>
+
+      <hr>
+
+      <div class="total-display">
+        Total Freight: {{ totalFreight | number: '1.2-2' }}
+      </div>
+    </form>
 
 
+
+  </div>
+
+  <div class="card-footer" style="text-align: right;">
+    <button type="button" class="btn btn-md btn-raised btnSave" (click)="saveAndCloseModal()">Add Entered Value</button>
+
+    <button type="button" class="btn btn-md btn-raised btnCancel" (click)="cancelModal()">Cancel</button>
+  </div>
+</ng-template>

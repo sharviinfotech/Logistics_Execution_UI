@@ -6,7 +6,18 @@ import { GeneralserviceService } from 'src/app/generalservice.service';
 
 import { NgxSpinnerService } from 'ngx-spinner';
 import Swal from 'sweetalert2';
-
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+interface FreightDetails {
+  basicFreight: number;
+  detentionLoading: number;
+  detentionUnloading: number;
+  loadingCharges: number;
+  unloadingCharges: number;
+  routeChangeCharges: number;
+  transhipmentCharges: number;
+  otherCharges: number;
+  deduction: number;
+}
 @Component({
   selector: 'app-freight-billing',
   standalone: true,
@@ -21,15 +32,19 @@ export class FreightBillingComponent implements OnInit {
   orderType: string = '';
   sapType: string = '';
   showForm = false;
-
+freightDetails: FreightDetails;
+totalFreight: number = 0;
   constructor(
     private fb: FormBuilder,
     private service: GeneralserviceService,
-    private spinner: NgxSpinnerService
-  ) {}
+    private spinner: NgxSpinnerService,private modalService: NgbModal,
+  ) {
+    this.freightDetails = this.resetDetails();
+  }
 
   ngOnInit(): void {
     this.initializeForm();
+    
   }
 
   initializeForm(): void {
@@ -43,6 +58,7 @@ export class FreightBillingComponent implements OnInit {
       WorkOrderNumber: ['', Validators.required],
       BillSubmission: ['', Validators.required],
     });
+    this.loadInitialData();
   }
 
   onOrderTypeChange(): void {
@@ -197,4 +213,80 @@ export class FreightBillingComponent implements OnInit {
     });
   }
 }
+
+
+resetDetails(): FreightDetails {
+    return {
+      basicFreight: 0,
+      detentionLoading: 0,
+      detentionUnloading: 0,
+      loadingCharges: 0,
+      unloadingCharges: 0,
+      routeChangeCharges: 0,
+      transhipmentCharges: 0,
+      otherCharges: 0,
+      deduction: 0,
+    };
+  }
+
+  // Mock function to load existing data (e.g., from a service)
+  loadInitialData() {
+      // In a real app, you'd fetch this from the server
+      const initialSavedData = { /* ... potentially saved data ... */ }; 
+      Object.assign(this.freightDetails, initialSavedData);
+      this.calculateTotal(); // Calculate the total to update the main field
+  }
+
+  // Calculation logic - must be called every time a field in the modal changes
+ calculateTotal(): number {
+  const d = this.freightDetails;
+
+  // Convert all fields to numbers safely
+  const toNum = (val: any) => Number(val) || 0;
+
+  const sumCharges =
+    toNum(d.basicFreight) +
+    toNum(d.detentionLoading) +
+    toNum(d.detentionUnloading) +
+    toNum(d.loadingCharges) +
+    toNum(d.unloadingCharges) +
+    toNum(d.routeChangeCharges) +
+    toNum(d.transhipmentCharges) +
+    toNum(d.otherCharges);
+
+  this.totalFreight = sumCharges - toNum(d.deduction);
+
+  return this.totalFreight;
+}
+
+  // 1. Function to open the modal
+  openModal(calculateTotalpopup) {
+    // Ensure the internal total is calculated based on the current saved/loaded details
+    this.calculateTotal(); 
+    this.modalService.open(calculateTotalpopup,{  backdrop: 'static', 
+      keyboard: false,size:'lg' });
+  }
+  
+  // 2. Function to save and close the modal
+  saveAndCloseModal() {
+    // Final calculation before saving
+    const finalTotal = this.calculateTotal(); 
+    console.log("finalTotal",finalTotal)
+    
+    // Set the value of the main form control
+    this.FreightBilling.get('FreightCharges').setValue(finalTotal);
+     this.modalService.dismissAll();
+     console.log("FreightCharges",this.FreightBilling.get('FreightCharges').setValue(finalTotal))
+    // Close the modal
+
+    // NOTE: At this point, you would typically save 'this.freightDetails' 
+    // to your backend/database along with the main form data.
+  }
+  cancelModal(){
+    this.modalService.dismissAll();
+
+  }
+  
+  // Function to close without saving (resets changes if needed, but not implemented here)
+
 }
