@@ -6,13 +6,16 @@
     <!-- Order Type -->
     <div class="form-radio optional">
       <label>
-        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" />
+        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeSelection()" />
         <span>Inward</span>
       </label>
+
       <label>
-        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" />
+        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward"
+          (change)="onOrderTypeSelection()" />
         <span>Outward</span>
       </label>
+
     </div>
 
     <br />

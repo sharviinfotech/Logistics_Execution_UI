@@ -59,6 +59,14 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   addRow(data?: any): void {
     this.invoices.push(this.createInvoiceRow(data));
   }
+  onOrderTypeSelection(): void {
+    this.showTable = false;
+    this.invoices.clear();
+    this.addRow();
+    this.sapType = '';
+    this.invoicenumber = '';
+  }
+
 
   removeRow(i: number): void {
     if (this.invoices.length > 1) this.invoices.removeAt(i);

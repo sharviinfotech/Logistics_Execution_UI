@@ -58,6 +58,14 @@ export class VechileInfoComponent implements OnInit {
   addRow(): void {
     this.vehicles.push(this.createVehicleRow());
   }
+  onOrderTypeSelection(): void {
+    this.sapType = '';
+    this.invoicenumber = '';
+    this.showTable = false;
+    this.vehicles.clear();
+    this.addRow();
+  }
+
 
   // Remove row
   removeRow(index: number): void {
