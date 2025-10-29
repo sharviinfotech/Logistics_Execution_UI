@@ -324,6 +324,28 @@ input:not(:placeholder-shown) + label {
   content: none !important;
   /* Forces the removal of the pseudo-element content */
 }
+.form-field input:disabled {
+  background-color: #f8f9fa !important;
+  cursor: not-allowed !important;
+  border: 2px dashed #dee2e6 !important;
+  color: #adb5bd !important;
+  position: relative;
+}
+
+.form-field:has(input:disabled)::before {
+  content: '🔒';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.form-field:has(input:disabled) label {
+  color: #adb5bd !important;
+}
 
 /* new css for validations */
 

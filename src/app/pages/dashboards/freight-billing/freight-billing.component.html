@@ -73,11 +73,17 @@
       </div>
 
       <!-- Work Order Number -->
-      <div class="form-field">
-        <input type="text" formControlName="WorkOrderNumber" placeholder=" " />
-        <label>Work Order Number</label>
-
-      </div>
+     <div class="form-field">
+  <select formControlName="WorkOrderNumber" optional>
+    <option value="">Select Option</option>
+    <option value="Rate contract">Rate contract</option>
+    <option value="WORK ORDER NUMBER">WORK ORDER NUMBER</option>
+    <option value="Customer Transporter">Customer Transporter</option>
+    <option value="Local Transporter">Local Transporter</option>
+    <option value="Company vehicle">Company vehicle</option>
+  </select>
+  <label>Work Order Number</label>
+</div>
 
       <div class="form-field">
         <input type="text" formControlName="BillSubmission" placeholder=" " />
