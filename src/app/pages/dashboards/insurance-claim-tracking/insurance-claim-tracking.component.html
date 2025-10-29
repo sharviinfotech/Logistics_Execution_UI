@@ -1,8 +1,66 @@
 <div class="card-LE">
     <div class="card-header-LE">Insurance Claim Tracking</div>
     <div class="card-body-LE">
+    <!-- Order Type -->
+    <div class="form-radio optional">
+      <label>
+        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
+        <span>Inward</span>
+      </label>
+      <label>
+        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
+        <span>Outward</span>
+      </label>
+    </div>
 
-        <form class="form-grid" [formGroup]="InsuranceClaimTracking">
+    <br />
+
+    <!-- SAP Type + Input -->
+    <div *ngIf="orderType" class="sap-row" style="display: flex !important;">
+      <!-- SAP Radio -->
+      <div class="form-radio optional sap-radio">
+        <label>
+          <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
+          <span>With SAP</span>
+        </label>
+        <label>
+          <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
+          <span>Without SAP</span>
+        </label>
+      </div>
+
+      <!-- Input + GET (only for SAP) -->
+      <!-- Input + GET (for both SAP and Non-SAP) -->
+        <div class="input-row" *ngIf="sapType === 'SAP' || sapType === 'Non-SAP'">
+        <div *ngIf="orderType === 'Inward'" class="input-flex">
+            <div class="form-field flex-1">
+            <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" " />
+            <label>PO Number</label>
+            </div>
+            <button type="button" class="btn-get" (click)="getForm('purchase')"
+            [disabled]="!ponumber || ponumber.trim()===''">
+            GET
+            </button>
+        </div>
+
+        <div *ngIf="orderType === 'Outward'" class="input-flex">
+            <div class="form-field flex-1">
+            <input type="text" name="invoicenumber" [(ngModel)]="invoicenumber" placeholder=" " />
+            <label>Invoice Number</label>
+            </div>
+            <button type="button" class="btn-get" (click)="getForm('invoice')"
+            [disabled]="!invoicenumber || invoicenumber.trim()===''">
+            GET
+            </button>
+        </div>
+        </div>
+
+    </div>
+  </div>
+
+
+
+        <form class="form-grid" [formGroup]="InsuranceClaimTracking" *ngIf="showForm">
             <div class="form-field">
                 <input type="text" formControlName="FinanceYear" placeholder=" " />
                 <label>Finance Year</label>               
@@ -191,11 +249,11 @@
 
         </form>
         <!-- Submit / Cancel Buttons -->
-        <div class="text-right">
+        <div class="text-right" *ngIf="showForm">
             <button type="button" class="btn btn-md btn-raised btnSave" (click)="savePlan()">
                 Save
             </button>
         </div>
     </div>
-</div>
+
 
