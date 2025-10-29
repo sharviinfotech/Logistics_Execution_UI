@@ -36,6 +36,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     this.InvoiceForm = this.fb.group({
       invoices: this.fb.array([]),
     });
+    this.addRow();
   }
 
   get invoices(): FormArray {
@@ -67,43 +68,84 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   onSapTypeSelection(): void {
     this.invoices.clear();
     this.addRow();
-
-    if (this.sapType === 'SAP') {
-      this.showTable = false; // hide until GET clicked
-    } else {
-      this.showTable = true;  // show immediately for Non-SAP
-    }
+    this.showTable = this.sapType !== 'SAP';
   }
 
+  // ✅ Combined two API calls (fetchInvoiceList + sapget)
   fetchInvoiceDetails(): void {
     if (!this.invoicenumber.trim()) {
       Swal.fire('Warning', 'Please enter invoice number', 'warning');
       return;
     }
 
-    const payload = { INV_GET: this.invoicenumber };
+    const payload1 = { INV_GET: this.invoicenumber };
     this.spinner.show();
 
-    this.service.Invoiceloaddetailsfetch(payload).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        if (Array.isArray(res) && res.length > 0) {
-          this.invoices.clear();
-          res.forEach((r) => this.addRow(r));
-          this.showTable = true;
-          Swal.fire('Success', 'Invoice details loaded', 'success');
-        } else {
-          Swal.fire('Info', 'No records found', 'info');
+    // 🔹 Step 1: Fetch Invoice List
+    this.service.Invoiceloaddetailsfetch(payload1).subscribe({
+      next: (fetchRes: any) => {
+        console.log('✅ FetchInvoiceList Response:', fetchRes);
+
+        if (!Array.isArray(fetchRes) || fetchRes.length === 0) {
+          this.spinner.hide();
+          Swal.fire('Info', 'No invoice data found', 'info');
+          return;
         }
+
+        const firstRow = fetchRes[0];
+
+        // 🔹 Prepare SAP Request Payload (static or based on your logic)
+        const sapPayload = {
+          TRUCK: firstRow.ZTRUC_TYPE || 'FTL 22 FEET',
+          ZACT_LOAD: firstRow.ZACT_LOAD || 10,
+          ZACT_VOL: firstRow.ZACT_VOL || '90',
+        };
+
+        // 🔹 Step 2: Call SAP Get API
+        this.service.sapget(sapPayload).subscribe({
+          next: (sapRes: any) => {
+            console.log('✅ SAPGet Response:', sapRes);
+            this.spinner.hide();
+
+            // Merge both responses
+            const merged = {
+              MANDT: firstRow.MANDT,
+              VBELN: firstRow.VBELN,
+              POSNR: firstRow.POSNR,
+              ZTRUC_TYPE: sapRes.ZTRUC_TYPE || sapPayload.TRUCK,
+              ZACT_LOAD: sapRes.ZACT_LOAD ?? sapPayload.ZACT_LOAD,
+              ZACT_VOL: sapRes.ZACT_VOL ?? sapPayload.ZACT_VOL,
+              ZLF_VOL: sapRes.ZLF_VOL ?? 0,
+              ZLF_WT: sapRes.ZLF_WT ?? '',
+              ZWEEK_SF: firstRow.ZWEEK_SF,
+              ZEWAYBILL_NO: firstRow.ZEWAYBILL_NO,
+              ZEWAYBILL_DT: firstRow.ZEWAYBILL_DT,
+            };
+
+            // Display data in table
+            this.invoices.clear();
+            this.addRow(merged);
+            this.showTable = true;
+
+            Swal.fire('Success', 'Invoice and SAP data loaded', 'success');
+          },
+          error: (err) => {
+            this.spinner.hide();
+            console.error(err);
+            Swal.fire('Error', 'SAP GET API failed', 'error');
+          },
+        });
       },
-      error: () => {
+      error: (err) => {
         this.spinner.hide();
-        Swal.fire('Error', 'Failed to fetch details', 'error');
+        console.error(err);
+        Swal.fire('Error', 'Fetch Invoice List API failed', 'error');
       },
     });
   }
 
-  // ✅ SAP Save
+  // ✅ Save for SAP
+
   saveInvoiceDetails(): void {
     this.InvoiceForm.markAllAsTouched();
     if (this.InvoiceForm.invalid) {
@@ -111,28 +153,45 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       return;
     }
 
-    const payload = this.invoices.value.map((item: any, i: number) => ({
-      SI_NO: i + 1,
-      ...item,
+    // ✅ Build payload in exact backend format
+    const payload = this.invoices.value.map((item: any) => ({
+      MANDT: item.MANDT || '234',
+      VBELN: this.invoicenumber,
+      POSNR: item.POSNR || 10,
+      ZTRUC_TYPE: item.ZTRUC_TYPE,
+      ZACT_LOAD: Number(item.ZACT_LOAD),
+      ZACT_VOL: Number(item.ZACT_VOL),
+      ZLF_VOL: Number(item.ZLF_VOL),
+      ZLF_WT: item.ZLF_WT,
+      ZWEEK_SF: item.ZWEEK_SF,
+      ZEWAYBILL_NO: item.ZEWAYBILL_NO,
+      ZEWAYBILL_DT: item.ZEWAYBILL_DT,
     }));
 
+    console.log('✅ Final SAP Save Payload:', JSON.stringify(payload, null, 2));
+
     this.spinner.show();
-    this.service.InvoiceloaddetailsSave(payload).subscribe({
+    this.service.InvoiceloaddetailsSave({ NSAP_LOAD: payload }).subscribe({
       next: (res: any) => {
         this.spinner.hide();
         if (res?.NUMBER === '200') {
           Swal.fire('Success', res.MSG || 'Saved Successfully', 'success');
           this.resetForm();
-        } else Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
+        } else {
+          Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
+        }
       },
-      error: () => {
+      error: (err) => {
         this.spinner.hide();
         Swal.fire('Error', 'Save failed', 'error');
+        console.error('❌ Save Error:', err);
       },
     });
   }
 
-  // ✅ Non-SAP Save
+
+
+  // ✅ Save for Non-SAP
   saveInvoiceNonsapDetails(): void {
     this.InvoiceForm.markAllAsTouched();
     if (this.InvoiceForm.invalid) {
@@ -171,16 +230,12 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       },
     });
   }
-  onSave(): void {
-    if (this.sapType === 'SAP') {
-      this.saveInvoiceDetails(); // call SAP save
-    } else if (this.sapType === 'Non-SAP') {
-      this.saveInvoiceNonsapDetails(); // call Non-SAP save
-    } else {
-      Swal.fire('Warning', 'Please select SAP type before saving', 'warning');
-    }
-  }
 
+  onSave(): void {
+    if (this.sapType === 'SAP') this.saveInvoiceDetails();
+    else if (this.sapType === 'Non-SAP') this.saveInvoiceNonsapDetails();
+    else Swal.fire('Warning', 'Please select SAP type before saving', 'warning');
+  }
 
   resetForm(): void {
     this.InvoiceForm.reset();
