@@ -204,5 +204,33 @@ export class GeneralserviceService {
   InvoiceloaddetailsNonSap(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/InvoiceloadDetails/NonSap/Save', obj);
   }
+  gettypeofvehicle() {
+    return this.http.get(environment.baseUrl + 'api/external/LE/InvoiceloadDetails/f4_getAllDetails');
+  }
+  InsuranceClaimTrackingfetch(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/InsuranceClaimTracking/Outward/fetchinvoicelist', obj);
+  }
+  InsuranceClaimTrackingSave(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/InsuranceClaimTracking/Outward/save', obj);
+  }
+  fetchinvoicelistnonsap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/InsuranceClaimTracking/NonSap/fetchinvoicelistnonsap', obj);
+  }
+
+  Nonsapsave(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/InsuranceClaimTracking/NonSap/Nonsapsave', obj);
+  }
+  TransitDamageInfofetch(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/TransitDamageInfo/Outward/fetchinvoicelist', obj);
+  }
+  TransitDamageInfoSave(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/TransitDamageInfo/Outward/Save', obj);
+  }
+  fetchinvoicelistnonsapwosp(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/TransitDamageInfo/NonSap/fetchinvoicelistnonsap', obj);
+  }
+  withoutsapSave(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/TransitDamageInfo/NonSap/withoutsapSave', obj);
+  }
 
 }

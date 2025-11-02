@@ -1,10 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, FormArray, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { GeneralserviceService } from 'src/app/generalservice.service';
-import { NgxSpinnerService, NgxSpinnerModule } from 'ngx-spinner';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  FormArray,
+  ReactiveFormsModule,
+  FormsModule,
+} from '@angular/forms';
 import Swal from 'sweetalert2';
-import { SpinnerService } from 'src/app/spinner.service';
+import { GeneralserviceService } from 'src/app/generalservice.service';
 
 @Component({
   selector: 'app-insurance-claim-tracking',
@@ -15,135 +20,260 @@ import { SpinnerService } from 'src/app/spinner.service';
 })
 export class InsuranceClaimTrackingComponent implements OnInit {
 
-  InsuranceClaimTracking!: FormGroup;
-  showForm = false;
-  orderType: string = '';
-  sapType: string = '';
-  ponumber: string = '';
-  invoicenumber: string = '';
-  previousOrderType: string | null = null;
-  previousSapType: string | null = null;
- 
+  orderType = '';
+  sapType = '';
+  invoicenumber = '';
+
+  showTable = false;
+
+  HeaderForm!: FormGroup;
+  ItemForm!: FormGroup;
 
   constructor(
     private fb: FormBuilder,
-    private service: GeneralserviceService,
-    private spinner: NgxSpinnerService
-  ) {}
+    private service: GeneralserviceService
+  ) { }
 
   ngOnInit(): void {
-    this.createForm();
+    this.createForms();
   }
 
-  createForm() {
-    this.InsuranceClaimTracking = this.fb.group({
-      FinanceYear: ['', Validators.required],
-      ReportedDate: ['', Validators.required],
-      ClaimRef: ['', Validators.required],
-      InvoiceNumber: ['', Validators.required],
-      InvoiceDate: ['', Validators.required],
-      InvoiceValueBasic: ['', Validators.required],
-      LossDeclaredRs: ['', Validators.required],
-      ClaimReceivedFinalised: ['', Validators.required],
-      SalvageValue: ['', Validators.required],
-      Customer: ['', Validators.required],
-      PONumber: ['', Validators.required],
-      vechilenumber: ['', [Validators.required, Validators.pattern(/^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/)]],
-      AhLoadedInTruck: ['', [Validators.required]],
-      NoOfSets: ['', Validators.required],
-      Location: ['', Validators.required],
-      Transporter: ['', Validators.required],
-      TruckNumber: ['', Validators.required],
-      LRNumber: ['', Validators.required],
-      DamageRemarks: ['', Validators.required],
-      ClaimInformationSentOn: ['', Validators.required],
-      ClaimStatus: ['', Validators.required],
-      ClaimDocumentsStatus: ['', Validators.required],
-      CourierDetails: ['', Validators.required],
-      PaymentStatus: ['', Validators.required],
-      PaymentInfo: ['', Validators.required],
-      UTR: ['', Validators.required],
-      ClaimSettlementDate: ['', Validators.required],
-      NEFT: ['', Validators.required]
+  createForms() {
+    this.HeaderForm = this.fb.group({
+      INV_NO: ['', Validators.required],
+      FI: [''],
+      REP_DATE: [''],
+      CLAIM_REF: [''],
+      INV_DATE: [''],
+      INV_BV: [''],
+      LOSS_DCL: [''],
+      CLM_RF: [''],
+      SOL_VAL: [''],
+      CUSTOMER: [''],
+      SO_NO: [''],
+      LOCATION: [''],
+      DAMAGE_RMK: [''],
+      CLM_INF: [''],
+      CLM_ST: [''],
+      CLM_DOC_ST: [''],
+      COURIER_DET: [''],
+      PAY_ST: [''],
+      PAY_INFO: [''],
+      UTR: [''],
+      CLM_SET_DT: ['']
+    });
+
+    this.ItemForm = this.fb.group({
+      ITEMS: this.fb.array([])
     });
   }
 
-  onOrderTypeChange(): void {
-    if (this.previousOrderType !== null && this.previousOrderType !== this.orderType) {
-      this.sapType = '';
-      this.previousSapType = null;
-      this.ponumber = '';
-      this.invoicenumber = '';
-      this.resetConditionalFields();
-    }
-    this.previousOrderType = this.orderType;
+  get items(): FormArray {
+    return this.ItemForm.get('ITEMS') as FormArray;
   }
 
-  onSapTypeChange(): void {
-    if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
-      this.resetConditionalFields();
-      this.ponumber = '';
-      this.invoicenumber = '';
-    }
-    this.previousSapType = this.sapType;
-    if (this.sapType === 'Non-SAP') {
-      
-    }
+  createItemRow(data?: any): FormGroup {
+    return this.fb.group({
+      INV_NO: [data?.INV_NO || this.invoicenumber],
+      POSNR: [data?.POSNR || ''],
+      VEH_LINE: [data?.VEH_LINE || ''],
+      VEHICLE: [data?.VEHICLE || ''],
+      TRUCK_NO: [data?.TRUCK_NO || ''],
+      LR_NO: [data?.LR_NO || ''],
+      AH: [data?.AH || ''],
+      NO_SETS: [data?.NO_SETS || ''],
+      TRANSPORTER: [data?.TRANSPORTER || '']
+    });
   }
 
-  onInputChange(type: 'purchase' | 'invoice') {
-    const value = type === 'purchase' ? this.ponumber : this.invoicenumber;
-    if (!value || value.trim() === '') {
-      this.showForm = false;
-      this.resetConditionalFields();
-    }
+  addItemRow(data?: any) {
+    this.items.push(this.createItemRow(data));
   }
-
-  getForm(type: 'purchase' | 'invoice'): void {
-  const value = type === 'purchase' ? this.ponumber : this.invoicenumber;
-  if (!value || value.trim() === '') {
-    this.showForm = false;
-    return;
-  }
-  this.showForm = true;
-  this.setValidatorsOnFormFields();
-}
-
-
-  savePlan() {
-    this.InsuranceClaimTracking.markAllAsTouched();
-    if (this.InsuranceClaimTracking.valid) {
-      Swal.fire({
-        title: 'Success',
-        text: 'Form submitted successfully!',
-        icon: 'success',
-        confirmButtonText: 'OK'
-      });
-      this.InsuranceClaimTracking.reset();
-      this.showForm = false;
-      this.orderType = '';
-      this.sapType = '';
-      this.ponumber = '';
-      this.invoicenumber = '';
+  onSave() {
+    if (this.sapType === 'SAP') {
+      this.saveSAP();
     } else {
-      Swal.fire({
-        title: 'Validation Error',
-        text: 'Please fill all required fields before saving.',
-        icon: 'warning',
-        confirmButtonText: 'OK'
-      });
+      this.saveNonSAP();
     }
   }
 
-  resetConditionalFields(): void {
-    this.showForm = false;
-    this.InsuranceClaimTracking.reset();
+
+  removeItemRow(i: number) {
+    if (this.items.length === 1) {
+      Swal.fire('Warning', 'At least one item required', 'warning');
+      return;
+    }
+    this.items.removeAt(i);
   }
 
-  setValidatorsOnFormFields(): void {
-    Object.keys(this.InsuranceClaimTracking.controls).forEach(c => {
-      this.InsuranceClaimTracking.get(c)?.setValidators(Validators.required);
-      this.InsuranceClaimTracking.get(c)?.updateValueAndValidity();
+  onOrderTypeSelection() {
+    this.sapType = '';
+    this.invoicenumber = '';
+    this.showTable = false;
+    this.items.clear();
+  }
+
+  onSapTypeSelection() {
+    this.showTable = false;
+    this.items.clear();
+  }
+
+  // ✅ ✅ FINAL: AUTO SELECT API BASED ON SAP TYPE
+  fetchInvoiceDetails() {
+
+    if (!this.invoicenumber.trim()) {
+      Swal.fire('Error', 'Enter Invoice Number', 'error');
+      return;
+    }
+
+    if (!this.sapType) {
+      Swal.fire('Error', 'Select SAP / Non-SAP', 'error');
+      return;
+    }
+
+    if (this.sapType === 'SAP') {
+      this.fetchSAPInvoice();
+    } else {
+      this.fetchNonSAPInvoice();
+    }
+  }
+
+  // ✅ ✅ SAP FETCH
+  fetchSAPInvoice() {
+
+    const payload = { VBELN: this.invoicenumber };
+
+    this.service.InsuranceClaimTrackingfetch(payload).subscribe({
+      next: (res: any) => {
+
+        if (!res || res.length === 0) {
+          Swal.fire('No Data', 'SAP Invoice not found', 'warning');
+          return;
+        }
+
+        const response = res[0];
+
+        this.HeaderForm.patchValue(response.HEADER);
+
+        this.items.clear();
+        if (response.ITEM?.length > 0) {
+          response.ITEM.forEach((row: any) => this.addItemRow(row));
+        }
+
+        this.showTable = true;
+        Swal.fire('Loaded', 'SAP Invoice Loaded Successfully', 'success');
+      },
+
+      error: () => {
+        Swal.fire('Error', 'SAP Fetch API Failed', 'error');
+      }
     });
   }
+
+  saveSAP() {
+
+    this.HeaderForm.markAllAsTouched();
+    this.ItemForm.markAllAsTouched();
+
+    if (this.HeaderForm.invalid) {
+      Swal.fire('Error', 'Header fields missing', 'error');
+      return;
+    }
+
+    if (this.items.length === 0) {
+      Swal.fire('Error', 'Add at least one row', 'error');
+      return;
+    }
+
+    const payload = {
+      HEADER: this.HeaderForm.value,
+      ITEM: this.items.value
+    };
+
+    this.service.InsuranceClaimTrackingSave(payload).subscribe({
+      next: (res: any) => {
+
+        if (res?.STATUS === "TRUE") {
+          Swal.fire('Success', res.MESSAGE || 'SAP Data Saved Successfully', 'success');
+        } else {
+          Swal.fire('Error', res?.MESSAGE || 'SAP Save Failed', 'error');
+        }
+      },
+
+      error: () => {
+        Swal.fire('Error', 'SAP Save API Failed', 'error');
+      }
+    });
+  }
+
+
+  // ✅ ✅ NON-SAP FETCH
+  fetchNonSAPInvoice() {
+
+    const payload = { VBELN: this.invoicenumber };
+
+    this.service.fetchinvoicelistnonsap(payload).subscribe({
+      next: (res: any) => {
+
+        if (!res || res.length === 0) {
+          Swal.fire('No Data', 'Non-SAP Invoice not found', 'warning');
+          return;
+        }
+
+        const response = res[0];
+
+        this.HeaderForm.patchValue(response.HEADER);
+
+        this.items.clear();
+        if (response.ITEM?.length > 0) {
+          response.ITEM.forEach((row: any) => this.addItemRow(row));
+        }
+
+        this.showTable = true;
+        Swal.fire('Loaded', 'Non-SAP Invoice Loaded Successfully', 'success');
+      },
+
+      error: () => {
+        Swal.fire('Error', 'Non-SAP Fetch API Failed', 'error');
+      }
+    });
+  }
+
+  saveNonSAP() {
+
+    this.HeaderForm.markAllAsTouched();
+    this.ItemForm.markAllAsTouched();
+
+    if (this.HeaderForm.invalid) {
+      Swal.fire('Error', 'Header fields missing', 'error');
+      return;
+    }
+
+    if (this.items.length === 0) {
+      Swal.fire('Error', 'Add at least one row', 'error');
+      return;
+    }
+
+    const payload = {
+      HEADER: this.HeaderForm.value,
+      ITEM: this.items.value
+    };
+
+    this.service.Nonsapsave(payload).subscribe({
+      next: (res: any) => {
+
+        if (res?.STATUS === "TRUE") {
+          Swal.fire('Success', res.MESSAGE || 'Non-SAP Data Saved Successfully', 'success');
+        } else {
+          Swal.fire('Error', res?.MESSAGE || 'Non-SAP Save Failed', 'error');
+        }
+      },
+
+      error: () => {
+        Swal.fire('Error', 'Non-SAP Save API Failed', 'error');
+      }
+    });
+  }
+
+
 }

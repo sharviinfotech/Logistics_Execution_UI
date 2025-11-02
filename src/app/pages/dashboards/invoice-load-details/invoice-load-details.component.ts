@@ -20,11 +20,13 @@ import { NgxSpinnerService } from 'ngx-spinner';
   styleUrls: ['./invoice-load-details.component.css'],
 })
 export class InvoiceLoadDetailsComponent implements OnInit {
+
   InvoiceForm!: FormGroup;
   orderType = '';
   sapType = '';
   invoicenumber = '';
   showTable = false;
+  vehicleTypes: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -37,6 +39,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       invoices: this.fb.array([]),
     });
     this.addRow();
+    this.getVehicleTypes();
   }
 
   get invoices(): FormArray {
@@ -45,6 +48,9 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
   createInvoiceRow(data?: any): FormGroup {
     return this.fb.group({
+      MANDT: [data?.MANDT || '234'],
+      VBELN: [data?.VBELN || this.invoicenumber],
+      POSNR: [data?.POSNR || ''],
       ZTRUC_TYPE: [data?.ZTRUC_TYPE || '', Validators.required],
       ZACT_LOAD: [data?.ZACT_LOAD || '', Validators.required],
       ZACT_VOL: [data?.ZACT_VOL || '', Validators.required],
@@ -59,6 +65,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   addRow(data?: any): void {
     this.invoices.push(this.createInvoiceRow(data));
   }
+
   onOrderTypeSelection(): void {
     this.showTable = false;
     this.invoices.clear();
@@ -66,7 +73,6 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     this.sapType = '';
     this.invoicenumber = '';
   }
-
 
   removeRow(i: number): void {
     if (this.invoices.length > 1) this.invoices.removeAt(i);
@@ -79,81 +85,38 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     this.showTable = this.sapType !== 'SAP';
   }
 
-  // ✅ Combined two API calls (fetchInvoiceList + sapget)
+  // ✅ FETCH INVOICE API
   fetchInvoiceDetails(): void {
-    if (!this.invoicenumber.trim()) {
+    if (!this.invoicenumber?.trim()) {
       Swal.fire('Warning', 'Please enter invoice number', 'warning');
       return;
     }
 
-    const payload1 = { INV_GET: this.invoicenumber };
+    const payload = { INV_GET: this.invoicenumber };
     this.spinner.show();
 
-    // 🔹 Step 1: Fetch Invoice List
-    this.service.Invoiceloaddetailsfetch(payload1).subscribe({
-      next: (fetchRes: any) => {
-        console.log('✅ FetchInvoiceList Response:', fetchRes);
+    this.service.Invoiceloaddetailsfetch(payload).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
 
-        if (!Array.isArray(fetchRes) || fetchRes.length === 0) {
-          this.spinner.hide();
-          Swal.fire('Info', 'No invoice data found', 'info');
-          return;
+        if (Array.isArray(res) && res.length > 0) {
+          this.invoices.clear();
+          res.forEach((item: any) => this.addRow(item));
+          this.showTable = true;
+
+          Swal.fire('Success', 'Invoice details loaded', 'success');
+        } else {
+          Swal.fire('Info', 'No records found', 'info');
         }
-
-        const firstRow = fetchRes[0];
-
-        // 🔹 Prepare SAP Request Payload (static or based on your logic)
-        const sapPayload = {
-          TRUCK: firstRow.ZTRUC_TYPE || 'FTL 22 FEET',
-          ZACT_LOAD: firstRow.ZACT_LOAD || 10,
-          ZACT_VOL: firstRow.ZACT_VOL || '90',
-        };
-
-        // 🔹 Step 2: Call SAP Get API
-        this.service.sapget(sapPayload).subscribe({
-          next: (sapRes: any) => {
-            console.log('✅ SAPGet Response:', sapRes);
-            this.spinner.hide();
-
-            // Merge both responses
-            const merged = {
-              MANDT: firstRow.MANDT,
-              VBELN: firstRow.VBELN,
-              POSNR: firstRow.POSNR,
-              ZTRUC_TYPE: sapRes.ZTRUC_TYPE || sapPayload.TRUCK,
-              ZACT_LOAD: sapRes.ZACT_LOAD ?? sapPayload.ZACT_LOAD,
-              ZACT_VOL: sapRes.ZACT_VOL ?? sapPayload.ZACT_VOL,
-              ZLF_VOL: sapRes.ZLF_VOL ?? 0,
-              ZLF_WT: sapRes.ZLF_WT ?? '',
-              ZWEEK_SF: firstRow.ZWEEK_SF,
-              ZEWAYBILL_NO: firstRow.ZEWAYBILL_NO,
-              ZEWAYBILL_DT: firstRow.ZEWAYBILL_DT,
-            };
-
-            // Display data in table
-            this.invoices.clear();
-            this.addRow(merged);
-            this.showTable = true;
-
-            Swal.fire('Success', 'Invoice and SAP data loaded', 'success');
-          },
-          error: (err) => {
-            this.spinner.hide();
-            console.error(err);
-            Swal.fire('Error', 'SAP GET API failed', 'error');
-          },
-        });
       },
       error: (err) => {
         this.spinner.hide();
-        console.error(err);
-        Swal.fire('Error', 'Fetch Invoice List API failed', 'error');
-      },
+        Swal.fire('Error', 'Fetch failed', 'error');
+      }
     });
   }
 
-  // ✅ Save for SAP
-
+  // ✅ SAVE FOR SAP
   saveInvoiceDetails(): void {
     this.InvoiceForm.markAllAsTouched();
     if (this.InvoiceForm.invalid) {
@@ -161,7 +124,6 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       return;
     }
 
-    // ✅ Build payload in exact backend format
     const payload = this.invoices.value.map((item: any) => ({
       MANDT: item.MANDT || '234',
       VBELN: this.invoicenumber,
@@ -176,8 +138,6 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       ZEWAYBILL_DT: item.ZEWAYBILL_DT,
     }));
 
-    console.log('✅ Final SAP Save Payload:', JSON.stringify(payload, null, 2));
-
     this.spinner.show();
     this.service.InvoiceloaddetailsSave({ NSAP_LOAD: payload }).subscribe({
       next: (res: any) => {
@@ -189,17 +149,14 @@ export class InvoiceLoadDetailsComponent implements OnInit {
           Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
         }
       },
-      error: (err) => {
+      error: () => {
         this.spinner.hide();
         Swal.fire('Error', 'Save failed', 'error');
-        console.error('❌ Save Error:', err);
-      },
+      }
     });
   }
 
-
-
-  // ✅ Save for Non-SAP
+  // ✅ SAVE NON-SAP
   saveInvoiceNonsapDetails(): void {
     this.InvoiceForm.markAllAsTouched();
     if (this.InvoiceForm.invalid) {
@@ -230,12 +187,14 @@ export class InvoiceLoadDetailsComponent implements OnInit {
         if (res?.NUMBER === '200') {
           Swal.fire('Success', res.MSG || 'Saved Successfully', 'success');
           this.resetForm();
-        } else Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
+        } else {
+          Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
+        }
       },
       error: () => {
         this.spinner.hide();
         Swal.fire('Error', 'Save failed', 'error');
-      },
+      }
     });
   }
 
@@ -254,4 +213,59 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     this.invoicenumber = '';
     this.showTable = false;
   }
+
+  onTruckTypeChange(i: number): void {
+
+    // ✅ If NON-SAP, do not call API
+    if (this.sapType === 'Non-SAP') {
+      return; // Just allow user to type manually
+    }
+
+    // ✅ Continue only for SAP
+    const row = this.invoices.at(i);
+    const selectedTruck = row.get('ZTRUC_TYPE')?.value;
+
+    if (!selectedTruck) return;
+
+    const payload = {
+      TRUCK: selectedTruck,
+      ZACT_LOAD: 10,
+      ZACT_VOL: "90"
+    };
+
+    this.spinner.show();
+    this.service.sapget(payload).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+
+        const data = Array.isArray(res) ? res[0] : res;
+        if (!data) return;
+
+        row.patchValue({
+          ZTRUC_TYPE: data.ZTRUC_TYPE || '',
+          ZACT_LOAD: data.ZACT_LOAD || '',
+          ZACT_VOL: data.ZACT_VOL || '',
+          ZLF_VOL: data.ZLF_VOL || '',
+          ZLF_WT: data.ZLF_WT || ''
+        });
+      },
+      error: () => {
+        this.spinner.hide();
+        Swal.fire("Error", "SAP Truck API failed", "error");
+      }
+    });
+  }
+
+  // ✅ LOAD VEHICLE TYPES
+  getVehicleTypes(): void {
+    this.service.gettypeofvehicle().subscribe({
+      next: (res: any) => {
+        this.vehicleTypes = res || [];
+      },
+      error: () => {
+        Swal.fire("Error", "Failed to load vehicle types", "error");
+      }
+    });
+  }
+
 }

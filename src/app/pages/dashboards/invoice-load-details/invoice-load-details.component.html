@@ -67,7 +67,19 @@
           <tbody formArrayName="invoices">
             <tr *ngFor="let group of invoices.controls; let i = index" [formGroupName]="i">
               <td>{{ i + 1 }}</td>
-              <td><input type="text" formControlName="ZTRUC_TYPE" /></td>
+              <!-- <td><input type="text" formControlName="ZTRUC_TYPE" /></td> -->
+              <td>
+
+                <select formControlName="ZTRUC_TYPE" (change)="onTruckTypeChange(i)">
+                  <option value="">-- Select Vehicle Type --</option>
+                  <option *ngFor="let v of vehicleTypes" [value]="v.ZTRUC_TYPE">
+                    {{ v.ZTRUC_TYPE }}
+                  </option>
+                </select>
+
+
+              </td>
+
               <td><input type="number" formControlName="ZACT_LOAD" /></td>
               <td><input type="text" formControlName="ZACT_VOL" /></td>
               <td><input type="text" formControlName="ZLF_VOL" /></td>

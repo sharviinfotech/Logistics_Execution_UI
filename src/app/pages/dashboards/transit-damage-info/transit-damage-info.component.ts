@@ -1,95 +1,293 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
- 
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  FormArray,
+  ReactiveFormsModule,
+  FormsModule
+} from '@angular/forms';
+import { GeneralserviceService } from 'src/app/generalservice.service';
+
 @Component({
   selector: 'app-transit-damage-info',
-   standalone: true,
- imports: [CommonModule, ReactiveFormsModule],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './transit-damage-info.component.html',
   styleUrl: './transit-damage-info.component.css'
 })
-export class TransitDamageInfoComponent {
- 
-transitDamageInfo!: FormGroup;
-  isEditMode = false;
-  isSubmitting = false;
- 
-  damageRemarksOptions = [
-    'Packing material damage',
-    'Pallet damage',
-    'Cells damage',
-    'Cell Bank damage',
-    'Can damage',
-    'Accident',
-    'Prohibited material loading and seized by Police',
-    'Damage during unloading',
-    'Material in wet condition',
-    'Damage due to other Materials loaded'
-  ];
- 
-  claimSettlementOptions = [
-    'Direct Deduction',
-    'Insurance claim',
-    'Repair Locally With cost',
-    'Repair Locally Without cost',
- 
-  ];
- 
-  constructor(private fb: FormBuilder) {
-    this.buildForm();
-    this.setupStatusWatcher();
+export class TransitDamageInfoComponent implements OnInit {
+
+  orderType: any;
+  sapType: any;
+  invoicenumber: any;
+
+  HeaderForm!: FormGroup;
+  ItemForm!: FormGroup;
+
+  showTable = false;
+
+  constructor(private fb: FormBuilder, private service: GeneralserviceService) { }
+
+  ngOnInit(): void {
+    this.buildHeaderForm();
+    this.buildItemForm();
   }
- 
-  private buildForm() {
-    this.transitDamageInfo = this.fb.group({
-      incidentdate: ['', Validators.required],
-      lrnumber: ['', Validators.required],
-      transportername: ['', Validators.required],
-      vechilenumber: ['', Validators.required,Validators.pattern(/^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/)],
-      fsrreportdate: ['', Validators.required],
-      imagesuploading: ['', Validators.required],
-      customer: ['', Validators.required],
-      nee: ['', Validators.required],
-      invoicenumber: ['', Validators.required],
-      invoicedate: ['', Validators.required],
-      shipmentvalue: ['', Validators.required],
-      DamageRemarks: ['', Validators.required],
-      claimsettlement: ['', Validators.required],
-      status: ['', Validators.required],
-      closingdamagedate: ['']
+
+  // ✅ Header form
+  buildHeaderForm() {
+    this.HeaderForm = this.fb.group({
+      INV_NO: [''],
+      INV_DATE: [''],
+      FSR_RPT_DT: [''],
+      BASIC_VALUE: [''],
+      INC_DATE: [''],
+      CUSTOMER: [''],
+      CONSIGN_NAME: [''],
+      DAMAGE_RMK: [''],
+      SETTLEMENT: [''],
+      CLOSING_DT: [''],
+      IMAGES: ['']
     });
   }
- 
- private setupStatusWatcher() {
-  this.transitDamageInfo.get('status')?.valueChanges.subscribe(status => {
-    const closingDateControl = this.transitDamageInfo.get('closingdamagedate');
-    if (status === 'close') {
-      closingDateControl?.setValidators([Validators.required]);
-    } else {
-      closingDateControl?.clearValidators();
-      closingDateControl?.setValue(null); // Reset value when not required
-    }
-    closingDateControl?.updateValueAndValidity();
-  });
-}
- 
-  savePlan() {
-    if (this.transitDamageInfo.valid) {
-      this.isSubmitting = true;
-      console.log('Form submitted:', this.transitDamageInfo.value);
-      setTimeout(() => {
-        this.isSubmitting = false;
-        this.transitDamageInfo.reset();
-        this.isEditMode = false;
-      }, 1000);
-    } else {
-      Object.values(this.transitDamageInfo.controls).forEach(control => control.markAsTouched());
-    }
+
+  // ✅ Item form
+  buildItemForm() {
+    this.ItemForm = this.fb.group({
+      ITEMS: this.fb.array([])
+    });
   }
- 
-  cancelEdit() {
-    this.isEditMode = false;
-    this.transitDamageInfo.reset();
+
+  get items() {
+    return this.ItemForm.get('ITEMS') as FormArray;
   }
+
+  addItemRow() {
+    const row = this.fb.group({
+      INV_NO: [''],
+      POSNR: [''],
+      VEH_LINE: [''],
+      TRUCK_NO: [''],
+      LR_NO: [''],
+      TRANSPORTER: ['']
+    });
+
+    this.items.push(row);
+  }
+
+  removeItemRow(i: number) {
+    this.items.removeAt(i);
+  }
+
+  // ✅ RESET ALL
+  resetForms() {
+    this.showTable = false;
+
+    this.HeaderForm.reset();
+
+    while (this.items.length !== 0) {
+      this.items.removeAt(0);
+    }
+
+    this.invoicenumber = "";
+  }
+
+  onOrderTypeSelection() {
+    this.resetForms();
+    this.sapType = null;
+  }
+
+  onSapTypeSelection() {
+    this.resetForms();
+  }
+
+  // ✅ ✅ ✅ MAIN FUNCTION — FETCH API & FILL DATA
+  fetchInvoiceDetails() {
+    if (!this.invoicenumber) return;
+
+    const payload = {
+      VBELN: this.invoicenumber
+    };
+
+    this.service.TransitDamageInfofetch(payload).subscribe({
+      next: (res: any) => {
+
+        if (!res || res.length === 0) {
+          alert("No data found");
+          return;
+        }
+
+        const header = res[0].HEADER;
+        const items = res[0].ITEM;
+
+        // ✅ Show UI
+        this.showTable = true;
+
+        // ✅ Fill Header
+        this.HeaderForm.patchValue({
+          INV_NO: header.INV_NO,
+          INV_DATE: header.INV_DATE,
+          FSR_RPT_DT: header.FSR_RPT_DT,
+          BASIC_VALUE: header.BASIC_VALUE,
+          INC_DATE: header.INC_DATE,
+          CUSTOMER: header.CUSTOMER,
+          CONSIGN_NAME: header.CONSIGN_NAME,
+          DAMAGE_RMK: header.DAMAGE_RMK,
+          SETTLEMENT: header.SETTLEMENT,
+          CLOSING_DT: header.CLOSING_DT,
+          IMAGES: header.IMAGES
+        });
+
+        // ✅ Clear old items
+        while (this.items.length !== 0) {
+          this.items.removeAt(0);
+        }
+
+        // ✅ Fill ITEM array
+        items.forEach((x: any) => {
+          const row = this.fb.group({
+            INV_NO: [x.INV_NO],
+            POSNR: [x.POSNR],
+            VEH_LINE: [x.VEH_LINE],
+            TRUCK_NO: [x.TRUCK_NO],
+            LR_NO: [x.LR_NO],
+            TRANSPORTER: [x.TRANSPORTER]
+          });
+
+          this.items.push(row);
+        });
+      },
+      error: (err) => {
+        console.error(err);
+        alert("Error fetching data");
+      }
+    });
+  }
+
+  // ✅ FINAL SAVE FUNCTION
+  onSave() {
+
+    // ✅ Build Final Payload EXACTLY AS API NEEDS
+    const payload = {
+      HEADER: this.HeaderForm.value,
+      ITEM: this.ItemForm.value.ITEMS   // ✅ correct
+    };
+
+    console.log("✅ Final Save Payload Sent:", payload);
+
+    // ✅ CALL SAVE API
+    this.service.TransitDamageInfoSave(payload).subscribe({
+      next: (res: any) => {
+
+        console.log("✅ SAVE RESPONSE:", res);
+
+        if (res && res.STATUS === "TRUE") {
+          alert("✅ Data Saved Successfully!");
+        } else {
+          alert("⚠️ Save Failed: " + res.MESSAGE);
+        }
+
+      },
+      error: (err) => {
+        console.error(err);
+        alert("❌ Error while saving data");
+      }
+    });
+
+  }
+  fetchInvoiceDetailsnonsap() {
+    if (!this.invoicenumber) return;
+
+    const payload = {
+      VBELN: this.invoicenumber
+    };
+
+    this.service.fetchinvoicelistnonsapwosp(payload).subscribe({
+      next: (res: any) => {
+
+        if (!res || res.length === 0) {
+          alert("No data found");
+          return;
+        }
+
+        const header = res[0].HEADER;
+        const items = res[0].ITEM;
+
+        // ✅ Show UI
+        this.showTable = true;
+
+        // ✅ Fill Header
+        this.HeaderForm.patchValue({
+          INV_NO: header.INV_NO,
+          INV_DATE: header.INV_DATE,
+          FSR_RPT_DT: header.FSR_RPT_DT,
+          BASIC_VALUE: header.BASIC_VALUE,
+          INC_DATE: header.INC_DATE,
+          CUSTOMER: header.CUSTOMER,
+          CONSIGN_NAME: header.CONSIGN_NAME,
+          DAMAGE_RMK: header.DAMAGE_RMK,
+          SETTLEMENT: header.SETTLEMENT,
+          CLOSING_DT: header.CLOSING_DT,
+          IMAGES: header.IMAGES
+        });
+
+        // ✅ Clear old items
+        while (this.items.length !== 0) {
+          this.items.removeAt(0);
+        }
+
+        // ✅ Fill items
+        items.forEach((x: any) => {
+          const row = this.fb.group({
+            INV_NO: [x.INV_NO],
+            POSNR: [x.POSNR],
+            VEH_LINE: [x.VEH_LINE],
+            TRUCK_NO: [x.TRUCK_NO],
+            LR_NO: [x.LR_NO],
+            TRANSPORTER: [x.TRANSPORTER]
+          });
+
+          this.items.push(row);
+        });
+
+      },
+      error: (err) => {
+        console.error(err);
+        alert("Error fetching NON-SAP data");
+      }
+    });
+  }
+
+  onSaveNonSap() {
+
+    // ✅ Build Final Payload EXACTLY AS API NEEDS
+    const payload = {
+      HEADER: this.HeaderForm.value,
+      ITEM: this.ItemForm.value.ITEMS   // ✅ correct
+    };
+
+    console.log("✅ Final Save Payload Sent:", payload);
+
+    // ✅ CALL SAVE API
+    this.service.withoutsapSave(payload).subscribe({
+      next: (res: any) => {
+
+        console.log("✅ SAVE RESPONSE:", res);
+
+        if (res && res.STATUS === "TRUE") {
+          alert("✅ Data Saved Successfully!");
+        } else {
+          alert("⚠️ Save Failed: " + res.MESSAGE);
+        }
+
+      },
+      error: (err) => {
+        console.error(err);
+        alert("❌ Error while saving data");
+      }
+    });
+
+  }
+
 }

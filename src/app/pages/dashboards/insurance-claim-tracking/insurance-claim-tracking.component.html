@@ -1,259 +1,221 @@
 <div class="card-LE">
     <div class="card-header-LE">Insurance Claim Tracking</div>
+
     <div class="card-body-LE">
-    <!-- Order Type -->
-    <div class="form-radio optional">
-      <label>
-        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
-        <span>Inward</span>
-      </label>
-      <label>
-        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
-        <span>Outward</span>
-      </label>
-    </div>
 
-    <br />
+        <!-- ✅ ORDER TYPE -->
+        <div class="form-radio optional">
+            <label>
+                <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward"
+                    (change)="onOrderTypeSelection()" />
+                <span>Inward</span>
+            </label>
 
-    <!-- SAP Type + Input -->
-    <div *ngIf="orderType" class="sap-row" style="display: flex !important;">
-      <!-- SAP Radio -->
-      <div class="form-radio optional sap-radio">
-        <label>
-          <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
-          <span>With SAP</span>
-        </label>
-        <label>
-          <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
-          <span>Without SAP</span>
-        </label>
-      </div>
-
-      <!-- Input + GET (only for SAP) -->
-      <!-- Input + GET (for both SAP and Non-SAP) -->
-        <div class="input-row" *ngIf="sapType === 'SAP' || sapType === 'Non-SAP'">
-        <div *ngIf="orderType === 'Inward'" class="input-flex">
-            <div class="form-field flex-1">
-            <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" " />
-            <label>PO Number</label>
-            </div>
-            <button type="button" class="btn-get" (click)="getForm('purchase')"
-            [disabled]="!ponumber || ponumber.trim()===''">
-            GET
-            </button>
+            <label>
+                <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward"
+                    (change)="onOrderTypeSelection()" />
+                <span>Outward</span>
+            </label>
         </div>
 
-        <div *ngIf="orderType === 'Outward'" class="input-flex">
-            <div class="form-field flex-1">
-            <input type="text" name="invoicenumber" [(ngModel)]="invoicenumber" placeholder=" " />
-            <label>Invoice Number</label>
+        <br />
+
+        <!-- ✅ SAP TYPE -->
+        <div *ngIf="orderType" class="sap-row" style="display: flex !important;">
+            <div class="form-radio optional sap-radio">
+                <label>
+                    <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeSelection()" />
+                    <span>With SAP</span>
+                </label>
+                <label>
+                    <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeSelection()" />
+                    <span>Without SAP</span>
+                </label>
             </div>
-            <button type="button" class="btn-get" (click)="getForm('invoice')"
-            [disabled]="!invoicenumber || invoicenumber.trim()===''">
-            GET
-            </button>
+
+            <!-- ✅ INVOICE INPUT + GET common -->
+            <div class="input-row" *ngIf="sapType">
+                <div class="input-flex">
+
+                    <div class="form-field flex-1">
+                        <input type="text" name="invoicenumber" [(ngModel)]="invoicenumber" placeholder=" " />
+                        <label>Invoice Number</label>
+                    </div>
+
+                    <button type="button" class="btn-get" (click)="fetchInvoiceDetails()"
+                        [disabled]="!invoicenumber || invoicenumber.trim() === ''">
+                        GET
+                    </button>
+
+                </div>
+            </div>
+
         </div>
-        </div>
 
-    </div>
-  </div>
+        <br />
 
+        <!-- ✅ HEADER FORM -->
+        <form [formGroup]="HeaderForm" *ngIf="showTable" class="form-grid">
 
-
-        <form class="form-grid" [formGroup]="InsuranceClaimTracking" *ngIf="showForm">
-            <div class="form-field">
-                <input type="text" formControlName="FinanceYear" placeholder=" " />
-                <label>Finance Year</label>               
-            </div>
-
-            <div class="form-field">
-                <input type="date" formControlName="ReportedDate" placeholder=" " />
-                <label>Reported Date</label>            
-            </div>
-            <div class="form-field">
-                <input type="text" formControlName="ClaimRef" placeholder=" " />
-                <label>Claim Ref</label>               
-            </div>
-            <div class="form-field">
-                <input type="text" formControlName="InvoiceNumber" placeholder=" " />
-                <label>Invoice Number </label>
-                
-            </div>
-            <div class="form-field">
-                <input type="date" formControlName="InvoiceDate" placeholder=" " />
-                <label>Invoice Date</label>
-                
-            </div>
-
-            <div class="form-field">
-                <input type="text" formControlName="InvoiceValueBasic" placeholder=" " />
-                <label>Invoice Value Basic</label>
-                
-            </div>
-            <div class="form-field">
-                <input type="text" formControlName="LossDeclaredRs" placeholder=" " />
-                <label>Loss Declared Rs </label>
-                
-            </div>
-            <div class="form-field">
-                <input type="text" formControlName="ClaimReceivedFinalised" placeholder=" " />
-                <label>Claim Received / Finalised(Rs) </label>
-                
-            </div>
-            <div class="form-field">
-                <input type="text" formControlName="SalvageValue" placeholder=" " />
-                <label>Solvage Value </label>
-                
-            </div>
-
-            <div class="form-field">
-                <input type="text" formControlName="Customer" placeholder=" " />
-                <label>Customer </label>
-                
-            </div>
-
-            <div class="form-field">
-                <input type="text" formControlName="PONumber" placeholder=" " />
-                <label>PO Number </label>
-                
-            </div>
-            <div class="form-field">
-                <input type="text" formControlName="vechilenumber" id="vechilenumber" placeholder=" " />
-                <label for="vechilenumber">Vehicle Number</label>
-                
-            </div>
-            <div class="form-field">
-                <input type="number" min="0" formControlName="AhLoadedInTruck" placeholder=" " step="0.01" />
-                <label>Ah loaded in the Truck</label>
-                
-            </div>
-
-            <div class="form-field">
-                <input type="text" formControlName="NoOfSets" placeholder=" " />
-                <label>No Of Sets /Nos </label>
-                
-            </div>
-
-
-            <div class="form-field">
-                <input type="text" formControlName="Location" placeholder=" " />
-                <label>Location</label>
-                
-            </div>
-
-
-            <div class="form-field">
-                <input type="date" formControlName="Transporter" placeholder=" " />
-                <label>Transporter</label>
-                
-            </div>
-            <div class="form-field">
-                <input type="date" formControlName="TruckNumber" placeholder=" " />
-                <label>Truck Number</label>
-               
-            </div>
-            <div class="form-field">
-                <input type="text" formControlName="LRNumber" placeholder=" " />
-                <label>LR Number</label>
-                
-            </div>
-            <div class="form-field">
-                <select formControlName="DamageRemarks">
-                    <option value="">Select</option>
-                    <option value="Packing material damage">Packing material damage</option>
-                    <option value="Pallet damage">Pallet damage</option>
-                    <option value="Cells damage">Cells damage</option>
-                    <option value="Cell Bank damage">Cell Bank damage</option>
-                    <option value="Can damage">Can damage</option>
-                    <option value="Accident">Accident</option>
-                    <option value="Prohibited material loading and seized by Police">
-                        Prohibited material loading and seized by Police
-                    </option>
-                    <option value="Damage during unloading">Damage during unloading</option>
-                    <option value="Material in wet condition">Material in wet condition</option>
-                    <option value="Damage due to other Materials loaded">
-                        Damage due to other Materials loaded
-                    </option>
-                </select>
-
-                <label>Damage Remarks</label>
-               
-            </div>
-
-            <div class="form-field">
-                <input type="text" formControlName="ClaimInformationSentOn" placeholder=" " />
-                <label>Claim Information Sent On</label>
-               
-            </div>
-            <div class="form-field">
-                <select formControlName="ClaimStatus">
-                    <option value="">Select</option>
-                    <option value="Open">Open</option>
-                    <option value="Close">Close</option>
-
-                </select>
-                <label>Claim Status</label>
-               
-            </div>
-            <div class="form-field">
-                <select formControlName="ClaimDocumentsStatus">
-                    <option value="">Select</option>
-                    <option value="Open">Open</option>
-                    <option value="Close">Close</option>
-
-                </select>
-                <label>Claim Documents Status</label>
-                
-            </div>
-            <div class="form-field">
-                <input type="date" formControlName="CourierDetails" placeholder=" " />
-                <label>Courier Details</label>
-                
-            </div>
-
-            <div class="form-field">
-                <select formControlName="PaymentStatus">
-                    <option value="">Select</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Pending">Pending</option>
-
-                </select>
-                <label>Payment Status</label>
-                
-            </div>
-
-            <div class="form-field">
-                <input type="date" formControlName="PaymentInfo" placeholder=" " />
-                <label>Payment Info</label>               
-            </div>
             <!-- <div class="form-field">
-                    <input type="date" formControlName="NEFT" placeholder=" " />
-                    <label>NEFT</label>
-                    <small class="error"
-                        *ngIf="InsuranceClaimTracking.get('NEFT')?.touched && InsuranceClaimTracking.get('NEFT')?.invalid">
-                        NEFT is required
-                    </small>
-                </div> -->
+                <input type="text" formControlName="INV_NO" placeholder=" " />
+                <label>Invoice Number</label>
+            </div> -->
+
+            <div class="form-field">
+                <input type="text" formControlName="FI" placeholder=" " />
+                <label>Fiscal Year</label>
+            </div>
+
+            <div class="form-field">
+                <input type="date" formControlName="REP_DATE" placeholder=" " />
+                <label>Reported Date</label>
+            </div>
+
+            <div class="form-field">
+                <input type="text" formControlName="CLAIM_REF" placeholder=" " />
+                <label>Claim Reference</label>
+            </div>
+
+            <div class="form-field">
+                <input type="date" formControlName="INV_DATE" placeholder=" " />
+                <label>Invoice Date</label>
+            </div>
+
+            <div class="form-field">
+                <input type="text" formControlName="INV_BV" placeholder=" " />
+                <label>Invoice Basic Value</label>
+            </div>
+
+            <div class="form-field">
+                <input type="text" formControlName="LOSS_DCL" placeholder=" " />
+                <label>Loss Declared</label>
+            </div>
+
+            <div class="form-field">
+                <input type="text" formControlName="CLM_RF" placeholder=" " />
+                <label>Claim Received</label>
+            </div>
+
+            <div class="form-field">
+                <input type="text" formControlName="SOL_VAL" placeholder=" " />
+                <label>Salvage Value</label>
+            </div>
+
+            <div class="form-field">
+                <input type="text" formControlName="CUSTOMER" placeholder=" " />
+                <label>Customer</label>
+            </div>
+
+            <div class="form-field">
+                <input type="text" formControlName="SO_NO" placeholder=" " />
+                <label>SO Number</label>
+            </div>
+
+            <div class="form-field">
+                <input type="text" formControlName="LOCATION" placeholder=" " />
+                <label>Location</label>
+            </div>
+
+            <div class="form-field">
+                <input type="text" formControlName="DAMAGE_RMK" placeholder=" " />
+                <label>Damage Remarks</label>
+            </div>
+
+            <div class="form-field">
+                <input type="text" formControlName="CLM_INF" placeholder=" " />
+                <label>Claim Info Sent</label>
+            </div>
+
+            <div class="form-field">
+                <input type="text" formControlName="CLM_ST" placeholder=" " />
+                <label>Claim Status</label>
+            </div>
+
+            <div class="form-field">
+                <input type="text" formControlName="CLM_DOC_ST" placeholder=" " />
+                <label>Claim Document Status</label>
+            </div>
+
+            <div class="form-field">
+                <input type="text" formControlName="COURIER_DET" placeholder=" " />
+                <label>Courier Details</label>
+            </div>
+
+            <div class="form-field">
+                <input type="text" formControlName="PAY_ST" placeholder=" " />
+                <label>Payment Status</label>
+            </div>
+
+            <div class="form-field">
+                <input type="text" formControlName="PAY_INFO" placeholder=" " />
+                <label>Payment Info</label>
+            </div>
 
             <div class="form-field">
                 <input type="text" formControlName="UTR" placeholder=" " />
-                <label>UTR</label>                
+                <label>UTR</label>
             </div>
 
             <div class="form-field">
-                <input type="Date" formControlName="ClaimSettlementDate" placeholder=" " />
-                <label>ClaimSettlementDate</label>               
+                <input type="date" formControlName="CLM_SET_DT" placeholder=" " />
+                <label>Claim Settlement Date</label>
             </div>
 
-
-
         </form>
-        <!-- Submit / Cancel Buttons -->
-        <div class="text-right" *ngIf="showForm">
-            <button type="button" class="btn btn-md btn-raised btnSave" (click)="savePlan()">
-                Save
-            </button>
+
+        <br />
+
+        <!-- ✅ ITEMS TABLE -->
+        <div *ngIf="showTable" style="overflow:auto;">
+            <form [formGroup]="ItemForm">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>SI.No</th>
+                            <!-- <th>POSNR</th> -->
+                            <th>Vehicle Line</th>
+                            <th>Vehicle Type</th>
+                            <th>Truck Number</th>
+                            <th>LR Number</th>
+                            <th>AH</th>
+                            <th>No. of Sets</th>
+                            <th>Transporter</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody formArrayName="ITEMS">
+                        <tr *ngFor="let item of items.controls; let i = index" [formGroupName]="i">
+
+                            <td>{{ i + 1 }}</td>
+
+                            <!-- <td><input formControlName="POSNR"></td> -->
+                            <td><input formControlName="VEH_LINE"></td>
+                            <td><input formControlName="VEHICLE"></td>
+                            <td><input formControlName="TRUCK_NO"></td>
+                            <td><input formControlName="LR_NO"></td>
+                            <td><input formControlName="AH"></td>
+                            <td><input formControlName="NO_SETS"></td>
+                            <td><input formControlName="TRANSPORTER"></td>
+
+                            <td>
+                                <button type="button" (click)="addItemRow()">+</button>
+                                <button type="button" (click)="removeItemRow(i)">✖</button>
+                            </td>
+
+                        </tr>
+                    </tbody>
+
+                </table>
+            </form>
         </div>
+
+        <br />
+
+        <div *ngIf="showTable" class="text-right">
+            <button class="btnSave" (click)="onSave()">Save</button>
+        </div>
+
     </div>
-
-
+</div>
