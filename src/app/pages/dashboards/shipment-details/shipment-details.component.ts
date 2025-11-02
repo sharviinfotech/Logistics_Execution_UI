@@ -17,7 +17,7 @@ export class ShipmentDetailsComponent implements OnInit {
 
   // Dropdown options
   productOptions = ['Batteries', 'Electronics', 'Fuze', 'Cement Poles and Piles', 'Raw Materials', 'Job Work Material', 'Machinery', 'Others'];
-  batteryConditionOptions = ['Dry and discharge with solid electrolyte', 'Dry and discharge with Liquid electrolyte', 'Filled and discharges', 'Filled and charged', 'Filled and formed no free Acid', 'Lead acid batteries (Dry)', 'Lead acid batteries (Filled)'];
+  batteryConditionOptions = ['Dry and discharge with solid electrolyte', 'Dry and discharge with Liquid electrolyte', 'Filled and discharged', 'Filled and charged', 'Filled and formed no free Acid', 'Lead acid batteries (Dry)', 'Lead acid batteries (Filled)'];
   insuranceScopeOptions = ['Buyer', 'Supplier'];
 
   // Form and variables
@@ -42,7 +42,11 @@ export class ShipmentDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.ProductInfo = this.fb.group({
+       Incoterms: ['', Validators.required],
+      InsuranceScope: ['',Validators.required],
+      Kilometres: [null, [Validators.required, Validators.min(0)]],
       items: this.fb.array([])
+      
     });
     this.addRow();
     this.fetchTypeofmaterial();
@@ -65,9 +69,6 @@ export class ShipmentDetailsComponent implements OnInit {
       AhLoadedInTruck: [null, [Validators.required, Validators.min(0)]],
       ShipmentWeight: [null, [Validators.required, Validators.min(0)]],
       BatteryCondition: [''],
-      Incoterms: ['', Validators.required],
-      InsuranceScope: ['Buyer'],
-      Kilometres: [null, [Validators.required, Validators.min(0)]]
     });
   }
 
@@ -153,51 +154,76 @@ export class ShipmentDetailsComponent implements OnInit {
   // ✅ Checkbox methods end
 
   // ✅ Fetch SAP invoice details
-  fetchInvoiceDetails() {
-    if (this.sapType !== 'SAP') {
-      alert('Please select "With SAP" first.');
-      return;
-    }
-
-    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
-    if (!referenceNumber?.trim()) {
-      alert(`Please enter a valid ${this.orderType === 'Inward' ? 'PO' : 'Invoice'} Number`);
-      return;
-    }
-
-    const payload = { INV_GET: referenceNumber.trim() };
-    this.service.shipmentdetailsfetch(payload).subscribe({
-      next: (res: any) => {
-        const result = Array.isArray(res) ? res : (res?.data || []);
-
-        if (result.length > 0) {
-          this.items.clear();
-          result.forEach((item: any) => {
-            this.items.push(this.fb.group({
-              selected: [false],
-              Product: [item.ZPRODUCT || ''],
-              TypeOfMaterial: [item.MTBEZ || ''],
-              MaterialDescription: [item.MAKTX || ''],
-              Noofseats: [item.ZSETS || 0, [Validators.min(1)]],
-              AhLoadedInTruck: [item.ZAH || 0],
-              ShipmentWeight: [item.ZSHIP_WT || 0],
-              BatteryCondition: [item.ZBATCOND || ''],
-              Incoterms: [item.ZINCO || ''],
-              InsuranceScope: [item.ZINS_SCPOE || 'Buyer'],
-              Kilometres: [item.ZKM || 0]
-            }));
-          });
-          this.showForm = true;
-        } else {
-          alert('No data found for this reference.');
-        }
-      },
-      error: (err) => {
-        console.error('Error fetching data:', err);
-        alert('Error fetching data from SAP.');
-      }
-    });
+ fetchInvoiceDetails() {
+  if (this.sapType !== 'SAP') {
+    alert('Please select "With SAP" first.');
+    return;
   }
+
+  const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+  if (!referenceNumber?.trim()) {
+    alert(`Please enter a valid ${this.orderType === 'Inward' ? 'PO' : 'Invoice'} Number`);
+    return;
+  }
+
+  const payload = { INV_GET: referenceNumber.trim() };
+  this.spinner.show();
+  
+  this.service.shipmentdetailsfetch(payload).subscribe({
+    next: (res: any) => {
+      const result = Array.isArray(res) ? res : (res?.data || []);
+
+      if (result.length > 0) {
+        const firstItem = result[0];
+        
+        // ✅ Check if the Incoterm exists in the list
+        const incoExists = this.IncotermsList.find(i => i.INCO1 === firstItem.ZINCO);
+        console.log("Incoterm from API:", firstItem.ZINCO);
+        console.log("Incoterm exists in list:", incoExists);
+        console.log("Full IncotermsList:", this.IncotermsList);
+        
+        this.items.clear();
+        
+        // ✅ Set the values
+        this.ProductInfo.patchValue({
+          Incoterms: firstItem.ZINCO || '',
+          InsuranceScope: firstItem.ZINS_SCPOE || 'Buyer',
+          Kilometres: firstItem.ZKM !== null && firstItem.ZKM !== undefined ? firstItem.ZKM : null
+        });
+        
+        console.log("Form values after patch:", {
+          Incoterms: this.ProductInfo.get('Incoterms')?.value,
+          InsuranceScope: this.ProductInfo.get('InsuranceScope')?.value,
+          Kilometres: this.ProductInfo.get('Kilometres')?.value
+        });
+
+        result.forEach((item: any) => {
+          this.items.push(this.fb.group({
+            selected: [false],
+            Product: [item.ZPRODUCT || ''],
+            TypeOfMaterial: [item.MTBEZ || ''],
+            MaterialDescription: [item.MAKTX || ''],
+            Noofseats: [item.ZSETS || 0, [Validators.min(1)]],
+            AhLoadedInTruck: [item.ZAH || 0],
+            ShipmentWeight: [item.ZSHIP_WT || 0],
+            BatteryCondition: [item.ZBATCOND || '']
+          }));
+        });
+        
+        this.showForm = true;
+        this.spinner.hide();
+      } else {
+        alert('No data found for this reference.');
+        this.spinner.hide();
+      }
+    },
+    error: (err) => {
+      console.error('Error fetching data:', err);
+      alert('Error fetching data from SAP.');
+      this.spinner.hide();
+    }
+  });
+}
 
   // ✅ Save only selected rows
   saveShipmentOutward(): void {
@@ -214,8 +240,17 @@ export class ShipmentDetailsComponent implements OnInit {
       return;
     }
 
+    const commonFields = {
+      Incoterms: this.ProductInfo.get('Incoterms')?.value,
+      InsuranceScope: this.ProductInfo.get('InsuranceScope')?.value,
+      Kilometres: this.ProductInfo.get('Kilometres')?.value
+    };
+
     // ✅ Remove 'selected' before sending
-    const cleanedRows = selectedRows.map(({ selected, ...rest }) => rest);
+    const cleanedRows = selectedRows.map(({ selected, ...rest }) => ({
+  ...rest,
+  ...commonFields
+}));
 
     console.log("Saving selected rows:", cleanedRows);
     this.spinner.show();
@@ -306,6 +341,12 @@ export class ShipmentDetailsComponent implements OnInit {
       next: (res: any) => {
         if (Array.isArray(res)) {
           this.items.clear();
+          const firstItem = res[0];
+          this.ProductInfo.patchValue({
+            Incoterms: firstItem.ZINCO || '',
+            InsuranceScope: firstItem.ZINS_SCPOE || '',
+            Kilometres: firstItem.ZKM || 0
+          });
           res.forEach((item: any) => {
             this.items.push(this.fb.group({
               selected: [false],
@@ -316,9 +357,7 @@ export class ShipmentDetailsComponent implements OnInit {
               AhLoadedInTruck: [item.ZAH || 0],
               ShipmentWeight: [item.ZSHIP_WT || 0],
               BatteryCondition: [item.ZBATCOND || ''],
-              Incoterms: [item.ZINCO || ''],
-              InsuranceScope: [item.ZINS_SCPOE || 'Supplier'],
-              Kilometres: [item.ZKM || 0]
+              
             }));
           });
           this.showForm = true;

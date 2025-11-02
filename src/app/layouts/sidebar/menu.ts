@@ -13,6 +13,13 @@ export const MENU: MenuItem[] = [
                 parentId: 2,
                 icon: 'bxs-dashboard',
             },
+            {
+                id: 2,
+                label: 'Dispatch',
+                link: '/dispatch',
+                parentId: 2,
+                icon: 'bxs-dashboard',
+            },
              {
                 id: 2,
                 label: 'Order Info',

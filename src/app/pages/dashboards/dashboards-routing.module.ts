@@ -26,6 +26,7 @@ import { TransitInfoComponent } from './transit-info/transit-info.component';
 import { FreightBillingComponent } from './freight-billing/freight-billing.component';
 import { TransitDamageInfoComponent } from './transit-damage-info/transit-damage-info.component';
 import { InsuranceClaimTrackingComponent } from './insurance-claim-tracking/insurance-claim-tracking.component';
+import { DispatchComponent } from './dispatch/dispatch.component';
 
 // import { CooisComponent } from './coois/coois.component';
 // import { Co11Component } from './co11/co11.component';
@@ -93,6 +94,10 @@ const routes: Routes = [
      {
         path: 'sectorwise',
         component: SectorWiseComponent
+    },
+     {
+        path: 'dispatch',
+        component: DispatchComponent
     },
        {
         path: 'order-info',

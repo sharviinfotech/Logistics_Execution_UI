@@ -137,6 +137,9 @@ export class GeneralserviceService {
   custgroup(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/orderInfo/Outward/withoutsap/custgroup', obj);
   }
+   OrderInfoPhysicaldispatch(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/orderInfo/Outward/Physicaldispatch', obj);
+  }
   shipmentdetailsfetch(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/ShipmentDetails/Outward/fetchInvoiceList', obj);
   }

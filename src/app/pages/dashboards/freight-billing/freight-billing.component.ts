@@ -49,6 +49,7 @@ export class FreightBillingComponent implements OnInit {
   ngOnInit(): void {
     this.initializeForm();
     this.setupWorkOrderListener();
+    
   }
 
   initializeForm(): void {

@@ -52,6 +52,7 @@
         <table class="table table-bordered">
           <thead>
             <tr>
+              <th><input type="checkbox"  (change)="toggleAllSelection($event)"[checked]="isAllSelected"/></th>
               <th>SI.No</th>
               <th>Type of Shipment</th>
               <th>Type of transporter</th>
@@ -69,6 +70,7 @@
           </thead>
           <tbody formArrayName="vehicles">
             <tr *ngFor="let group of vehicles.controls; let i = index" [formGroupName]="i">
+               <td><input type="checkbox" formControlName="selected"  (change)="onRowCheckboxChange()"></td>
               <td>{{ i + 1 }}</td>
               <td><input type="text" formControlName="ZTRX_TYPE" /></td>
               <td><input type="text" formControlName="ZTRANSPOTER" /></td>

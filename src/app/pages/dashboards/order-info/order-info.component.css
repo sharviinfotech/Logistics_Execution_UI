@@ -317,11 +317,190 @@ input[type="radio"] {
   content: none !important;
   /* Forces the removal of the pseudo-element content */
 }
+/* ========================================
+   NEW CSS - Processing Badge & Toggle Arrow
+   ======================================== */
 
-/* new css for validations */
+/* Wrapper for Order Type + Processing Badge + Arrow */
+.order-type-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
 
-/* ----------------------------
-   🌿 FORM FIELD VALIDATION INDICATORS
-   ---------------------------- */
+/* New Container to align Arrow and Badge side-by-side */
+.status-display-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
 
-/* Base input and select styling */
+/* Processing Badge */
+.processing-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  animation: processingPulse 2s ease-in-out infinite;
+  white-space: nowrap;
+}
+
+@keyframes processingPulse {
+  0%, 100% {
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 25px rgba(102, 126, 234, 0.6);
+  }
+}
+
+/* Status Dot with Blink Animation */
+.processing-badge .status-dot {
+  width: 8px;
+  height: 8px;
+  background: #4ade80;
+  border-radius: 50%;
+  animation: statusBlink 1.5s ease-in-out infinite;
+  box-shadow: 0 0 8px #4ade80;
+}
+
+@keyframes statusBlink {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.4;
+    transform: scale(0.9);
+  }
+}
+
+/* Toggle Arrow Button - Default styles (if used elsewhere) */
+.toggle-arrow {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.toggle-arrow:hover {
+  transform: scale(1.15) rotate(180deg);
+  box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+}
+
+.toggle-arrow:active {
+  transform: scale(0.95) rotate(180deg);
+}
+
+.toggle-arrow svg {
+  width: 24px;
+  height: 24px;
+  fill: white;
+  transition: transform 0.3s ease;
+}
+
+.toggle-arrow.reversed svg {
+  transform: rotate(180deg);
+}
+
+
+.toggle-arrow.arrow-icon {
+  background: none; 
+  box-shadow: none;
+  border: 2px solid #333;
+  transition: all 0.2s ease;
+  width: 50px;
+  height: 50px;
+}
+
+.toggle-arrow.arrow-icon:hover {
+  transform: scale(1.05);
+  background-color: rgba(0, 0, 0, 0.05);
+  box-shadow: none;
+}
+
+.toggle-arrow.arrow-icon:active {
+  transform: scale(0.95);
+}
+
+.toggle-arrow.arrow-icon svg {
+  fill: none;
+  stroke: #333;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform: none; 
+  transition: none; 
+}
+
+
+
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .order-type-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+  
+  .processing-badge {
+    justify-content: center;
+  }
+  
+  .toggle-arrow {
+    align-self: center;
+  }
+  
+  .status-display-container {
+    display: flex; 
+    align-self: center;
+  }
+  .form-field input:disabled,
+.form-field select:disabled { 
+ background-color: #f8f9fa !important;
+ cursor: not-allowed !important;
+ border: 2px dashed #dee2e6 !important;
+ color: #adb5bd !important;
+ position: relative;
+}
+
+/* input కి మాత్రమే lock icon */
+.form-field:has(input:disabled)::before { 
+ content: '🔒';
+ position: absolute;
+ right: 12px;
+ top: 50%;
+ transform: translateY(-50%);
+ font-size: 16px;
+ opacity: 0.5;
+ pointer-events: none;
+}
+
+.form-field:has(input:disabled) label,
+.form-field:has(select:disabled) label {
+ color: #adb5bd !important;
+}
+  
+}
+
+  
+
+
+

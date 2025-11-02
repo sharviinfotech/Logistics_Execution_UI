@@ -4,23 +4,39 @@
   </div>
 
   <div class="card-body-LE">
-    <!-- Order Type -->
-    <div class="form-radio optional">
-      <label>
-        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
-        <span>Inward</span>
-      </label>
-      <label>
-        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
-        <span>Outward</span>
-      </label>
-    </div>
+    <!-- Order Type with Processing Badge -->
+    <div class="order-type-wrapper">
+      <div class="form-radio optional" *ngIf="!orderType">
+        <label>
+          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
+            <span>Inward</span>
+        </label>
+        <label>
+          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
+            <span>Outward</span>
+        </label>
+          </div>
+            <div class="status-display-container" *ngIf="orderType">
+    
+              <button class="toggle-arrow arrow-icon" [class.reversed]="orderType === 'Outward'" (click)="toggleOrderType()" type="button">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z"/>
+                </svg>
+              </button>
+
+              <div class="processing-badge">
+                  <span class="status-dot"></span>
+                  <span>{{ orderType }} is Processing</span>
+              </div>
+
+            </div>
+          </div>
+        
 
     <br />
 
-    <!-- SAP Type + Input -->
+    <!-- SAP Type Selection -->
     <div *ngIf="orderType" class="sap-row" style="display: flex !important;">
-      <!-- SAP Radio -->
       <div class="form-radio optional sap-radio">
         <label>
           <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
@@ -64,9 +80,10 @@
   <!-- Form Section -->
   <form class="form-grid" [formGroup]="OrderInfo" *ngIf="showForm">
     <!-- Tax Invoice -->
-    <div class="form-field">
-      <input type="text" formControlName="TaxInvoice" placeholder=" " />
-      <label>Tax Invoice Number</label>
+  <div class="form-field">
+      <input type="text" formControlName="TaxInvoice" placeholder=" " *ngIf="isSap()" />
+      <input type="text" formControlName="DCReference" placeholder=" " *ngIf="!isSap()" />
+      <label>{{ isSap() ? 'Tax Invoice' : 'DC Reference Number' }}</label>
     </div>
 
     <!-- ODN -->
@@ -76,10 +93,12 @@
     </div>
 
     <!-- Invoice Date -->
-    <div class="form-field">
-      <input type="date" formControlName="InvoiceDate" placeholder=" " />
-      <label>Invoice Date</label>
+ <div class="form-field">
+      <input type="date" formControlName="InvoiceeDate" placeholder=" " *ngIf="isSap()"  />
+      <input type="date" formControlName="ReferenceDate" placeholder=" " *ngIf="!isSap()" />
+      <label>{{ isSap() ? 'Invoice Date' : 'Reference Date' }}</label >
     </div>
+
 
     <!-- Basic Shipment -->
     <div class="form-field">
@@ -101,19 +120,13 @@
 
     <!-- Fiscal Year -->
     <div class="form-field">
-      <input type="text" formControlName="FiscalYear" placeholder=" " />
+      <input type="text" formControlName="FiscalYear" placeholder=" " readonly/>
       <label>Fiscal Year</label>
     </div>
 
     <!-- Fiscal Quarter -->
     <div class="form-field">
-      <select formControlName="FiscalQuarter">
-        <option value="">Select Quarter</option>
-        <option value="Q1">Q1 (Apr - Jun)</option>
-        <option value="Q2">Q2 (Jul - Sep)</option>
-        <option value="Q3">Q3 (Oct - Dec)</option>
-        <option value="Q4">Q4 (Jan - Mar)</option>
-      </select>
+      <input type="text" formControlName="FiscalQuarter" placeholder=" " readonly />
       <label>Fiscal Quarter</label>
     </div>
 
@@ -134,21 +147,7 @@
     </div> -->
     <!-- Month Dropdown -->
     <div class="form-field">
-      <select formControlName="Month">
-        <option value="">Select Month</option>
-        <option value="January">January</option>
-        <option value="February">February</option>
-        <option value="March">March</option>
-        <option value="April">April</option>
-        <option value="May">May</option>
-        <option value="June">June</option>
-        <option value="July">July</option>
-        <option value="August">August</option>
-        <option value="September">September</option>
-        <option value="October">October</option>
-        <option value="November">November</option>
-        <option value="December">December</option>
-      </select>
+      <input type="text" formControlName="Month" placeholder=" " readonly>
       <label>Month</label>
     </div>
 
@@ -369,11 +368,13 @@
       <label>Designation State</label>
     </div>
 
-    <!-- Destination Zone -->
-    <div class="form-field">
-      <input type="text" formControlName="DestinationZone" placeholder=" " />
-      <label>Destination Zone</label>
-    </div>
+   
+        <!-- Destination Zone -->
+        <div class="form-field">
+          <input type="text" formControlName="DestinationZone" placeholder=" " readonly/>
+          <label>Destination Zone</label>
+        </div>
+
   </form>
 
   <!-- Buttons -->

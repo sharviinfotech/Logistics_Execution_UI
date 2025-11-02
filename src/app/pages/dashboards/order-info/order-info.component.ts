@@ -6,10 +6,11 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import Swal from 'sweetalert2';
 import { SpinnerService } from 'src/app/spinner.service';
 import { SharedModule } from '../saas/shared/shared.module';
+
 @Component({
   selector: 'app-order-info',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule,SharedModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, SharedModule],
   templateUrl: './order-info.component.html',
   styleUrls: ['./order-info.component.css']
 })
@@ -20,6 +21,7 @@ export class OrderInfoComponent implements OnInit {
 
   orderType: string = '';
   sapType: string = '';
+  isProcessing: boolean = false;
   ponumber: string = '';
   invoicenumber: string = '';
   previousOrderType: string | null = null;
@@ -30,40 +32,46 @@ export class OrderInfoComponent implements OnInit {
   statesList: any;
   custList: any;
   customerGroup: string = '';
+  initialFormValues: any = {};
 
-  constructor(private fb: FormBuilder, private service: GeneralserviceService, private spinner: NgxSpinnerService, public spinnerService: SpinnerService) { }
+  constructor(
+    private fb: FormBuilder,
+    private service: GeneralserviceService,
+    private spinner: NgxSpinnerService,
+    public spinnerService: SpinnerService
+  ) { }
 
   ngOnInit(): void {
     this.OrderInfo = this.fb.group({
-      TaxInvoice: ['', Validators.required],
-      ODN: ['', Validators.required],
-      InvoiceDate: ['', Validators.required],
-      BasicShipment: ['', Validators.required],
-      // Itemnumber: [''],
-      InvoiceWithGst: ['', Validators.required],
-      // SystemGeneratedDate: [''],
+      TaxInvoice: [''],
+      DCReference: [''],
+      InvoiceeDate: [''], 
+      ReferenceDate: [''],
+      ODN: [''],
+      InvoiceDate: [''],
+      BasicShipment: [''],
+      InvoiceWithGst: [''],
       FiscalYear: [''],
-      FiscalQuarter: ['', Validators.required],
-      Month: ['', Validators.required],
-      BillingTransactionType: ['', Validators.required],
-      // Billingdescription: [''],
-      Plant: ['', Validators.required],
-      // Plantdescription: [''],
-      TransactionType: ['', Validators.required],
-      Division: ['', Validators.required],
-      // Divisiondescription: [''],
-      SubDivision: ['', Validators.required],
-      RefNumber: ['', Validators.required],
-      Customer: ['', Validators.required],
-      CustomerGroup: ['', Validators.required],
-      CNee: ['', Validators.required],
-      DestinationLocation: ['', Validators.required],
-      DestinationState: ['', Validators.required],
-      DestinationZone: ['', Validators.required],
-      // status: [''],
-      PhysicalDispatchDateTime: ['', Validators.required]
+      FiscalQuarter: [''],
+      Month: [''],
+      BillingTransactionType: [''],
+      Plant: [''],
+      TransactionType: [''],
+      Division: [''],
+      SubDivision: [''],
+      RefNumber: [''],
+      Customer: [''],
+      CustomerGroup: [''],
+      CNee: [''],
+      DestinationLocation: [''],
+      DestinationState: [''],
+      DestinationZone: [''],
+      PhysicalDispatchDateTime: [''],
+      
     });
-
+    this.initialFormValues = this.OrderInfo.value;
+    // this.setupDestinationZoneListener();
+    this.setupPhysicalDispatch();
   }
 
   // Helper to check SAP mode
@@ -71,23 +79,80 @@ export class OrderInfoComponent implements OnInit {
     return this.sapType === 'SAP';
   }
 
+  toggleOrderType() {
+  
+  this.OrderInfo.reset(this.initialFormValues);
+  this.orderType = '';
+    this.sapType = '';
+    this.showForm = false;
+    this.isProcessing = false;
+    this.previousOrderType = null;
+    this.previousSapType = null;
+  
+ 
+}
+//   setupDestinationZoneListener(): void {
+//   this.OrderInfo.get('DestinationZone')?.valueChanges.subscribe((value) => {
+//     if (value && value !== '') {
+//       this.OrderInfo.get('DestinationZone')?.disable();
+//     } else {
+//       this.OrderInfo.get('DestinationZone')?.enable();
+//     }
+//     this.OrderInfo.get('DestinationZone')?.updateValueAndValidity();
+//   });
+// }
+
+ setConditionalValidators(): void {
+  console.log('🔧 Setting validators for sapType:', this.sapType);
+
+  // Clear old validators
+  Object.keys(this.OrderInfo.controls).forEach(key => {
+    this.OrderInfo.get(key)?.clearValidators();
+    this.OrderInfo.get(key)?.updateValueAndValidity({ emitEvent: false });
+  });
+
+  // Always required fields
+  const alwaysRequired = [
+    'ODN', 'BasicShipment', 'InvoiceWithGst', 'FiscalQuarter', 'Month',
+    'BillingTransactionType', 'Plant', 'TransactionType', 'Division', 'SubDivision',
+    'RefNumber', 'Customer', 'CustomerGroup', 'CNee', 'DestinationLocation',
+    'DestinationState', 'DestinationZone', 'PhysicalDispatchDateTime'
+  ];
+  alwaysRequired.forEach(key => {
+    this.OrderInfo.get(key)?.setValidators([Validators.required]);
+  });
+
+  // ✅ Conditional validation
+  if (this.isSap()) {
+    this.OrderInfo.get('TaxInvoice')?.setValidators([Validators.required]);
+    this.OrderInfo.get('InvoiceeDate')?.setValidators([Validators.required]);
+  } else {
+    this.OrderInfo.get('DCReference')?.setValidators([Validators.required]);
+    this.OrderInfo.get('ReferenceDate')?.setValidators([Validators.required]);
+  }
+
+  // Update all
+  Object.keys(this.OrderInfo.controls).forEach(key => {
+    this.OrderInfo.get(key)?.updateValueAndValidity({ emitEvent: false });
+  });
+
+  console.log('✅ Validators set successfully');
+}
+
+
   onPlantChange(): void {
     const code = this.OrderInfo.get('Plant')?.value;
-    console.log("code", code)
-    const selected = this.plantList.find((p: any) => p.PLANT === code);
-    this.OrderInfo.patchValue({ Plantdescription: selected?.PLANT_DESC || '' });
+    console.log("Plant selected:", code);
   }
 
   onDivisionChange(): void {
     const code = this.OrderInfo.get('Division')?.value;
-    const selected = this.divisionList.find((d: any) => d.DIVISION === code);
-    this.OrderInfo.patchValue({ Divisiondescription: selected?.DIVISION_DESC || '' });
+    console.log("Division selected:", code);
   }
 
   onBillingTypeChange(): void {
     const code = this.OrderInfo.get('BillingTransactionType')?.value;
-    const selected = this.billintypeList.find((b: any) => b.BILL_TYPE === code);
-    this.OrderInfo.patchValue({ Billingdescription: selected?.BILL_TYPE_DESC || '' });
+    console.log("Billing Type selected:", code);
   }
 
   onOrderTypeChange(): void {
@@ -95,84 +160,123 @@ export class OrderInfoComponent implements OnInit {
       this.sapType = '';
       this.previousSapType = null;
       this.resetConditionalFields();
+      this.isProcessing = true;
     }
     this.previousOrderType = this.orderType;
   }
+  setupPhysicalDispatch(): void {
+  this.OrderInfo.get('PhysicalDispatchDateTime')?.valueChanges.subscribe(value => {
+    if (value) {
+      const obj = { phys_dispatch: value };
+      console.log("Fetching Fiscal Info for Dispatch Date:", obj);
+
+      this.spinner.show();
+
+      this.service.OrderInfoPhysicaldispatch(obj).subscribe(
+        (res: any) => {
+          console.log(" Fiscal Info Response:", res);
+          if (res) {
+            this.OrderInfo.patchValue({
+              Month: res.FISCAL_MONTH || '',
+              FiscalQuarter: res.FISCAL_QUARTER || '',
+              FiscalYear: res.FISCAL_YEAR || ''
+            });
+            this.OrderInfo.get('Month')?.disable();
+ this.OrderInfo.get('FiscalQuarter')?.disable();
+             this.OrderInfo.get('FiscalYear')?.disable();
+            
+          }
+          this.spinner.hide();
+        },
+        error => {
+          console.error("Error fetching fiscal info:", error);
+          this.spinner.hide();
+        }
+      );
+    }
+    else {
+      // 🔹 If Physical Dispatch Date is cleared, reset & enable all three fields
+      this.OrderInfo.patchValue({
+        Month: '',
+        FiscalQuarter: '',
+        FiscalYear: ''
+      });
+
+      this.OrderInfo.get('Month')?.enable();
+      this.OrderInfo.get('FiscalQuarter')?.enable();
+      this.OrderInfo.get('FiscalYear')?.enable();
+    }
+
+  });
+}
+
 
   onSapTypeChange(): void {
     this.fetchpdb();
     this.showForm = false;
+    
     if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
       this.resetConditionalFields();
     }
+    
     this.previousSapType = this.sapType;
+    this.setConditionalValidators();
 
     console.log("sapType", this.sapType);
-    if (this.sapType === "SAP") {
-      // this.fetchNonSAPData(); // can be replaced with SAP master fetch if available
-    } else {
+    
+    if (this.sapType === "Non-SAP") {
       this.showForm = true;
     }
   }
 
   getForm(type: 'purchase' | 'invoice'): void {
     const value = type === 'purchase' ? this.ponumber : this.invoicenumber;
+    
     if (!value || value.trim() === '') {
       this.showForm = false;
       return;
     }
-    this.setValidatorsOnFormFields();
 
     if (this.sapType === 'SAP') {
       this.fetchSAPData(type);
     } else if (this.sapType === 'Non-SAP') {
       this.fetchNonSAPData();
-      this.showForm=true
+      this.showForm = true;
     }
   }
 
   fetchSAPData(type: 'purchase' | 'invoice'): void {
     const obj = { VBELN: this.invoicenumber };
 
-    this.spinner.show()
-    this.service.OrderinfoOutward(obj).subscribe((res: any) => {
-      console.log("res Fetch", res)
-      if (res && res.length > 0) {
-        this.patchForm(res[0]);
-        this.showForm = true;
-        this.spinner.hide()
-        // setTimeout(() => {
-        // this.spinner.show('success', 'right');
-        // setTimeout(() => this.spinner.hide(), 900);
-        // }, 50); 
-      } else {
+    this.spinner.show();
+    this.service.OrderinfoOutward(obj).subscribe(
+      (res: any) => {
+        console.log("✅ SAP Fetch Response:", res);
+        
+        if (res && res.length > 0) {
+          this.patchForm(res[0]);
+          this.showForm = true;
+          this.spinner.hide();
+        } else {
+          this.showForm = false;
+          this.spinner.hide();
+          Swal.fire({
+            text: 'No Data',
+            icon: 'warning',
+            timer: 5000
+          });
+        }
+      },
+      error => {
         this.showForm = false;
-        this.spinner.hide()
-         Swal.fire({
-        text: 'No Data',
-        icon: 'warning',
-        timer: 5000
-      });
-        //    setTimeout(() => {
-        //   this.spinner.show('error', 'left');
-        //   setTimeout(() => this.spinner.hide(), 900);
-        // }, 50);
+        this.spinner.hide();
+        Swal.fire({
+          text: 'Internal Server Error. Please try again later.',
+          icon: 'error',
+          timer: 5000
+        });
       }
-    }, error => {
-      this.showForm = false;
-      this.spinner.hide()
-
-      Swal.fire({
-        text: 'Internal Server Error. Please try again later.',
-        icon: 'error',
-        timer: 5000
-      });
-      // this.spinnerErrorMsg = 'Internal Server Error. Please try again later.';
-      // setTimeout(() => {
-      //     this.spinner.show('error', 'left');
-      //     setTimeout(() => this.spinner.hide(), 900);
-      //   }, 50);
-    });
+    );
   }
 
   fetchNonSAPData(): void {
@@ -183,28 +287,37 @@ export class OrderInfoComponent implements OnInit {
       Customer: this.OrderInfo.get('Customer')?.value || ''
     };
 
-    this.service.OrderInfoNonSap(obj).subscribe((res: any) => {
-
-      console.log("non sap save ", res)
-      if (res && res.length > 0) {
-        this.patchForm(res[0]);
-        this.showForm = true;
-      } else {
-        this.resetExtraFields();
+    this.spinner.show();
+    this.service.OrderInfoNonSap(obj).subscribe(
+      (res: any) => {
+        console.log("✅ Non-SAP Response:", res);
+        
+        if (res && res.length > 0) {
+          this.patchForm(res[0]);
+          this.showForm = true;
+          this.spinner.hide();
+        } else {
+          this.resetExtraFields();
+          this.showForm = false;
+          this.spinner.hide();
+        }
+      },
+      error => {
         this.showForm = false;
+        this.spinner.hide();
       }
-    }, error => {
-      this.showForm = false;
-    });
+    );
   }
 
   private patchForm(data: any): void {
+    console.log("📝 Patching form with data:", data);
+    
     this.OrderInfo.patchValue({
       TaxInvoice: data.INV_VBELN || '',
+      DCReference: data.DC_REF || '',
       ODN: data.INV_ODNO || '',
-      InvoiceData: this.formatToDDMMYYYY(data.INV_DATE) || '',
+      InvoiceOrReferenceDate: this.formatToDDMMYYYY(data.INV_DATE) || '',
       BasicShipment: data.BASIC_SHIP_VALUE || '',
-      Itemnumber: data.POSNR || '',
       InvoiceWithGst: data.INV_VALUE_GST || '',
       FiscalYear: data.FISCAL_YEAR || '',
       FiscalQuarter: data.FISCAL_QUARTER || '',
@@ -222,34 +335,71 @@ export class OrderInfoComponent implements OnInit {
       DestinationLocation: data.DEST_LOC || '',
       DestinationState: data.DEST_STATE || '',
       DestinationZone: data.DEST_ZONE || ''
-    });
-    this.showForm = true;
+    }, { emitEvent: false });
+
+    console.log("📋 Form values after patch:", this.OrderInfo.value);
+    
+    // Set validators after patching
+    this.setConditionalValidators();
+    
+    // Mark as touched to show any validation errors
     this.OrderInfo.markAllAsTouched();
+    
+    this.showForm = true;
   }
 
   saveOutwardInvoiceData(): void {
-
-
     this.OrderInfo.markAllAsTouched();
-    console.log("this.OrderInfo", this.OrderInfo)
+    
+    // Debug: Check which fields are invalid
+    console.log('📊 Form Status:', {
+      valid: this.OrderInfo.valid,
+      sapType: this.sapType,
+      orderType: this.orderType
+    });
+    console.log('📝 Form Values:', this.OrderInfo.value);
+    
+    const invalidFields: string[] = [];
+    const missingFields: string[] = [];
+    
+    Object.keys(this.OrderInfo.controls).forEach(key => {
+      const control = this.OrderInfo.get(key);
+      if (control?.invalid) {
+        invalidFields.push(key);
+        console.log(`❌ Invalid field: ${key}`, {
+          value: control.value,
+          errors: control.errors,
+          hasValidator: control.hasValidator(Validators.required)
+        });
+        
+        if (control.errors?.['required']) {
+          missingFields.push(key);
+        }
+      }
+    });
+
     // Stop if form is invalid
     if (this.OrderInfo.invalid) {
+      const errorMessage = missingFields.length > 0 
+        ? `Please fill all required fields before saving:`
+        : 'Please fill all required fields before saving.';
+      
       Swal.fire({
         title: 'Validation Error',
-        text: 'Please fill all required fields before saving.',
+        text: errorMessage,
         icon: 'warning',
         confirmButtonText: 'Ok',
-        timer: 4000
+        timer: 6000
       });
       return;
     }
+
     const formValue = this.OrderInfo.value;
     const record = {
-      INV_VBELN: formValue.TaxInvoice,
+      INV_VBELN: this.isSap() ? formValue.TaxInvoice : formValue.DCReference,
       INV_ODNO: formValue.ODN,
-      INV_DATE: formValue.InvoiceDate,
+      INV_DATE: formValue.InvoiceOrReferenceDate,
       BASIC_SHIP_VALUE: formValue.BasicShipment,
-
       INV_VALUE_GST: formValue.InvoiceWithGst,
       PHYS_DISPATCH: formValue.PhysicalDispatchDateTime,
       FISCAL_YEAR: formValue.FiscalYear,
@@ -269,97 +419,94 @@ export class OrderInfoComponent implements OnInit {
       DEST_ZONE: formValue.DestinationZone
     };
 
+    console.log('💾 Saving record:', record);
+
     if (this.sapType === "SAP") {
-      this.spinner.show()
-      this.service.OrderInfoOutwardSave({ SAVE: [record] }).subscribe((res: any) => {
-        console.log("res SAP", res)
+      this.spinner.show();
+      this.service.OrderInfoOutwardSave({ SAVE: [record] }).subscribe(
+        (res: any) => {
+          console.log("✅ SAP Save Response:", res);
 
-        if (res.STATUS == "true" || res.NUMBER == "200") {
+          if (res.STATUS == "true" || res.NUMBER == "200") {
+            Swal.fire({
+              title: 'Success',
+              text: res.MESSAGE || 'Data saved successfully',
+              icon: 'success',
+              confirmButtonText: 'Ok',
+              timer: 5000
+            });
+            this.OrderInfo.reset();
+            this.spinner.hide();
+            this.showForm = false;
+          } else {
+            Swal.fire({
+              title: 'Error',
+              text: res.MESSAGE || 'Failed to save data',
+              icon: 'error',
+              confirmButtonText: 'Ok',
+              timer: 5000
+            });
+            this.spinner.hide();
+          }
+        },
+        error => {
+          console.error('❌ SAP Save Error:', error);
+          this.spinner.hide();
           Swal.fire({
-            title: '',
-            text: res.MESSAGE,
-            icon: 'success',
-            cancelButtonText: 'Ok',
-            timer: 5000
-          }).then((result) => {
-            if (result) {
-              // Handle confirmation if needed
-            } else {
-              // Handle cancel if needed
-            }
-          });
-          this.OrderInfo.reset()
-          this.spinner.hide()
-          this.showForm = false;
-        } else {
-          Swal.fire({
-            title: '',
-            text: res.MESSAGE,
+            text: 'Internal Server Error. Please try again later.',
             icon: 'error',
-            cancelButtonText: 'Ok',
             timer: 5000
-          }).then((result) => {
-            if (result) {
-              // Handle confirmation if needed
-            } else {
-              // Handle cancel if needed
-            }
-            this.spinner.hide()
           });
-          this.spinner.hide()
         }
-
-
-      }, error => {
-        this.spinner.hide()
-      });
+      );
     } else {
-      this.service.OrderInfoNonSap({ CREATE: [record] }).subscribe((res: any) => {
-        console.log("res non SAP", res)
-        if (res.STATUS == "true" || res.NUMBER == "200") {
+      this.spinner.show();
+      this.service.OrderInfoNonSap({ CREATE: [record] }).subscribe(
+        (res: any) => {
+          console.log("✅ Non-SAP Save Response:", res);
+          
+          if (res.STATUS == "true" || res.NUMBER == "200") {
+            Swal.fire({
+              title: 'Success',
+              text: res.MESSAGE || 'Data saved successfully',
+              icon: 'success',
+              confirmButtonText: 'Ok',
+              timer: 5000
+            });
+            this.OrderInfo.reset();
+            this.spinner.hide();
+            this.showForm = false;
+          } else {
+            Swal.fire({
+              title: 'Error',
+              text: res.MESSAGE || 'Failed to save data',
+              icon: 'error',
+              confirmButtonText: 'Ok',
+              timer: 5000
+            });
+            this.spinner.hide();
+          }
+        },
+        error => {
+          console.error('❌ Non-SAP Save Error:', error);
+          this.spinner.hide();
           Swal.fire({
-            title: '',
-            text: res.MESSAGE,
-            icon: 'success',
-            cancelButtonText: 'Ok',
+            text: 'Internal Server Error. Please try again later.',
+            icon: 'error',
             timer: 5000
-          }).then((result) => {
-            if (result) {
-              // Handle confirmation if needed
-            } else {
-              // Handle cancel if needed
-            }
           });
-          this.OrderInfo.reset()
-          this.spinner.hide()
-          this.showForm = true;
-        } else {
-          Swal.fire({
-            title: '',
-            text: res.MESSAGE,
-            icon: 'success',
-            cancelButtonText: 'Ok',
-            timer: 5000
-          }).then((result) => {
-            if (result) {
-              // Handle confirmation if needed
-            } else {
-              // Handle cancel if needed
-            }
-          });
-          this.spinner.hide()
         }
-      }, error => {
-        this.spinner.hide()
-      });
+      );
     }
   }
 
   private formatToDDMMYYYY(value: any): string {
     if (!value) return '';
+    
     if (typeof value === 'string' && /^\d{8}$/.test(value)) {
       return `${value.substr(6, 2)}-${value.substr(4, 2)}-${value.substr(0, 4)}`;
     }
+    
     const date = new Date(value);
     if (!isNaN(date.getTime())) {
       const dd = String(date.getDate()).padStart(2, '0');
@@ -367,6 +514,7 @@ export class OrderInfoComponent implements OnInit {
       const yyyy = date.getFullYear();
       return `${dd}-${mm}-${yyyy}`;
     }
+    
     return String(value);
   }
 
@@ -387,100 +535,43 @@ export class OrderInfoComponent implements OnInit {
     this.OrderInfo.reset();
   }
 
-  setValidatorsOnFormFields(): void {
-    Object.keys(this.OrderInfo.controls).forEach(c => {
-      this.OrderInfo.get(c)?.setValidators(Validators.required);
-      this.OrderInfo.get(c)?.updateValueAndValidity();
-    });
-  }
-
-  fetchpdb() {
-
-    this.spinner.show()
-    this.service.getpdb().subscribe((res: any) => {
-      console.log("PDB Data:", res);
-      this.plantList = res[0].PLANT;
-      this.divisionList = res[0].DIVISION;
-      this.billintypeList = res[0].BILLING_TYPE;
-      this.statesList = res[0].STATES;
-      this.spinner.hide()
-    }, error => {
-      this.spinner.hide()
-    });
-  }
-  fetchzonechange() {
-    if (this.OrderInfo.value.DestinationState) {
-      let obj = {
-        "STATE": this.OrderInfo.value.DestinationState
+  fetchpdb(): void {
+    this.spinner.show();
+    this.service.getpdb().subscribe(
+      (res: any) => {
+        console.log("📦 PDB Data:", res);
+        this.plantList = res[0].PLANT;
+        this.divisionList = res[0].DIVISION;
+        this.billintypeList = res[0].BILLING_TYPE;
+        this.statesList = res[0].STATES;
+        this.spinner.hide();
+      },
+      error => {
+        console.error("❌ PDB Fetch Error:", error);
+        this.spinner.hide();
       }
-      this.spinner.show()
-      this.service.fetchzone(obj).subscribe((res: any) => {
-        this.OrderInfo.patchValue({
-          "DestinationZone": res.ZONE
-        })
-        this.spinner.hide()
-      }, error => {
-        this.spinner.hide()
-      });
-    }
-
+    );
   }
-  // custgroupchange() {
-  //   if (this.OrderInfo.value.Customer) {
-  //     let obj = {
-  //       "CUST": {
-  //         "customer": this.OrderInfo.value.Customer
-  //       }
-  //     }
-  //     this.service.custgroup(obj).subscribe((res: any) => {
-  //       this.OrderInfo.patchValue({
-  //         "CustomerGroup": res.CUSTOMER_GRP
-  //       })
-  //     });
-  //   }
 
-  // }
-
-  // custgroupchange() {
-  //   const customer = this.OrderInfo.value.Customer;
-
-  //   if (customer) {
-  //     // ✅ Properly wrap payload for your service
-  //     const payload = {
-  //       CUST: {
-  //         customer: customer
-  //       }
-  //     };
-
-  //     console.log('➡️ Sending Payload:', payload);
-
-  //     this.service.custgroup(payload).subscribe({
-  //       next: (res: any) => {
-  //         console.log('✅ API Response:', res);
-
-  //         if (res && res.CUSTOMER_GRP) {
-  //           this.OrderInfo.patchValue({
-  //             CustomerGroup: res.CUSTOMER_GRP
-  //           });
-  //         } else {
-  //           console.warn('⚠️ CUSTOMER_GRP missing in response:', res);
-  //           this.OrderInfo.patchValue({ CustomerGroup: '' });
-  //         }
-  //       },
-  //       error: (err) => {
-  //         console.error('❌ API Error:', err);
-  //         this.OrderInfo.patchValue({ CustomerGroup: '' });
-  //       }
-  //     });
-  //   } else {
-  //     console.warn('⚠️ No customer selected');
-  //     this.OrderInfo.patchValue({ CustomerGroup: '' });
-  //   }
-  // }
-
-
-
-
-
-
+  fetchzonechange(): void {
+    if (this.OrderInfo.value.DestinationState) {
+      const obj = {
+        "STATE": this.OrderInfo.value.DestinationState
+      };
+      
+      this.spinner.show();
+      this.service.fetchzone(obj).subscribe(
+        (res: any) => {
+          this.OrderInfo.patchValue({
+            "DestinationZone": res.ZONE
+          });
+          this.spinner.hide();
+        },
+        error => {
+          console.error("❌ Zone Fetch Error:", error);
+          this.spinner.hide();
+        }
+      );
+    }
+  }
 }

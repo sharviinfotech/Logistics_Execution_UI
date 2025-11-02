@@ -19,18 +19,19 @@ export class VechileInfoComponent implements OnInit {
   sapType: string = '';         // SAP / Non-SAP
   invoicenumber: string = '';   // Invoice number
   showTable: boolean = false;   // To show or hide the vehicle table
+  isAllSelected: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private service: GeneralserviceService,
     private spinner: NgxSpinnerService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.VehicleForm = this.fb.group({
       vehicles: this.fb.array([])
     });
-    this.addRow(); // Start with one row initially
+    this.addRow();
   }
 
   // Getter for form array
@@ -41,6 +42,7 @@ export class VechileInfoComponent implements OnInit {
   // Create a single vehicle row
   createVehicleRow(data?: any): FormGroup {
     return this.fb.group({
+      selected: [false], // ✅ checkbox added
       ZTRX_TYPE: [data?.ZTRX_TYPE || '', Validators.required],
       ZTRANSPOTER: [data?.ZTRANSPOTER || '', Validators.required],
       ZLRNO: [data?.ZLRNO || '', Validators.required],
@@ -58,6 +60,7 @@ export class VechileInfoComponent implements OnInit {
   addRow(): void {
     this.vehicles.push(this.createVehicleRow());
   }
+
   onOrderTypeSelection(): void {
     this.sapType = '';
     this.invoicenumber = '';
@@ -65,7 +68,6 @@ export class VechileInfoComponent implements OnInit {
     this.vehicles.clear();
     this.addRow();
   }
-
 
   // Remove row
   removeRow(index: number): void {
@@ -76,17 +78,38 @@ export class VechileInfoComponent implements OnInit {
     }
   }
 
+  // ✅ Checkbox Methods Start
+  allSelected(): boolean {
+    return this.vehicles.controls.length > 0 &&
+           this.vehicles.controls.every(ctrl => ctrl.get('selected')?.value === true);
+  }
+
+  toggleAllSelection(event: any): void {
+    const isChecked = event.target.checked;
+    this.isAllSelected = isChecked;
+    this.vehicles.controls.forEach(ctrl => ctrl.get('selected')?.setValue(isChecked));
+  }
+
+  onRowCheckboxChange(): void {
+    this.isAllSelected = this.allSelected();
+  }
+
+  getSelectedRows() {
+    return this.vehicles.controls
+      .map(ctrl => ctrl.value)
+      .filter(row => row.selected);
+  }
+  // ✅ Checkbox Methods End
+
   // ✅ When switching between SAP / Non-SAP
   onSapTypeSelection(): void {
-    this.vehicles.clear(); // clear existing rows
+    this.vehicles.clear();
     this.showTable = false;
 
     if (this.sapType === 'Non-SAP') {
-      // Non-SAP: show empty table
       this.addRow();
       this.showTable = true;
     } else if (this.sapType === 'SAP') {
-      // SAP: wait for GET to show table
       this.invoicenumber = '';
     }
   }
@@ -109,7 +132,6 @@ export class VechileInfoComponent implements OnInit {
     this.service.VehicleInfofetch(reqBody).subscribe({
       next: (res: any) => {
         this.spinner.hide();
-
         this.vehicles.clear();
 
         if (Array.isArray(res) && res.length > 0) {
@@ -131,16 +153,16 @@ export class VechileInfoComponent implements OnInit {
     });
   }
 
-  // ✅ Combined save handler (checks sapType)
+  // ✅ Save only selected rows
   saveVehicleInfo(): void {
-    this.VehicleForm.markAllAsTouched();
+    const selectedRows = this.getSelectedRows();
 
-    if (this.VehicleForm.invalid) {
-      Swal.fire('Error', 'Please fill all required fields correctly.', 'error');
+    if (selectedRows.length === 0) {
+      Swal.fire('Warning', 'Please select at least one row to save.', 'warning');
       return;
     }
 
-    const payload = this.vehicles.value.map((veh: any, index: number) => ({
+    const cleanedRows = selectedRows.map(({ selected, ...veh }, index: number) => ({
       MANDT: '234',
       VBELN: this.invoicenumber?.trim() || '',
       POSNR: (index + 1) * 10,
@@ -161,17 +183,17 @@ export class VechileInfoComponent implements OnInit {
 
     const apiCall =
       this.sapType === 'SAP'
-        ? this.service.VehicleInfosave(payload)
-        : this.service.VehicleInfoNonSap(payload);
+        ? this.service.VehicleInfosave(cleanedRows)
+        : this.service.VehicleInfoNonSap(cleanedRows);
 
     apiCall.subscribe({
       next: (res: any) => {
         this.spinner.hide();
         if (res?.NUMBER === '200') {
-          Swal.fire('Success', res.MSG || 'Record(s) Saved Successfully', 'success');
+          Swal.fire('Success', res.MSG || 'Selected Vehicle(s) saved successfully!', 'success');
           this.resetForm();
         } else {
-          Swal.fire('Error', res?.MSG || 'Failed to save vehicle info.', 'error');
+          Swal.fire('Error', res?.MSG || 'Failed to save selected vehicle info.', 'error');
         }
       },
       error: (err) => {
@@ -191,5 +213,6 @@ export class VechileInfoComponent implements OnInit {
     this.sapType = '';
     this.invoicenumber = '';
     this.showTable = false;
+    this.isAllSelected = false;
   }
 }
