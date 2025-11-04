@@ -1,0 +1,73 @@
+.table {
+    width: 100%;
+    border-collapse: separate;
+    /* important */
+    border-spacing: 0;
+    /* remove gap */
+}
+
+.table thead th {
+    background: #f2f2f2;
+    font-weight: 600;
+    text-align: center;
+    padding: 8px;
+    border-right: 2px solid #fff;
+    /* white line */
+}
+
+.table thead th:last-child {
+    border-right: none;
+}
+
+.table tbody td {
+    text-align: center;
+    padding: 6px;
+    vertical-align: middle;
+    border-right: 2px solid #fff;
+    /* white line */
+}
+
+.table tbody td:last-child {
+    border-right: none;
+}
+
+table input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.action-btns {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.btn-add,
+.btn-remove {
+    padding: 4px 8px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.btn-add {
+    background-color: #4caf50;
+    color: white;
+}
+
+.btn-remove {
+    background-color: #e53935;
+    color: white;
+}
+
+/* ✅ Disabled dropdown text BLACK & visible */
+select:disabled {
+    color: #000 !important;
+    /* text black */
+    background-color: #f2f2f2;
+    /* optional - light background */
+    opacity: 1 !important;
+    /* removes dim effect */
+}

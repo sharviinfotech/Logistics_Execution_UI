@@ -1,66 +1,94 @@
 <div class="card-LE">
-    <div class="card-header-LE">Dispatch</div>
-    <div class="card-body-LE">
-      <form class="form-grid" [formGroup]="dispatch">   
-        <div class="form-field">
-          <input type="nunber" formControlName="workorder"  placeholder=" " />
-          <label >Workorder</label>
-        </div>
- 
-       
-        <div class="form-field ">
-          <input type="text" formControlName="VehicleType"  placeholder=" " />
-          <label >Vehicle Type</label>
-        </div>
- 
-       
-        <div class="form-field">
-          <input type="number" formControlName="NoOfTrucks"  placeholder=" " />
-          <label>No Of Trucks</label>
-        </div>
- 
-       
-        <div class="form-field">
-          <input type="text" formControlName="Transporter"  placeholder=" " />
-          <label>Transporter</label>
-        </div>
-        <div class="form-field">
-          <input type="number" formControlName="LoadingPoints"  placeholder=" " />
-          <label>Loading Points</label>
-        </div>
-        <div class="form-field">
-          <input type="number" formControlName="UnLoadingPoints"  placeholder=" " />
-          <label>UnLoading Points</label>
-        </div>
- 
-        <!-- <div class="form-field">
-          <select formControlName="DamageRemarks">
-            <option value="">Select</option>
-            <option value="Packing material damage">Packing material damage</option>
-            <option value="Pallet damage">Pallet damage</option>
-            <option value="Cells damage">Cells damage</option>
-            <option value="Cell Bank damage">Cell Bank damage</option>
-            <option value="Can damage">Can damage</option>
-            <option value="Accident">Accident</option>
-            <option value="Prohibited material loading and seized by Police">
-              Prohibited material loading and seized by Police
-            </option>
-            <option value="Damage during unloading">Damage during unloading</option>
-            <option value="Material in wet condition">Material in wet condition</option>
-            <option value="Damage due to other Materials loaded">
-              Damage due to other Materials loaded
-            </option>
-          </select>
-          </div> -->
+  <div class="card-header-LE">Dispatch</div>
 
-        </form>
-      <div class="text-right">
-          <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
-            Cancel
-          </button>
-          <button type="submit" class="btn btn-md btn-raised btnSave" (click)="savePlan()">
-           Save
-          </button>
-        </div>
+  <div class="card-body-LE">
+
+    <form [formGroup]="dispatchForm">
+      <table class="table shipment-table">
+        <thead>
+          <tr>
+            <th>SI.No</th>
+            <th>Vehicle Type</th>
+            <th>Workorder</th>
+            <th>No Of Trucks</th>
+            <th>Transporter</th>
+            <th>Loading Points</th>
+            <th>UnLoading Points</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody formArrayName="rows">
+          <tr *ngFor="let row of rows.controls; let i = index" [formGroupName]="i">
+
+            <td>{{ i + 1 }}</td>
+            <!-- <td><input type="text" formControlName="VehicleType"></td> -->
+            <td>
+              <select formControlName="VehicleType">
+                <option value="" disabled>Select Vehicle Type</option>
+                <option value="Cargo">Cargo</option>
+                <option value="Rate Contract">Rate Contract</option>
+                <option value="Local Transportation">Local Transportation</option>
+                <option value="Customer Transporter">Customer Transporter</option>
+                <option value="Company Vehicle">Company Vehicle</option>
+                <option value="Courier">Courier</option>
+                <option value="By Hand">By Hand</option>
+                <option value="Full Truck Load">Full Truck Load</option>
+
+              </select>
+            </td>
+
+            <!-- <td><input type="text" formControlName="workorder"></td> -->
+            <!-- <td *ngIf="row.get('VehicleType')?.value === 'Full Truck Load'">
+              <input type="text" formControlName="workorder" />
+            </td> -->
+            <!-- <td *ngIf="row.get('VehicleType')?.value !== 'Full Truck Load'">
+   </td> -->
+            <td>
+              <input *ngIf="row.get('VehicleType')?.value === 'Full Truck Load'" type="text"
+                formControlName="workorder" />
+
+              <span *ngIf="row.get('VehicleType')?.value !== 'Full Truck Load'">
+              </span>
+            </td>
+
+
+            <td><input type="text" formControlName="NoOfTrucks"></td>
+            <td><input type="text" formControlName="Transporter"></td>
+            <td><input type="text" formControlName="LoadingPoints"></td>
+            <td><input type="text" formControlName="UnLoadingPoints"></td>
+
+            <!-- <td class="action-btns">
+              <button type="button" class="btn-add" (click)="addRow()">+</button>
+              <button type="button" class="btn-remove" (click)="removeRow(i)" [disabled]="rows.length === 1">✖</button>
+            </td> -->
+            <td class="action-btns">
+
+              <!-- ✅ First row type decide rules -->
+              <ng-container *ngIf="rows.at(0).get('VehicleType')?.value === 'Full Truck Load'">
+
+                <!-- ADD button always for FTL -->
+                <button type="button" class="btn-add" (click)="addRow()">+</button>
+
+                <!-- Remove allowed except first row -->
+                <button type="button" class="btn-remove" *ngIf="i !== 0" (click)="removeRow(i)">
+                  ✖
+                </button>
+
+              </ng-container>
+
+            </td>
+
+
+
+          </tr>
+        </tbody>
+      </table>
+    </form>
+
+    <div class="text-right">
+      <button class="btn btn-md btn-raised btnSave" (click)="save()">Save</button>
     </div>
+
   </div>
+</div>

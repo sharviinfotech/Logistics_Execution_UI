@@ -6,189 +6,189 @@ export const MENU: MenuItem[] = [
     //     label: 'MENUITEMS.DASHBOARDS.TEXT',
     //     icon: 'bx-home-circle',
     //     subItems: [
-            {
-                id: 2,
-                label: 'Dashboard',
-                link: '/dashboard',
-                parentId: 2,
-                icon: 'bxs-dashboard',
-            },
-            {
-                id: 2,
-                label: 'Dispatch',
-                link: '/dispatch',
-                parentId: 2,
-                icon: 'bxs-dashboard',
-            },
-             {
-                id: 2,
-                label: 'Order Info',
-                link: '/order-info',
-                parentId: 2,
-                icon: 'bx-receipt',
-            },
-               {
-                id: 2,
-                label: 'Shipment Details',
-                link: '/shipment-details',
-                parentId: 2,
-                icon: 'bx-package',
-            },
-            //  {
-            //     id: 2,
-            //     label: 'Vechile Info',
-            //     link: '/vechile-info',
-            //     parentId: 2,
-            //     icon: 'bx-home-circle',
-            // },
-               {
-                id: 2,
-                label: 'Invoice & Load Details',
-                link: '/invoice-load-details',
-                parentId: 2,
-                icon: 'bx-file',
-            },
-                  {
-                id: 2,
-                label: 'Segment Info',
-                link: '/segment-info',
-                parentId: 2,
-                icon: 'bx-sitemap',
-            },
-            {
-                id: 2,
-                label: 'Vechile Info',
-                link: '/vechile-info',
-                parentId: 2,
-                icon: 'bxs-truck',
-            },
-                {
-                id: 2,
-                label: 'Transit Info',
-                link: '/transit-info',
-                parentId: 2,
-                icon: 'bx-error-circle',
-            },
-               {
-                id: 2,
-                label: 'Freight Billing',
-                link: '/freight-billing',
-                parentId: 2,
-                icon: 'bx-credit-card',
-            },
-              {
-                id: 2,
-                label: 'Transit Damage Info',
-                link: '/transit-damage-info',
-                parentId: 2,
-                icon: 'bx-map-alt',
-            },
-            {
-                id: 2,
-                label: 'Insurance Claim Tracking',
-                link: '/insurance-claim-tracking',
-                parentId: 2,
-                icon: 'bx-shield',
-            },
-            //   {
-            //     id: 2,
-            //     label: 'Production Order Confirmation',
-            //     link: '/co11',
-            //     parentId: 2,
-            //     icon: 'bx-home-circle',
-            // },
-             
-            //   {
-            //     id: 3,
-            //     label: 'Order Information System',
-            //     link: '/coois',
-            //     parentId: 2,
-            //     icon: 'bx-home-circle',
-            // },
-           
-             
-            
-            // {
-            //     id:4 ,
-            //     label: 'Invoice Layout',
-            //     link: '/InvoiceLayout',
-            //     parentId: 1,
-            //     icon: 'bx bx-layout',
-            // },
-            // {
-            //     id:5,
-            //     label: 'Invoice',
-            //     link: '/Invoice',
-            //     parentId: 1,
-            //     icon: 'bx bx-plus',
-            // },
-            
-            // {
-            //     id: 6,
-            //     label: 'Invoice Decision',
-            //     link: '/InvoiceDecision',
-            //     parentId: 1,
-            //     icon: 'bx-sync', // Represents invoice approval/decision
-            // },
-            // {
-            //     id:7 ,
-            //     label: 'Invoice Reports',
-            //     link: '/InvoiceReports',
-            //     parentId: 1,
-            //     icon: 'bx bx-spreadsheet',
-            // },
-            // {
-            //     id: 3,
-            //     label: 'Customer Creation',
-            //     link: '/CustomerCreation',
-            //     parentId: 1,
-            //     icon: 'bx-user-check', // Represents invoice approval/decision
-            // },
-            // {
-            //     id: 8,
-            //     label: 'User Creation',
-            //     link: '/InvoiceUserCreation',
-            //     parentId: 1,
-            //     icon: 'bx bx-user-check',
-            // },
-            // {
-            //     id: 9,
-            //     label: 'Service Charges',
-            //     link: '/ServiceCharges',
-            //     parentId: 1,
-            //     icon: 'bx bx-receipt',
-            // },
-            //  {
-            //     id: 9,
-            //     label: 'Sector Wise',
-            //     link: '/sectorwise',
-            //     parentId: 1,
-            //     icon: 'bx bx-receipt',
-            // },
-          
-          
-          
-                        
-             
-           
-           
-             
-            
-           
-          
-           
-           
-            
-             
-           
-            
-            
+    {
+        id: 2,
+        label: 'Dashboard',
+        link: '/dashboard',
+        parentId: 2,
+        icon: 'bxs-dashboard',
+    },
+    {
+        id: 2,
+        label: 'Dispatch',
+        link: '/dispatch',
+        parentId: 2,
+        icon: 'bxs-send',
+    },
+    {
+        id: 2,
+        label: 'Order Info',
+        link: '/order-info',
+        parentId: 2,
+        icon: 'bx-receipt',
+    },
+    {
+        id: 2,
+        label: 'Shipment Details',
+        link: '/shipment-details',
+        parentId: 2,
+        icon: 'bx-package',
+    },
+    //  {
+    //     id: 2,
+    //     label: 'Vechile Info',
+    //     link: '/vechile-info',
+    //     parentId: 2,
+    //     icon: 'bx-home-circle',
+    // },
+    {
+        id: 2,
+        label: 'Invoice & Load Details',
+        link: '/invoice-load-details',
+        parentId: 2,
+        icon: 'bx-file',
+    },
+    {
+        id: 2,
+        label: 'Segment Info',
+        link: '/segment-info',
+        parentId: 2,
+        icon: 'bx-sitemap',
+    },
+    {
+        id: 2,
+        label: 'Vechile Info',
+        link: '/vechile-info',
+        parentId: 2,
+        icon: 'bxs-truck',
+    },
+    {
+        id: 2,
+        label: 'Transit Info',
+        link: '/transit-info',
+        parentId: 2,
+        icon: 'bx-error-circle',
+    },
+    {
+        id: 2,
+        label: 'Freight Billing',
+        link: '/freight-billing',
+        parentId: 2,
+        icon: 'bx-credit-card',
+    },
+    {
+        id: 2,
+        label: 'Transit Damage Info',
+        link: '/transit-damage-info',
+        parentId: 2,
+        icon: 'bx-map-alt',
+    },
+    {
+        id: 2,
+        label: 'Insurance Claim Tracking',
+        link: '/insurance-claim-tracking',
+        parentId: 2,
+        icon: 'bx-shield',
+    },
+    //   {
+    //     id: 2,
+    //     label: 'Production Order Confirmation',
+    //     link: '/co11',
+    //     parentId: 2,
+    //     icon: 'bx-home-circle',
+    // },
 
-            // <i class="bx bx-user-plus"></i>  
-            // <i class="bx bx-user-check"></i> 
-            // <i class="bx bx-user-pin"></i>  
+    //   {
+    //     id: 3,
+    //     label: 'Order Information System',
+    //     link: '/coois',
+    //     parentId: 2,
+    //     icon: 'bx-home-circle',
+    // },
 
-           
+
+
+    // {
+    //     id:4 ,
+    //     label: 'Invoice Layout',
+    //     link: '/InvoiceLayout',
+    //     parentId: 1,
+    //     icon: 'bx bx-layout',
+    // },
+    // {
+    //     id:5,
+    //     label: 'Invoice',
+    //     link: '/Invoice',
+    //     parentId: 1,
+    //     icon: 'bx bx-plus',
+    // },
+
+    // {
+    //     id: 6,
+    //     label: 'Invoice Decision',
+    //     link: '/InvoiceDecision',
+    //     parentId: 1,
+    //     icon: 'bx-sync', // Represents invoice approval/decision
+    // },
+    // {
+    //     id:7 ,
+    //     label: 'Invoice Reports',
+    //     link: '/InvoiceReports',
+    //     parentId: 1,
+    //     icon: 'bx bx-spreadsheet',
+    // },
+    // {
+    //     id: 3,
+    //     label: 'Customer Creation',
+    //     link: '/CustomerCreation',
+    //     parentId: 1,
+    //     icon: 'bx-user-check', // Represents invoice approval/decision
+    // },
+    // {
+    //     id: 8,
+    //     label: 'User Creation',
+    //     link: '/InvoiceUserCreation',
+    //     parentId: 1,
+    //     icon: 'bx bx-user-check',
+    // },
+    // {
+    //     id: 9,
+    //     label: 'Service Charges',
+    //     link: '/ServiceCharges',
+    //     parentId: 1,
+    //     icon: 'bx bx-receipt',
+    // },
+    //  {
+    //     id: 9,
+    //     label: 'Sector Wise',
+    //     link: '/sectorwise',
+    //     parentId: 1,
+    //     icon: 'bx bx-receipt',
+    // },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // <i class="bx bx-user-plus"></i>  
+    // <i class="bx bx-user-check"></i> 
+    // <i class="bx bx-user-pin"></i>  
+
+
     //     ]
     // },
     // {
@@ -386,7 +386,7 @@ export const MENU: MenuItem[] = [
     //             link: 'contacts/profile',
     //             parentId: 67
     //         },
-            
+
     //     ]
     // },
 ];
