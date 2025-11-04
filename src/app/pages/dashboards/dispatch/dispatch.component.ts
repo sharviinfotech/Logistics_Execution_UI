@@ -1,6 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
+import { NgxSpinnerService } from 'ngx-spinner';
+import Swal from 'sweetalert2';
+import { SpinnerService } from 'src/app/spinner.service';
 import { GeneralserviceService } from 'src/app/generalservice.service';
 
 @Component({
@@ -17,6 +20,8 @@ export class DispatchComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private cd: ChangeDetectorRef,
+    private spinner: NgxSpinnerService,
+    public spinnerService: SpinnerService,
     private service: GeneralserviceService
   ) {
     this.dispatchForm = this.fb.group({
@@ -129,6 +134,7 @@ export class DispatchComponent implements OnInit {
   // ✅ SAVE
   save() {
 
+    this.spinner.show();
     if (!this.dispatchForm.valid) {
       this.dispatchForm.markAllAsTouched();
       return;
@@ -149,12 +155,37 @@ export class DispatchComponent implements OnInit {
 
     this.service.DispatchSave(payload).subscribe(
       (res: any) => {
-        alert(res.STATUS === "TRUE" ? res.MSG : "Error: " + res.MSG);
+        this.spinner.hide()
+        if (res.STATUS == 'true' || res.NUMBER == '200') {
+          Swal.fire({
+            text: res.MSG,
+            icon: 'success',
+            confirmButtonText: 'Ok',
+
+          }).then(() =>
+            this.resetAll()
+          );
+        } else {
+          Swal.fire({
+            text: res.MSG,
+            icon: 'error',
+
+          });
+        }
       },
+
       err => {
         console.error("API Error:", err);
-        alert("Something went wrong!");
+
+        this.spinner.hide();
+        Swal.fire({
+          text: err.MESSAGE || 'Failed to save Transit Info (Non-SAP)!',
+          icon: 'error',
+          timer: 3000
+        });
       }
     );
+
   }
+  resetAll() { }
 }
