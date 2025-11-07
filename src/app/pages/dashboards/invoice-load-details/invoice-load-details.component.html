@@ -51,12 +51,12 @@
           <thead>
             <tr>
               <th>SI.No</th>
-
               <th>Truck Type</th>
+              <th>Passing Weight</th>
               <th>Actual Load (Tons)</th>
+              <th>Loading Factor (Weight)</th>
               <th>Actual Volume Occupied</th>
               <th>Loading Factor (Volume)</th>
-              <th>Loading Factor (Weight)</th>
               <th>Week Wise Shipment Flow</th>
               <th>Eway Bill Number</th>
               <th>Eway Bill Expiry Date</th>
@@ -76,10 +76,8 @@
                     {{ v.ZTRUC_TYPE }}
                   </option>
                 </select>
-
-
               </td>
-
+              <td><input type="number" formControlName="ZPASS_WT" /></td>
               <td><input type="number" formControlName="ZACT_LOAD" /></td>
               <td><input type="text" formControlName="ZACT_VOL" /></td>
               <td><input type="text" formControlName="ZLF_VOL" /></td>

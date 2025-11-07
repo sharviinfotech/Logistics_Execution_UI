@@ -119,14 +119,14 @@
     </div>
 
     <!-- Fiscal Year -->
-    <div class="form-field">
+    <div class="form-field" *ngIf="showFiscalFields">
       <input type="text" formControlName="FiscalYear" placeholder=" " readonly/>
       <label>Fiscal Year</label>
     </div>
 
     <!-- Fiscal Quarter -->
-    <div class="form-field">
-      <input type="text" formControlName="FiscalQuarter" placeholder=" " readonly />
+    <div class="form-field"  *ngIf="showFiscalFields">
+      <input type="text" formControlName="FiscalQuarter" placeholder=" "  readonly/>
       <label>Fiscal Quarter</label>
     </div>
 
@@ -146,8 +146,8 @@
       <label>Month</label>
     </div> -->
     <!-- Month Dropdown -->
-    <div class="form-field">
-      <input type="text" formControlName="Month" placeholder=" " readonly>
+    <div class="form-field" *ngIf="showFiscalFields">
+      <input type="text" formControlName="Month" placeholder=" " readonly/>
       <label>Month</label>
     </div>
 
@@ -370,7 +370,7 @@
 
    
         <!-- Destination Zone -->
-        <div class="form-field">
+        <div class="form-field" >
           <input type="text" formControlName="DestinationZone" placeholder=" " readonly/>
           <label>Destination Zone</label>
         </div>

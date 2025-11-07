@@ -1,73 +1,63 @@
 .table {
-    width: 100%;
-    border-collapse: separate;
-    /* important */
-    border-spacing: 0;
-    /* remove gap */
+  width: 100%;
+  border-collapse: collapse; /* ✅ Ensures clean single borders */
+  border-color: inherit;
+    border-style: solid;
+    border-width: 0;
 }
 
+/* ✅ Add border to all header and body cells */
+.table th,
+.table td {
+  border: 1px solid #ccc; 
+  text-align: center;
+  padding: 8px;
+}
+
+/* ✅ Header styling */
 .table thead th {
-    background: #f2f2f2;
-    font-weight: 600;
-    text-align: center;
-    padding: 8px;
-    border-right: 2px solid #fff;
-    /* white line */
+  background: #f2f2f2;
+  font-weight: 600;
 }
 
-.table thead th:last-child {
-    border-right: none;
-}
-
-.table tbody td {
-    text-align: center;
-    padding: 6px;
-    vertical-align: middle;
-    border-right: 2px solid #fff;
-    /* white line */
-}
-
-.table tbody td:last-child {
-    border-right: none;
-}
-
+/* ✅ Input styling inside cells */
 table input {
-    width: 100%;
-    padding: 6px 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
+/* ✅ Action buttons styling */
 .action-btns {
-    display: flex;
-    justify-content: center;
-    gap: 5px;
+  justify-content: center;
+  align-items: center; /* centers vertically */
+  gap: 6px;
+  height: 100%;
 }
+
 
 .btn-add,
 .btn-remove {
-    padding: 4px 8px;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
+  padding: 4px 8px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
 }
 
 .btn-add {
-    background-color: #4caf50;
-    color: white;
+  background-color: #4caf50;
+  color: white;
 }
 
 .btn-remove {
-    background-color: #e53935;
-    color: white;
+  background-color: #e53935;
+  color: white;
 }
 
 /* ✅ Disabled dropdown text BLACK & visible */
 select:disabled {
-    color: #000 !important;
-    /* text black */
-    background-color: #f2f2f2;
-    /* optional - light background */
-    opacity: 1 !important;
-    /* removes dim effect */
+  color: #000 !important;
+  background-color: #f2f2f2;
+  opacity: 1 !important;
 }

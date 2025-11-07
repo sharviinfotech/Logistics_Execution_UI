@@ -497,6 +497,15 @@ input[type="radio"] {
 .form-field:has(select:disabled) label {
  color: #adb5bd !important;
 }
+
+.form-field .ng-select.ng-valid.ng-touched .ng-select-container,
+.form-field .ng-select.ng-valid.ng-dirty .ng-select-container,
+.form-field .ng-select.ng-valid:not(.ng-touched):not(.ng-untouched) .ng-select-container {
+    box-shadow: 0 0 5px rgba(0, 166, 81, 0.25);
+    border-left: 3px solid #00A651 !important;
+}
+
+
   
 }
 

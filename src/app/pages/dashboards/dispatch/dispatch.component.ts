@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -9,13 +10,18 @@ import { GeneralserviceService } from 'src/app/generalservice.service';
 @Component({
   selector: 'app-dispatch',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,FormsModule],
   templateUrl: './dispatch.component.html',
   styleUrls: ['./dispatch.component.css']
 })
 export class DispatchComponent implements OnInit {
 
   dispatchForm!: FormGroup;
+  showActionColumn: boolean = false;
+  orderType: string = '';
+  sapType: string = '';
+  showForm = false;
+
 
   constructor(
     private fb: FormBuilder,
@@ -28,10 +34,21 @@ export class DispatchComponent implements OnInit {
       rows: this.fb.array([this.createRow(true)])
     });
   }
+  onOrderTypeChange(): void {
+  this.sapType = '';
+  this.showForm = false;
+  this.dispatchForm.reset();
+}
+onSapTypeChange(): void {
+  this.dispatchForm.reset();
+  this.showForm = !!(this.orderType && this.sapType);
+  console.log('SAP Type changed to:', this.sapType, '| Form visible:', this.showForm);
+}
 
   ngOnInit() {
     // ✅ FIRST ROW VEHICLE TYPE CHANGE LOGIC
     this.rows.at(0).get('VehicleType')?.valueChanges.subscribe(val => {
+      this.showActionColumn = (val === 'Full Truck Load');
 
       if (val !== 'Full Truck Load') {
         this.resetRowsForNonFTL(val);   // ✅ CLEAR ALL EXTRA ROWS
@@ -50,6 +67,7 @@ export class DispatchComponent implements OnInit {
       VehicleType: ['', Validators.required],
       NoOfTrucks: [''],
       Transporter: [''],
+      LRNumber: [''],
       LoadingPoints: [''],
       UnLoadingPoints: ['']
     });
@@ -61,6 +79,7 @@ export class DispatchComponent implements OnInit {
         NoOfTrucks: '',
         Transporter: '',
         LoadingPoints: '',
+        LRNumber: '',
         UnLoadingPoints: ''
       }, { emitEvent: false });
 
@@ -102,6 +121,7 @@ export class DispatchComponent implements OnInit {
       workorder: '',
       NoOfTrucks: '',
       Transporter: '',
+      LRNumber: '',
       LoadingPoints: '',
       UnLoadingPoints: ''
     }, { emitEvent: false });
@@ -110,82 +130,110 @@ export class DispatchComponent implements OnInit {
     while (this.rows.length > 1) {
       this.rows.removeAt(1);
     }
-
+    this.showActionColumn = false;
     this.cd.detectChanges();
   }
 
   // ✅ ADD NEW ROW
   addRow() {
     this.rows.push(this.createRow(false));
-
     const firstType = this.rows.at(0).get('VehicleType')?.value;
+
+    this.showActionColumn = (firstType === 'Full Truck Load');
     if (firstType) {
       this.applyVehicleTypeToAll(firstType);
     }
+     this.cd.detectChanges();
   }
 
   // ✅ REMOVE ROW
   removeRow(index: number) {
     if (this.rows.length > 1) {
       this.rows.removeAt(index);
+       this.cd.detectChanges();
     }
   }
 
   // ✅ SAVE
-  save() {
+ save() {
+  this.spinner.show();
 
-    this.spinner.show();
-    if (!this.dispatchForm.valid) {
-      this.dispatchForm.markAllAsTouched();
-      return;
-    }
+  if (!this.dispatchForm.valid) {
+    this.spinner.hide();
+    this.dispatchForm.markAllAsTouched();
+    return;
+  }
 
-    const payload = {
-      DISPATCH: this.rows.controls.map((row: any) => ({
-        NO_TRUCKS: row.get('NoOfTrucks')?.value,
-        VEH_TYPE: row.get('VehicleType')?.value,
-        WORK_ORDER: row.get('workorder')?.value,
-        LOAD_PT: row.get('LoadingPoints')?.value,
-        UNLOAD_PT: row.get('UnLoadingPoints')?.value,
-        TRANSPORTER: row.get('Transporter')?.value
-      }))
-    };
+  // ✅ Build payload as backend expects
+  const payload = {
+    DISPATCH: this.rows.controls.map((row: any) => ({
+      NO_TRUCKS: row.get('NoOfTrucks')?.value,
+      veh_type: row.get('VehicleType')?.value,
+      work_order: row.get('workorder')?.value,
+      transporter: row.get('Transporter')?.value,
+      lr_no: row.get('LRNumber')?.value,
+      load_pt: row.get('LoadingPoints')?.value,
+      unload_Pt: row.get('UnLoadingPoints')?.value
+    }))
+  };
 
-    console.log("Final Payload Sending →", payload);
+  console.log('Final Payload Sending →', payload);
 
-    this.service.DispatchSave(payload).subscribe(
-      (res: any) => {
-        this.spinner.hide()
-        if (res.STATUS == 'true' || res.NUMBER == '200') {
-          Swal.fire({
-            text: res.MSG,
-            icon: 'success',
-            confirmButtonText: 'Ok',
+  // ✅ Select API dynamically
+  let request$;
+  if (this.sapType === 'SAP') {
+    request$ = this.service.DispatchSave(payload);  // POST
+  } else if (this.sapType === 'Non-SAP') {
+    request$ = this.service.DispatchNonSapSave(payload); // PUT
+  } else {
+    this.spinner.hide();
+    Swal.fire({
+      text: 'Please select SAP Type (With SAP / Without SAP)',
+      icon: 'warning'
+    });
+    return;
+  }
 
-          }).then(() =>
-            this.resetAll()
-          );
-        } else {
-          Swal.fire({
-            text: res.MSG,
-            icon: 'error',
+  // ✅ Call API
+  request$.subscribe(
+    (res: any) => {
+      this.spinner.hide();
 
-          });
-        }
-      },
-
-      err => {
-        console.error("API Error:", err);
-
-        this.spinner.hide();
+      if (res.STATUS === 'TRUE' || res.NUMBER === '200') {
         Swal.fire({
-          text: err.MESSAGE || 'Failed to save Transit Info (Non-SAP)!',
-          icon: 'error',
-          timer: 3000
+          text: res.MSG,
+          icon: 'success',
+          confirmButtonText: 'Ok'
+        }).then(() => this.resetAll());
+      } else {
+        Swal.fire({
+          text: res.MSG || 'Dispatch saving failed!',
+          icon: 'error'
         });
       }
-    );
+    },
+    err => {
+      this.spinner.hide();
+      console.error('API Error:', err);
+      Swal.fire({
+        text: err?.error?.MSG || 'Failed to save Dispatch!',
+        icon: 'error',
+        timer: 3000
+      });
+    }
+  );
+}
 
+
+  resetAll() {
+  while (this.rows.length !== 0) {
+    this.rows.removeAt(0);
   }
-  resetAll() { }
+  this.rows.push(this.createRow(true));
+   this.showActionColumn = false;
+  this.dispatchForm.markAsPristine();
+  this.dispatchForm.markAsUntouched();
+  this.dispatchForm.updateValueAndValidity();
+  this.cd.detectChanges();
+}
 }

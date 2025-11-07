@@ -1,9 +1,40 @@
 <div class="card-LE">
   <div class="card-header-LE">Dispatch</div>
 
-  <div class="card-body-LE">
+    <div class="card-body-LE">
 
-    <form [formGroup]="dispatchForm">
+    <!-- 🔹 Order Type (Inward / Outward) -->
+    <div class="form-radio optional">
+      <label>
+        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
+        <span>Inward</span>
+      </label>
+      <label>
+        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
+        <span>Outward</span>
+      </label>
+    </div>
+
+    <br />
+
+    <!-- 🔹 SAP Type (With / Without SAP) -->
+    <div *ngIf="orderType" class="sap-row" style="display: flex !important;">
+      <div class="form-radio optional sap-radio">
+        <label>
+          <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
+          <span>With SAP</span>
+        </label>
+        <label>
+          <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
+          <span>Without SAP</span>
+        </label>
+      </div>
+    </div>
+
+    <br />
+
+    
+    <form [formGroup]="dispatchForm" *ngIf="showForm">
       <table class="table shipment-table">
         <thead>
           <tr>
@@ -12,9 +43,10 @@
             <th>Workorder</th>
             <th>No Of Trucks</th>
             <th>Transporter</th>
+            <th>LR Number</th>
             <th>Loading Points</th>
             <th>UnLoading Points</th>
-            <th>Action</th>
+            <th *ngIf="showActionColumn">Action</th>
           </tr>
         </thead>
 
@@ -55,40 +87,28 @@
 
             <td><input type="text" formControlName="NoOfTrucks"></td>
             <td><input type="text" formControlName="Transporter"></td>
+            <td><input type="text" formControlName="LRNumber"></td>
             <td><input type="text" formControlName="LoadingPoints"></td>
             <td><input type="text" formControlName="UnLoadingPoints"></td>
 
-            <!-- <td class="action-btns">
-              <button type="button" class="btn-add" (click)="addRow()">+</button>
-              <button type="button" class="btn-remove" (click)="removeRow(i)" [disabled]="rows.length === 1">✖</button>
-            </td> -->
-            <td class="action-btns">
+            
+            <td class="action-btns"*ngIf="showActionColumn">
 
-              <!-- ✅ First row type decide rules -->
+              
               <ng-container *ngIf="rows.at(0).get('VehicleType')?.value === 'Full Truck Load'">
-
-                <!-- ADD button always for FTL -->
                 <button type="button" class="btn-add" (click)="addRow()">+</button>
-
-                <!-- Remove allowed except first row -->
                 <button type="button" class="btn-remove" *ngIf="i !== 0" (click)="removeRow(i)">
                   ✖
                 </button>
 
               </ng-container>
-
             </td>
-
-
-
           </tr>
         </tbody>
       </table>
     </form>
-
-    <div class="text-right">
+    <div class="text-right" *ngIf="showForm">
       <button class="btn btn-md btn-raised btnSave" (click)="save()">Save</button>
     </div>
 
   </div>
-</div>

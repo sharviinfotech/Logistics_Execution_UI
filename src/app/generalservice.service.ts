@@ -158,7 +158,7 @@ export class GeneralserviceService {
   shipmentdetailsNonSapReports(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/ShipmentDetails/Nonsap/Reports', obj);
   }
-  SegmentInfoInwardOutward(obj) {
+  SegmentInfoOutwardFetch(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/fetchInvoiceList', obj);
   }
   SegmentInfoOutwardSave(obj) {
@@ -169,6 +169,12 @@ export class GeneralserviceService {
   }
   getssc() {
     return this.http.get(environment.baseUrl + 'api/external/LE/segmentInfo/f4_getAllDetails',);
+  }
+   fetchTAT(obj: any) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/withSap/TAT_Type', obj);
+  }
+   fetchNonSapTAT(obj: any) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/NonSap/TAT_Type', obj);
   }
   fetchzoneTat(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/withoutsap/fetchzone', obj);
@@ -236,7 +242,10 @@ export class GeneralserviceService {
     return this.http.put(environment.baseUrl + 'api/external/LE/TransitDamageInfo/NonSap/withoutsapSave', obj);
   }
   DispatchSave(obj) {
-    return this.http.post(environment.baseUrl + 'api/external/LE/Dispatch/Outward/Save', obj);
+    return this.http.post(environment.baseUrl + 'api/external/LE/Dispatch/Outward/withsap/Save', obj);
+  }
+  DispatchNonSapSave(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/Dispatch/Outward/withoutsap/Save', obj);
   }
 
 }

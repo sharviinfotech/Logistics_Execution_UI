@@ -52,6 +52,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       VBELN: [data?.VBELN || this.invoicenumber],
       POSNR: [data?.POSNR || ''],
       ZTRUC_TYPE: [data?.ZTRUC_TYPE || '', Validators.required],
+      ZPASS_WT: [data?.ZPASS_WT || '', Validators.required],
       ZACT_LOAD: [data?.ZACT_LOAD || '', Validators.required],
       ZACT_VOL: [data?.ZACT_VOL || '', Validators.required],
       ZLF_VOL: [data?.ZLF_VOL || '', Validators.required],
@@ -59,6 +60,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       ZWEEK_SF: [data?.ZWEEK_SF || '', Validators.required],
       ZEWAYBILL_NO: [data?.ZEWAYBILL_NO || '', Validators.required],
       ZEWAYBILL_DT: [data?.ZEWAYBILL_DT || '', Validators.required],
+
     });
   }
 

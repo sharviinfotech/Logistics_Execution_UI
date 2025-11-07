@@ -62,8 +62,8 @@
   <form class="form-grid" [formGroup]="segmentInfo" *ngIf="showForm">
 
     <!-- Sales Person -->
-    <div class="form-field">
-      <ng-container *ngIf="sapType === 'Non-SAP'; else sapSales">
+    <!-- <div class="form-field" [class.filled]="segmentInfo.get('SALES_EMP')?.value">
+      <ng-container *ngIf="sapType === 'Non-SAP' || showF4.SALES_EMP; else sapSales">
         <select formControlName="SALES_EMP">
           <option value="">Select Sales Person</option>
           <option *ngFor="let s of supplierList" [value]="s.SUPPLIER_NAME">
@@ -72,81 +72,89 @@
         </select>
       </ng-container>
       <ng-template #sapSales>
-        <input type="text" formControlName="SALES_EMP" readonly />
+        <input type="text" formControlName="SALES_EMP" placeholder=" " readonly />
       </ng-template>
       <label>Sales Person</label>
-    </div>
-    <!-- <div class="form-field">
-      <ng-container *ngIf="sapType === 'Non-SAP'; else sapSales">
-        <ng-select [items]="supplierList" bindLabel="SUPPLIER_NAME" bindValue="SUPPLIER_NAME" required
-          formControlName="SALES_EMP" [searchable]="true" [virtualScroll]="true" placeholder="Select Sales Person"
-          class="w-full">
-          <ng-template ng-option-tmp let-item="item">
-            {{ item.SUPPLIER }} - {{ item.SUPPLIER_NAME }}
-          </ng-template>
+    </div> -->
+    <div class="form-field" [class.filled]="segmentInfo.get('SALES_EMP')?.value">
+        <ng-container *ngIf="sapType === 'Non-SAP' || showF4.SALES_EMP; else sapSales">
+        <ng-select
+              [items]="supplierList"
+              bindLabel="SUPPLIER_NAME"
+              bindValue="SUPPLIER_NAME"
+              formControlName="SALES_EMP"
+              [searchable]="true"
+              [virtualScroll]="true"
+              placeholder="Select Sales Person"
+              class="w-full">
+        <ng-template ng-option-tmp let-item="item">
+          
+                {{ item.SUPPLIER }} - {{ item.SUPPLIER_NAME }}
+        </ng-template>
         </ng-select>
-      </ng-container>
+        </ng-container>
+        
+          <ng-template #sapSales>
+         <input type="text" formControlName="SALES_EMP" placeholder=" " readonly />
+        </ng-template>
+        
+          <label>Sales Person</label>
+        </div>
 
-      <ng-template #sapSales>
-        <input type="text" formControlName="SALES_EMP" readonly />
-      </ng-template>
-
-      <label>Sales Person</label>
-    </div> -->
-
-    <!-- Segment -->
-    <!-- <div class="form-field">
-      <ng-container *ngIf="sapType === 'Non-SAP'; else sapSegment">
-        <select formControlName="SEGMENT">
-          <option value="">Select Segment</option>
-          <option *ngFor="let seg of segmentList" [value]="seg.SEGMENT_DESC">
-            {{ seg.SEGMENT }} - {{ seg.SEGMENT_DESC }}
-          </option>
-        </select>
-      </ng-container>
-      <ng-template #sapSegment>
-        <input type="text" formControlName="SEGMENT" readonly />
-      </ng-template>
-      <label>Segment</label>
-    </div> -->
-    <!-- Segment -->
     <!-- Segment -->
     <div class="form-field" [class.filled]="segmentInfo.get('SEGMENT')?.value">
-      <ng-container *ngIf="sapType === 'Non-SAP'; else sapSegment">
-        <select formControlName="SEGMENT" required>
+      <ng-container *ngIf="sapType === 'Non-SAP' || showF4.SEGMENT; else sapSegment">
+        <select formControlName="SEGMENT">
           <option value="" disabled hidden>Select Segment</option>
           <option *ngFor="let seg of segmentList" [value]="seg.SEGMENT_DESC">
             {{ seg.SEGMENT }} - {{ seg.SEGMENT_DESC }}
           </option>
         </select>
       </ng-container>
-      <!-- Input for SAP -->
       <ng-template #sapSegment>
-        <input type="text" formControlName="SEGMENT" placeholder=" " />
+        <input type="text" formControlName="SEGMENT" placeholder=" " readonly />
       </ng-template>
-
       <label>Segment</label>
     </div>
 
-    <!-- Customer Profile -->
-    <div class="form-field">
-      <ng-container *ngIf="sapType === 'Non-SAP'; else sapCustProf">
-        <select formControlName="CUST_PROF">
-          <option value="">Select Customer Profile</option>
-          <option *ngFor="let c of custGrpList" [value]="c.CUST_GRP_DESC">
-            {{ c.CUST_GRP }} - {{ c.CUST_GRP_DESC }}
+    <!-- Application Type -->
+    <div class="form-field" [class.filled]="segmentInfo.get('APPTYP')?.value">
+      <ng-container *ngIf="sapType === 'Non-SAP' || showF4.APPTYP; else sapAppType">
+        <select formControlName="APPTYP">
+          <option value="">Select Application Type</option>
+          <option *ngFor="let app of appTypeList" [value]="app.APPTYP">
+            {{ app.APPTYP }} - {{ app.DESC }}
           </option>
         </select>
       </ng-container>
-      <ng-template #sapCustProf>
-        <input type="text" formControlName="CUST_PROF" readonly />
+      <ng-template #sapAppType>
+        <input type="text" formControlName="APPTYP" placeholder=" " readonly />
       </ng-template>
-      <label>Customer Profile</label>
+      <label>Application Type</label>
     </div>
 
+    <!-- Customer Profile -->
+    <div class="form-field" [class.filled]="segmentInfo.get('CUST_PROF')?.value">
+  <ng-container *ngIf="sapType === 'Non-SAP' || showF4.CUST_PROF; else sapCustProf">
+    <select formControlName="CUST_PROF">
+      <option value="">Select Customer Profile</option>
+      <option *ngFor="let c of custGrpList" [value]="c.CUST_PROF_DESC">
+        {{ c.CUST_PROF }} - {{ c.CUST_PROF_DESC }}
+      </option>
+    </select>
+  </ng-container>
+
+  <ng-template #sapCustProf>
+    <input type="text" formControlName="CUST_PROF" placeholder=" " readonly />
+  </ng-template>
+
+  <label>Customer Profile</label>
+</div>
+
+
     <!-- Branch -->
-    <div class="form-field">
-      <ng-container *ngIf="sapType === 'Non-SAP'; else sapBranch">
+    <div class="form-field" [class.filled]="segmentInfo.get('BRANCH')?.value">
+      <ng-container *ngIf="sapType === 'Non-SAP' || showF4.BRANCH; else sapBranch">
         <select formControlName="BRANCH" (change)="fetchzonechange()">
           <option value="">Select Branch (State)</option>
           <option *ngFor="let b of branchList" [value]="b.BRANCH_DESC">
@@ -155,26 +163,39 @@
         </select>
       </ng-container>
       <ng-template #sapBranch>
-        <input type="text" formControlName="BRANCH" readonly />
+        <input type="text" formControlName="BRANCH" placeholder=" " readonly />
       </ng-template>
       <label>Branch</label>
     </div>
 
     <!-- Branch Zone -->
-    <div class="form-field">
-      <input type="text" formControlName="BRANCH_ZONE" placeholder=" " />
+    <div class="form-field" [class.filled]="segmentInfo.get('BRANCH_ZONE')?.value">
+      <input type="text" formControlName="BRANCH_ZONE" placeholder=" " readonly />
       <label>Branch Zone</label>
     </div>
 
-    <!-- TAT Days -->
-    <div class="form-field">
+    <!-- TAT Type - ✅ CRITICAL FIX: Added (change) event -->
+    <div class="form-field" [class.filled]="segmentInfo.get('TAT_Type')?.value">
+      <select formControlName="TAT_Type" (change)="onTatTypeChange()" >
+        <option value="">Select TAT Type</option>
+        <option value="Direct Truck TAT">Direct Truck TAT</option>
+        <option value="Revised TAT">Revised TAT</option>
+        <option value="Safe Express TAT">Safe Express TAT</option>
+        <option value="Delivery TAT">Delivery TAT</option>
+        <option value="GATI TAT">GATI TAT</option>
+      </select>
+      <label>TAT Type</label>
+    </div>
+
+    <!-- TAT Days - ✅ Made readonly (auto-filled from backend) -->
+    <div class="form-field" [class.filled]="segmentInfo.get('TAT_DAYS')?.value">
       <input type="text" formControlName="TAT_DAYS" placeholder=" " />
       <label>TAT (Days)</label>
     </div>
 
-    <!-- ETA -->
-    <div class="form-field">
-      <input type="text" formControlName="ETA_DATE" placeholder="" />
+    <!-- ETA - ✅ Made readonly (auto-filled from backend) -->
+    <div class="form-field" [class.filled]="segmentInfo.get('ETA_DATE')?.value">
+      <input type="text" formControlName="ETA_DATE" placeholder=" "  />
       <label>ETA</label>
     </div>
 

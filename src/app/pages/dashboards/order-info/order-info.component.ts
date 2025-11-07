@@ -32,6 +32,8 @@ export class OrderInfoComponent implements OnInit {
   statesList: any;
   custList: any;
   customerGroup: string = '';
+  showFiscalFields: boolean = false; // Add this at the top with other variables
+
   initialFormValues: any = {};
 
   constructor(
@@ -164,7 +166,7 @@ export class OrderInfoComponent implements OnInit {
     }
     this.previousOrderType = this.orderType;
   }
-  setupPhysicalDispatch(): void {
+ setupPhysicalDispatch(): void {
   this.OrderInfo.get('PhysicalDispatchDateTime')?.valueChanges.subscribe(value => {
     if (value) {
       const obj = { phys_dispatch: value };
@@ -174,17 +176,16 @@ export class OrderInfoComponent implements OnInit {
 
       this.service.OrderInfoPhysicaldispatch(obj).subscribe(
         (res: any) => {
-          console.log(" Fiscal Info Response:", res);
+          console.log("Fiscal Info Response:", res);
           if (res) {
+            // ✅ Just patch values - readonly in HTML handles the rest
             this.OrderInfo.patchValue({
               Month: res.FISCAL_MONTH || '',
               FiscalQuarter: res.FISCAL_QUARTER || '',
               FiscalYear: res.FISCAL_YEAR || ''
             });
-            this.OrderInfo.get('Month')?.disable();
- this.OrderInfo.get('FiscalQuarter')?.disable();
-             this.OrderInfo.get('FiscalYear')?.disable();
             
+            this.showFiscalFields = true;
           }
           this.spinner.hide();
         },
@@ -193,20 +194,16 @@ export class OrderInfoComponent implements OnInit {
           this.spinner.hide();
         }
       );
-    }
-    else {
-      // 🔹 If Physical Dispatch Date is cleared, reset & enable all three fields
+    } else {
+      // Clear fields when date is removed
       this.OrderInfo.patchValue({
         Month: '',
         FiscalQuarter: '',
         FiscalYear: ''
       });
-
-      this.OrderInfo.get('Month')?.enable();
-      this.OrderInfo.get('FiscalQuarter')?.enable();
-      this.OrderInfo.get('FiscalYear')?.enable();
+      
+      this.showFiscalFields = false;
     }
-
   });
 }
 
@@ -263,7 +260,7 @@ export class OrderInfoComponent implements OnInit {
           Swal.fire({
             text: 'No Data',
             icon: 'warning',
-            timer: 5000
+            
           });
         }
       },
@@ -273,7 +270,7 @@ export class OrderInfoComponent implements OnInit {
         Swal.fire({
           text: 'Internal Server Error. Please try again later.',
           icon: 'error',
-          timer: 5000
+          
         });
       }
     );
