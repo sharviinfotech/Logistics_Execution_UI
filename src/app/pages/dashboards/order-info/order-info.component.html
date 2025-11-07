@@ -9,29 +9,30 @@
       <div class="form-radio optional" *ngIf="!orderType">
         <label>
           <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
-            <span>Inward</span>
+          <span>Inward</span>
         </label>
         <label>
           <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
-            <span>Outward</span>
+          <span>Outward</span>
         </label>
-          </div>
-            <div class="status-display-container" *ngIf="orderType">
-    
-              <button class="toggle-arrow arrow-icon" [class.reversed]="orderType === 'Outward'" (click)="toggleOrderType()" type="button">
-                <svg viewBox="0 0 24 24">
-                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z"/>
-                </svg>
-              </button>
+      </div>
+      <div class="status-display-container" *ngIf="orderType">
 
-              <div class="processing-badge">
-                  <span class="status-dot"></span>
-                  <span>{{ orderType }} is Processing</span>
-              </div>
+        <button class="toggle-arrow arrow-icon" [class.reversed]="orderType === 'Outward'" (click)="toggleOrderType()"
+          type="button">
+          <svg viewBox="0 0 24 24">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z" />
+          </svg>
+        </button>
 
-            </div>
-          </div>
-        
+        <div class="processing-badge">
+          <span class="status-dot"></span>
+          <span>{{ orderType }} is Processing</span>
+        </div>
+
+      </div>
+    </div>
+
 
     <br />
 
@@ -80,7 +81,7 @@
   <!-- Form Section -->
   <form class="form-grid" [formGroup]="OrderInfo" *ngIf="showForm">
     <!-- Tax Invoice -->
-  <div class="form-field">
+    <div class="form-field">
       <input type="text" formControlName="TaxInvoice" placeholder=" " *ngIf="isSap()" />
       <input type="text" formControlName="DCReference" placeholder=" " *ngIf="!isSap()" />
       <label>{{ isSap() ? 'Tax Invoice' : 'DC Reference Number' }}</label>
@@ -93,10 +94,10 @@
     </div>
 
     <!-- Invoice Date -->
- <div class="form-field">
-      <input type="date" formControlName="InvoiceeDate" placeholder=" " *ngIf="isSap()"  />
+    <div class="form-field">
+      <input type="date" formControlName="InvoiceeDate" placeholder=" " *ngIf="isSap()" />
       <input type="date" formControlName="ReferenceDate" placeholder=" " *ngIf="!isSap()" />
-      <label>{{ isSap() ? 'Invoice Date' : 'Reference Date' }}</label >
+      <label>{{ isSap() ? 'Invoice Date' : 'Reference Date' }}</label>
     </div>
 
 
@@ -119,14 +120,24 @@
     </div>
 
     <!-- Fiscal Year -->
-    <div class="form-field" *ngIf="showFiscalFields">
-      <input type="text" formControlName="FiscalYear" placeholder=" " readonly/>
+    <!-- <div class="form-field" *ngIf="showFiscalFields">
+      <input type="text" formControlName="FiscalYear" placeholder=" " readonly />
+      <label>Fiscal Year</label>
+    </div> -->
+    <div class="form-field" *ngIf="showFiscalFields"
+      [ngClass]="{'grayReadOnly': OrderInfo.value.PhysicalDispatchDateTime}">
+      <input type="text" formControlName="FiscalYear" placeholder=" " readonly />
       <label>Fiscal Year</label>
     </div>
 
     <!-- Fiscal Quarter -->
-    <div class="form-field"  *ngIf="showFiscalFields">
-      <input type="text" formControlName="FiscalQuarter" placeholder=" "  readonly/>
+    <!-- <div class="form-field" *ngIf="showFiscalFields">
+      <input type="text" formControlName="FiscalQuarter" placeholder=" " readonly />
+      <label>Fiscal Quarter</label>
+    </div> -->
+    <div class="form-field" *ngIf="showFiscalFields"
+      [ngClass]="{'grayReadOnly': OrderInfo.value.PhysicalDispatchDateTime}">
+      <input type="text" formControlName="FiscalQuarter" placeholder=" " readonly />
       <label>Fiscal Quarter</label>
     </div>
 
@@ -146,8 +157,13 @@
       <label>Month</label>
     </div> -->
     <!-- Month Dropdown -->
-    <div class="form-field" *ngIf="showFiscalFields">
-      <input type="text" formControlName="Month" placeholder=" " readonly/>
+    <!-- <div class="form-field" *ngIf="showFiscalFields">
+      <input type="text" formControlName="Month" placeholder=" " readonly />
+      <label>Month</label>
+    </div> -->
+    <div class="form-field" *ngIf="showFiscalFields"
+      [ngClass]="{'grayReadOnly': OrderInfo.value.PhysicalDispatchDateTime}">
+      <input type="text" formControlName="Month" placeholder=" " readonly />
       <label>Month</label>
     </div>
 
@@ -336,7 +352,7 @@
       <label>Customer Group</label>
     </div>
 
-    
+
 
 
 
@@ -368,12 +384,26 @@
       <label>Designation State</label>
     </div>
 
-   
-        <!-- Destination Zone -->
-        <div class="form-field" >
-          <input type="text" formControlName="DestinationZone" placeholder=" " readonly/>
-          <label>Destination Zone</label>
-        </div>
+
+    <!-- Destination Zone -->
+    <!-- <div class="form-field">
+      <input type="text" formControlName="DestinationZone" placeholder=" " readonly />
+      <label>Destination Zone</label>
+    </div> -->
+    <div class="form-field" [ngClass]="{
+        'grayReadOnly': !isSap() && OrderInfo.value.DestinationZone
+     }">
+      <input type="text" formControlName="DestinationZone" readonly />
+      <label>Destination Zone</label>
+    </div>
+
+
+
+
+
+
+
+
 
   </form>
 

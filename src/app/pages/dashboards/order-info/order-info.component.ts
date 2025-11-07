@@ -34,6 +34,7 @@ export class OrderInfoComponent implements OnInit {
   customerGroup: string = '';
   showFiscalFields: boolean = false; // Add this at the top with other variables
 
+
   initialFormValues: any = {};
 
   constructor(
@@ -47,7 +48,7 @@ export class OrderInfoComponent implements OnInit {
     this.OrderInfo = this.fb.group({
       TaxInvoice: [''],
       DCReference: [''],
-      InvoiceeDate: [''], 
+      InvoiceeDate: [''],
       ReferenceDate: [''],
       ODN: [''],
       InvoiceDate: [''],
@@ -69,7 +70,7 @@ export class OrderInfoComponent implements OnInit {
       DestinationState: [''],
       DestinationZone: [''],
       PhysicalDispatchDateTime: [''],
-      
+
     });
     this.initialFormValues = this.OrderInfo.value;
     // this.setupDestinationZoneListener();
@@ -82,64 +83,64 @@ export class OrderInfoComponent implements OnInit {
   }
 
   toggleOrderType() {
-  
-  this.OrderInfo.reset(this.initialFormValues);
-  this.orderType = '';
+
+    this.OrderInfo.reset(this.initialFormValues);
+    this.orderType = '';
     this.sapType = '';
     this.showForm = false;
     this.isProcessing = false;
     this.previousOrderType = null;
     this.previousSapType = null;
-  
- 
-}
-//   setupDestinationZoneListener(): void {
-//   this.OrderInfo.get('DestinationZone')?.valueChanges.subscribe((value) => {
-//     if (value && value !== '') {
-//       this.OrderInfo.get('DestinationZone')?.disable();
-//     } else {
-//       this.OrderInfo.get('DestinationZone')?.enable();
-//     }
-//     this.OrderInfo.get('DestinationZone')?.updateValueAndValidity();
-//   });
-// }
 
- setConditionalValidators(): void {
-  console.log('🔧 Setting validators for sapType:', this.sapType);
 
-  // Clear old validators
-  Object.keys(this.OrderInfo.controls).forEach(key => {
-    this.OrderInfo.get(key)?.clearValidators();
-    this.OrderInfo.get(key)?.updateValueAndValidity({ emitEvent: false });
-  });
-
-  // Always required fields
-  const alwaysRequired = [
-    'ODN', 'BasicShipment', 'InvoiceWithGst', 'FiscalQuarter', 'Month',
-    'BillingTransactionType', 'Plant', 'TransactionType', 'Division', 'SubDivision',
-    'RefNumber', 'Customer', 'CustomerGroup', 'CNee', 'DestinationLocation',
-    'DestinationState', 'DestinationZone', 'PhysicalDispatchDateTime'
-  ];
-  alwaysRequired.forEach(key => {
-    this.OrderInfo.get(key)?.setValidators([Validators.required]);
-  });
-
-  // ✅ Conditional validation
-  if (this.isSap()) {
-    this.OrderInfo.get('TaxInvoice')?.setValidators([Validators.required]);
-    this.OrderInfo.get('InvoiceeDate')?.setValidators([Validators.required]);
-  } else {
-    this.OrderInfo.get('DCReference')?.setValidators([Validators.required]);
-    this.OrderInfo.get('ReferenceDate')?.setValidators([Validators.required]);
   }
+  //   setupDestinationZoneListener(): void {
+  //   this.OrderInfo.get('DestinationZone')?.valueChanges.subscribe((value) => {
+  //     if (value && value !== '') {
+  //       this.OrderInfo.get('DestinationZone')?.disable();
+  //     } else {
+  //       this.OrderInfo.get('DestinationZone')?.enable();
+  //     }
+  //     this.OrderInfo.get('DestinationZone')?.updateValueAndValidity();
+  //   });
+  // }
 
-  // Update all
-  Object.keys(this.OrderInfo.controls).forEach(key => {
-    this.OrderInfo.get(key)?.updateValueAndValidity({ emitEvent: false });
-  });
+  setConditionalValidators(): void {
+    console.log('🔧 Setting validators for sapType:', this.sapType);
 
-  console.log('✅ Validators set successfully');
-}
+    // Clear old validators
+    Object.keys(this.OrderInfo.controls).forEach(key => {
+      this.OrderInfo.get(key)?.clearValidators();
+      this.OrderInfo.get(key)?.updateValueAndValidity({ emitEvent: false });
+    });
+
+    // Always required fields
+    const alwaysRequired = [
+      'ODN', 'BasicShipment', 'InvoiceWithGst', 'FiscalQuarter', 'Month',
+      'BillingTransactionType', 'Plant', 'TransactionType', 'Division', 'SubDivision',
+      'RefNumber', 'Customer', 'CustomerGroup', 'CNee', 'DestinationLocation',
+      'DestinationState', 'DestinationZone', 'PhysicalDispatchDateTime'
+    ];
+    alwaysRequired.forEach(key => {
+      this.OrderInfo.get(key)?.setValidators([Validators.required]);
+    });
+
+    // ✅ Conditional validation
+    if (this.isSap()) {
+      this.OrderInfo.get('TaxInvoice')?.setValidators([Validators.required]);
+      this.OrderInfo.get('InvoiceeDate')?.setValidators([Validators.required]);
+    } else {
+      this.OrderInfo.get('DCReference')?.setValidators([Validators.required]);
+      this.OrderInfo.get('ReferenceDate')?.setValidators([Validators.required]);
+    }
+
+    // Update all
+    Object.keys(this.OrderInfo.controls).forEach(key => {
+      this.OrderInfo.get(key)?.updateValueAndValidity({ emitEvent: false });
+    });
+
+    console.log('✅ Validators set successfully');
+  }
 
 
   onPlantChange(): void {
@@ -166,61 +167,61 @@ export class OrderInfoComponent implements OnInit {
     }
     this.previousOrderType = this.orderType;
   }
- setupPhysicalDispatch(): void {
-  this.OrderInfo.get('PhysicalDispatchDateTime')?.valueChanges.subscribe(value => {
-    if (value) {
-      const obj = { phys_dispatch: value };
-      console.log("Fetching Fiscal Info for Dispatch Date:", obj);
+  setupPhysicalDispatch(): void {
+    this.OrderInfo.get('PhysicalDispatchDateTime')?.valueChanges.subscribe(value => {
+      if (value) {
+        const obj = { phys_dispatch: value };
+        console.log("Fetching Fiscal Info for Dispatch Date:", obj);
 
-      this.spinner.show();
+        this.spinner.show();
 
-      this.service.OrderInfoPhysicaldispatch(obj).subscribe(
-        (res: any) => {
-          console.log("Fiscal Info Response:", res);
-          if (res) {
-            // ✅ Just patch values - readonly in HTML handles the rest
-            this.OrderInfo.patchValue({
-              Month: res.FISCAL_MONTH || '',
-              FiscalQuarter: res.FISCAL_QUARTER || '',
-              FiscalYear: res.FISCAL_YEAR || ''
-            });
-            
-            this.showFiscalFields = true;
+        this.service.OrderInfoPhysicaldispatch(obj).subscribe(
+          (res: any) => {
+            console.log("Fiscal Info Response:", res);
+            if (res) {
+              // ✅ Just patch values - readonly in HTML handles the rest
+              this.OrderInfo.patchValue({
+                Month: res.FISCAL_MONTH || '',
+                FiscalQuarter: res.FISCAL_QUARTER || '',
+                FiscalYear: res.FISCAL_YEAR || ''
+              });
+
+              this.showFiscalFields = true;
+            }
+            this.spinner.hide();
+          },
+          error => {
+            console.error("Error fetching fiscal info:", error);
+            this.spinner.hide();
           }
-          this.spinner.hide();
-        },
-        error => {
-          console.error("Error fetching fiscal info:", error);
-          this.spinner.hide();
-        }
-      );
-    } else {
-      // Clear fields when date is removed
-      this.OrderInfo.patchValue({
-        Month: '',
-        FiscalQuarter: '',
-        FiscalYear: ''
-      });
-      
-      this.showFiscalFields = false;
-    }
-  });
-}
+        );
+      } else {
+        // Clear fields when date is removed
+        this.OrderInfo.patchValue({
+          Month: '',
+          FiscalQuarter: '',
+          FiscalYear: ''
+        });
+
+        this.showFiscalFields = false;
+      }
+    });
+  }
 
 
   onSapTypeChange(): void {
     this.fetchpdb();
     this.showForm = false;
-    
+
     if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
       this.resetConditionalFields();
     }
-    
+
     this.previousSapType = this.sapType;
     this.setConditionalValidators();
 
     console.log("sapType", this.sapType);
-    
+
     if (this.sapType === "Non-SAP") {
       this.showForm = true;
     }
@@ -228,7 +229,7 @@ export class OrderInfoComponent implements OnInit {
 
   getForm(type: 'purchase' | 'invoice'): void {
     const value = type === 'purchase' ? this.ponumber : this.invoicenumber;
-    
+
     if (!value || value.trim() === '') {
       this.showForm = false;
       return;
@@ -249,7 +250,7 @@ export class OrderInfoComponent implements OnInit {
     this.service.OrderinfoOutward(obj).subscribe(
       (res: any) => {
         console.log("✅ SAP Fetch Response:", res);
-        
+
         if (res && res.length > 0) {
           this.patchForm(res[0]);
           this.showForm = true;
@@ -260,7 +261,7 @@ export class OrderInfoComponent implements OnInit {
           Swal.fire({
             text: 'No Data',
             icon: 'warning',
-            
+
           });
         }
       },
@@ -270,7 +271,7 @@ export class OrderInfoComponent implements OnInit {
         Swal.fire({
           text: 'Internal Server Error. Please try again later.',
           icon: 'error',
-          
+
         });
       }
     );
@@ -288,7 +289,7 @@ export class OrderInfoComponent implements OnInit {
     this.service.OrderInfoNonSap(obj).subscribe(
       (res: any) => {
         console.log("✅ Non-SAP Response:", res);
-        
+
         if (res && res.length > 0) {
           this.patchForm(res[0]);
           this.showForm = true;
@@ -308,7 +309,7 @@ export class OrderInfoComponent implements OnInit {
 
   private patchForm(data: any): void {
     console.log("📝 Patching form with data:", data);
-    
+
     this.OrderInfo.patchValue({
       TaxInvoice: data.INV_VBELN || '',
       DCReference: data.DC_REF || '',
@@ -335,19 +336,19 @@ export class OrderInfoComponent implements OnInit {
     }, { emitEvent: false });
 
     console.log("📋 Form values after patch:", this.OrderInfo.value);
-    
+
     // Set validators after patching
     this.setConditionalValidators();
-    
+
     // Mark as touched to show any validation errors
     this.OrderInfo.markAllAsTouched();
-    
+
     this.showForm = true;
   }
 
   saveOutwardInvoiceData(): void {
     this.OrderInfo.markAllAsTouched();
-    
+
     // Debug: Check which fields are invalid
     console.log('📊 Form Status:', {
       valid: this.OrderInfo.valid,
@@ -355,10 +356,10 @@ export class OrderInfoComponent implements OnInit {
       orderType: this.orderType
     });
     console.log('📝 Form Values:', this.OrderInfo.value);
-    
+
     const invalidFields: string[] = [];
     const missingFields: string[] = [];
-    
+
     Object.keys(this.OrderInfo.controls).forEach(key => {
       const control = this.OrderInfo.get(key);
       if (control?.invalid) {
@@ -368,7 +369,7 @@ export class OrderInfoComponent implements OnInit {
           errors: control.errors,
           hasValidator: control.hasValidator(Validators.required)
         });
-        
+
         if (control.errors?.['required']) {
           missingFields.push(key);
         }
@@ -377,10 +378,10 @@ export class OrderInfoComponent implements OnInit {
 
     // Stop if form is invalid
     if (this.OrderInfo.invalid) {
-      const errorMessage = missingFields.length > 0 
+      const errorMessage = missingFields.length > 0
         ? `Please fill all required fields before saving:`
         : 'Please fill all required fields before saving.';
-      
+
       Swal.fire({
         title: 'Validation Error',
         text: errorMessage,
@@ -461,7 +462,7 @@ export class OrderInfoComponent implements OnInit {
       this.service.OrderInfoNonSap({ CREATE: [record] }).subscribe(
         (res: any) => {
           console.log("✅ Non-SAP Save Response:", res);
-          
+
           if (res.STATUS == "true" || res.NUMBER == "200") {
             Swal.fire({
               title: 'Success',
@@ -499,11 +500,11 @@ export class OrderInfoComponent implements OnInit {
 
   private formatToDDMMYYYY(value: any): string {
     if (!value) return '';
-    
+
     if (typeof value === 'string' && /^\d{8}$/.test(value)) {
       return `${value.substr(6, 2)}-${value.substr(4, 2)}-${value.substr(0, 4)}`;
     }
-    
+
     const date = new Date(value);
     if (!isNaN(date.getTime())) {
       const dd = String(date.getDate()).padStart(2, '0');
@@ -511,7 +512,7 @@ export class OrderInfoComponent implements OnInit {
       const yyyy = date.getFullYear();
       return `${dd}-${mm}-${yyyy}`;
     }
-    
+
     return String(value);
   }
 
@@ -555,13 +556,14 @@ export class OrderInfoComponent implements OnInit {
       const obj = {
         "STATE": this.OrderInfo.value.DestinationState
       };
-      
+
       this.spinner.show();
       this.service.fetchzone(obj).subscribe(
         (res: any) => {
           this.OrderInfo.patchValue({
             "DestinationZone": res.ZONE
           });
+
           this.spinner.hide();
         },
         error => {

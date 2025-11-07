@@ -317,6 +317,7 @@ input[type="radio"] {
   content: none !important;
   /* Forces the removal of the pseudo-element content */
 }
+
 /* ========================================
    NEW CSS - Processing Badge & Toggle Arrow
    ======================================== */
@@ -353,9 +354,12 @@ input[type="radio"] {
 }
 
 @keyframes processingPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
   }
+
   50% {
     box-shadow: 0 4px 25px rgba(102, 126, 234, 0.6);
   }
@@ -372,11 +376,14 @@ input[type="radio"] {
 }
 
 @keyframes statusBlink {
-  0%, 100% { 
+
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
-  50% { 
+
+  50% {
     opacity: 0.4;
     transform: scale(0.9);
   }
@@ -420,7 +427,7 @@ input[type="radio"] {
 
 
 .toggle-arrow.arrow-icon {
-  background: none; 
+  background: none;
   box-shadow: none;
   border: 2px solid #333;
   transition: all 0.2s ease;
@@ -444,8 +451,8 @@ input[type="radio"] {
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transform: none; 
-  transition: none; 
+  transform: none;
+  transition: none;
 }
 
 
@@ -459,57 +466,65 @@ input[type="radio"] {
     align-items: stretch;
     gap: 15px;
   }
-  
+
   .processing-badge {
     justify-content: center;
   }
-  
+
   .toggle-arrow {
     align-self: center;
   }
-  
+
   .status-display-container {
-    display: flex; 
+    display: flex;
     align-self: center;
   }
+
   .form-field input:disabled,
-.form-field select:disabled { 
- background-color: #f8f9fa !important;
- cursor: not-allowed !important;
- border: 2px dashed #dee2e6 !important;
- color: #adb5bd !important;
- position: relative;
-}
+  .form-field select:disabled {
+    background-color: #f8f9fa !important;
+    cursor: not-allowed !important;
+    border: 2px dashed #dee2e6 !important;
+    color: #adb5bd !important;
+    position: relative;
+  }
 
-/* input కి మాత్రమే lock icon */
-.form-field:has(input:disabled)::before { 
- content: '🔒';
- position: absolute;
- right: 12px;
- top: 50%;
- transform: translateY(-50%);
- font-size: 16px;
- opacity: 0.5;
- pointer-events: none;
-}
+  /* input కి మాత్రమే lock icon */
+  .form-field:has(input:disabled)::before {
+    content: '🔒';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    opacity: 0.5;
+    pointer-events: none;
+  }
 
-.form-field:has(input:disabled) label,
-.form-field:has(select:disabled) label {
- color: #adb5bd !important;
-}
+  .form-field:has(input:disabled) label,
+  .form-field:has(select:disabled) label {
+    color: #adb5bd !important;
+  }
 
-.form-field .ng-select.ng-valid.ng-touched .ng-select-container,
-.form-field .ng-select.ng-valid.ng-dirty .ng-select-container,
-.form-field .ng-select.ng-valid:not(.ng-touched):not(.ng-untouched) .ng-select-container {
+  .form-field .ng-select.ng-valid.ng-touched .ng-select-container,
+  .form-field .ng-select.ng-valid.ng-dirty .ng-select-container,
+  .form-field .ng-select.ng-valid:not(.ng-touched):not(.ng-untouched) .ng-select-container {
     box-shadow: 0 0 5px rgba(0, 166, 81, 0.25);
     border-left: 3px solid #00A651 !important;
+  }
+
+
+
 }
 
-
-  
+.grayReadOnly input {
+  border: 1px solid #ced4da !important;
+  box-shadow: none !important;
+  background-color: #f8f9fa !important;
+  color: #495057 !important;
 }
 
-  
-
-
-
+.grayReadOnly input:focus {
+  border: 1px solid #ced4da !important;
+  box-shadow: none !important;
+}
