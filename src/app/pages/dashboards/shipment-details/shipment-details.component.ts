@@ -5,6 +5,8 @@ import { GeneralserviceService } from 'src/app/generalservice.service';
 import { NgxSpinnerService, NgxSpinnerModule } from 'ngx-spinner';
 import Swal from 'sweetalert2';
 import { SpinnerService } from 'src/app/spinner.service';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-shipment-details',
@@ -37,7 +39,8 @@ export class ShipmentDetailsComponent implements OnInit {
     private fb: FormBuilder,
     private service: GeneralserviceService,
     private spinner: NgxSpinnerService,
-    public spinnerService: SpinnerService
+    public spinnerService: SpinnerService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {

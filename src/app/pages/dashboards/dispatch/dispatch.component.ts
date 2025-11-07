@@ -6,6 +6,8 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import Swal from 'sweetalert2';
 import { SpinnerService } from 'src/app/spinner.service';
 import { GeneralserviceService } from 'src/app/generalservice.service';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-dispatch',
@@ -28,7 +30,8 @@ export class DispatchComponent implements OnInit {
     private cd: ChangeDetectorRef,
     private spinner: NgxSpinnerService,
     public spinnerService: SpinnerService,
-    private service: GeneralserviceService
+    private service: GeneralserviceService,
+    private router: Router
   ) {
     this.dispatchForm = this.fb.group({
       rows: this.fb.array([this.createRow(true)])
@@ -155,7 +158,7 @@ onSapTypeChange(): void {
   }
 
   // ✅ SAVE
- save() {
+ save(action: 'stay' | 'next' | 'previous' = 'stay') {
   this.spinner.show();
 
   if (!this.dispatchForm.valid) {
@@ -164,7 +167,6 @@ onSapTypeChange(): void {
     return;
   }
 
-  // ✅ Build payload as backend expects
   const payload = {
     DISPATCH: this.rows.controls.map((row: any) => ({
       NO_TRUCKS: row.get('NoOfTrucks')?.value,
@@ -177,14 +179,11 @@ onSapTypeChange(): void {
     }))
   };
 
-  console.log('Final Payload Sending →', payload);
-
-  // ✅ Select API dynamically
   let request$;
   if (this.sapType === 'SAP') {
-    request$ = this.service.DispatchSave(payload);  // POST
+    request$ = this.service.DispatchSave(payload);
   } else if (this.sapType === 'Non-SAP') {
-    request$ = this.service.DispatchNonSapSave(payload); // PUT
+    request$ = this.service.DispatchNonSapSave(payload);
   } else {
     this.spinner.hide();
     Swal.fire({
@@ -194,7 +193,6 @@ onSapTypeChange(): void {
     return;
   }
 
-  // ✅ Call API
   request$.subscribe(
     (res: any) => {
       this.spinner.hide();
@@ -204,7 +202,15 @@ onSapTypeChange(): void {
           text: res.MSG,
           icon: 'success',
           confirmButtonText: 'Ok'
-        }).then(() => this.resetAll());
+        }).then(() => {
+          if (action === 'next') {
+            this.router.navigate(['/order-info']);  // ✅ go to next
+          } else if (action === 'previous') {
+            this.router.navigate(['dashboard']);  // ✅ go to previous
+          } else {
+            this.resetAll();  // ✅ stay on same screen
+          }
+        });
       } else {
         Swal.fire({
           text: res.MSG || 'Dispatch saving failed!',
@@ -214,7 +220,6 @@ onSapTypeChange(): void {
     },
     err => {
       this.spinner.hide();
-      console.error('API Error:', err);
       Swal.fire({
         text: err?.error?.MSG || 'Failed to save Dispatch!',
         icon: 'error',
@@ -223,6 +228,7 @@ onSapTypeChange(): void {
     }
   );
 }
+
 
 
   resetAll() {

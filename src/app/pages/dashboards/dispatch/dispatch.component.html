@@ -109,6 +109,8 @@
     </form>
     <div class="text-right" *ngIf="showForm">
       <button class="btn btn-md btn-raised btnSave" (click)="save()">Save</button>
+      <button class="btn btn-md btn-raised btnSave move" (click)="save('next')">Save and Next</button>
+      <button class="btn btn-md btn-raised btnSave prev" (click)="save('previous')">Save and Previous</button>
     </div>
 
   </div>
