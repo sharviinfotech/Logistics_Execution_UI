@@ -489,7 +489,6 @@ input[type="radio"] {
     position: relative;
   }
 
-  /* input కి మాత్రమే lock icon */
   .form-field:has(input:disabled)::before {
     content: '🔒';
     position: absolute;

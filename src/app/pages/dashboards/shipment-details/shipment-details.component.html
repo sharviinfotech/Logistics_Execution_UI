@@ -50,48 +50,52 @@
                 </div>
             </div>
         </div>
-            <div *ngIf="showForm" class="form-grid">
-             <div class="form-field">
-                <ng-container *ngIf="!isSap(); else sapInco">
-                    <select formControlName="Incoterms">
-                    <option value="">Select Incoterm</option>
-                    <option *ngFor="let i of IncotermsList" [value]="i.INCO1">
-                        {{ i.INCO1 }} - {{ i.BEZEI }}
-                    </option>
+
+        <!-- Common Fields (outside form but with formControlName - Angular allows this) -->
+        <div *ngIf="showForm">
+            <div class="form-grid" [formGroup]="ProductInfo">
+                <div class="form-field">
+                    <ng-container *ngIf="!isSap(); else sapInco">
+                        <select formControlName="Incoterms">
+                            <option value="">Select Incoterm</option>
+                            <option *ngFor="let i of IncotermsList" [value]="i.INCO1">
+                                {{ i.INCO1 }} - {{ i.BEZEI }}
+                            </option>
+                        </select>
+                    </ng-container>
+
+                    <ng-template #sapInco>
+                        <input type="text" formControlName="Incoterms" placeholder="" readonly 
+                            [value]="ProductInfo.get('Incoterms')?.value"/>
+                    </ng-template>
+                    <label>Incoterms</label>
+                </div>
+
+                <div class="form-field">
+                    <select formControlName="InsuranceScope">
+                        <option value="">Select Insurance Scope</option>
+                        <option *ngFor="let option of insuranceScopeOptions" [value]="option">
+                            {{ option }}
+                        </option>
                     </select>
-                </ng-container>
-
-                <ng-template #sapInco>
-                    <input type="text" formControlName="Incoterms" placeholder=""  readonly 
-                    [value]="ProductInfo.get('Incoterms')?.value"/>
-                </ng-template>
-                <label>Incoterms</label>
+                    <label>Insurance Scope</label>
                 </div>
 
                 <div class="form-field">
-                <select formControlName="InsuranceScope">
-                    <option value="">Select Insurance Scope</option>
-                    <option *ngFor="let option of insuranceScopeOptions" [value]="option">
-                    {{ option }}
-                    </option>
-                </select>
-                <label>Insurance Scope</label>
-                </div>
-
-                <div class="form-field">
-                <input type="number" formControlName="Kilometres"  min="0" placeholder="" [value]="ProductInfo.get('Kilometres')?.value ?? ''"/>
-                <label>Kilometres</label>
+                    <input type="number" formControlName="Kilometres" min="0" placeholder="" 
+                        [value]="ProductInfo.get('Kilometres')?.value ?? ''"/>
+                    <label>Kilometres</label>
                 </div>
             </div>
 
-        <!-- Dynamic Product Form -->
-        <div *ngIf="showForm" class="table-responsive">
-            <form [formGroup]="ProductInfo" class="form-grid">
-                <table class="table table-bordered">
+            <!-- Dynamic Product Table -->
+            <div class="table-responsive">
+                <form [formGroup]="ProductInfo">
+                    <table class="table table-bordered">
                     <thead>
                         <tr>
                             <th>
-                                <input type="checkbox"  (change)="toggleAllSelection($event)"[checked]="isAllSelected"/>
+                                <input type="checkbox" (change)="toggleAllSelection($event)" [checked]="isAllSelected"/>
                             </th>
                             <th>SI.No.</th>
                             <th>Product</th>
@@ -99,17 +103,16 @@
                             <th>Material Description</th>
                             <th>No of Sets/No (Qty)</th>                           
                             <th>Ah Loaded in Truck</th>
-                             <th>Shipment Weight(kg)</th>
+                            <th>Shipment Weight(kg)</th>
                             <th>Battery Condition</th>
-                                                                                           
-                            <th>Action </th>
+                            <th>Action</th>
                         </tr>
                     </thead>
 
                     <tbody formArrayName="items">
                         <tr *ngFor="let itemGroup of items.controls; let i = index" [formGroupName]="i">
                             <td>
-                                <input type="checkbox" formControlName="selected"  (change)="onRowCheckboxChange()">
+                                <input type="checkbox" formControlName="selected" (change)="onRowCheckboxChange()">
                             </td>
                             <td>{{ i + 1 }}</td>
 
@@ -120,8 +123,7 @@
                                 </select>
                             </td>
 
-                            
-                          <td>
+                            <td>
                                 <div class="d-flex align-items-center">
                                     <ng-container *ngIf="!isSap(); else sapType">
                                         <div class="input-group">
@@ -131,36 +133,29 @@
                                                     {{ m.MTART }} - {{ m.MTBEZ }}
                                                 </option>
                                             </select>
-                                            <!-- <button type="button" class="btn btn-f4" (click)="openTypeOfMaterialF4(i)">F4</button> -->
                                         </div>
                                     </ng-container>
                                     <ng-template #sapType>
                                         <input type="text" formControlName="TypeOfMaterial" readonly />
                                     </ng-template>
                                 </div>
-                                <!-- <label>Type of Material</label> -->
                             </td>
-                            <!-- <td><input type="text" formControlName="TypeOfMaterial"></td> -->
-
 
                             <td><input type="text" formControlName="MaterialDescription"></td>
                             <td><input type="number" formControlName="Noofseats" min="0" /></td>
                             <td>
-                                <input
-                                    type="number"
-                                    formControlName="AhLoadedInTruck"
-                                    min="0"
+                                <input type="number" formControlName="AhLoadedInTruck" min="0"
                                     *ngIf="itemGroup.get('Product')?.value === 'Batteries'"
-                                    placeholder="Ah Loaded"
-                                />
-                             </td>
-                            <td><input type="number" formControlName="ShipmentWeight"   /></td>
+                                    placeholder="Ah Loaded" />
+                            </td>
+                            <td><input type="number" formControlName="ShipmentWeight" /></td>
 
                             <td>
                                 <select formControlName="BatteryCondition"
                                     *ngIf="itemGroup.get('Product')?.value === 'Batteries'">
                                     <option value="">Select Condition</option>
-                                    <option *ngFor="let option of batteryConditionOptions" [value]="option">{{ option }}
+                                    <option *ngFor="let option of batteryConditionOptions" [value]="option">
+                                        {{ option }}
                                     </option>
                                 </select>
                             </td>
@@ -170,15 +165,17 @@
                                     [disabled]="items.length === 1">✖</button>
                             </td>
                         </tr>
-
-                        <!-- Save Button -->
-
-
                     </tbody>
                 </table>
-            </form>
+                </form>
+            </div>
+
+            <!-- Save Buttons -->
+            <div class="text-right">
+                <button class="btn btn-md btn-raised btnSave" type="button" (click)="saveShipmentOutward('stay')">Save</button>
+                <button class="btn btn-md btn-raised btnSave move" type="button" (click)="saveShipmentOutward('next')">Save and Next</button>
+                <button class="btn btn-md btn-raised btnSave prev" type="button" (click)="saveShipmentOutward('previous')">Save and Previous</button>
+            </div>
         </div>
-        <div *ngIf="showForm" class="text-right"> <button type="button" class="btn btn-md btn-raised btnSave"
-                (click)="saveShipmentOutward()">Save</button></div>
     </div>
 </div>

@@ -203,8 +203,8 @@
 
   <!-- Save Button -->
   <div class="text-right" *ngIf="showForm">
-    <button type="submit" class="btn btn-md btn-raised btnSave" (click)="savePlan()" [disabled]="isSubmitting">
-      Save
-    </button>
+       <button class="btn btn-md btn-raised btnSave" (click)="savePlan('stay')">Save</button>
+    <button class="btn btn-md btn-raised btnSave move" (click)="savePlan('next')">Save and Next</button>
+    <button class="btn btn-md btn-raised btnSave prev" (click)="savePlan('previous')">Save and Previous</button>
   </div>
 </div>

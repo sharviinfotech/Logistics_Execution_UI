@@ -229,7 +229,7 @@ export class ShipmentDetailsComponent implements OnInit {
 }
 
   // ✅ Save only selected rows
-  saveShipmentOutward(): void {
+  saveShipmentOutward(action: 'stay' | 'next' | 'previous' = 'stay'): void {
     const selectedRows = this.getSelectedRows();
 
     if (selectedRows.length === 0) {
@@ -264,40 +264,46 @@ export class ShipmentDetailsComponent implements OnInit {
       : this.service.shipmentdetailsNonSapSave(cleanedRows);
 
     saveOperation.subscribe({
-      next: (res: any) => {
-        if (res.NUMBER == "200") {
-          Swal.fire({
-            title: '',
-            text: res.MSG || 'Selected rows saved successfully!',
-            icon: 'success',
-            confirmButtonText: 'Ok',
-            timer: 4000
-          });
-          this.resetForm();
+  next: (res: any) => {
+    this.spinner.hide(); // ✅ Hide spinner FIRST
+    
+    if (res.NUMBER == "200") {
+      Swal.fire({
+        title: 'Success',
+        text: res.MSG || 'Selected rows saved successfully!',
+        icon: 'success',
+        confirmButtonText: 'Ok'
+      }).then(() => {
+        // ✅ Handle navigation AFTER Swal closes
+        if (action === 'next') {
+          this.router.navigate(['/invoice-load-details']);
+        } else if (action === 'previous') {
+          this.router.navigate(['/order-info']);
         } else {
-          Swal.fire({
-            title: '',
-            text: res.MSG || 'Save Failed',
-            icon: 'error',
-            confirmButtonText: 'Ok',
-            timer: 4000
-          });
+          this.resetForm();
         }
-        this.spinner.hide();
-      },
-      error: (err) => {
-        console.error("Save Error:", err);
-        Swal.fire({
-          title: 'Error',
-          text: 'Something went wrong while saving shipment details.',
-          icon: 'error',
-          confirmButtonText: 'Ok'
-        });
-        this.spinner.hide();
-      }
+      });
+    } else {
+      Swal.fire({
+        title: 'Error',
+        text: res.MSG || 'Save Failed',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
+    }
+  },
+  error: (err) => {
+    this.spinner.hide();
+    console.error("Save Error:", err);
+    Swal.fire({
+      title: 'Error',
+      text: 'Something went wrong while saving shipment details.',
+      icon: 'error',
+      confirmButtonText: 'Ok'
     });
   }
-
+});
+}
   fetchTypeofmaterial() {
     this.spinner.show();
     this.service.getTypeofmaterial().subscribe({

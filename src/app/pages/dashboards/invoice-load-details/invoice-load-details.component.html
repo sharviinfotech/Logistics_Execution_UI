@@ -98,7 +98,9 @@
 
     <!-- Save Button -->
     <div *ngIf="showTable" class="text-right">
-      <button type="button" class="btn btn-md btn-raised btnSave" (click)="onSave()">Save</button>
+      <button class="btn btn-md btn-raised btnSave" (click)="onSave('stay')">Save</button>
+    <button class="btn btn-md btn-raised btnSave move" (click)="onSave('next')">Save and Next</button>
+    <button class="btn btn-md btn-raised btnSave prev" (click)="onSave('previous')">Save and Previous</button>
     </div>
   </div>
 </div>

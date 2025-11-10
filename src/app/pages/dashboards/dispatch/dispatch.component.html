@@ -42,7 +42,9 @@
             <th>Vehicle Type</th>
             <th>Workorder</th>
             <th>No Of Trucks</th>
+            <th>Vendor Code</th>
             <th>Transporter</th>
+            <th>No.of LRs</th>
             <th>LR Number</th>
             <th>Loading Points</th>
             <th>UnLoading Points</th>
@@ -86,7 +88,9 @@
 
 
             <td><input type="text" formControlName="NoOfTrucks"></td>
+            <td><input type="text" formControlName="VendorCode"></td>
             <td><input type="text" formControlName="Transporter"></td>
+            <td><input type="text" formControlName="NoOfLRs"></td>
             <td><input type="text" formControlName="LRNumber"></td>
             <td><input type="text" formControlName="LoadingPoints"></td>
             <td><input type="text" formControlName="UnLoadingPoints"></td>
@@ -110,7 +114,7 @@
     <div class="text-right" *ngIf="showForm">
       <button class="btn btn-md btn-raised btnSave" (click)="save()">Save</button>
       <button class="btn btn-md btn-raised btnSave move" (click)="save('next')">Save and Next</button>
-      <button class="btn btn-md btn-raised btnSave prev" (click)="save('previous')">Save and Previous</button>
+      <!-- <button class="btn btn-md btn-raised btnSave prev" (click)="save('previous')">Save and Previous</button> -->
     </div>
 
   </div>

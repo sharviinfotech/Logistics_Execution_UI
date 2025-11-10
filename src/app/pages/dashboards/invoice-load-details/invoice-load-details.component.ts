@@ -11,6 +11,7 @@ import {
 import Swal from 'sweetalert2';
 import { GeneralserviceService } from 'src/app/generalservice.service';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-invoice-load-details',
@@ -31,7 +32,8 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private service: GeneralserviceService,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -119,92 +121,122 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   }
 
   // ✅ SAVE FOR SAP
-  saveInvoiceDetails(): void {
-    this.InvoiceForm.markAllAsTouched();
-    if (this.InvoiceForm.invalid) {
-      Swal.fire('Error', 'Please fill all required fields', 'error');
-      return;
-    }
-
-    const payload = this.invoices.value.map((item: any) => ({
-      MANDT: item.MANDT || '234',
-      VBELN: this.invoicenumber,
-      POSNR: item.POSNR || 10,
-      ZTRUC_TYPE: item.ZTRUC_TYPE,
-      ZACT_LOAD: Number(item.ZACT_LOAD),
-      ZACT_VOL: Number(item.ZACT_VOL),
-      ZLF_VOL: Number(item.ZLF_VOL),
-      ZLF_WT: item.ZLF_WT,
-      ZWEEK_SF: item.ZWEEK_SF,
-      ZEWAYBILL_NO: item.ZEWAYBILL_NO,
-      ZEWAYBILL_DT: item.ZEWAYBILL_DT,
-    }));
-
-    this.spinner.show();
-    this.service.InvoiceloaddetailsSave({ NSAP_LOAD: payload }).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        if (res?.NUMBER === '200') {
-          Swal.fire('Success', res.MSG || 'Saved Successfully', 'success');
-          this.resetForm();
-        } else {
-          Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
-        }
-      },
-      error: () => {
-        this.spinner.hide();
-        Swal.fire('Error', 'Save failed', 'error');
-      }
-    });
+ saveInvoiceDetails(action: 'stay' | 'next' | 'previous' = 'stay'): void {
+  this.InvoiceForm.markAllAsTouched();
+  if (this.InvoiceForm.invalid) {
+    Swal.fire('Error', 'Please fill all required fields', 'error');
+    return;
   }
+
+  const payload = this.invoices.value.map((item: any) => ({
+    MANDT: item.MANDT || '234',
+    VBELN: this.invoicenumber,
+    POSNR: item.POSNR || 10,
+    ZTRUC_TYPE: item.ZTRUC_TYPE,
+    ZACT_LOAD: Number(item.ZACT_LOAD),
+    ZACT_VOL: Number(item.ZACT_VOL),
+    ZLF_VOL: Number(item.ZLF_VOL),
+    ZLF_WT: item.ZLF_WT,
+    ZWEEK_SF: item.ZWEEK_SF,
+    ZEWAYBILL_NO: item.ZEWAYBILL_NO,
+    ZEWAYBILL_DT: item.ZEWAYBILL_DT,
+  }));
+
+  this.spinner.show();
+  this.service.InvoiceloaddetailsSave({ NSAP_LOAD: payload }).subscribe({
+    next: (res: any) => {
+      this.spinner.hide();
+      if (res?.NUMBER === '200') {
+        Swal.fire({
+          title: 'Success',
+          text: res.MSG || 'Saved Successfully',
+          icon: 'success',
+          confirmButtonText: 'Ok'
+        }).then(() => {
+          if (action === 'next') {
+            this.router.navigate(['/segment-info']); // ✅ Next screen
+          } else if (action === 'previous') {
+            this.router.navigate(['/shipment-details']); // ✅ Previous screen
+          } else {
+            this.resetForm();
+          }
+        });
+      } else {
+        Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
+      }
+    },
+    error: () => {
+      this.spinner.hide();
+      Swal.fire('Error', 'Save failed', 'error');
+    }
+  });
+}
+
 
   // ✅ SAVE NON-SAP
-  saveInvoiceNonsapDetails(): void {
-    this.InvoiceForm.markAllAsTouched();
-    if (this.InvoiceForm.invalid) {
-      Swal.fire('Error', 'Please fill all required fields', 'error');
-      return;
-    }
+ saveInvoiceNonsapDetails(action: 'stay' | 'next' | 'previous' = 'stay'): void {
+  this.InvoiceForm.markAllAsTouched();
+  if (this.InvoiceForm.invalid) {
+    Swal.fire('Error', 'Please fill all required fields', 'error');
+    return;
+  }
 
-    const payload = {
-      NSAP_LOAD: this.invoices.value.map((inv: any) => ({
-        MANDT: '234',
-        VBELN: this.invoicenumber || '0000000000',
-        POSNR: 10,
-        ZTRUC_TYPE: inv.ZTRUC_TYPE,
-        ZACT_LOAD: inv.ZACT_LOAD,
-        ZACT_VOL: inv.ZACT_VOL,
-        ZLF_VOL: inv.ZLF_VOL,
-        ZLF_WT: inv.ZLF_WT,
-        ZWEEK_SF: inv.ZWEEK_SF,
-        ZEWAYBILL_NO: inv.ZEWAYBILL_NO,
-        ZEWAYBILL_DT: inv.ZEWAYBILL_DT,
-      })),
-    };
+  const payload = {
+    NSAP_LOAD: this.invoices.value.map((inv: any) => ({
+      MANDT: '234',
+      VBELN: this.invoicenumber || '0000000000',
+      POSNR: 10,
+      ZTRUC_TYPE: inv.ZTRUC_TYPE,
+      ZACT_LOAD: inv.ZACT_LOAD,
+      ZACT_VOL: inv.ZACT_VOL,
+      ZLF_VOL: inv.ZLF_VOL,
+      ZLF_WT: inv.ZLF_WT,
+      ZWEEK_SF: inv.ZWEEK_SF,
+      ZEWAYBILL_NO: inv.ZEWAYBILL_NO,
+      ZEWAYBILL_DT: inv.ZEWAYBILL_DT,
+    })),
+  };
 
-    this.spinner.show();
-    this.service.InvoiceloaddetailsNonSap(payload).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        if (res?.NUMBER === '200') {
-          Swal.fire('Success', res.MSG || 'Saved Successfully', 'success');
-          this.resetForm();
-        } else {
-          Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
-        }
-      },
-      error: () => {
-        this.spinner.hide();
-        Swal.fire('Error', 'Save failed', 'error');
+  this.spinner.show();
+  this.service.InvoiceloaddetailsNonSap(payload).subscribe({
+    next: (res: any) => {
+      this.spinner.hide();
+      if (res?.NUMBER === '200') {
+        Swal.fire({
+          title: 'Success',
+          text: res.MSG || 'Saved Successfully',
+          icon: 'success',
+          confirmButtonText: 'Ok'
+        }).then(() => {
+          if (action === 'next') {
+            this.router.navigate(['/segment-info']); // ✅ Next screen
+          } else if (action === 'previous') {
+            this.router.navigate(['/shipment-details']); // ✅ Previous screen
+          } else {
+            this.resetForm();
+          }
+        });
+      } else {
+        Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
       }
-    });
-  }
+    },
+    error: () => {
+      this.spinner.hide();
+      Swal.fire('Error', 'Save failed', 'error');
+    }
+  });
+}
 
-  onSave(): void {
-    if (this.sapType === 'SAP') this.saveInvoiceDetails();
-    else if (this.sapType === 'Non-SAP') this.saveInvoiceNonsapDetails();
-    else Swal.fire('Warning', 'Please select SAP type before saving', 'warning');
+
+  onSave(action: 'stay' | 'next' | 'previous' = 'stay'): void {
+  if (this.sapType === 'SAP') {
+    this.saveInvoiceDetails(action);
+  } else if (this.sapType === 'Non-SAP') {
+    this.saveInvoiceNonsapDetails(action);
+  } else {
+    Swal.fire('Warning', 'Please select SAP type before saving', 'warning');
   }
+}
 
   resetForm(): void {
     this.InvoiceForm.reset();

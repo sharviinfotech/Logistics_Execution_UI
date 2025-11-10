@@ -69,7 +69,9 @@ onSapTypeChange(): void {
       workorder: [''],
       VehicleType: ['', Validators.required],
       NoOfTrucks: [''],
+      VendorCode: [''],
       Transporter: [''],
+      NoOfLRs: [''],
       LRNumber: [''],
       LoadingPoints: [''],
       UnLoadingPoints: ['']
@@ -80,7 +82,9 @@ onSapTypeChange(): void {
       row.patchValue({
         workorder: '',
         NoOfTrucks: '',
+        VendorCode: '',
         Transporter: '',
+        NoOfLRs: '',
         LoadingPoints: '',
         LRNumber: '',
         UnLoadingPoints: ''
@@ -123,7 +127,9 @@ onSapTypeChange(): void {
     firstRow.patchValue({
       workorder: '',
       NoOfTrucks: '',
+      VendorCode: '',
       Transporter: '',
+      NoOfLRs: '',
       LRNumber: '',
       LoadingPoints: '',
       UnLoadingPoints: ''

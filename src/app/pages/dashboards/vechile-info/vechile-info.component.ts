@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, FormArray, ReactiveFormsModule, For
 import { GeneralserviceService } from 'src/app/generalservice.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-vechile-info',
@@ -24,7 +25,8 @@ export class VechileInfoComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private service: GeneralserviceService,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -154,7 +156,7 @@ export class VechileInfoComponent implements OnInit {
   }
 
   // ✅ Save only selected rows
-  saveVehicleInfo(): void {
+  saveVehicleInfo(action: 'stay' | 'next' | 'previous' = 'stay'): void {
     const selectedRows = this.getSelectedRows();
 
     if (selectedRows.length === 0) {
@@ -191,7 +193,13 @@ export class VechileInfoComponent implements OnInit {
         this.spinner.hide();
         if (res?.NUMBER === '200') {
           Swal.fire('Success', res.MSG || 'Selected Vehicle(s) saved successfully!', 'success');
-          this.resetForm();
+          if (action === 'next') {
+            // Navigate to next screen (e.g., Invoice Load Details or other)
+            this.router.navigate(['/transit-info']); 
+          } else if (action === 'previous') {
+            // Navigate back to Segment Info
+            this.router.navigate(['/segment-info']); 
+          }this.resetForm();
         } else {
           Swal.fire('Error', res?.MSG || 'Failed to save selected vehicle info.', 'error');
         }

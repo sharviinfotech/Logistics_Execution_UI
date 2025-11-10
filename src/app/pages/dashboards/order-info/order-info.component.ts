@@ -6,6 +6,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import Swal from 'sweetalert2';
 import { SpinnerService } from 'src/app/spinner.service';
 import { SharedModule } from '../saas/shared/shared.module';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-order-info',
@@ -41,7 +42,8 @@ export class OrderInfoComponent implements OnInit {
     private fb: FormBuilder,
     private service: GeneralserviceService,
     private spinner: NgxSpinnerService,
-    public spinnerService: SpinnerService
+    public spinnerService: SpinnerService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -346,9 +348,9 @@ export class OrderInfoComponent implements OnInit {
     this.showForm = true;
   }
 
-  saveOutwardInvoiceData(): void {
+  saveOutwardInvoiceData(action: 'stay' | 'next' | 'previous' = 'stay'): void {
     this.OrderInfo.markAllAsTouched();
-
+    
     // Debug: Check which fields are invalid
     console.log('📊 Form Status:', {
       valid: this.OrderInfo.valid,
@@ -356,10 +358,10 @@ export class OrderInfoComponent implements OnInit {
       orderType: this.orderType
     });
     console.log('📝 Form Values:', this.OrderInfo.value);
-
+    
     const invalidFields: string[] = [];
     const missingFields: string[] = [];
-
+    
     Object.keys(this.OrderInfo.controls).forEach(key => {
       const control = this.OrderInfo.get(key);
       if (control?.invalid) {
@@ -369,7 +371,7 @@ export class OrderInfoComponent implements OnInit {
           errors: control.errors,
           hasValidator: control.hasValidator(Validators.required)
         });
-
+        
         if (control.errors?.['required']) {
           missingFields.push(key);
         }
@@ -378,16 +380,16 @@ export class OrderInfoComponent implements OnInit {
 
     // Stop if form is invalid
     if (this.OrderInfo.invalid) {
-      const errorMessage = missingFields.length > 0
+      const errorMessage = missingFields.length > 0 
         ? `Please fill all required fields before saving:`
         : 'Please fill all required fields before saving.';
-
+      
       Swal.fire({
         title: 'Validation Error',
         text: errorMessage,
         icon: 'warning',
         confirmButtonText: 'Ok',
-        timer: 6000
+        
       });
       return;
     }
@@ -425,24 +427,33 @@ export class OrderInfoComponent implements OnInit {
         (res: any) => {
           console.log("✅ SAP Save Response:", res);
 
-          if (res.STATUS == "true" || res.NUMBER == "200") {
-            Swal.fire({
-              title: 'Success',
-              text: res.MESSAGE || 'Data saved successfully',
-              icon: 'success',
-              confirmButtonText: 'Ok',
-              timer: 5000
-            });
+          if (res.STATUS === 'true' || res.NUMBER === '200') {
+        Swal.fire({
+          title: 'Success',
+          text: res.MESSAGE || 'Data saved successfully',
+          icon: 'success',
+          confirmButtonText: 'Ok',
+          
+        }).then(() => {
+          
+          if (action === 'next') {
+            this.router.navigate(['/shipment-details']); // ✅ Next screen
+          } else if (action === 'previous') {
+            this.router.navigate(['/dispatch']); // ✅ Previous screen
+          } else {
+            // Stay on same page, reset form
             this.OrderInfo.reset();
-            this.spinner.hide();
             this.showForm = false;
+          }
+        });
+         this.spinner.hide();
           } else {
             Swal.fire({
               title: 'Error',
               text: res.MESSAGE || 'Failed to save data',
               icon: 'error',
               confirmButtonText: 'Ok',
-              timer: 5000
+              
             });
             this.spinner.hide();
           }
@@ -452,8 +463,7 @@ export class OrderInfoComponent implements OnInit {
           this.spinner.hide();
           Swal.fire({
             text: 'Internal Server Error. Please try again later.',
-            icon: 'error',
-            timer: 5000
+            
           });
         }
       );
@@ -462,25 +472,33 @@ export class OrderInfoComponent implements OnInit {
       this.service.OrderInfoNonSap({ CREATE: [record] }).subscribe(
         (res: any) => {
           console.log("✅ Non-SAP Save Response:", res);
-
-          if (res.STATUS == "true" || res.NUMBER == "200") {
-            Swal.fire({
-              title: 'Success',
-              text: res.MESSAGE || 'Data saved successfully',
-              icon: 'success',
-              confirmButtonText: 'Ok',
-              timer: 5000
-            });
+          
+          if (res.STATUS === 'true' || res.NUMBER === '200') {
+        Swal.fire({
+          title: 'Success',
+          text: res.MESSAGE || 'Data saved successfully',
+          icon: 'success',
+          confirmButtonText: 'Ok',
+         
+        }).then(() => {
+          this.spinner.hide();
+          if (action === 'next') {
+            this.router.navigate(['/shipment-details']); // ✅ Next screen
+          } else if (action === 'previous') {
+            this.router.navigate(['/dispatch']); // ✅ Previous screen
+          } else {
+            // Stay on same page, reset form
             this.OrderInfo.reset();
-            this.spinner.hide();
             this.showForm = false;
+          }
+        });
           } else {
             Swal.fire({
               title: 'Error',
               text: res.MESSAGE || 'Failed to save data',
               icon: 'error',
               confirmButtonText: 'Ok',
-              timer: 5000
+              
             });
             this.spinner.hide();
           }
@@ -491,12 +509,13 @@ export class OrderInfoComponent implements OnInit {
           Swal.fire({
             text: 'Internal Server Error. Please try again later.',
             icon: 'error',
-            timer: 5000
+           
           });
         }
       );
     }
   }
+
 
   private formatToDDMMYYYY(value: any): string {
     if (!value) return '';
@@ -546,7 +565,7 @@ export class OrderInfoComponent implements OnInit {
       },
       error => {
         console.error("❌ PDB Fetch Error:", error);
-        this.spinner.hide();
+        // this.spinner.hide();
       }
     );
   }

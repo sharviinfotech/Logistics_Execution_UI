@@ -5,6 +5,7 @@ import { GeneralserviceService } from 'src/app/generalservice.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import Swal from 'sweetalert2';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-segment-info',
@@ -45,7 +46,8 @@ export class SegmentInfoComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private service: GeneralserviceService,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -199,74 +201,82 @@ export class SegmentInfoComponent implements OnInit {
     });
   }
 
-  savePlan() {
-    if (this.sapType === 'SAP') {
-      this.saveSegmentInfoWithSAP();
-    } else {
-      this.saveSegmentInfoWithoutSAP();
-    }
+  savePlan(action: 'stay' | 'next' | 'previous' = 'stay') {
+  if (this.sapType === 'SAP') {
+    this.saveSegmentInfoWithSAP(action); // ✅ pass the action
+  } else {
+    this.saveSegmentInfoWithoutSAP(action); // ✅ pass the action
+  }
+}
+
+
+ saveSegmentInfoWithSAP(action: 'stay' | 'next' | 'previous' = 'stay'): void {
+  this.segmentInfo.markAllAsTouched();
+
+  if (this.segmentInfo.invalid) {
+    Swal.fire({
+      title: 'Validation Error',
+      text: 'Please fill all required fields before saving.',
+      icon: 'warning',
+      confirmButtonText: 'Ok',
+    });
+    return;
   }
 
-  saveSegmentInfoWithSAP(): void {
-    this.segmentInfo.markAllAsTouched();
+  const formValue = this.segmentInfo.value;
+  const payload = {
+    SAVE: [
+      {
+        INV_VBELN: formValue.INV_VBELN,
+        SALES_EMP: formValue.SALES_EMP,
+        SEGMENT: formValue.SEGMENT,
+        APPTYP: formValue.APPTYP,
+        CUST_PROF: formValue.CUST_PROF,
+        BRANCH: formValue.BRANCH,
+        BRANCH_ZONE: formValue.BRANCH_ZONE,
+        TAT_TYPE: formValue.TAT_Type,
+        TAT_DAYS: formValue.TAT_DAYS,
+        ETA_DATE: formValue.ETA_DATE,
+      },
+    ],
+  };
 
-    if (this.segmentInfo.invalid) {
-      Swal.fire({
-        title: 'Validation Error',
-        text: 'Please fill all required fields before saving.',
-        icon: 'warning',
-        confirmButtonText: 'Ok',
-      });
-      return;
-    }
-
-    const formValue = this.segmentInfo.value;
-    const payload = {
-      SAVE: [
-        {
-          INV_VBELN: formValue.INV_VBELN,
-          SALES_EMP: formValue.SALES_EMP,
-          SEGMENT: formValue.SEGMENT,
-          APPTYP: formValue.APPTYP,
-          CUST_PROF: formValue.CUST_PROF,
-          BRANCH: formValue.BRANCH,
-          BRANCH_ZONE: formValue.BRANCH_ZONE,
-          TAT_TYPE: formValue.TAT_Type,  // ✅ Fixed field name
-          TAT_DAYS: formValue.TAT_DAYS,
-          ETA_DATE: formValue.ETA_DATE
-        }
-      ]
-    };
-
-    this.spinner.show();
-    this.service.SegmentInfoOutwardSave(payload).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        if (res.STATUS == "true" || res.NUMBER == "200") {
-          Swal.fire({
-            title: '',
-            text: res.MESSAGE,
-            icon: 'success',
-            confirmButtonText: 'Ok',
-          }).then(() => {
+  this.spinner.show();
+  this.service.SegmentInfoOutwardSave(payload).subscribe({
+    next: (res: any) => {
+      this.spinner.hide();
+      if (res.STATUS == 'true' || res.NUMBER == '200') {
+        Swal.fire({
+          title: 'Success',
+          text: res.MESSAGE,
+          icon: 'success',
+          confirmButtonText: 'Ok',
+        }).then(() => {
+          if (action === 'next') {
+            this.router.navigate(['/vehicle-info']); // ✅ next screen route
+          } else if (action === 'previous') {
+            this.router.navigate(['/invoice-load-details']); // ✅ previous screen route
+          } else {
             this.segmentInfo.reset();
             this.showForm = false;
-          });
-        } else {
-          Swal.fire({
-            title: '',
-            text: res.MESSAGE,
-            icon: 'warning',
-            confirmButtonText: 'Ok',
-          });
-        }
-      },
-      error: () => {
-        this.spinner.hide();
-        Swal.fire('Server error while saving', '', 'error');
+          }
+        });
+      } else {
+        Swal.fire({
+          title: '',
+          text: res.MESSAGE,
+          icon: 'warning',
+          confirmButtonText: 'Ok',
+        });
       }
-    });
-  }
+    },
+    error: () => {
+      this.spinner.hide();
+      Swal.fire('Server error while saving', '', 'error');
+    },
+  });
+}
+
 
   // ✅ FIXED: TatTypeChange method
   TatTypeChange(): void {
@@ -353,65 +363,72 @@ export class SegmentInfoComponent implements OnInit {
 
 
 
-  saveSegmentInfoWithoutSAP(): void {
-    this.segmentInfo.markAllAsTouched();
+  saveSegmentInfoWithoutSAP(action: 'stay' | 'next' | 'previous' = 'stay'): void {
+  this.segmentInfo.markAllAsTouched();
 
-    if (this.segmentInfo.invalid) {
-      Swal.fire({
-        title: 'Validation Error',
-        text: 'Please fill all required fields before saving.',
-        icon: 'warning',
-        confirmButtonText: 'Ok',
-      });
-      return;
-    }
+  if (this.segmentInfo.invalid) {
+    Swal.fire({
+      title: 'Validation Error',
+      text: 'Please fill all required fields before saving.',
+      icon: 'warning',
+      confirmButtonText: 'Ok',
+    });
+    return;
+  }
 
-    const formValue = this.segmentInfo.value;
-    const payload = {
-      CREATE: [
-        {
-          SALES_EMP: formValue.SALES_EMP,
-          SEGMENT: formValue.SEGMENT,
-          APPTYP: formValue.APPTYP,
-          CUST_PROF: formValue.CUST_PROF,
-          BRANCH: formValue.BRANCH,
-          BRANCH_ZONE: formValue.BRANCH_ZONE,
-          TAT_TYPE: formValue.TAT_Type,  // ✅ Fixed field name
-          TAT_DAYS: formValue.TAT_DAYS,
-          ETA_DATE: formValue.ETA_DATE
-        }
-      ]
-    };
+  const formValue = this.segmentInfo.value;
+  const payload = {
+    CREATE: [
+      {
+        SALES_EMP: formValue.SALES_EMP,
+        SEGMENT: formValue.SEGMENT,
+        APPTYP: formValue.APPTYP,
+        CUST_PROF: formValue.CUST_PROF,
+        BRANCH: formValue.BRANCH,
+        BRANCH_ZONE: formValue.BRANCH_ZONE,
+        TAT_TYPE: formValue.TAT_Type,
+        TAT_DAYS: formValue.TAT_DAYS,
+        ETA_DATE: formValue.ETA_DATE,
+      },
+    ],
+  };
 
-    this.spinner.show();
-    this.service.SegmentInfoNonSap(payload).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        if (res.STATUS == "true" || res.NUMBER == "200") {
-          Swal.fire({
-            title: '',
-            text: res.MESSAGE,
-            icon: 'success',
-            confirmButtonText: 'Ok',
-          }).then(() => {
+  this.spinner.show();
+  this.service.SegmentInfoNonSap(payload).subscribe({
+    next: (res: any) => {
+      this.spinner.hide();
+      if (res.STATUS == 'true' || res.NUMBER == '200') {
+        Swal.fire({
+          title: 'Success',
+          text: res.MESSAGE,
+          icon: 'success',
+          confirmButtonText: 'Ok',
+        }).then(() => {
+          if (action === 'next') {
+            this.router.navigate(['/vehicle-info']); // ✅ next screen route
+          } else if (action === 'previous') {
+            this.router.navigate(['/invoice-load-details']); // ✅ previous screen route
+          } else {
             this.segmentInfo.reset();
             this.showForm = true;
-          });
-        } else {
-          Swal.fire({
-            title: '',
-            text: res.MESSAGE,
-            icon: 'warning',
-            confirmButtonText: 'Ok',
-          });
-        }
-      },
-      error: () => {
-        this.spinner.hide();
-        Swal.fire('Error saving Non-SAP data', '', 'error');
+          }
+        });
+      } else {
+        Swal.fire({
+          title: '',
+          text: res.MESSAGE,
+          icon: 'warning',
+          confirmButtonText: 'Ok',
+        });
       }
-    });
-  }
+    },
+    error: () => {
+      this.spinner.hide();
+      Swal.fire('Error saving Non-SAP data', '', 'error');
+    },
+  });
+}
+
 
  fetchzonechange() {
   console.log('SAP Type:', this.sapType);
