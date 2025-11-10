@@ -8,7 +8,10 @@ import {
   ReactiveFormsModule,
   FormsModule
 } from '@angular/forms';
+import Swal from 'sweetalert2/dist/sweetalert2.js';
+
 import { GeneralserviceService } from 'src/app/generalservice.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-transit-damage-info',
@@ -27,8 +30,11 @@ export class TransitDamageInfoComponent implements OnInit {
   ItemForm!: FormGroup;
 
   showTable = false;
+  showForm = false;
+  isEditMode = false;
 
-  constructor(private fb: FormBuilder, private service: GeneralserviceService) { }
+
+  constructor(private fb: FormBuilder, private service: GeneralserviceService, private router: Router) { }
 
   ngOnInit(): void {
     this.buildHeaderForm();
@@ -82,7 +88,7 @@ export class TransitDamageInfoComponent implements OnInit {
 
   // ✅ RESET ALL
   resetForms() {
-    this.showTable = false;
+
 
     this.HeaderForm.reset();
 
@@ -123,6 +129,7 @@ export class TransitDamageInfoComponent implements OnInit {
 
         // ✅ Show UI
         this.showTable = true;
+        this.showForm = true;
 
         // ✅ Fill Header
         this.HeaderForm.patchValue({
@@ -165,37 +172,66 @@ export class TransitDamageInfoComponent implements OnInit {
     });
   }
 
-  // ✅ FINAL SAVE FUNCTION
-  onSave() {
+  onSaveActionSap(action: 'stay' | 'next' | 'previous' = 'stay') {
 
-    // ✅ Build Final Payload EXACTLY AS API NEEDS
+    // ✅ INV NO push
+    this.HeaderForm.patchValue({
+      INV_NO: this.invoicenumber
+    });
+
+    this.items.controls.forEach(row => {
+      row.patchValue({ INV_NO: this.invoicenumber });
+    });
+
     const payload = {
       HEADER: this.HeaderForm.value,
-      ITEM: this.ItemForm.value.ITEMS   // ✅ correct
+      ITEM: this.ItemForm.value.ITEMS
     };
 
-    console.log("✅ Final Save Payload Sent:", payload);
-
-    // ✅ CALL SAVE API
     this.service.TransitDamageInfoSave(payload).subscribe({
       next: (res: any) => {
 
-        console.log("✅ SAVE RESPONSE:", res);
+        if (res?.STATUS === "TRUE" || res?.STATUS === true) {
 
-        if (res && res.STATUS === "TRUE") {
-          alert("✅ Data Saved Successfully!");
+          Swal.fire({
+            text: "✅ Data Saved Successfully!",
+            icon: "success",
+            showConfirmButton: false,
+            timer: 900,
+            willClose: () => {
+
+              // ✅ ✅ Navigation here ALWAYS works!
+              if (action === 'next') {
+                this.router.navigate(['/insurance-claim-tracking']);
+              }
+              else if (action === 'previous') {
+                this.router.navigate(['/freight-billing']);
+              }
+            }
+          });
+
         } else {
-          alert("⚠️ Save Failed: " + res.MESSAGE);
-        }
 
+          Swal.fire({
+            text: "⚠️ Save Failed: " + (res.MESSAGE || ''),
+            icon: "warning"
+          });
+
+        }
       },
+
       error: (err) => {
-        console.error(err);
-        alert("❌ Error while saving data");
+        Swal.fire({
+          text: "❌ Error while saving",
+          icon: "error"
+        });
       }
     });
-
   }
+
+
+
+
   fetchInvoiceDetailsnonsap() {
     if (!this.invoicenumber) return;
 
@@ -216,6 +252,7 @@ export class TransitDamageInfoComponent implements OnInit {
 
         // ✅ Show UI
         this.showTable = true;
+        this.showForm = true;
 
         // ✅ Fill Header
         this.HeaderForm.patchValue({
@@ -259,35 +296,59 @@ export class TransitDamageInfoComponent implements OnInit {
     });
   }
 
-  onSaveNonSap() {
+  onSaveNonSap(action: 'stay' | 'next' | 'previous' = 'stay') {
 
-    // ✅ Build Final Payload EXACTLY AS API NEEDS
+    this.HeaderForm.patchValue({
+      INV_NO: this.invoicenumber
+    });
+
+    this.items.controls.forEach(row => {
+      row.patchValue({ INV_NO: this.invoicenumber });
+    });
+
     const payload = {
       HEADER: this.HeaderForm.value,
-      ITEM: this.ItemForm.value.ITEMS   // ✅ correct
+      ITEM: this.ItemForm.value.ITEMS
     };
 
-    console.log("✅ Final Save Payload Sent:", payload);
-
-    // ✅ CALL SAVE API
     this.service.withoutsapSave(payload).subscribe({
       next: (res: any) => {
 
-        console.log("✅ SAVE RESPONSE:", res);
+        if (res?.STATUS === "TRUE" || res?.STATUS === true) {
 
-        if (res && res.STATUS === "TRUE") {
-          alert("✅ Data Saved Successfully!");
+          Swal.fire({
+            text: "✅ Data Saved Successfully!",
+            icon: "success",
+            showConfirmButton: false,
+            timer: 900,
+            willClose: () => {
+
+              if (action === 'next') {
+                this.router.navigate(['/insurance-claim-tracking']);
+              }
+              else if (action === 'previous') {
+                this.router.navigate(['/freight-billing']);
+              }
+            }
+          });
+
         } else {
-          alert("⚠️ Save Failed: " + res.MESSAGE);
+          Swal.fire({
+            text: "⚠️ Save Failed: " + (res.MESSAGE || ''),
+            icon: "warning"
+          });
         }
-
       },
-      error: (err) => {
-        console.error(err);
-        alert("❌ Error while saving data");
+
+      error: () => {
+        Swal.fire({
+          text: "❌ Error while saving data",
+          icon: "error"
+        });
       }
     });
 
   }
+
 
 }

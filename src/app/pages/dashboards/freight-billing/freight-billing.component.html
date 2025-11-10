@@ -1,15 +1,17 @@
 <div class="card-LE">
   <div class="card-header-LE">
-    Freight billing
+    Freight Billing
   </div>
 
   <div class="card-body-LE">
 
+    <!-- ORDER TYPE -->
     <div class="form-radio optional">
       <label>
         <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
         <span>Inward</span>
       </label>
+
       <label>
         <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
         <span>Outward</span>
@@ -18,19 +20,22 @@
 
     <br />
 
-    <!-- SAP Type Selection -->
+    <!-- SAP TYPE -->
     <div *ngIf="orderType" class="sap-row" style="display: flex !important;">
       <div class="form-radio optional sap-radio">
         <label>
           <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
           <span>With SAP</span>
         </label>
+
         <label>
-          <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
+          <input type="radio" [(ngModel)]="sapType" value="Non-SSAP" (change)="onSapTypeChange()" />
           <span>Without SAP</span>
         </label>
       </div>
     </div>
+
+    <!-- MAIN FORM -->
     <form class="form-grid" [formGroup]="FreightBilling" *ngIf="showForm">
 
       <div *ngIf="orderType === 'Inward'" class="form-field">
@@ -43,154 +48,154 @@
         <label>Invoice Number</label>
       </div>
 
-      <!-- Freight Bill Number -->
       <div class="form-field">
-        <input type="number" min="0" formControlName="FreightBillNumber" placeholder=" " />
+        <input type="number" formControlName="FreightBillNumber" placeholder=" " />
         <label>Freight Bill Number</label>
       </div>
 
-      <!-- Freight Bill Date -->
       <div class="form-field">
         <input type="date" formControlName="FreightBillDate" placeholder=" " />
         <label>Freight Bill Date</label>
-
       </div>
 
-      <!-- Freight Bill Physical Submission Date -->
       <div class="form-field">
         <input type="date" formControlName="FreightBillPhysicalSubmissionDate" placeholder=" " />
-        <label>Freight Bill Physical Submission Date</label>
-
+        <label>Physical Submission Date</label>
       </div>
 
-      <!-- Freight Charges -->
       <div class="form-field">
-        <input type="number" min="0" formControlName="FreightCharges" (click)="openModal(calculateTotalpopup)"
-          (keyup)="onKeyUpFreight($event)" (keydown.enter)="onEnterFreight($event)" (keydown.tab)="onTabFreight($event)"
-          (blur)="onBlurFreight($event)" placeholder=" " />
+        <input type="number" formControlName="FreightCharges" (click)="openModal(calculateTotalpopup)"
+          placeholder=" " />
         <label>Freight Charges</label>
-
       </div>
 
-      <!-- Work Order Number -->
-     <div class="form-field">
-  <select formControlName="WorkOrderNumber" optional>
-    <option value="">Select Option</option>
-    <option value="Rate contract">Rate contract</option>
-    <option value="WORK ORDER NUMBER">WORK ORDER NUMBER</option>
-    <option value="Customer Transporter">Customer Transporter</option>
-    <option value="Local Transporter">Local Transporter</option>
-    <option value="Company vehicle">Company vehicle</option>
-  </select>
-  <label>Work Order Number</label>
-</div>
+      <div class="form-field">
+        <select formControlName="WorkOrderNumber">
+          <option value="">Select Option</option>
+          <option value="Rate contract">Rate contract</option>
+          <option value="WORK ORDER NUMBER">WORK ORDER NUMBER</option>
+          <option value="Customer Transporter">Customer Transporter</option>
+          <option value="Local Transporter">Local Transporter</option>
+          <option value="Company vehicle">Company vehicle</option>
+        </select>
+        <label>Work Order Number</label>
+      </div>
 
       <div class="form-field">
         <input type="text" formControlName="BillSubmission" placeholder=" " />
         <label>Bill Submission To F&A</label>
-
       </div>
 
-
-
     </form>
+
+    <!-- ✅ BUTTONS (VISIBLE ALWAYS WHEN showForm = true) -->
     <div class="text-right" *ngIf="showForm">
+
       <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
         Cancel
       </button>
-      <button type="submit" class="btn btn-md btn-raised btnSave" (click)="saveFreightBilling()">
+
+      <button class="btn btn-md btn-raised btnSave" (click)="saveFreightBilling()">
         Save
       </button>
+
+      <button class="btn btn-md btn-raised btnSave move" (click)="saveFreightBilling('next')">
+        Save and Next
+      </button>
+
+      <button class="btn btn-md btn-raised btnSave prev" (click)="saveFreightBilling('previous')">
+        Save and Previous
+      </button>
+
     </div>
   </div>
 </div>
 
+
+<!-- ✅ MODAL FOR FREIGHT CALCULATION -->
 <ng-template #calculateTotalpopup let-c="close">
   <div class="modal-header">
     Detailed Freight Charges Input
   </div>
+
   <div class="modal-body">
 
     <form class="form-grid">
-      <div class="form-field">
 
+      <div class="form-field">
         <input type="text" [(ngModel)]="freightDetails.basicFreight" [ngModelOptions]="{standalone: true}"
           (ngModelChange)="calculateTotal()">
-        <label>Basic freight</label>
+        <label>Basic Freight</label>
       </div>
 
       <div class="form-field">
-
         <input type="text" [(ngModel)]="freightDetails.detentionLoading" [ngModelOptions]="{standalone: true}"
           (ngModelChange)="calculateTotal()">
-        <label>Detention charges at loading point</label>
+        <label>Detention Loading</label>
       </div>
 
       <div class="form-field">
-
         <input type="text" [(ngModel)]="freightDetails.detentionUnloading" [ngModelOptions]="{standalone: true}"
           (ngModelChange)="calculateTotal()">
-        <label>Detention charges at unloading point</label>
+        <label>Detention Unloading</label>
       </div>
 
       <div class="form-field">
-
         <input type="text" [(ngModel)]="freightDetails.loadingCharges" [ngModelOptions]="{standalone: true}"
           (ngModelChange)="calculateTotal()">
-        <label>Loading charges</label>
+        <label>Loading Charges</label>
       </div>
 
       <div class="form-field">
-
         <input type="text" [(ngModel)]="freightDetails.unloadingCharges" [ngModelOptions]="{standalone: true}"
           (ngModelChange)="calculateTotal()">
-        <label>Unloading charges</label>
+        <label>Unloading Charges</label>
       </div>
 
       <div class="form-field">
-
         <input type="text" [(ngModel)]="freightDetails.routeChangeCharges" [ngModelOptions]="{standalone: true}"
           (ngModelChange)="calculateTotal()">
-        <label>Route change charges</label>
+        <label>Route Change</label>
       </div>
 
       <div class="form-field">
-
         <input type="text" [(ngModel)]="freightDetails.transhipmentCharges" [ngModelOptions]="{standalone: true}"
           (ngModelChange)="calculateTotal()">
-        <label>Transhipment charges</label>
+        <label>Transhipment Charges</label>
       </div>
 
       <div class="form-field">
-
         <input type="text" [(ngModel)]="freightDetails.otherCharges" [ngModelOptions]="{standalone: true}"
           (ngModelChange)="calculateTotal()">
-        <label>Other charges</label>
+        <label>Other Charges</label>
       </div>
-
-      <hr>
 
       <div class="form-field deduction">
-
         <input type="text" [(ngModel)]="freightDetails.deduction" [ngModelOptions]="{standalone: true}"
           (ngModelChange)="calculateTotal()">
-        <label>Deduction if any</label>
+        <label>Deduction</label>
       </div>
 
-      <hr>
+      <hr />
 
       <div class="total-display">
-        Total Freight: {{ totalFreight | number: '1.2-2' }}
+        Total Freight: {{ totalFreight }}
       </div>
+
     </form>
-
-
 
   </div>
 
-  <div class="card-footer" style="text-align: right;">
-    <button type="button" class="btn btn-md btn-raised btnSave" (click)="saveAndCloseModal()">Add Entered Value</button>
+  <!-- ✅ MODAL BUTTONS -->
+  <div class="text-right">
 
-    <button type="button" class="btn btn-md btn-raised btnCancel" (click)="cancelModal()">Cancel</button>
+    <button class="btn btn-md btn-raised btnCancel" (click)="cancelModal()">
+      Cancel
+    </button>
+
+    <button class="btn btn-md btn-raised btnSave" (click)="saveAndCloseModal()">
+      Save
+    </button>
+
   </div>
 </ng-template>

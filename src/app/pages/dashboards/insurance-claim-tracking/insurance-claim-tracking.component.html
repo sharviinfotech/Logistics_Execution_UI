@@ -214,8 +214,23 @@
         <br />
 
         <div *ngIf="showTable" class="text-right">
-            <button class="btnSave" (click)="onSave()">Save</button>
+            <!-- Normal Save -->
+            <button class="btnSave" (click)="sapType === 'SAP' ? saveSAP() : saveNonSAP()">
+                Save
+            </button>
+
+            <!-- Save & Next -->
+            <button class="btnSave move" (click)="sapType === 'SAP' ? saveSAP('next') : saveNonSAP('next')">
+                Save and Next
+            </button>
+
+            <!-- Save & Previous -->
+            <button class="btnSave prev" (click)="sapType === 'SAP' ? saveSAP('previous') : saveNonSAP('previous')">
+                Save and Previous
+            </button>
         </div>
+
+
 
     </div>
 </div>

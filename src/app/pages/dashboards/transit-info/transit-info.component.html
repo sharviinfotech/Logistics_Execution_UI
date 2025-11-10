@@ -1,16 +1,16 @@
 <div class="card-LE">
-    <div class="card-header-LE">Transit Info</div>
-    <div class="card-body-LE">
+  <div class="card-header-LE">Transit Info</div>
+  <div class="card-body-LE">
 
-      
 
-      <div class="form-radio optional">
+
+    <div class="form-radio optional">
       <label>
         <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
         <span>Inward</span>
       </label>
       <label>
-        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()"/>
+        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
         <span>Outward</span>
       </label>
     </div>
@@ -51,63 +51,73 @@
     </div>
 
 
-      <form class="form-grid" [formGroup]="transitInfo" *ngIf="showForm">
+    <form class="form-grid" [formGroup]="transitInfo" *ngIf="showForm">
 
-        <div *ngIf="orderType === 'Inward'" class="form-field">
+      <div *ngIf="orderType === 'Inward'" class="form-field">
         <input type="text" formControlName="ponumber" placeholder=" " />
         <label>PO Number</label>
-        
+
       </div>
 
       <div *ngIf="orderType === 'Outward'" class="form-field">
         <input type="text" formControlName="invoicenumber" placeholder=" " />
-        <label>Invoice Number</label> 
+        <label>Invoice Number</label>
       </div>
 
-        <!-- Segment -->
-        <div class="form-field">
-          <input type="date" formControlName="physicalarrivedatdestinationdateandtime"  placeholder="" />
-          <label>Physical arrived at destination date</label>
-          
-        </div>
+      <!-- Segment -->
+      <div class="form-field">
+        <input type="date" formControlName="physicalarrivedatdestinationdateandtime" placeholder="" />
+        <label>Physical arrived at destination date</label>
 
-        <!-- Customer Profile -->
-        <div class="form-field">
-          <input type="datetime-local" formControlName="unloadingdateandtime"(change)="updateSIT()" placeholder="" />
-          <label>Unloading date and time</label>
-          
-        </div>
+      </div>
 
-        <div class="form-field">
-          <input type="datetime-local" formControlName="podscanreceiveddateandtime" (change)="updateSIT()" placeholder="" />
-          <label>POD scan received date and time</label>
-          
-        </div>
+      <!-- Customer Profile -->
+      <div class="form-field">
+        <input type="datetime-local" formControlName="unloadingdateandtime" (change)="updateSIT()" placeholder="" />
+        <label>Unloading date and time</label>
 
-        <!-- Branch -->
-        <div class="form-field">
-          <input type="text" formControlName="sit" readonly placeholder="" />
-          <label>SIT/SALE</label>
-          
-        </div>
+      </div>
 
-        <!-- Branch Zone -->
-        
+      <div class="form-field">
+        <input type="datetime-local" formControlName="podscanreceiveddateandtime" (change)="updateSIT()"
+          placeholder="" />
+        <label>POD scan received date and time</label>
 
-        
+      </div>
+
+      <!-- Branch -->
+      <div class="form-field">
+        <input type="text" formControlName="sit" readonly placeholder="" />
+        <label>SIT/SALE</label>
+
+      </div>
+
+      <!-- Branch Zone -->
 
 
-       
 
-      </form>
-      <div class="text-right" *ngIf="showForm" >
-          <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
-            Cancel
-          </button>
-          <button type="button" class="btn btn-md btn-raised btnSave" (click)="saveTransitInfo()">
-            Save
-          </button>
-        </div>
+
+
+
+
+    </form>
+    <div class="text-right" *ngIf="showForm">
+      <button type="button" *ngIf="isEditMode" class="btn-secondary" (click)="cancelEdit()">
+        Cancel
+      </button>
+
+      <button class="btn btn-md btn-raised btnSave" (click)="saveTransitInfo()">
+        Save
+      </button>
+
+      <button class="btn btn-md btn-raised btnSave move" (click)="saveTransitInfo('next')">
+        Save and Next
+      </button>
+
+      <button class="btn btn-md btn-raised btnSave prev" (click)="saveTransitInfo('previous')">
+        Save and Previous
+      </button>
     </div>
-  </div>
 
+  </div>
+</div>

@@ -7,6 +7,7 @@ import { GeneralserviceService } from 'src/app/generalservice.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import Swal from 'sweetalert2';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Router } from '@angular/router';
 
 interface FreightDetails {
   basicFreight: number;
@@ -42,6 +43,7 @@ export class FreightBillingComponent implements OnInit {
     private service: GeneralserviceService,
     private spinner: NgxSpinnerService,
     private modalService: NgbModal,
+    private router: Router
   ) {
     this.freightDetails = this.resetDetails();
   }
@@ -49,7 +51,7 @@ export class FreightBillingComponent implements OnInit {
   ngOnInit(): void {
     this.initializeForm();
     this.setupWorkOrderListener();
-    
+
   }
 
   initializeForm(): void {
@@ -61,7 +63,7 @@ export class FreightBillingComponent implements OnInit {
       FreightBillPhysicalSubmissionDate: ['', Validators.required],
       FreightCharges: ['', [Validators.required, Validators.min(0)]],
       WorkOrderNumber: [''],
-      BillSubmission: ['',Validators.required ],
+      BillSubmission: ['', Validators.required],
     });
     this.loadInitialData();
   }
@@ -74,15 +76,15 @@ export class FreightBillingComponent implements OnInit {
         this.FreightBilling.get('FreightBillNumber')?.clearValidators();
         this.FreightBilling.get('FreightBillNumber')?.disable();
         this.FreightBilling.get('FreightBillNumber')?.setValue('');
-        
+
         this.FreightBilling.get('FreightBillDate')?.clearValidators();
         this.FreightBilling.get('FreightBillDate')?.disable();
         this.FreightBilling.get('FreightBillDate')?.setValue('');
-        
+
         this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.clearValidators();
         this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.disable();
         this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.setValue('');
-        
+
         this.FreightBilling.get('FreightCharges')?.clearValidators();
         this.FreightBilling.get('FreightCharges')?.disable();
         this.FreightBilling.get('FreightCharges')?.setValue('');
@@ -90,17 +92,17 @@ export class FreightBillingComponent implements OnInit {
         // If Work Order Number is not selected, enable and restore validation
         this.FreightBilling.get('FreightBillNumber')?.setValidators([Validators.required]);
         this.FreightBilling.get('FreightBillNumber')?.enable();
-        
+
         this.FreightBilling.get('FreightBillDate')?.setValidators([Validators.required]);
         this.FreightBilling.get('FreightBillDate')?.enable();
-        
+
         this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.setValidators([Validators.required]);
         this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.enable();
-        
+
         this.FreightBilling.get('FreightCharges')?.setValidators([Validators.required, Validators.min(0)]);
         this.FreightBilling.get('FreightCharges')?.enable();
       }
-      
+
       // Update validity for all affected fields
       this.FreightBilling.get('FreightBillNumber')?.updateValueAndValidity();
       this.FreightBilling.get('FreightBillDate')?.updateValueAndValidity();
@@ -118,7 +120,7 @@ export class FreightBillingComponent implements OnInit {
   onSapTypeChange(): void {
     this.FreightBilling.reset();
     this.showForm = !!(this.orderType && this.sapType);
-    
+
     if (this.orderType === 'Inward') {
       this.FreightBilling.get('ponumber')?.setValidators([Validators.required]);
       this.FreightBilling.get('invoicenumber')?.clearValidators();
@@ -129,7 +131,7 @@ export class FreightBillingComponent implements OnInit {
       this.FreightBilling.get('ponumber')?.clearValidators();
       this.FreightBilling.get('invoicenumber')?.clearValidators();
     }
-    
+
     this.FreightBilling.get('ponumber')?.updateValueAndValidity();
     this.FreightBilling.get('invoicenumber')?.updateValueAndValidity();
     console.log('SAP Type changed to:', this.sapType, '| Form reset done.');
@@ -146,11 +148,10 @@ export class FreightBillingComponent implements OnInit {
     this.sapType = '';
     this.showForm = false;
   }
-  
-  saveFreightBilling(): void {
-    // Get raw value to include disabled fields
+
+  saveFreightBilling(action: 'stay' | 'next' | 'previous' = 'stay'): void {
     const formValue = this.FreightBilling.getRawValue();
-    
+
     // Mark all enabled controls as touched
     Object.keys(this.FreightBilling.controls).forEach(key => {
       const control = this.FreightBilling.get(key);
@@ -159,19 +160,16 @@ export class FreightBillingComponent implements OnInit {
       }
     });
 
-    // Check if form is valid (only enabled fields will be validated)
     if (this.FreightBilling.invalid) {
       Swal.fire({
         title: 'Validation Error',
         text: 'Please fill all required fields before saving.',
         icon: 'warning',
-        confirmButtonText: 'Ok',
         timer: 4000
       });
       return;
     }
 
-    // Prepare payload structure
     const record = {
       INV_NO: formValue.invoicenumber || '',
       BILLNO: formValue.FreightBillNumber || '',
@@ -182,90 +180,54 @@ export class FreightBillingComponent implements OnInit {
       BILL_SUBMISSION: formValue.BillSubmission
     };
 
-    // With SAP or Without SAP save logic
-    if (this.sapType === 'SAP') {
-      this.spinner.show();
+    this.spinner.show();
 
-      this.service.FreightBillingSave({ SAVE: [record] }).subscribe({
-        next: (res: any) => {
-          console.log('Response SAP:', res);
+    let request$ =
+      this.sapType === 'SAP'
+        ? this.service.FreightBillingSave({ SAVE: [record] })
+        : this.service.FreightBillingNonSap({ CREATE: [record] });
 
-          if (res.STATUS == 'true' || res.NUMBER == '200') {
-            Swal.fire({
-              title: '',
-              text: res.MESSAGE || 'Freight Billing saved successfully!',
-              icon: 'success',
-              confirmButtonText: 'Ok',
-              timer: 4000
-            }).then(() => {
-              this.resetForm();
-            });
-          } else {
-            Swal.fire({
-              title: '',
-              text: res.MESSAGE || 'Failed to save Freight Billing!',
-              icon: 'error',
-              confirmButtonText: 'Ok',
-              timer: 4000
-            });
-          }
-          this.spinner.hide();
-        },
-        error: (err) => {
-          console.error('Error SAP:', err);
-          this.spinner.hide();
+    request$.subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+
+        if (res.STATUS == 'true' || res.NUMBER == '200') {
           Swal.fire({
-            title: 'Error',
-            text: 'Something went wrong while saving!',
+            text: res.MESSAGE || 'Freight Billing saved successfully!',
+            icon: 'success',
+            timer: 3000
+          }).then(() => {
+            // ✅ Navigation controls
+            if (action === 'next') {
+              this.router.navigate(['/transit-damage-info']);  // ✅ Next Screen
+            }
+            else if (action === 'previous') {
+              this.router.navigate(['/transit-info']);         // ✅ Previous Screen
+            }
+            else {
+              this.resetForm();   // ✅ Stay on same screen
+            }
+          });
+        } else {
+          Swal.fire({
+            text: res.MESSAGE || 'Failed to save!',
             icon: 'error',
-            confirmButtonText: 'Ok',
-            timer: 4000
+            timer: 3000
           });
         }
-      });
-    } else {
-      // Non-SAP Save API
-      this.spinner.show();
-
-      this.service.FreightBillingNonSap({ CREATE: [record] }).subscribe({
-        next: (res: any) => {
-          console.log('Response Non-SAP:', res);
-
-          if (res.STATUS == 'true' || res.NUMBER == '200') {
-            Swal.fire({
-              title: '',
-              text: res.MESSAGE || 'Freight Billing (Non-SAP) saved successfully!',
-              icon: 'success',
-              confirmButtonText: 'Ok',
-              timer: 4000
-            }).then(() => {
-              this.resetForm();
-            });
-          } else {
-            Swal.fire({
-              title: '',
-              text: res.MESSAGE || 'Failed to save Freight Billing!',
-              icon: 'error',
-              confirmButtonText: 'Ok',
-              timer: 4000
-            });
-          }
-          this.spinner.hide();
-        },
-        error: (err) => {
-          console.error('Error Non-SAP:', err);
-          this.spinner.hide();
-          Swal.fire({
-            title: 'Error',
-            text: 'Something went wrong while saving!',
-            icon: 'error',
-            confirmButtonText: 'Ok',
-            timer: 4000
-          });
-        }
-      });
-    }
+      },
+      error: () => {
+        this.spinner.hide();
+        Swal.fire({
+          title: 'Error',
+          text: 'Something went wrong while saving!',
+          icon: 'error',
+          timer: 3000
+        });
+      }
+    });
   }
+
 
   resetDetails(): FreightDetails {
     return {
@@ -284,7 +246,7 @@ export class FreightBillingComponent implements OnInit {
   // Mock function to load existing data (e.g., from a service)
   loadInitialData() {
     // In a real app, you'd fetch this from the server
-    const initialSavedData = { /* ... potentially saved data ... */ }; 
+    const initialSavedData = { /* ... potentially saved data ... */ };
     Object.assign(this.freightDetails, initialSavedData);
     this.calculateTotal(); // Calculate the total to update the main field
   }
@@ -324,27 +286,27 @@ export class FreightBillingComponent implements OnInit {
       });
       return;
     }
-    
+
     // Ensure the internal total is calculated based on the current saved/loaded details
-    this.calculateTotal(); 
-    this.modalService.open(calculateTotalpopup, {  
-      backdrop: 'static', 
+    this.calculateTotal();
+    this.modalService.open(calculateTotalpopup, {
+      backdrop: 'static',
       keyboard: false,
-      size:'lg' 
+      size: 'lg'
     });
   }
-  
+
   // 2. Function to save and close the modal
   saveAndCloseModal() {
     // Final calculation before saving
-    const finalTotal = this.calculateTotal(); 
+    const finalTotal = this.calculateTotal();
     console.log("finalTotal", finalTotal);
-    
+
     // Set the value of the main form control
     this.FreightBilling.get('FreightCharges')?.setValue(finalTotal);
     this.modalService.dismissAll();
     console.log("FreightCharges", this.FreightBilling.get('FreightCharges')?.value);
-    
+
     // NOTE: At this point, you would typically save 'this.freightDetails' 
     // to your backend/database along with the main form data.
   }

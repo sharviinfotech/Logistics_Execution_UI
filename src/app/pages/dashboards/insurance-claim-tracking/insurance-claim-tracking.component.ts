@@ -10,6 +10,7 @@ import {
 } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { GeneralserviceService } from 'src/app/generalservice.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-insurance-claim-tracking',
@@ -31,7 +32,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private service: GeneralserviceService
+    private service: GeneralserviceService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -89,14 +91,6 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   addItemRow(data?: any) {
     this.items.push(this.createItemRow(data));
   }
-  onSave() {
-    if (this.sapType === 'SAP') {
-      this.saveSAP();
-    } else {
-      this.saveNonSAP();
-    }
-  }
-
 
   removeItemRow(i: number) {
     if (this.items.length === 1) {
@@ -118,9 +112,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     this.items.clear();
   }
 
-  // ✅ ✅ FINAL: AUTO SELECT API BASED ON SAP TYPE
   fetchInvoiceDetails() {
-
     if (!this.invoicenumber.trim()) {
       Swal.fire('Error', 'Enter Invoice Number', 'error');
       return;
@@ -138,14 +130,10 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     }
   }
 
-  // ✅ ✅ SAP FETCH
   fetchSAPInvoice() {
-
     const payload = { VBELN: this.invoicenumber };
-
     this.service.InsuranceClaimTrackingfetch(payload).subscribe({
       next: (res: any) => {
-
         if (!res || res.length === 0) {
           Swal.fire('No Data', 'SAP Invoice not found', 'warning');
           return;
@@ -153,7 +141,11 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
         const response = res[0];
 
-        this.HeaderForm.patchValue(response.HEADER);
+        // ✅ Patch INV_NO explicitly to avoid required error
+        this.HeaderForm.patchValue({
+          ...response.HEADER,
+          INV_NO: this.invoicenumber
+        });
 
         this.items.clear();
         if (response.ITEM?.length > 0) {
@@ -163,58 +155,16 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         this.showTable = true;
         Swal.fire('Loaded', 'SAP Invoice Loaded Successfully', 'success');
       },
-
       error: () => {
         Swal.fire('Error', 'SAP Fetch API Failed', 'error');
       }
     });
   }
 
-  saveSAP() {
-
-    this.HeaderForm.markAllAsTouched();
-    this.ItemForm.markAllAsTouched();
-
-    if (this.HeaderForm.invalid) {
-      Swal.fire('Error', 'Header fields missing', 'error');
-      return;
-    }
-
-    if (this.items.length === 0) {
-      Swal.fire('Error', 'Add at least one row', 'error');
-      return;
-    }
-
-    const payload = {
-      HEADER: this.HeaderForm.value,
-      ITEM: this.items.value
-    };
-
-    this.service.InsuranceClaimTrackingSave(payload).subscribe({
-      next: (res: any) => {
-
-        if (res?.STATUS === "TRUE") {
-          Swal.fire('Success', res.MESSAGE || 'SAP Data Saved Successfully', 'success');
-        } else {
-          Swal.fire('Error', res?.MESSAGE || 'SAP Save Failed', 'error');
-        }
-      },
-
-      error: () => {
-        Swal.fire('Error', 'SAP Save API Failed', 'error');
-      }
-    });
-  }
-
-
-  // ✅ ✅ NON-SAP FETCH
   fetchNonSAPInvoice() {
-
     const payload = { VBELN: this.invoicenumber };
-
     this.service.fetchinvoicelistnonsap(payload).subscribe({
       next: (res: any) => {
-
         if (!res || res.length === 0) {
           Swal.fire('No Data', 'Non-SAP Invoice not found', 'warning');
           return;
@@ -222,7 +172,10 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
         const response = res[0];
 
-        this.HeaderForm.patchValue(response.HEADER);
+        this.HeaderForm.patchValue({
+          ...response.HEADER,
+          INV_NO: this.invoicenumber
+        });
 
         this.items.clear();
         if (response.ITEM?.length > 0) {
@@ -232,15 +185,13 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         this.showTable = true;
         Swal.fire('Loaded', 'Non-SAP Invoice Loaded Successfully', 'success');
       },
-
       error: () => {
         Swal.fire('Error', 'Non-SAP Fetch API Failed', 'error');
       }
     });
   }
 
-  saveNonSAP() {
-
+  saveSAP(action: 'stay' | 'next' | 'previous' = 'stay') {
     this.HeaderForm.markAllAsTouched();
     this.ItemForm.markAllAsTouched();
 
@@ -250,8 +201,55 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     }
 
     if (this.items.length === 0) {
+      this.addItemRow();
       Swal.fire('Error', 'Add at least one row', 'error');
+      // return;
+    }
+
+    const payload = {
+      HEADER: this.HeaderForm.value,
+      ITEM: this.items.value
+    };
+
+    this.service.InsuranceClaimTrackingSave(payload).subscribe({
+      next: (res: any) => {
+        if (res?.STATUS === "TRUE") {
+          Swal.fire({
+            icon: 'success',
+            text: res.MESSAGE || 'SAP Data Saved Successfully',
+            confirmButtonText: 'Ok'
+          }).then(() => {
+            if (action === 'next') {
+              this.router.navigate(['/dashboard']);  // ✅ next screen
+            } else if (action === 'previous') {
+              this.router.navigate(['/transit-damage-info']); // ✅ previous screen
+            } else {
+              this.resetForms(); // ✅ stay on same screen
+            }
+          });
+        } else {
+          Swal.fire('Error', res?.MESSAGE || 'SAP Save Failed', 'error');
+        }
+      },
+      error: () => {
+        Swal.fire('Error', 'SAP Save API Failed', 'error');
+      }
+    });
+  }
+
+  saveNonSAP(action: 'stay' | 'next' | 'previous' = 'stay') {
+    this.HeaderForm.markAllAsTouched();
+    this.ItemForm.markAllAsTouched();
+
+    if (this.HeaderForm.invalid) {
+      Swal.fire('Error', 'Header fields missing', 'error');
       return;
+    }
+
+    if (this.items.length === 0) {
+      this.addItemRow();
+      Swal.fire('Error', 'Add at least one row', 'error');
+      // return;
     }
 
     const payload = {
@@ -261,19 +259,30 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
     this.service.Nonsapsave(payload).subscribe({
       next: (res: any) => {
-
         if (res?.STATUS === "TRUE") {
-          Swal.fire('Success', res.MESSAGE || 'Non-SAP Data Saved Successfully', 'success');
+          Swal.fire('Success', res.MESSAGE || 'Non-SAP Data Saved Successfully', 'success').then(() => {
+            if (action === 'next') {
+              this.router.navigate(['/dashboard']);
+            } else if (action === 'previous') {
+              this.router.navigate(['/transit-damage-info']);
+            } else {
+              this.resetForms();
+            }
+          });
         } else {
           Swal.fire('Error', res?.MESSAGE || 'Non-SAP Save Failed', 'error');
         }
       },
-
       error: () => {
         Swal.fire('Error', 'Non-SAP Save API Failed', 'error');
       }
     });
   }
 
-
+  resetForms() {
+    this.HeaderForm.reset();
+    this.ItemForm.reset();
+    this.items.clear();
+    this.showTable = false;
+  }
 }

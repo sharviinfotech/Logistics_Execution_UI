@@ -150,9 +150,44 @@
 
     <br />
 
-    <div *ngIf="showTable" class="text-right">
-      <button class="btnSave" (click)="sapType==='SAP' ? onSave() : onSaveNonSap()">Save</button>
+    <!-- ✅ SAP BUTTON GROUP -->
+    <div class="text-right" *ngIf="showForm && sapType === 'SAP'">
+
+      <button class="btn btn-md btn-raised btnSave" (click)="onSaveActionSap('stay')">
+        Save
+      </button>
+
+      <button class="btn btn-md btn-raised btnSave move" (click)="onSaveActionSap('next')">
+        Save and Next
+      </button>
+
+      <button class="btn btn-md btn-raised btnSave prev" (click)="onSaveActionSap('previous')">
+        Save and Previous
+      </button>
+
     </div>
+
+
+
+    <!-- ✅ NON-SAP BUTTON GROUP -->
+    <div class="text-right" *ngIf="showForm && sapType === 'Non-SAP'">
+
+      <button class="btn btn-md btn-raised btnSave" (click)="onSaveNonSap('stay')">
+        Save
+      </button>
+
+      <button class="btn btn-md btn-raised btnSave move" (click)="onSaveNonSap('next')">
+        Save and Next
+      </button>
+
+      <button class="btn btn-md btn-raised btnSave prev" (click)="onSaveNonSap('previous')">
+        Save and Previous
+      </button>
+
+    </div>
+
+
+
 
   </div>
 </div>
