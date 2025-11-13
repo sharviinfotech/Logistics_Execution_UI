@@ -247,5 +247,16 @@ export class GeneralserviceService {
   DispatchNonSapSave(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/Dispatch/Outward/withoutsap/Save', obj);
   }
+   fetchVendorCode() {
+    return this.http.get(environment.baseUrl + 'api/external/LE/Dispatch/Outward/F4Vendorcode/fetch');
+  }
+  
+ fetchReferencenumber(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/Dispatch/Outward/ReferenceNumber/fetch', obj);
+  }
+  fetchReferencenumberEdit(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/Dispatch/Outward/ReferenceNumber/edit', obj);
+  }
+
 
 }

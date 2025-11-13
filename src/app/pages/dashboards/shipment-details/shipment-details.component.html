@@ -55,37 +55,35 @@
         <div *ngIf="showForm">
             <div class="form-grid" [formGroup]="ProductInfo">
                 <div class="form-field">
-                    <ng-container *ngIf="!isSap(); else sapInco">
-                        <select formControlName="Incoterms">
-                            <option value="">Select Incoterm</option>
-                            <option *ngFor="let i of IncotermsList" [value]="i.INCO1">
-                                {{ i.INCO1 }} - {{ i.BEZEI }}
-                            </option>
-                        </select>
-                    </ng-container>
+    <ng-container *ngIf="!isSap(); else sapInco">
+        <select formControlName="Incoterms">
+            <option value="">Select Incoterm</option>
+            <option *ngFor="let i of IncotermsList" [value]="i.INCO1">
+                {{ i.INCO1 }} - {{ i.BEZEI }}
+            </option>
+        </select>
+    </ng-container>
 
-                    <ng-template #sapInco>
-                        <input type="text" formControlName="Incoterms" placeholder="" readonly 
-                            [value]="ProductInfo.get('Incoterms')?.value"/>
-                    </ng-template>
-                    <label>Incoterms</label>
-                </div>
+    <ng-template #sapInco>
+        <input type="text" formControlName="Incoterms" placeholder=" " readonly />
+    </ng-template>
+    <label>Incoterms</label>
+</div>
 
-                <div class="form-field">
-                    <select formControlName="InsuranceScope">
-                        <option value="">Select Insurance Scope</option>
-                        <option *ngFor="let option of insuranceScopeOptions" [value]="option">
-                            {{ option }}
-                        </option>
-                    </select>
-                    <label>Insurance Scope</label>
-                </div>
+<div class="form-field">
+    <select formControlName="InsuranceScope">
+        <option value="">Select Insurance Scope</option>
+        <option *ngFor="let option of insuranceScopeOptions" [value]="option">
+            {{ option }}
+        </option>
+    </select>
+    <label>Insurance Scope</label>
+</div>
 
-                <div class="form-field">
-                    <input type="number" formControlName="Kilometres" min="0" placeholder="" 
-                        [value]="ProductInfo.get('Kilometres')?.value ?? ''"/>
-                    <label>Kilometres</label>
-                </div>
+<div class="form-field">
+    <input type="number" formControlName="Kilometres" min="0" placeholder=" " />
+    <label>Kilometres</label>
+</div>
             </div>
 
             <!-- Dynamic Product Table -->

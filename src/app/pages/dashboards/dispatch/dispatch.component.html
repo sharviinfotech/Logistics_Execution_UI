@@ -18,7 +18,8 @@
     <br />
 
     <!-- 🔹 SAP Type (With / Without SAP) -->
-    <div *ngIf="orderType" class="sap-row" style="display: flex !important;">
+      <!-- 🔹 SAP Type (With / Without SAP) & Search Bar -->
+    <div *ngIf="orderType" class="sap-search-container">
       <div class="form-radio optional sap-radio">
         <label>
           <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
@@ -29,13 +30,29 @@
           <span>Without SAP</span>
         </label>
       </div>
+
+      <!-- 🔍 Search Bar -->
+      <div class="search-bar-wrapper" *ngIf="sapType">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search by Reference Number"
+          [(ngModel)]="searchReference"
+          name="searchReference"
+          (keyup.enter)="onSearchReference()"
+        />
+        <button type="button" class="search-btn" (click)="onSearchReference()">
+           <i class="fas fa-search"></i>
+        </button>
+      </div>
     </div>
 
-    <br />
+<br />
 
-    
-    <form [formGroup]="dispatchForm" *ngIf="showForm">
-      <table class="table shipment-table">
+
+    <div class="table-responsive">
+      <form [formGroup]="dispatchForm" *ngIf="showForm">
+      <table class="table table-bordered">
         <thead>
           <tr>
             <th>SI.No</th>
@@ -87,34 +104,59 @@
             </td>
 
 
-            <td><input type="text" formControlName="NoOfTrucks"></td>
-            <td><input type="text" formControlName="VendorCode"></td>
-            <td><input type="text" formControlName="Transporter"></td>
+            <td ><input type="text" formControlName="NoOfTrucks"></td>
+          <td >
+              <div class="d-flex align-items-center">
+                <!-- Vendor Dropdown -->
+                <select 
+                      formControlName="VendorCode"
+                      (change)="onchangeVendorCode(i)">
+                      <option value="">Select Vendor</option>
+                      <option *ngFor="let vendor of VendorCodeList"
+                              [value]="vendor.VENDOR_CODE">
+                        {{ vendor.VENDOR_CODE }} 
+                      </option>
+              </select>
+              </div>
+            </td>
+
+            <td ><input type="text" formControlName="Transporter"></td>
             <td><input type="text" formControlName="NoOfLRs"></td>
             <td><input type="text" formControlName="LRNumber"></td>
             <td><input type="text" formControlName="LoadingPoints"></td>
             <td><input type="text" formControlName="UnLoadingPoints"></td>
 
             
-            <td class="action-btns"*ngIf="showActionColumn">
+           <td class="action-btns" *ngIf="showActionColumn">
+            <!-- Show '+' on all rows -->
+            <button
+              type="button"
+              class="btn-add"
+              (click)="addRow()">
+              +
+            </button>
 
-              
-              <ng-container *ngIf="rows.at(0).get('VehicleType')?.value === 'Full Truck Load'">
-                <button type="button" class="btn-add" (click)="addRow()">+</button>
-                <button type="button" class="btn-remove" *ngIf="i !== 0" (click)="removeRow(i)">
-                  ✖
-                </button>
-
-              </ng-container>
-            </td>
-          </tr>
+            <!-- Show '✖' on all rows except first -->
+            <button
+              type="button"
+              class="btn-remove"
+              *ngIf="i !== 0"
+              (click)="removeRow(i)">
+              ✖
+            </button>
+          </td>
+       </tr>
         </tbody>
       </table>
     </form>
-    <div class="text-right" *ngIf="showForm">
-      <button class="btn btn-md btn-raised btnSave" (click)="save()">Save</button>
-      <button class="btn btn-md btn-raised btnSave move" (click)="save('next')">Save and Next</button>
-      <!-- <button class="btn btn-md btn-raised btnSave prev" (click)="save('previous')">Save and Previous</button> -->
     </div>
-
+    
+    <div class="text-right" *ngIf="showForm">
+      <button class="btn btn-md btn-raised btnSave" (click)="isUpdateMode ? onUpdateDispatch() : save()">
+        {{ isUpdateMode ? 'Update' : 'Save' }}
+      </button>
+      <button class="btn btn-md btn-raised btnSave move" (click)="isUpdateMode ? onUpdateDispatch() : save('next')">
+        {{ isUpdateMode ? 'Update and Next' : 'Save and Next' }}
+      </button>
+    </div>
   </div>

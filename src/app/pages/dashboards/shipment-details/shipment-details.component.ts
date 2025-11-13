@@ -190,7 +190,7 @@ export class ShipmentDetailsComponent implements OnInit {
         // ✅ Set the values
         this.ProductInfo.patchValue({
           Incoterms: firstItem.ZINCO || '',
-          InsuranceScope: firstItem.ZINS_SCPOE || 'Buyer',
+          InsuranceScope: firstItem.ZINS_SCPOE || '',
           Kilometres: firstItem.ZKM !== null && firstItem.ZKM !== undefined ? firstItem.ZKM : null
         });
         

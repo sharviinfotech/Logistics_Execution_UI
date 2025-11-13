@@ -1,48 +1,26 @@
-.table {
-  width: 100%;
-  border-collapse: collapse; /* ✅ Ensures clean single borders */
-  border-color: inherit;
-    border-style: solid;
-    border-width: 0;
-}
 
-/* ✅ Add border to all header and body cells */
-.table th,
-.table td {
-  border: 1px solid #ccc; 
-  text-align: center;
-  padding: 8px;
-}
 
-/* ✅ Header styling */
-.table thead th {
-  background: #f2f2f2;
-  font-weight: 600;
-}
 
-/* ✅ Input styling inside cells */
-table input {
-  width: 100%;
-  padding: 6px 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-/* ✅ Action buttons styling */
 .action-btns {
+  display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: center; /* centers vertically */
   gap: 6px;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
   height: 100%;
 }
 
 
 .btn-add,
 .btn-remove {
-  padding: 4px 8px;
   border: none;
-  cursor: pointer;
+  padding: 6px 10px;
   border-radius: 4px;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .btn-add {
@@ -61,3 +39,52 @@ select:disabled {
   background-color: #f2f2f2;
   opacity: 1 !important;
 }
+.sap-search-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.sap-radio {
+  flex-shrink: 0;
+}
+
+/* ✅ Updated search bar wrapper */
+.search-bar-wrapper {
+  position: relative; /* container for absolute positioning */
+  width: 350px; /* adjust width as needed */
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 40px 10px 16px; /* extra right padding for icon */
+  border-radius: 25px; /* rounded like Chrome bar */
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.search-input:focus {
+  border-color: #4285f4;
+  box-shadow: 0 2px 6px rgba(66,133,244,0.3);
+}
+
+.search-btn {
+  position: absolute;
+  top: 50%;
+  right: 10px; /* distance from right edge */
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #9e9595;
+  padding: 0;
+}
+
+.search-btn:hover {
+  color: #3367d6;
+}
+

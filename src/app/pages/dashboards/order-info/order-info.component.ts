@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators,FormArray} from '@angular/forms';
 import { GeneralserviceService } from 'src/app/generalservice.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import Swal from 'sweetalert2';
@@ -34,6 +34,7 @@ export class OrderInfoComponent implements OnInit {
   custList: any;
   customerGroup: string = '';
   showFiscalFields: boolean = false; // Add this at the top with other variables
+  
 
 
   initialFormValues: any = {};
@@ -72,11 +73,31 @@ export class OrderInfoComponent implements OnInit {
       DestinationState: [''],
       DestinationZone: [''],
       PhysicalDispatchDateTime: [''],
+      items: this.fb.array([this.createItemRow()])
 
     });
+    
     this.initialFormValues = this.OrderInfo.value;
+    
     // this.setupDestinationZoneListener();
     this.setupPhysicalDispatch();
+  }
+  get items(): FormArray {
+    return this.OrderInfo.get('items') as FormArray;
+  }
+
+  createItemRow(): FormGroup {
+    return this.fb.group({
+      referenceNumber: [''],
+      workOrderNumber: [''],
+      lrNumber: [''],
+      transporter: ['']
+    });
+  }
+  
+  // Example function to add a row (You need a button in HTML for this)
+  addItem(): void {
+    this.items.push(this.createItemRow());
   }
 
   // Helper to check SAP mode
