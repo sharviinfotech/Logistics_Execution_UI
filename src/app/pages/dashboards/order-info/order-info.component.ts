@@ -38,7 +38,17 @@ export class OrderInfoComponent implements OnInit {
 
 
   initialFormValues: any = {};
-
+selectedItems: any[] = [];
+searchReference: string = ''; 
+searchOptions = [
+  { key: 'NUM', label: 'Reference No' },
+  { key: 'INV_NO', label: 'Invoice No' },
+  { key: 'ODN_NO', label: 'ODN No' },
+  { key: 'SO_NUM', label: 'SO No' }
+];
+selectedType: any = '';
+searchOptionsList:any[]=[]
+dropdownOpen = false;
   constructor(
     private fb: FormBuilder,
     private service: GeneralserviceService,
@@ -82,9 +92,7 @@ export class OrderInfoComponent implements OnInit {
     // this.setupDestinationZoneListener();
     this.setupPhysicalDispatch();
   }
-  get items(): FormArray {
-    return this.OrderInfo.get('items') as FormArray;
-  }
+ 
 
   createItemRow(): FormGroup {
     return this.fb.group({
@@ -99,7 +107,9 @@ export class OrderInfoComponent implements OnInit {
   addItem(): void {
     this.items.push(this.createItemRow());
   }
-
+ get items(): FormArray {
+    return this.OrderInfo.get('items') as FormArray;
+  }
   // Helper to check SAP mode
   isSap(): boolean {
     return this.sapType === 'SAP';
@@ -251,6 +261,9 @@ export class OrderInfoComponent implements OnInit {
   }
 
   getForm(type: 'purchase' | 'invoice'): void {
+    this.searchOptionsList =[]
+    this.searchReference =''
+    this.selectedType = ''
     const value = type === 'purchase' ? this.ponumber : this.invoicenumber;
 
     if (!value || value.trim() === '') {
@@ -586,7 +599,7 @@ export class OrderInfoComponent implements OnInit {
       },
       error => {
         console.error("❌ PDB Fetch Error:", error);
-        // this.spinner.hide();
+        this.spinner.hide();
       }
     );
   }
@@ -613,4 +626,274 @@ export class OrderInfoComponent implements OnInit {
       );
     }
   }
+ onFieldBlur(index: number, fieldKey: string): void {
+  if (index !== 0) return; // Only first row triggers API
+
+  const firstRow = this.items.at(0) as FormGroup;
+  const values = firstRow.value;
+
+  // If all fields empty → reset to one blank row
+  if (
+    !values.referenceNumber &&
+    !values.workOrderNumber &&
+    !values.lrNumber &&
+    !values.transporter
+  ) {
+    this.items.clear();
+    this.items.push(this.createItemRow());
+    return;
+  }
+
+  // Build object: only the entered field gets value
+  const obj = {
+    REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
+    WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
+    LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
+    TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : ''
+  };
+
+  console.log('🔹 Sending Object:', obj);
+
+  this.spinner.show();
+  this.service.GlobalReferenceNoFetch(obj).subscribe({
+    next: (res: any) => {
+      console.log('✅ GlobalRefSearch Response:', res);
+      this.spinner.hide();
+      this.populateRows(res);
+    },
+    error: err => {
+      console.error('❌ Ref Fetch Error:', err);
+      this.spinner.hide();
+    }
+  });
 }
+
+populateRows(data: any[]): void {
+  this.items.clear(); // remove all existing rows
+
+  if (data && data.length > 0) {
+    // ✅ If response has data → populate rows
+    data.forEach(d => {
+      this.items.push(
+        this.fb.group({
+          referenceNumber: [d.REF_NO || ''],
+          workOrderNumber: [d.WORK_ORDER_NO || ''],
+          lrNumber: [d.LR_NO || ''],
+          transporter: [d.TRANSPORTER || '']
+        })
+      );
+    });
+  } else {
+    Swal.fire({
+      icon: 'info',
+      title: 'No Records Found',
+      text: 'No matching reference details were found.',
+      timer: 1500,
+      showConfirmButton: false,
+      width: '300px'
+    });
+    this.items.push(this.createItemRow());
+  }
+}
+onCheckboxChange(event: Event, index: number): void {
+  const checkbox = event.target as HTMLInputElement;
+  const rowValue = (this.items.at(index) as FormGroup).value;
+
+  if (checkbox.checked) {
+    // ✅ Add row to selected list (avoid duplicates)
+    const exists = this.selectedItems.some(
+      (item) =>
+        item.referenceNumber === rowValue.referenceNumber &&
+        item.workOrderNumber === rowValue.workOrderNumber &&
+        item.lrNumber === rowValue.lrNumber &&
+        item.transporter === rowValue.transporter
+    );
+    if (!exists) {
+      this.selectedItems.push(rowValue);
+    }
+  } else {
+    // ❌ Remove unchecked row
+    this.selectedItems = this.selectedItems.filter(
+      (item) =>
+        !(
+          item.referenceNumber === rowValue.referenceNumber &&
+          item.workOrderNumber === rowValue.workOrderNumber &&
+          item.lrNumber === rowValue.lrNumber &&
+          item.transporter === rowValue.transporter
+        )
+    );
+  }
+
+  console.log('✅ Selected Items:', this.selectedItems);
+}
+
+// To show checkbox state correctly
+isItemSelected(index: number): boolean {
+  const rowValue = (this.items.at(index) as FormGroup).value;
+
+  return this.selectedItems.some(
+    (item) =>
+      item.referenceNumber === rowValue.referenceNumber &&
+      item.workOrderNumber === rowValue.workOrderNumber &&
+      item.lrNumber === rowValue.lrNumber &&
+      item.transporter === rowValue.transporter
+  );
+}
+openSearchTypePopup() {
+  this.ponumber = '';
+  this.invoicenumber = '';
+  this.showForm = false;
+
+  if (!this.searchReference?.trim()) {
+    Swal.fire('Please enter a value before searching', '', 'warning');
+    return;
+  }
+
+  Swal.fire({
+    title: 'Select Search Type',
+    html: this.generateSearchOptionsHTML(),
+    showCancelButton: false,
+    confirmButtonText: 'Search',
+    width: 400,
+    focusConfirm: false,
+    showCloseButton: true,
+    customClass: {
+      popup: 'custom-swal-popup',
+      confirmButton: 'custom-swal-confirm-btn'
+    },
+    didOpen: () => {
+      // add event listener to update tick dynamically
+      const radios = document.querySelectorAll('input[name="searchType"]');
+      radios.forEach((radio) => {
+        radio.addEventListener('change', () => {
+          document
+            .querySelectorAll('.radio-option')
+            .forEach((el) => el.classList.remove('selected'));
+          (radio.parentElement as HTMLElement).classList.add('selected');
+        });
+      });
+    },
+    preConfirm: () => {
+      const selected = (document.querySelector(
+        'input[name="searchType"]:checked'
+      ) as HTMLInputElement)?.value;
+      if (!selected) {
+        Swal.showValidationMessage('Please select a search type');
+        return false;
+      }
+      return selected;
+    }
+  }).then((result) => {
+    if (result.isConfirmed && result.value) {
+      this.selectedType = result.value;
+      this.onSearchReference(); // call API
+    }
+  });
+}
+
+generateSearchOptionsHTML(): string {
+  return this.searchOptions
+    .map(
+      (opt) => `
+      <div class="radio-option">
+        <label>
+          <input type="radio" name="searchType" value="${opt.key}">
+          ${opt.label}
+          <span class="tick-mark">✔</span>
+        </label>
+      </div>`
+    )
+    .join('');
+}
+
+
+onSearchReference() {
+  if (!this.searchReference?.trim()) {
+    Swal.fire('Please enter a value', '', 'warning');
+    return;
+  }
+
+  if (!this.selectedType) {
+    Swal.fire('Please select a search type', '', 'info');
+    return;
+  }
+
+  let payload: any = {
+    NUM: '',
+    INV_NO: '',
+    ODN_NO: '',
+    SO_NUM: ''
+  };
+  payload[this.selectedType] = this.searchReference.trim();
+
+  console.log('🔍 Payload:', payload);
+
+  this.spinner.show();
+  this.service.global_Fields_SearchOption(payload).subscribe({
+    next: (res: any) => {
+      this.spinner.hide();
+      if (res.length > 0) {
+        this.searchOptionsList = res;
+        Swal.fire('Data fetched successfully!', '', 'success');
+      } else {
+        Swal.fire('No records found', '', 'info');
+      }
+    },
+    error: (err) => {
+      this.spinner.hide();
+      console.error('❌ Error:', err);
+      Swal.fire('Error fetching data', '', 'error');
+    }
+  });
+}
+  toggleDropdown() {
+  this.dropdownOpen = !this.dropdownOpen;
+}
+
+selectSearchType(option: any) {
+  this.selectedType = option;
+  this.dropdownOpen = false;
+}
+
+// onSearchReference() {
+//   if (!this.searchReference?.trim()) {
+//     Swal.fire('Please enter a value', '', 'warning');
+//     return;
+//   }
+
+//   if (!this.selectedType) {
+//     Swal.fire('Please select a search type', '', 'info');
+//     return;
+//   }
+
+//   // Build payload dynamically
+//   let payload: any = {
+//     NUM: '',
+//     INV_NO: '',
+//     ODN_NO: '',
+//     SO_NUM: ''
+//   };
+//   payload[this.selectedType.key] = this.searchReference.trim();
+
+//   console.log('🔍 Payload:', payload);
+
+//   this.spinner.show();
+//   this.service.global_Fields_SearchOption(payload).subscribe({
+//     next: (res: any) => {
+//       this.spinner.hide();
+//       const records = Array.isArray(res) ? res : res?.data || [];
+//       if (records.length > 0) {
+//         Swal.fire('Data fetched successfully!', '', 'success');
+//       } else {
+//         Swal.fire('No records found', '', 'info');
+//       }
+//     },
+//     error: (err) => {
+//       this.spinner.hide();
+//       console.error('❌ Error:', err);
+//       Swal.fire('Error fetching data', '', 'error');
+//     }
+//   });
+// }
+}
+

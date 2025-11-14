@@ -258,5 +258,12 @@ export class GeneralserviceService {
     return this.http.post(environment.baseUrl + 'api/external/LE/Dispatch/Outward/ReferenceNumber/edit', obj);
   }
 
+   GlobalReferenceNoFetch(obj) {
+    return this.http.post(environment.baseUrl + 'api/external//LE/orderinfo/GlobalReferenceNoFetch', obj);
+  }
+   global_Fields_SearchOption(obj) {
+    return this.http.post(environment.baseUrl + 'api/external//LE/orderinfo/global_Fields_SearchOption', obj);
+  }
+
 
 }
