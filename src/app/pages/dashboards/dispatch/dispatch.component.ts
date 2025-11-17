@@ -83,7 +83,7 @@ export class DispatchComponent implements OnInit {
       workorder: [''],
       VehicleType: ['', Validators.required],
       NoOfTrucks: ['', Validators.required],
-      VendorCode: ['', Validators.required],
+      VendorCode: [''],
       Transporter: ['', Validators.required],
       NoOfLRs: ['', Validators.required],
       LRNumber: ['', Validators.required],
@@ -289,7 +289,7 @@ export class DispatchComponent implements OnInit {
         workorder: [item.WORK_ORDER || ''],
         VehicleType: [item.VEH_TYPE || '', Validators.required],
         NoOfTrucks: [item.NO_TRUCKS || '', Validators.required],
-        VendorCode: [item.VENDOR_CD || '', Validators.required],
+        VendorCode: [item.VENDOR_CD || ''],
         Transporter: [item.TRANSPORTER || '', Validators.required],
         NoOfLRs: [item.NO_LRS || '', Validators.required],
         LRNumber: [item.LR_NO || '', Validators.required],
@@ -347,28 +347,27 @@ export class DispatchComponent implements OnInit {
         this.spinner.hide();
         console.log("✅ Update response:", res);
 
-        if (res.STATUS === 'TRUE' && res.NUMBER === '200') {
-          Swal.fire({
-            title: 'Success',
-            text: res.MSG || 'Dispatch data updated successfully',
-            icon: 'success'
-          }).then(() => {
-            // ✅ Handle navigation after update
-            if (action === 'next') {
-              this.router.navigate(['/order-info']);
-            } else if (action === 'previous') {
-              this.router.navigate(['/dashboard']);
-            } else {
-              // Reset form after successful update
-              this.resetAll();
-              this.searchReference = '';
-              this.isUpdateMode = false;
-              this.showForm = false;
-            }
-          });
-        } else {
-          Swal.fire('Failed', res.MSG || 'Something went wrong', 'error');
-        }
+       if (res.STATUS === 'TRUE' || res.NUMBER === '200') {
+  Swal.fire({
+    title: 'Success',
+    text: res.MSG || 'Dispatch data updated successfully',
+    icon: 'success'
+  }).then(() => {
+    if (action === 'next') {
+      this.router.navigate(['/order-info']);
+    } else if (action === 'previous') {
+      this.router.navigate(['/dashboard']);
+    } else {
+      this.resetAll();
+      this.searchReference = '';
+      this.isUpdateMode = false;
+      this.showForm = false;
+    }
+  });
+} else {
+  Swal.fire('Failed', res.MSG || 'Something went wrong', 'error');
+}
+
       },
       error: (err) => {
         this.spinner.hide();

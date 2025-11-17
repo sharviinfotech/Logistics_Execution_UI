@@ -17,7 +17,6 @@
         </label>
       </div>
       <div class="status-display-container" *ngIf="orderType">
-
         <button class="toggle-arrow arrow-icon" [class.reversed]="orderType === 'Outward'" (click)="toggleOrderType()"
           type="button">
           <svg viewBox="0 0 24 24">
@@ -29,10 +28,8 @@
           <span class="status-dot"></span>
           <span>{{ orderType }} is Processing</span>
         </div>
-
       </div>
     </div>
-
 
     <br />
 
@@ -49,11 +46,11 @@
         </label>
       </div>
       <br>
-
-      <!-- Input + GET (only for SAP) -->
-
     </div>
-    <div class="input-row" *ngIf="sapType === 'SAP'">
+
+    <!-- Common Section for Both SAP and Non-SAP -->
+    <div class="input-row" *ngIf="sapType">
+      <!-- Inward: PO Number Input -->
       <div *ngIf="orderType === 'Inward'" class="input-flex">
         <div class="form-field flex-1">
           <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" "
@@ -66,7 +63,9 @@
         </button>
       </div>
 
+      <!-- Outward: Table + Invoice/DC Reference + Search -->
       <div *ngIf="orderType === 'Outward'">
+        <!-- Reference Number Table (Common for both SAP and Non-SAP) -->
         <form [formGroup]="OrderInfo">
           <div class="table-responsive" id="refTable">
             <table class="table table-bordered">
@@ -83,7 +82,6 @@
 
               <tbody formArrayName="items">
                 <tr *ngFor="let item of items.controls; let i = index" [formGroupName]="i">
-                  <!-- ✅ Checkbox column -->
                   <td>
                     <input type="checkbox" (change)="onCheckboxChange($event, i)" [checked]="isItemSelected(i)" />
                   </td>
@@ -119,28 +117,21 @@
           </div>
         </form>
 
-
-
-        <div class="input-row input-flex" *ngIf="sapType">
+        <!-- SAP: Invoice Number + GET Button + Search Bar -->
+        <div class="input-row input-flex" *ngIf="sapType === 'SAP'">
           <div class="form-field flex-1">
             <input type="text" name="invoicenumber" [(ngModel)]="invoicenumber" placeholder=" "
               (input)="onInputChange('invoice')" />
             <label>Invoice Number</label>
           </div>
+
           <button type="button" class="btn-get" (click)="getForm('invoice')"
             [disabled]="!invoicenumber || invoicenumber.trim()===''">
             GET
           </button>
-          <!-- <div class="search-bar-wrapper-global" *ngIf="sapType">
-            <input type="text" class="search-input"
-              placeholder="Search by Reference No or Invoice No or ODN No or SO No " [(ngModel)]="searchReference"
-              name="searchReference" (keyup.enter)="onSearchReference()" />
-            <button type="button" class="search-btn" (click)="onSearchReference()">
-              <i class="fas fa-search"></i>
-            </button>
-          </div> -->
 
-          <div class="search-bar-wrapper-global" *ngIf="sapType">
+          <!-- Global Search Bar for SAP -->
+          <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
                 <select class="search-type-select" [(ngModel)]="selectedType" name="searchType">
@@ -157,20 +148,40 @@
               </div>
             </div>
           </div>
+        </div>
 
+        <!-- Non-SAP: Only Search Bar (No Input Field, No GET Button) -->
+        <div class="input-row input-flex" *ngIf="sapType === 'Non-SAP'">
+          <div class="search-bar-wrapper-global">
+            <div class="search-container">
+              <div class="search-box">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType">
+                  <option value="" disabled selected>Select</option>
+                  <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
+                </select>
 
+                <input type="text" class="search-input" placeholder="Enter Reference / Invoice / ODN / SO Number"
+                  [(ngModel)]="searchReference" name="searchReference" (keyup.enter)="onSearchReference()" />
 
+                <button type="button" class="search-btn-global" (click)="onSearchReference()">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
   </div>
 </div>
+
+<!-- Form Card -->
 <div class="card" style="margin-top: 10px;">
   <div class="card-body-LE">
     <!-- Form Section -->
     <form class="form-grid" [formGroup]="OrderInfo" *ngIf="showForm">
-      <!-- Tax Invoice -->
+      <!-- Tax Invoice / DC Reference -->
       <div class="form-field">
         <input type="text" formControlName="TaxInvoice" placeholder=" " *ngIf="isSap()" />
         <input type="text" formControlName="DCReference" placeholder=" " *ngIf="!isSap()" />
@@ -183,25 +194,18 @@
         <label>ODN Number</label>
       </div>
 
-      <!-- Invoice Date -->
+      <!-- Invoice Date / Reference Date -->
       <div class="form-field">
         <input type="date" formControlName="InvoiceeDate" placeholder=" " *ngIf="isSap()" />
         <input type="date" formControlName="ReferenceDate" placeholder=" " *ngIf="!isSap()" />
         <label>{{ isSap() ? 'Invoice Date' : 'Reference Date' }}</label>
       </div>
 
-
       <!-- Basic Shipment -->
       <div class="form-field">
         <input type="text" formControlName="BasicShipment" placeholder=" " />
         <label>Basic Shipment Value</label>
       </div>
-
-      <!-- Item Number
-    <div class="form-field">
-      <input type="text" formControlName="Itemnumber" placeholder=" " />
-      <label>Item Number</label>
-    </div> -->
 
       <!-- Invoice With GST -->
       <div class="form-field">
@@ -210,10 +214,6 @@
       </div>
 
       <!-- Fiscal Year -->
-      <!-- <div class="form-field" *ngIf="showFiscalFields">
-      <input type="text" formControlName="FiscalYear" placeholder=" " readonly />
-      <label>Fiscal Year</label>
-    </div> -->
       <div class="form-field" *ngIf="showFiscalFields"
         [ngClass]="{'grayReadOnly': OrderInfo.value.PhysicalDispatchDateTime}">
         <input type="text" formControlName="FiscalYear" placeholder=" " readonly />
@@ -221,44 +221,18 @@
       </div>
 
       <!-- Fiscal Quarter -->
-      <!-- <div class="form-field" *ngIf="showFiscalFields">
-      <input type="text" formControlName="FiscalQuarter" placeholder=" " readonly />
-      <label>Fiscal Quarter</label>
-    </div> -->
       <div class="form-field" *ngIf="showFiscalFields"
         [ngClass]="{'grayReadOnly': OrderInfo.value.PhysicalDispatchDateTime}">
         <input type="text" formControlName="FiscalQuarter" placeholder=" " readonly />
         <label>Fiscal Quarter</label>
       </div>
 
-      <!-- Month
-    <div class="form-field">
-      <select formControlName="Month">
-        <option value="">Select Month</option>
-        <option *ngFor="let m of months" [value]="m">
-          {{ m }}
-        </option>
-      </select>
-      <label>Month</label>
-    </div> -->
       <!-- Month -->
-      <!-- <div class="form-field">
-      <input type="month" formControlName="Month" />
-      <label>Month</label>
-    </div> -->
-      <!-- Month Dropdown -->
-      <!-- <div class="form-field" *ngIf="showFiscalFields">
-      <input type="text" formControlName="Month" placeholder=" " readonly />
-      <label>Month</label>
-    </div> -->
       <div class="form-field" *ngIf="showFiscalFields"
         [ngClass]="{'grayReadOnly': OrderInfo.value.PhysicalDispatchDateTime}">
         <input type="text" formControlName="Month" placeholder=" " readonly />
         <label>Month</label>
       </div>
-
-
-
 
       <!-- Physical Dispatch -->
       <div class="form-field">
@@ -266,20 +240,7 @@
         <label>Physical Dispatch Date & Time</label>
       </div>
 
-      <!-- Plant Dropdown
-    <div class="form-field">
-      <select formControlName="Plant" (change)="onPlantChange()">
-        <option value="">Select Plant</option>
-        <option *ngFor="let data of plantList" [value]="data.PLANT">{{ data.PLANT }}</option>
-      </select>
-      <label>Plant</label>
-    </div>
-    <div class="form-field">
-      remove [value] -->
-      <!-- <input type="text" formControlName="Plantdescription" placeholder=" " readonly />
-      <label>Plant Description</label>
-    </div> -->
-      <!-- 🌿 Plant -->
+      <!-- Plant -->
       <div class="form-field">
         <ng-container *ngIf="!isSap(); else sapPlant">
           <select formControlName="Plant" (change)="onPlantChange()">
@@ -292,10 +253,6 @@
         </ng-template>
         <label>Plant</label>
       </div>
-      <!-- <div class="form-field" *ngIf="!isSap()">
-      <input type="text" formControlName="Plantdescription" readonly />
-      <label>Plant Description</label>
-    </div> -->
 
       <!-- Transaction Type -->
       <div class="form-field">
@@ -313,19 +270,7 @@
         <label>Transaction Type</label>
       </div>
 
-      <!-- Billing Type Dropdown
-    <div class="form-field">
-      <select formControlName="BillingTransactionType" (change)="onBillingTypeChange()">
-        <option value="">Select Billing Type</option>
-        <option *ngFor="let b of billintypeList" [value]="b.BILL_TYPE">{{ b.BILL_TYPE }}</option>
-      </select>
-      <label>Billing Transaction Type</label>
-    </div>
-    <div class="form-field">
-      <input type="text" formControlName="Billingdescription" [value]="selectedBillingDesc" placeholder=" " readonly />
-      <label>Billing Description</label>
-    </div> -->
-      <!-- 🧾 Billing Type -->
+      <!-- Billing Transaction Type -->
       <div class="form-field">
         <ng-container *ngIf="!isSap(); else sapBilling">
           <select formControlName="BillingTransactionType" (change)="onBillingTypeChange()">
@@ -340,25 +285,8 @@
         </ng-template>
         <label>Billing Transaction Type</label>
       </div>
-      <!-- <div class="form-field" *ngIf="!isSap()">
-      <input type="text" formControlName="Billingdescription" readonly />
-      <label>Billing Description</label>
-    </div> -->
 
-      <!-- Division Dropdown -->
-      <!-- <div class="form-field">
-      <select formControlName="Division" (change)="onDivisionChange()">
-        <option value="">Select Division</option>
-        <option *ngFor="let data of divisionList" [value]="data.DIVISION">{{ data.DIVISION }}</option>
-      </select>
-      <label>Division</label>
-    </div>
-    <div class="form-field">
-      <input type="text" formControlName="Divisiondescription" [value]="selectedDivisionDesc" placeholder=" "
-        readonly />
-      <label>Division Description</label>
-    </div> -->
-      <!-- 🏢 Division -->
+      <!-- Division -->
       <div class="form-field">
         <ng-container *ngIf="!isSap(); else sapDivision">
           <select formControlName="Division" (change)="onDivisionChange()">
@@ -372,10 +300,6 @@
         </ng-template>
         <label>Division</label>
       </div>
-      <!-- <div class="form-field" *ngIf="!isSap()">
-      <input type="text" formControlName="Divisiondescription" readonly />
-      <label>Division Description</label>
-    </div> -->
 
       <!-- Sub Division -->
       <div class="form-field">
@@ -405,46 +329,16 @@
       </div>
 
       <!-- Customer -->
-      <!-- <div class="form-field">
-      <input type="text" formControlName="Customer" placeholder=" " />
-      <label>Customer</label>
-    </div> -->
-
-      <!-- <div class="form-field">
-      <ng-container *ngIf="!isSap(); else sapDivision">
-        <select formControlName="Customer" (change)="custgroupchange()">
-          <option value="">Select Customer</option>
-          <option *ngFor="let d of custList" [value]="d.CUST">{{ d.CUST }}
-          </option>
-        </select>
-      </ng-container>
-      <ng-template #sapDivision>
-        <input type="text" formControlName="Customer" readonly />
-      </ng-template>
-      <label>Customer</label>
-    </div> -->
-
-      <!-- Customer Group -->
       <div class="form-field">
         <input type="text" formControlName="Customer" placeholder=" " />
         <label>Customer</label>
       </div>
-      <!-- <div class="form-field">
-      <select formControlName="Customer" (change)="custgroupchange()">
-        <option value="">Select Customer</option>
-        <option *ngFor="let d of custList" [value]="d.customer">{{ d.customer }}</option>
-      </select>
-      <label>Customer</label>
-    </div> -->
 
+      <!-- Customer Group -->
       <div class="form-field">
         <input type="text" formControlName="CustomerGroup" placeholder=" " />
         <label>Customer Group</label>
       </div>
-
-
-
-
 
       <!-- C/nee -->
       <div class="form-field">
@@ -459,39 +353,32 @@
       </div>
 
       <!-- Destination State -->
-
       <div class="form-field">
-        <ng-container *ngIf="!isSap(); else sapDivision">
+        <ng-container *ngIf="!isSap(); else sapState">
           <select formControlName="DestinationState" (change)="fetchzonechange()">
             <option value="">Select State</option>
             <option *ngFor="let d of statesList" [value]="d.STATE">{{ d.STATE }}
             </option>
           </select>
         </ng-container>
-        <ng-template #sapDivision>
+        <ng-template #sapState>
           <input type="text" formControlName="DestinationState" readonly />
         </ng-template>
         <label>Designation State</label>
       </div>
 
-
       <!-- Destination Zone -->
-      <!-- <div class="form-field">
-      <input type="text" formControlName="DestinationZone" placeholder=" " readonly />
-      <label>Destination Zone</label>
-    </div> -->
-      <div class="form-field" [ngClass]="{
-        'grayReadOnly': !isSap() && OrderInfo.value.DestinationZone
-     }">
+      <div class="form-field" [ngClass]="{'grayReadOnly': !isSap() && OrderInfo.value.DestinationZone}">
         <input type="text" formControlName="DestinationZone" readonly />
         <label>Destination Zone</label>
       </div>
     </form>
+
+    <!-- Search Results Table -->
     <div *ngIf="searchOptionsList?.length > 0" class="table-responsive mt-3">
       <table class="table table-bordered table-striped text-center">
         <thead>
           <tr>
-
             <th>REFNO</th>
             <th>Invoice No</th>
             <th>Line No</th>
@@ -524,7 +411,6 @@
         </thead>
         <tbody>
           <tr *ngFor="let item of searchOptionsList">
-
             <td>{{ item.ZREFNO }}</td>
             <td>{{ item.ZINV_NO }}</td>
             <td>{{ item.ZLINE_NO }}</td>
@@ -558,8 +444,7 @@
       </table>
     </div>
 
-
-    <!-- Buttons -->
+    <!-- Action Buttons -->
     <div class="text-right" *ngIf="showForm">
       <button class="btn btn-md btn-raised btnSave" (click)="saveOutwardInvoiceData('stay')">Save</button>
       <button class="btn btn-md btn-raised btnSave move" (click)="saveOutwardInvoiceData('next')">Save and Next</button>
@@ -567,5 +452,4 @@
         Previous</button>
     </div>
   </div>
-
 </div>

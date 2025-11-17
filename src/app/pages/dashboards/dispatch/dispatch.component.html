@@ -151,12 +151,20 @@
     </form>
     </div>
     
-    <div class="text-right" *ngIf="showForm">
-      <button class="btn btn-md btn-raised btnSave" (click)="isUpdateMode ? onUpdateDispatch() : save()">
-        {{ isUpdateMode ? 'Update' : 'Save' }}
-      </button>
-      <button class="btn btn-md btn-raised btnSave move" (click)="isUpdateMode ? onUpdateDispatch() : save('next')">
-        {{ isUpdateMode ? 'Update and Next' : 'Save and Next' }}
-      </button>
-    </div>
+   <div class="text-right" *ngIf="showForm">
+
+  <!-- Save / Update -->
+  <button class="btn btn-md btn-raised btnSave"
+          (click)="isUpdateMode ? onUpdateDispatch() : save()">
+    {{ isUpdateMode ? 'Update' : 'Save' }}
+  </button>
+
+  <!-- Save and Next / Update and Next -->
+  <button class="btn btn-md btn-raised btnSave move"
+          (click)="isUpdateMode ? onUpdateDispatch('next') : save('next')">
+    {{ isUpdateMode ? 'Update and Next' : 'Save and Next' }}
+  </button>
+
+</div>
+
   </div>

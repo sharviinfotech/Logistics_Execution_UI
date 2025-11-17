@@ -34,6 +34,9 @@ export class OrderInfoComponent implements OnInit {
   custList: any;
   customerGroup: string = '';
   showFiscalFields: boolean = false; // Add this at the top with other variables
+   // New flag to control form visibility
+
+
   
 
 
@@ -92,8 +95,6 @@ dropdownOpen = false;
     // this.setupDestinationZoneListener();
     this.setupPhysicalDispatch();
   }
- 
-
   createItemRow(): FormGroup {
     return this.fb.group({
       referenceNumber: [''],
@@ -247,6 +248,8 @@ dropdownOpen = false;
     this.showForm = false;
 
     if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
+      this.ponumber = '';        // New line
+        this.invoicenumber = '';   // New line
       this.resetConditionalFields();
     }
 
@@ -259,6 +262,17 @@ dropdownOpen = false;
       this.showForm = true;
     }
   }
+  resetConditionalFields(): void {
+    this.showForm = false;
+    this.searchOptionsList = []; // New line: Clear search results
+    this.selectedItems = [];     // New line: Clear selected table items
+    this.OrderInfo.reset(this.initialFormValues); // Reset main form controls
+
+    // Re-initialize the items FormArray with one blank row
+    const itemsArray = this.OrderInfo.get('items') as FormArray;
+    itemsArray.clear();
+    itemsArray.push(this.createItemRow());
+}
 
   getForm(type: 'purchase' | 'invoice'): void {
     this.searchOptionsList =[]
@@ -428,36 +442,57 @@ dropdownOpen = false;
       return;
     }
 
-    const formValue = this.OrderInfo.value;
-    const record = {
-      INV_VBELN: this.isSap() ? formValue.TaxInvoice : formValue.DCReference,
-      INV_ODNO: formValue.ODN,
-      INV_DATE: formValue.InvoiceOrReferenceDate,
-      BASIC_SHIP_VALUE: formValue.BasicShipment,
-      INV_VALUE_GST: formValue.InvoiceWithGst,
-      PHYS_DISPATCH: formValue.PhysicalDispatchDateTime,
-      FISCAL_YEAR: formValue.FiscalYear,
-      FISCAL_QUARTER: formValue.FiscalQuarter,
-      MONTH: formValue.Month,
-      PLANT_NAME: formValue.Plant,
-      TRAN_TYPE: formValue.TransactionType,
-      TRAN_TEXT_BILL: formValue.BillingTransactionType,
-      DIVISION: formValue.Division,
-      SUB_DIVISION: formValue.SubDivision,
-      SO_REF_NO: formValue.RefNumber,
-      CUST_NAME: formValue.Customer,
-      CUST_GROUP: formValue.CustomerGroup,
-      CNEE_NAME: formValue.CNee,
-      DEST_LOC: formValue.DestinationLocation,
-      DEST_STATE: formValue.DestinationState,
-      DEST_ZONE: formValue.DestinationZone
-    };
+    // Get selected rows
+      const selectedRows = this.items.controls
+        .filter((_, idx) => this.isItemSelected(idx))
+        .map(item => item.value);
 
-    console.log('💾 Saving record:', record);
+      if (selectedRows.length === 0) {
+        Swal.fire({
+          icon: 'warning',
+          text: 'Please select at least one row before saving'
+        });
+        return;
+      }
+
+      const formValue = this.OrderInfo.value;
+
+      // Build SAVE array
+      const record = selectedRows.map(row => ({
+        REF_NO: row.referenceNumber || "",
+        WORK_ORDER_NO: row.workOrderNumber || "",
+        LR_NO: row.lrNumber || "",
+        TRANSPORTER: row.transporter || "",
+
+        INV_VBELN: this.isSap() ? formValue.TaxInvoice : formValue.DCReference,
+        INV_ODNO: formValue.ODN,
+        INV_DATE: formValue.InvoiceOrReferenceDate,
+        BASIC_SHIP_VALUE: formValue.BasicShipment,
+        INV_VALUE_GST: formValue.InvoiceWithGst,
+        PHYS_DISPATCH: formValue.PhysicalDispatchDateTime,
+        FISCAL_YEAR: formValue.FiscalYear,
+        FISCAL_QUARTER: formValue.FiscalQuarter,
+        MONTH: formValue.Month,
+        PLANT_NAME: formValue.Plant,
+        TRAN_TYPE: formValue.TransactionType,
+        TRAN_TEXT_BILL: formValue.BillingTransactionType,
+        DIVISION: formValue.Division,
+        SUB_DIVISION: formValue.SubDivision,
+        SO_REF_NO: formValue.RefNumber,
+        CUST_NAME: formValue.Customer,
+        CUST_GROUP: formValue.CustomerGroup,
+        CNEE_NAME: formValue.CNee,
+        DEST_LOC: formValue.DestinationLocation,
+        DEST_STATE: formValue.DestinationState,
+        DEST_ZONE: formValue.DestinationZone
+      }));
+
+      console.log("💾 Final SAVE Payload:", record);
+
 
     if (this.sapType === "SAP") {
       this.spinner.show();
-      this.service.OrderInfoOutwardSave({ SAVE: [record] }).subscribe(
+      this.service.OrderInfoOutwardSave({ SAVE: record }).subscribe(
         (res: any) => {
           console.log("✅ SAP Save Response:", res);
 
@@ -503,9 +538,10 @@ dropdownOpen = false;
       );
     } else {
       this.spinner.show();
-      this.service.OrderInfoNonSap({ CREATE: [record] }).subscribe(
+      this.service.OrderInfoNonSap({ CREATE: record }).subscribe(
         (res: any) => {
           console.log("✅ Non-SAP Save Response:", res);
+           this.spinner.hide();
           
           if (res.STATUS === 'true' || res.NUMBER === '200') {
         Swal.fire({
@@ -515,7 +551,7 @@ dropdownOpen = false;
           confirmButtonText: 'Ok',
          
         }).then(() => {
-          this.spinner.hide();
+          
           if (action === 'next') {
             this.router.navigate(['/shipment-details']); // ✅ Next screen
           } else if (action === 'previous') {
@@ -581,10 +617,10 @@ dropdownOpen = false;
     this.OrderInfo.reset();
   }
 
-  resetConditionalFields(): void {
-    this.showForm = false;
-    this.OrderInfo.reset();
-  }
+  // resetConditionalFields(): void {
+  //   this.showForm = false;
+  //   this.OrderInfo.reset();
+  // }
 
   fetchpdb(): void {
     this.spinner.show();
@@ -834,6 +870,7 @@ onSearchReference() {
       this.spinner.hide();
       if (res.length > 0) {
         this.searchOptionsList = res;
+         this.showForm = false;
         Swal.fire('Data fetched successfully!', '', 'success');
       } else {
         Swal.fire('No records found', '', 'info');
@@ -854,6 +891,7 @@ selectSearchType(option: any) {
   this.selectedType = option;
   this.dropdownOpen = false;
 }
+
 
 // onSearchReference() {
 //   if (!this.searchReference?.trim()) {
