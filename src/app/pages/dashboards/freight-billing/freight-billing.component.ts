@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { GeneralserviceService } from 'src/app/generalservice.service';
-
 import { NgxSpinnerService } from 'ngx-spinner';
 import Swal from 'sweetalert2';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -38,6 +37,23 @@ export class FreightBillingComponent implements OnInit {
   freightDetails: FreightDetails;
   totalFreight: number = 0;
 
+  previousOrderType: string | null = null;
+  previousSapType: string | null = null;
+
+  // Search functionality
+  selectedItems: any[] = [];
+  searchReference: string = '';
+  searchOptions = [
+    { key: 'NUM', label: 'Reference No' },
+    { key: 'INV_NO', label: 'Invoice No' },
+    { key: 'ODN_NO', label: 'ODN No' },
+    { key: 'SO_NUM', label: 'SO No' },
+    { key: 'LR_NO', label: 'LR NO' }
+  ];
+  selectedType: any = '';
+  searchOptionsList: any[] = [];
+  dropdownOpen = false;
+
   constructor(
     private fb: FormBuilder,
     private service: GeneralserviceService,
@@ -51,7 +67,6 @@ export class FreightBillingComponent implements OnInit {
   ngOnInit(): void {
     this.initializeForm();
     this.setupWorkOrderListener();
-
   }
 
   initializeForm(): void {
@@ -64,15 +79,27 @@ export class FreightBillingComponent implements OnInit {
       FreightCharges: ['', [Validators.required, Validators.min(0)]],
       WorkOrderNumber: [''],
       BillSubmission: ['', Validators.required],
+      referenceItems: this.fb.array([this.createReferenceRow()])
     });
     this.loadInitialData();
   }
 
-  // Setup listener for Work Order Number changes
+  get referenceItems(): FormArray {
+    return this.FreightBilling.get('referenceItems') as FormArray;
+  }
+
+  createReferenceRow(): FormGroup {
+    return this.fb.group({
+      referenceNumber: [''],
+      workOrderNumber: [''],
+      lrNumber: [''],
+      transporter: ['']
+    });
+  }
+
   setupWorkOrderListener(): void {
     this.FreightBilling.get('WorkOrderNumber')?.valueChanges.subscribe((value) => {
       if (value && value !== '') {
-        // If Work Order Number is selected, disable and clear validation for these fields
         this.FreightBilling.get('FreightBillNumber')?.clearValidators();
         this.FreightBilling.get('FreightBillNumber')?.disable();
         this.FreightBilling.get('FreightBillNumber')?.setValue('');
@@ -89,7 +116,6 @@ export class FreightBillingComponent implements OnInit {
         this.FreightBilling.get('FreightCharges')?.disable();
         this.FreightBilling.get('FreightCharges')?.setValue('');
       } else {
-        // If Work Order Number is not selected, enable and restore validation
         this.FreightBilling.get('FreightBillNumber')?.setValidators([Validators.required]);
         this.FreightBilling.get('FreightBillNumber')?.enable();
 
@@ -103,7 +129,6 @@ export class FreightBillingComponent implements OnInit {
         this.FreightBilling.get('FreightCharges')?.enable();
       }
 
-      // Update validity for all affected fields
       this.FreightBilling.get('FreightBillNumber')?.updateValueAndValidity();
       this.FreightBilling.get('FreightBillDate')?.updateValueAndValidity();
       this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.updateValueAndValidity();
@@ -112,13 +137,24 @@ export class FreightBillingComponent implements OnInit {
   }
 
   onOrderTypeChange(): void {
-    this.sapType = '';
-    this.showForm = false;
-    this.FreightBilling.reset();
+    if (this.previousOrderType !== null && this.previousOrderType !== this.orderType) {
+      this.sapType = '';
+      this.previousSapType = null;
+      this.resetConditionalFields();
+    }
+    this.previousOrderType = this.orderType;
   }
 
   onSapTypeChange(): void {
+    if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
+      this.resetConditionalFields();
+    }
+    this.previousSapType = this.sapType;
+
     this.FreightBilling.reset();
+    this.referenceItems.clear();
+    this.referenceItems.push(this.createReferenceRow());
+
     this.showForm = !!(this.orderType && this.sapType);
 
     if (this.orderType === 'Inward') {
@@ -137,22 +173,198 @@ export class FreightBillingComponent implements OnInit {
     console.log('SAP Type changed to:', this.sapType, '| Form reset done.');
   }
 
+  resetConditionalFields(): void {
+    this.showForm = false;
+    this.searchOptionsList = [];
+    this.selectedItems = [];
+    this.FreightBilling.reset();
+    this.referenceItems.clear();
+    this.referenceItems.push(this.createReferenceRow());
+  }
+
+  // Reference Table: Field Blur Handler
+  onFieldBlur(index: number, fieldKey: string): void {
+    if (index !== 0) return;
+
+    const firstRow = this.referenceItems.at(0) as FormGroup;
+    const values = firstRow.value;
+
+    if (
+      !values.referenceNumber &&
+      !values.workOrderNumber &&
+      !values.lrNumber &&
+      !values.transporter
+    ) {
+      this.referenceItems.clear();
+      this.referenceItems.push(this.createReferenceRow());
+      return;
+    }
+
+    const obj = {
+      REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
+      WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
+      LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
+      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : ''
+    };
+
+    console.log('🔹 Sending Object:', obj);
+
+    this.spinner.show();
+    this.service.GlobalReferenceNoFetch(obj).subscribe({
+      next: (res: any) => {
+        console.log('✅ GlobalRefSearch Response:', res);
+        this.spinner.hide();
+        this.populateReferenceRows(res);
+      },
+      error: err => {
+        console.error('❌ Ref Fetch Error:', err);
+        this.spinner.hide();
+      }
+    });
+  }
+
+  populateReferenceRows(data: any[]): void {
+    this.referenceItems.clear();
+
+    if (data && data.length > 0) {
+      data.forEach(d => {
+        this.referenceItems.push(
+          this.fb.group({
+            referenceNumber: [d.REF_NO || ''],
+            workOrderNumber: [d.WORK_ORDER_NO || ''],
+            lrNumber: [d.LR_NO || ''],
+            transporter: [d.TRANSPORTER || '']
+          })
+        );
+      });
+    } else {
+      Swal.fire({
+        icon: 'info',
+        title: 'No Records Found',
+        text: 'No matching reference details were found.',
+        timer: 1500,
+        showConfirmButton: false,
+        width: '300px'
+      });
+      this.referenceItems.push(this.createReferenceRow());
+    }
+  }
+
+  onCheckboxChange(event: Event, index: number): void {
+    const checkbox = event.target as HTMLInputElement;
+    const rowValue = (this.referenceItems.at(index) as FormGroup).value;
+
+    if (checkbox.checked) {
+      const exists = this.selectedItems.some(
+        (item) =>
+          item.referenceNumber === rowValue.referenceNumber &&
+          item.workOrderNumber === rowValue.workOrderNumber &&
+          item.lrNumber === rowValue.lrNumber &&
+          item.transporter === rowValue.transporter
+      );
+      if (!exists) {
+        this.selectedItems.push(rowValue);
+      }
+    } else {
+      this.selectedItems = this.selectedItems.filter(
+        (item) =>
+          !(
+            item.referenceNumber === rowValue.referenceNumber &&
+            item.workOrderNumber === rowValue.workOrderNumber &&
+            item.lrNumber === rowValue.lrNumber &&
+            item.transporter === rowValue.transporter
+          )
+      );
+    }
+
+    console.log('✅ Selected Items:', this.selectedItems);
+  }
+
+  isItemSelected(index: number): boolean {
+    const rowValue = (this.referenceItems.at(index) as FormGroup).value;
+
+    return this.selectedItems.some(
+      (item) =>
+        item.referenceNumber === rowValue.referenceNumber &&
+        item.workOrderNumber === rowValue.workOrderNumber &&
+        item.lrNumber === rowValue.lrNumber &&
+        item.transporter === rowValue.transporter
+    );
+  }
+
+  // Search functionality
+  onSearchReference() {
+    if (!this.searchReference?.trim()) {
+      Swal.fire('Please enter a value', '', 'warning');
+      return;
+    }
+
+    if (!this.selectedType) {
+      Swal.fire('Please select a search type', '', 'info');
+      return;
+    }
+
+    let payload: any = {
+      NUM: '',
+      INV_NO: '',
+      ODN_NO: '',
+      SO_NUM: '',
+      LR_NO: ''
+    };
+    payload[this.selectedType] = this.searchReference.trim();
+
+    console.log('🔍 Payload:', payload);
+
+    this.spinner.show();
+    this.service.global_Fields_SearchOption(payload).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        if (res.length > 0) {
+          this.searchOptionsList = res;
+          this.showForm = false;
+          Swal.fire('Data fetched successfully!', '', 'success');
+        } else {
+          Swal.fire('No records found', '', 'info');
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('❌ Error:', err);
+        Swal.fire('Error fetching data', '', 'error');
+      }
+    });
+  }
+
+  toggleDropdown() {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
+  selectSearchType(option: any) {
+    this.selectedType = option;
+    this.dropdownOpen = false;
+  }
+
   cancelEdit(): void {
     this.resetForm();
   }
 
   resetForm(): void {
     this.FreightBilling.reset();
+    this.referenceItems.clear();
+    this.referenceItems.push(this.createReferenceRow());
     this.isEditMode = false;
     this.orderType = '';
     this.sapType = '';
     this.showForm = false;
+    this.searchOptionsList = [];
+    this.selectedItems = [];
+    this.searchReference = '';
+    this.selectedType = '';
   }
 
   saveFreightBilling(action: 'stay' | 'next' | 'previous' = 'stay'): void {
     const formValue = this.FreightBilling.getRawValue();
 
-    // Mark all enabled controls as touched
     Object.keys(this.FreightBilling.controls).forEach(key => {
       const control = this.FreightBilling.get(key);
       if (control?.enabled) {
@@ -170,14 +382,23 @@ export class FreightBillingComponent implements OnInit {
       return;
     }
 
+    if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        text: 'Please select at least one reference row before saving'
+      });
+      return;
+    }
+
     const record = {
-      INV_NO: formValue.invoicenumber || '',
+      INV_NO: formValue.invoicenumber || formValue.ponumber || '',
       BILLNO: formValue.FreightBillNumber || '',
       BILLDATE: formValue.FreightBillDate || '',
       PHY_DATE: formValue.FreightBillPhysicalSubmissionDate || '',
       FRT_CHARGES: formValue.FreightCharges || 0,
       ORDER_NO: formValue.WorkOrderNumber || '',
-      BILL_SUBMISSION: formValue.BillSubmission
+      BILL_SUBMISSION: formValue.BillSubmission,
+      ...(this.orderType === 'Outward' && this.selectedItems.length > 0 ? this.selectedItems[0] : {})
     };
 
     this.spinner.show();
@@ -197,15 +418,12 @@ export class FreightBillingComponent implements OnInit {
             icon: 'success',
             timer: 3000
           }).then(() => {
-            // ✅ Navigation controls
             if (action === 'next') {
-              this.router.navigate(['/transit-damage-info']);  // ✅ Next Screen
-            }
-            else if (action === 'previous') {
-              this.router.navigate(['/transit-info']);         // ✅ Previous Screen
-            }
-            else {
-              this.resetForm();   // ✅ Stay on same screen
+              this.router.navigate(['/transit-damage-info']);
+            } else if (action === 'previous') {
+              this.router.navigate(['/transit-info']);
+            } else {
+              this.resetForm();
             }
           });
         } else {
@@ -228,7 +446,6 @@ export class FreightBillingComponent implements OnInit {
     });
   }
 
-
   resetDetails(): FreightDetails {
     return {
       basicFreight: 0,
@@ -243,19 +460,15 @@ export class FreightBillingComponent implements OnInit {
     };
   }
 
-  // Mock function to load existing data (e.g., from a service)
   loadInitialData() {
-    // In a real app, you'd fetch this from the server
-    const initialSavedData = { /* ... potentially saved data ... */ };
+    const initialSavedData = {};
     Object.assign(this.freightDetails, initialSavedData);
-    this.calculateTotal(); // Calculate the total to update the main field
+    this.calculateTotal();
   }
 
-  // Calculation logic - must be called every time a field in the modal changes
   calculateTotal(): number {
     const d = this.freightDetails;
 
-    // Convert all fields to numbers safely
     const toNum = (val: any) => Number(val) || 0;
 
     const sumCharges =
@@ -273,9 +486,7 @@ export class FreightBillingComponent implements OnInit {
     return this.totalFreight;
   }
 
-  // 1. Function to open the modal
   openModal(calculateTotalpopup: any) {
-    // Check if Freight Charges field is disabled
     if (this.FreightBilling.get('FreightCharges')?.disabled) {
       Swal.fire({
         title: 'Field Disabled',
@@ -287,7 +498,6 @@ export class FreightBillingComponent implements OnInit {
       return;
     }
 
-    // Ensure the internal total is calculated based on the current saved/loaded details
     this.calculateTotal();
     this.modalService.open(calculateTotalpopup, {
       backdrop: 'static',
@@ -296,22 +506,20 @@ export class FreightBillingComponent implements OnInit {
     });
   }
 
-  // 2. Function to save and close the modal
   saveAndCloseModal() {
-    // Final calculation before saving
     const finalTotal = this.calculateTotal();
     console.log("finalTotal", finalTotal);
 
-    // Set the value of the main form control
     this.FreightBilling.get('FreightCharges')?.setValue(finalTotal);
     this.modalService.dismissAll();
     console.log("FreightCharges", this.FreightBilling.get('FreightCharges')?.value);
-
-    // NOTE: At this point, you would typically save 'this.freightDetails' 
-    // to your backend/database along with the main form data.
   }
 
   cancelModal() {
     this.modalService.dismissAll();
+  }
+
+  isSap(): boolean {
+    return this.sapType === 'SAP';
   }
 }

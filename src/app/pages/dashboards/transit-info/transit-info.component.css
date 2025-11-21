@@ -2,7 +2,7 @@
 .form-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 13px;
   margin-top: 10px;
   width: 100%;
   box-sizing: border-box;
@@ -25,10 +25,10 @@ input[type="radio"] {
 
 
 .input-row {
-  display: flex;
+  
   align-items: center;
   gap: 12px;
-  margin-left: 20px;
+ 
 }
 
 .input-row .form-field {
@@ -41,6 +41,8 @@ input[type="radio"] {
   display: flex;
   align-items: center;
   gap: 10px;
+  width: fit-content; /* shrink to content size */
+ 
 }
 
 .form-field.flex-1 {

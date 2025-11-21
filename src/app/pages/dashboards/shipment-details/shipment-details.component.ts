@@ -7,7 +7,6 @@ import Swal from 'sweetalert2';
 import { SpinnerService } from 'src/app/spinner.service';
 import { Router } from '@angular/router';
 
-
 @Component({
   selector: 'app-shipment-details',
   standalone: true,
@@ -26,14 +25,30 @@ export class ShipmentDetailsComponent implements OnInit {
   ProductInfo!: FormGroup;
   isEditMode = false;
   showForm = false;
-  orderType: string = '';     // Inward / Outward
-  sapType: string = '';       // SAP / Non-SAP
-  ponumber: string = '';      // For Inward SAP
+  orderType: string = '';
+  sapType: string = '';
+  ponumber: string = '';
   invoicenumber: string = '';
   TypeofmaterialList: any = [];
   IncotermsList: any[] = [];
-  Incoterms: string = '';     // For Outward SAP
-  isAllSelected: boolean = false; // For header checkbox
+  Incoterms: string = '';
+  isAllSelected: boolean = false;
+
+  selectedItems: any[] = [];
+  searchReference: string = '';
+  searchOptions = [
+    { key: 'NUM', label: 'Reference No' },
+    { key: 'INV_NO', label: 'Invoice No' },
+    { key: 'ODN_NO', label: 'ODN No' },
+    { key: 'SO_NUM', label: 'SO No' },
+    { key: 'LR_NO', label: 'LR NO' }
+  ];
+  selectedType: any = '';
+  searchOptionsList: any[] = [];
+  dropdownOpen = false;
+
+  previousOrderType: string | null = null;
+  previousSapType: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -45,37 +60,51 @@ export class ShipmentDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.ProductInfo = this.fb.group({
-       Incoterms: ['', Validators.required],
-      InsuranceScope: ['',Validators.required],
+      Incoterms: ['', Validators.required],
+      InsuranceScope: ['', Validators.required],
       Kilometres: [null, [Validators.required, Validators.min(0)]],
-      items: this.fb.array([])
-      
+      items: this.fb.array([this.createItemRow()]),
+      referenceItems: this.fb.array([this.createReferenceRow()])
     });
-    this.addRow();
     this.fetchTypeofmaterial();
     this.fetchIncoterms();
   }
 
-  // Getter for FormArray
+  // Getter for Product Items FormArray
   get items(): FormArray {
     return this.ProductInfo.get('items') as FormArray;
   }
 
-  // Create one item row
+  // Getter for Reference Items FormArray
+  get referenceItems(): FormArray {
+    return this.ProductInfo.get('referenceItems') as FormArray;
+  }
+
+  // Create one product item row
   createItemRow(): FormGroup {
     return this.fb.group({
-      selected: [false], // ✅ added for checkbox support
+      selected: [false],
       Product: ['', Validators.required],
       TypeOfMaterial: ['', Validators.required],
       MaterialDescription: ['', Validators.required],
       Noofseats: [null, [Validators.required, Validators.min(1)]],
       AhLoadedInTruck: [null, [Validators.required, Validators.min(0)]],
       ShipmentWeight: [null, [Validators.required, Validators.min(0)]],
-      BatteryCondition: [''],
+      BatteryCondition: ['']
     });
   }
 
-  // Add / Remove rows
+  // Create one reference row
+  createReferenceRow(): FormGroup {
+    return this.fb.group({
+      referenceNumber: [''],
+      workOrderNumber: [''],
+      lrNumber: [''],
+      transporter: ['']
+    });
+  }
+
+  // Add / Remove product rows
   addRow() {
     this.items.push(this.createItemRow());
   }
@@ -91,16 +120,19 @@ export class ShipmentDetailsComponent implements OnInit {
   resetForm() {
     this.ProductInfo.reset();
     this.items.clear();
-    this.addRow();
+    this.referenceItems.clear();
+    this.items.push(this.createItemRow());
+    this.referenceItems.push(this.createReferenceRow());
     this.showForm = false;
     this.ponumber = '';
     this.invoicenumber = '';
     this.sapType = '';
     this.orderType = '';
+    this.searchOptionsList = [];
+    this.selectedItems = [];
+    this.searchReference = '';
+    this.selectedType = '';
   }
-
-  previousOrderType: string | null = null;
-  previousSapType: string | null = null;
 
   onSapTypeSelection() {
     if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
@@ -128,12 +160,169 @@ export class ShipmentDetailsComponent implements OnInit {
 
   resetConditionalFields(): void {
     this.showForm = false;
+    this.searchOptionsList = [];
+    this.selectedItems = [];
     this.ProductInfo.reset();
     this.items.clear();
-    this.addRow();
+    this.referenceItems.clear();
+    this.items.push(this.createItemRow());
+    this.referenceItems.push(this.createReferenceRow());
   }
 
-  // ✅ Checkbox methods start (work for both SAP & Non-SAP)
+  // Reference Table: Field Blur Handler
+  onFieldBlur(index: number, fieldKey: string): void {
+    if (index !== 0) return;
+
+    const firstRow = this.referenceItems.at(0) as FormGroup;
+    const values = firstRow.value;
+
+    if (
+      !values.referenceNumber &&
+      !values.workOrderNumber &&
+      !values.lrNumber &&
+      !values.transporter
+    ) {
+      this.referenceItems.clear();
+      this.referenceItems.push(this.createReferenceRow());
+      return;
+    }
+
+    const obj = {
+      REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
+      WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
+      LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
+      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : ''
+    };
+
+    console.log('🔹 Sending Object:', obj);
+
+    this.spinner.show();
+    this.service.GlobalReferenceNoFetch(obj).subscribe({
+      next: (res: any) => {
+        console.log('✅ GlobalRefSearch Response:', res);
+        this.spinner.hide();
+        this.populateReferenceRows(res);
+      },
+      error: err => {
+        console.error('❌ Ref Fetch Error:', err);
+        this.spinner.hide();
+      }
+    });
+  }
+
+  populateReferenceRows(data: any[]): void {
+    this.referenceItems.clear();
+
+    if (data && data.length > 0) {
+      data.forEach(d => {
+        this.referenceItems.push(
+          this.fb.group({
+            referenceNumber: [d.REF_NO || ''],
+            workOrderNumber: [d.WORK_ORDER_NO || ''],
+            lrNumber: [d.LR_NO || ''],
+            transporter: [d.TRANSPORTER || '']
+          })
+        );
+      });
+    } else {
+      Swal.fire({
+        icon: 'info',
+        title: 'No Records Found',
+        text: 'No matching reference details were found.',
+        timer: 1500,
+        showConfirmButton: false,
+        width: '300px'
+      });
+      this.referenceItems.push(this.createReferenceRow());
+    }
+  }
+
+  onCheckboxChange(event: Event, index: number): void {
+    const checkbox = event.target as HTMLInputElement;
+    const rowValue = (this.referenceItems.at(index) as FormGroup).value;
+
+    if (checkbox.checked) {
+      const exists = this.selectedItems.some(
+        (item) =>
+          item.referenceNumber === rowValue.referenceNumber &&
+          item.workOrderNumber === rowValue.workOrderNumber &&
+          item.lrNumber === rowValue.lrNumber &&
+          item.transporter === rowValue.transporter
+      );
+      if (!exists) {
+        this.selectedItems.push(rowValue);
+      }
+    } else {
+      this.selectedItems = this.selectedItems.filter(
+        (item) =>
+          !(
+            item.referenceNumber === rowValue.referenceNumber &&
+            item.workOrderNumber === rowValue.workOrderNumber &&
+            item.lrNumber === rowValue.lrNumber &&
+            item.transporter === rowValue.transporter
+          )
+      );
+    }
+
+    console.log('✅ Selected Items:', this.selectedItems);
+  }
+
+  isItemSelected(index: number): boolean {
+    const rowValue = (this.referenceItems.at(index) as FormGroup).value;
+
+    return this.selectedItems.some(
+      (item) =>
+        item.referenceNumber === rowValue.referenceNumber &&
+        item.workOrderNumber === rowValue.workOrderNumber &&
+        item.lrNumber === rowValue.lrNumber &&
+        item.transporter === rowValue.transporter
+    );
+  }
+
+  // Search functionality
+  onSearchReference() {
+    if (!this.searchReference?.trim()) {
+      Swal.fire('Please enter a value', '', 'warning');
+      return;
+    }
+
+    if (!this.selectedType) {
+      Swal.fire('Please select a search type', '', 'info');
+      return;
+    }
+
+    let payload: any = {
+      NUM: '',
+      INV_NO: '',
+      ODN_NO: '',
+      SO_NUM: '',
+      LR_NO: ''
+    };
+    payload[this.selectedType] = this.searchReference.trim();
+
+    console.log('🔍 Payload:', payload);
+
+    this.spinner.show();
+    this.service.global_Fields_SearchOption(payload).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        if (res.length > 0) {
+          this.searchOptionsList = res;
+          this.showForm = false;
+          Swal.fire('Data fetched successfully!', '', 'success');
+        } else {
+          Swal.fire('No records found', '', 'info');
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('❌ Error:', err);
+        Swal.fire('Error fetching data', '', 'error');
+      }
+    });
+  }
+
+  // Product checkbox methods
   allSelected(): boolean {
     return this.items.controls.length > 0 &&
            this.items.controls.every(ctrl => ctrl.get('selected')?.value === true);
@@ -154,91 +343,99 @@ export class ShipmentDetailsComponent implements OnInit {
       .map(ctrl => ctrl.value)
       .filter(row => row.selected);
   }
-  // ✅ Checkbox methods end
 
-  // ✅ Fetch SAP invoice details
- fetchInvoiceDetails() {
-  if (this.sapType !== 'SAP') {
-    alert('Please select "With SAP" first.');
-    return;
-  }
+  // Fetch invoice details
+  fetchInvoiceDetails() {
+    if (this.sapType !== 'SAP') {
+      alert('Please select "With SAP" first.');
+      return;
+    }
 
-  const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
-  if (!referenceNumber?.trim()) {
-    alert(`Please enter a valid ${this.orderType === 'Inward' ? 'PO' : 'Invoice'} Number`);
-    return;
-  }
+    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+    if (!referenceNumber?.trim()) {
+      alert(`Please enter a valid ${this.orderType === 'Inward' ? 'PO' : 'Invoice'} Number`);
+      return;
+    }
 
-  const payload = { INV_GET: referenceNumber.trim() };
-  this.spinner.show();
-  
-  this.service.shipmentdetailsfetch(payload).subscribe({
-    next: (res: any) => {
-      const result = Array.isArray(res) ? res : (res?.data || []);
+    const payload = { INV_GET: referenceNumber.trim() };
+    this.spinner.show();
+    
+    this.service.shipmentdetailsfetch(payload).subscribe({
+      next: (res: any) => {
+        const result = Array.isArray(res) ? res : (res?.data || []);
 
-      if (result.length > 0) {
-        const firstItem = result[0];
-        
-        // ✅ Check if the Incoterm exists in the list
-        const incoExists = this.IncotermsList.find(i => i.INCO1 === firstItem.ZINCO);
-        console.log("Incoterm from API:", firstItem.ZINCO);
-        console.log("Incoterm exists in list:", incoExists);
-        console.log("Full IncotermsList:", this.IncotermsList);
-        
-        this.items.clear();
-        
-        // ✅ Set the values
-        this.ProductInfo.patchValue({
-          Incoterms: firstItem.ZINCO || '',
-          InsuranceScope: firstItem.ZINS_SCPOE || '',
-          Kilometres: firstItem.ZKM !== null && firstItem.ZKM !== undefined ? firstItem.ZKM : null
-        });
-        
-        console.log("Form values after patch:", {
-          Incoterms: this.ProductInfo.get('Incoterms')?.value,
-          InsuranceScope: this.ProductInfo.get('InsuranceScope')?.value,
-          Kilometres: this.ProductInfo.get('Kilometres')?.value
-        });
+        if (result.length > 0) {
+          const firstItem = result[0];
+          
+          this.items.clear();
+          
+          this.ProductInfo.patchValue({
+            Incoterms: firstItem.ZINCO || '',
+            InsuranceScope: firstItem.ZINS_SCPOE || '',
+            Kilometres: firstItem.ZKM !== null && firstItem.ZKM !== undefined ? firstItem.ZKM : null
+          });
 
-        result.forEach((item: any) => {
-          this.items.push(this.fb.group({
-            selected: [false],
-            Product: [item.ZPRODUCT || ''],
-            TypeOfMaterial: [item.MTBEZ || ''],
-            MaterialDescription: [item.MAKTX || ''],
-            Noofseats: [item.ZSETS || 0, [Validators.min(1)]],
-            AhLoadedInTruck: [item.ZAH || 0],
-            ShipmentWeight: [item.ZSHIP_WT || 0],
-            BatteryCondition: [item.ZBATCOND || '']
-          }));
-        });
-        
-        this.showForm = true;
-        this.spinner.hide();
-      } else {
-        alert('No data found for this reference.');
+          result.forEach((item: any) => {
+            this.items.push(this.fb.group({
+              selected: [false],
+              Product: [item.ZPRODUCT || ''],
+              TypeOfMaterial: [item.MTBEZ || ''],
+              MaterialDescription: [item.MAKTX || ''],
+              Noofseats: [item.ZSETS || 0, [Validators.min(1)]],
+              AhLoadedInTruck: [item.ZAH || 0],
+              ShipmentWeight: [item.ZSHIP_WT || 0],
+              BatteryCondition: [item.ZBATCOND || '']
+            }));
+          });
+          
+          this.showForm = true;
+          this.spinner.hide();
+        } else {
+          alert('No data found for this reference.');
+          this.spinner.hide();
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching data:', err);
+        alert('Error fetching data from SAP.');
         this.spinner.hide();
       }
-    },
-    error: (err) => {
-      console.error('Error fetching data:', err);
-      alert('Error fetching data from SAP.');
-      this.spinner.hide();
+    });
+  }
+
+  onInputChange(type: 'purchase' | 'invoice'): void {
+    const value = type === 'purchase' ? this.ponumber : this.invoicenumber;
+    if (!value || value.trim() === '') {
+      this.showForm = false;
     }
-  });
-}
+  }
 
-  // ✅ Save only selected rows
+  getForm(type: 'purchase' | 'invoice'): void {
+    this.fetchInvoiceDetails();
+  }
+
+  // Save functionality
   saveShipmentOutward(action: 'stay' | 'next' | 'previous' = 'stay'): void {
-    const selectedRows = this.getSelectedRows();
+    const selectedProductRows = this.getSelectedRows();
+    const selectedReferenceRows = this.referenceItems.controls
+      .filter((_, idx) => this.isItemSelected(idx))
+      .map(item => item.value);
 
-    if (selectedRows.length === 0) {
+    if (selectedProductRows.length === 0) {
       Swal.fire({
         title: 'Warning',
-        text: 'Please select at least one row to save.',
+        text: 'Please select at least one product row to save.',
         icon: 'warning',
         timer: 3000,
         showConfirmButton: false
+      });
+      return;
+    }
+
+    if (this.orderType === 'Outward' && selectedReferenceRows.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        text: 'Please select at least one reference row before saving'
       });
       return;
     }
@@ -249,61 +446,60 @@ export class ShipmentDetailsComponent implements OnInit {
       Kilometres: this.ProductInfo.get('Kilometres')?.value
     };
 
-    // ✅ Remove 'selected' before sending
-    const cleanedRows = selectedRows.map(({ selected, ...rest }) => ({
-  ...rest,
-  ...commonFields
-}));
+    const cleanedRows = selectedProductRows.map(({ selected, ...rest }) => ({
+      ...rest,
+      ...commonFields,
+      ...(this.orderType === 'Outward' && selectedReferenceRows.length > 0 ? selectedReferenceRows[0] : {})
+    }));
 
     console.log("Saving selected rows:", cleanedRows);
     this.spinner.show();
 
-    // ✅ Use cleanedRows for both SAP & Non-SAP
     const saveOperation = this.sapType === 'SAP'
       ? this.service.ShipmentOutwardSave(cleanedRows)
       : this.service.shipmentdetailsNonSapSave(cleanedRows);
 
     saveOperation.subscribe({
-  next: (res: any) => {
-    this.spinner.hide(); // ✅ Hide spinner FIRST
-    
-    if (res.NUMBER == "200") {
-      Swal.fire({
-        title: 'Success',
-        text: res.MSG || 'Selected rows saved successfully!',
-        icon: 'success',
-        confirmButtonText: 'Ok'
-      }).then(() => {
-        // ✅ Handle navigation AFTER Swal closes
-        if (action === 'next') {
-          this.router.navigate(['/invoice-load-details']);
-        } else if (action === 'previous') {
-          this.router.navigate(['/order-info']);
+      next: (res: any) => {
+        this.spinner.hide();
+        
+        if (res.NUMBER == "200") {
+          Swal.fire({
+            title: 'Success',
+            text: res.MSG || 'Selected rows saved successfully!',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          }).then(() => {
+            if (action === 'next') {
+              this.router.navigate(['/invoice-load-details']);
+            } else if (action === 'previous') {
+              this.router.navigate(['/order-info']);
+            } else {
+              this.resetForm();
+            }
+          });
         } else {
-          this.resetForm();
+          Swal.fire({
+            title: 'Error',
+            text: res.MSG || 'Save Failed',
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          });
         }
-      });
-    } else {
-      Swal.fire({
-        title: 'Error',
-        text: res.MSG || 'Save Failed',
-        icon: 'error',
-        confirmButtonText: 'Ok'
-      });
-    }
-  },
-  error: (err) => {
-    this.spinner.hide();
-    console.error("Save Error:", err);
-    Swal.fire({
-      title: 'Error',
-      text: 'Something went wrong while saving shipment details.',
-      icon: 'error',
-      confirmButtonText: 'Ok'
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error("Save Error:", err);
+        Swal.fire({
+          title: 'Error',
+          text: 'Something went wrong while saving shipment details.',
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+      }
     });
   }
-});
-}
+
   fetchTypeofmaterial() {
     this.spinner.show();
     this.service.getTypeofmaterial().subscribe({
@@ -341,7 +537,6 @@ export class ShipmentDetailsComponent implements OnInit {
     console.log('Type of Material changed');
   }
 
-  // ✅ Fetch Non-SAP reports (with checkbox support)
   fetchNonSapReports(): void {
     const payload = { REPORT: "X" };
     this.spinner.show();
@@ -365,8 +560,7 @@ export class ShipmentDetailsComponent implements OnInit {
               Noofseats: [item.ZSETS || 0, [Validators.min(1)]],
               AhLoadedInTruck: [item.ZAH || 0],
               ShipmentWeight: [item.ZSHIP_WT || 0],
-              BatteryCondition: [item.ZBATCOND || ''],
-              
+              BatteryCondition: [item.ZBATCOND || '']
             }));
           });
           this.showForm = true;
@@ -392,5 +586,14 @@ export class ShipmentDetailsComponent implements OnInit {
         this.spinner.hide();
       }
     });
+  }
+
+  toggleDropdown() {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
+  selectSearchType(option: any) {
+    this.selectedType = option;
+    this.dropdownOpen = false;
   }
 }

@@ -28,10 +28,10 @@ input[type="radio"] {
 
 
 .input-row {
-  display: flex;
+  
   align-items: center;
   gap: 12px;
-  margin-left: 20px;
+  
 }
 
 .input-row .form-field {
@@ -44,6 +44,8 @@ input[type="radio"] {
   display: flex;
   align-items: center;
   gap: 10px;
+  width: fit-content; /* shrink to content size */
+ 
 }
 
 .form-field.flex-1 {

@@ -16,11 +16,28 @@ import { Router } from '@angular/router';
 export class VechileInfoComponent implements OnInit {
 
   VehicleForm!: FormGroup;
-  orderType: string = '';       // Inward / Outward
-  sapType: string = '';         // SAP / Non-SAP
-  invoicenumber: string = '';   // Invoice number
-  showTable: boolean = false;   // To show or hide the vehicle table
+  orderType: string = '';
+  sapType: string = '';
+  invoicenumber: string = '';
+  ponumber: string = '';
+  showTable: boolean = false;
   isAllSelected: boolean = false;
+  previousOrderType: string | null = null;
+  previousSapType: string | null = null;
+
+  // Search functionality
+  selectedItems: any[] = [];
+  searchReference: string = '';
+  searchOptions = [
+    { key: 'NUM', label: 'Reference No' },
+    { key: 'INV_NO', label: 'Invoice No' },
+    { key: 'ODN_NO', label: 'ODN No' },
+    { key: 'SO_NUM', label: 'SO No' },
+    { key: 'LR_NO', label: 'LR NO' }
+  ];
+  selectedType: any = '';
+  searchOptionsList: any[] = [];
+  dropdownOpen = false;
 
   constructor(
     private fb: FormBuilder,
@@ -31,20 +48,23 @@ export class VechileInfoComponent implements OnInit {
 
   ngOnInit(): void {
     this.VehicleForm = this.fb.group({
-      vehicles: this.fb.array([])
+      vehicles: this.fb.array([]),
+      referenceItems: this.fb.array([this.createReferenceRow()])
     });
     this.addRow();
   }
 
-  // Getter for form array
   get vehicles(): FormArray {
     return this.VehicleForm.get('vehicles') as FormArray;
   }
 
-  // Create a single vehicle row
+  get referenceItems(): FormArray {
+    return this.VehicleForm.get('referenceItems') as FormArray;
+  }
+
   createVehicleRow(data?: any): FormGroup {
     return this.fb.group({
-      selected: [false], // ✅ checkbox added
+      selected: [false],
       ZTRX_TYPE: [data?.ZTRX_TYPE || '', Validators.required],
       ZTRANSPOTER: [data?.ZTRANSPOTER || '', Validators.required],
       ZLRNO: [data?.ZLRNO || '', Validators.required],
@@ -58,20 +78,41 @@ export class VechileInfoComponent implements OnInit {
     });
   }
 
-  // Add new row
+  createReferenceRow(): FormGroup {
+    return this.fb.group({
+      referenceNumber: [''],
+      workOrderNumber: [''],
+      lrNumber: [''],
+      transporter: ['']
+    });
+  }
+
   addRow(): void {
     this.vehicles.push(this.createVehicleRow());
+  }
+
+  onOrderTypeChange(): void {
+    if (this.previousOrderType !== null && this.previousOrderType !== this.orderType) {
+      this.sapType = '';
+      this.previousSapType = null;
+      this.resetConditionalFields();
+    }
+    this.previousOrderType = this.orderType;
   }
 
   onOrderTypeSelection(): void {
     this.sapType = '';
     this.invoicenumber = '';
+    this.ponumber = '';
     this.showTable = false;
     this.vehicles.clear();
+    this.referenceItems.clear();
     this.addRow();
+    this.referenceItems.push(this.createReferenceRow());
+    this.searchOptionsList = [];
+    this.selectedItems = [];
   }
 
-  // Remove row
   removeRow(index: number): void {
     if (this.vehicles.length > 1) {
       this.vehicles.removeAt(index);
@@ -80,7 +121,6 @@ export class VechileInfoComponent implements OnInit {
     }
   }
 
-  // ✅ Checkbox Methods Start
   allSelected(): boolean {
     return this.vehicles.controls.length > 0 &&
            this.vehicles.controls.every(ctrl => ctrl.get('selected')?.value === true);
@@ -101,10 +141,13 @@ export class VechileInfoComponent implements OnInit {
       .map(ctrl => ctrl.value)
       .filter(row => row.selected);
   }
-  // ✅ Checkbox Methods End
 
-  // ✅ When switching between SAP / Non-SAP
   onSapTypeSelection(): void {
+    if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
+      this.resetConditionalFields();
+    }
+    this.previousSapType = this.sapType;
+
     this.vehicles.clear();
     this.showTable = false;
 
@@ -113,22 +156,208 @@ export class VechileInfoComponent implements OnInit {
       this.showTable = true;
     } else if (this.sapType === 'SAP') {
       this.invoicenumber = '';
+      this.ponumber = '';
     }
   }
 
-  // Fetch Vehicle Info (SAP)
+  resetConditionalFields(): void {
+    this.showTable = false;
+    this.searchOptionsList = [];
+    this.selectedItems = [];
+    this.VehicleForm.reset();
+    this.vehicles.clear();
+    this.referenceItems.clear();
+    this.addRow();
+    this.referenceItems.push(this.createReferenceRow());
+  }
+
+  // Reference Table: Field Blur Handler
+  onFieldBlur(index: number, fieldKey: string): void {
+    if (index !== 0) return;
+
+    const firstRow = this.referenceItems.at(0) as FormGroup;
+    const values = firstRow.value;
+
+    if (
+      !values.referenceNumber &&
+      !values.workOrderNumber &&
+      !values.lrNumber &&
+      !values.transporter
+    ) {
+      this.referenceItems.clear();
+      this.referenceItems.push(this.createReferenceRow());
+      return;
+    }
+
+    const obj = {
+      REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
+      WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
+      LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
+      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : ''
+    };
+
+    console.log('🔹 Sending Object:', obj);
+
+    this.spinner.show();
+    this.service.GlobalReferenceNoFetch(obj).subscribe({
+      next: (res: any) => {
+        console.log('✅ GlobalRefSearch Response:', res);
+        this.spinner.hide();
+        this.populateReferenceRows(res);
+      },
+      error: err => {
+        console.error('❌ Ref Fetch Error:', err);
+        this.spinner.hide();
+      }
+    });
+  }
+
+  populateReferenceRows(data: any[]): void {
+    this.referenceItems.clear();
+
+    if (data && data.length > 0) {
+      data.forEach(d => {
+        this.referenceItems.push(
+          this.fb.group({
+            referenceNumber: [d.REF_NO || ''],
+            workOrderNumber: [d.WORK_ORDER_NO || ''],
+            lrNumber: [d.LR_NO || ''],
+            transporter: [d.TRANSPORTER || '']
+          })
+        );
+      });
+    } else {
+      Swal.fire({
+        icon: 'info',
+        title: 'No Records Found',
+        text: 'No matching reference details were found.',
+        timer: 1500,
+        showConfirmButton: false,
+        width: '300px'
+      });
+      this.referenceItems.push(this.createReferenceRow());
+    }
+  }
+
+  onCheckboxChange(event: Event, index: number): void {
+    const checkbox = event.target as HTMLInputElement;
+    const rowValue = (this.referenceItems.at(index) as FormGroup).value;
+
+    if (checkbox.checked) {
+      const exists = this.selectedItems.some(
+        (item) =>
+          item.referenceNumber === rowValue.referenceNumber &&
+          item.workOrderNumber === rowValue.workOrderNumber &&
+          item.lrNumber === rowValue.lrNumber &&
+          item.transporter === rowValue.transporter
+      );
+      if (!exists) {
+        this.selectedItems.push(rowValue);
+      }
+    } else {
+      this.selectedItems = this.selectedItems.filter(
+        (item) =>
+          !(
+            item.referenceNumber === rowValue.referenceNumber &&
+            item.workOrderNumber === rowValue.workOrderNumber &&
+            item.lrNumber === rowValue.lrNumber &&
+            item.transporter === rowValue.transporter
+          )
+      );
+    }
+
+    console.log('✅ Selected Items:', this.selectedItems);
+  }
+
+  isItemSelected(index: number): boolean {
+    const rowValue = (this.referenceItems.at(index) as FormGroup).value;
+
+    return this.selectedItems.some(
+      (item) =>
+        item.referenceNumber === rowValue.referenceNumber &&
+        item.workOrderNumber === rowValue.workOrderNumber &&
+        item.lrNumber === rowValue.lrNumber &&
+        item.transporter === rowValue.transporter
+    );
+  }
+
+  // Search functionality
+  onSearchReference() {
+    if (!this.searchReference?.trim()) {
+      Swal.fire('Please enter a value', '', 'warning');
+      return;
+    }
+
+    if (!this.selectedType) {
+      Swal.fire('Please select a search type', '', 'info');
+      return;
+    }
+
+    let payload: any = {
+      NUM: '',
+      INV_NO: '',
+      ODN_NO: '',
+      SO_NUM: '',
+      LR_NO: ''
+    };
+    payload[this.selectedType] = this.searchReference.trim();
+
+    console.log('🔍 Payload:', payload);
+
+    this.spinner.show();
+    this.service.global_Fields_SearchOption(payload).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        if (res.length > 0) {
+          this.searchOptionsList = res;
+          this.showTable = false;
+          Swal.fire('Data fetched successfully!', '', 'success');
+        } else {
+          Swal.fire('No records found', '', 'info');
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('❌ Error:', err);
+        Swal.fire('Error fetching data', '', 'error');
+      }
+    });
+  }
+
+  toggleDropdown() {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
+  selectSearchType(option: any) {
+    this.selectedType = option;
+    this.dropdownOpen = false;
+  }
+
+  onInputChange(type: 'purchase' | 'invoice'): void {
+    const value = type === 'purchase' ? this.ponumber : this.invoicenumber;
+    if (!value || value.trim() === '') {
+      this.showTable = false;
+    }
+  }
+
+  getForm(type: 'purchase' | 'invoice'): void {
+    this.fetchVehicleDetails();
+  }
+
   fetchVehicleDetails(): void {
     if (this.sapType !== 'SAP') {
       Swal.fire('Info', 'Please select "With SAP" first.', 'info');
       return;
     }
 
-    if (!this.invoicenumber?.trim()) {
-      Swal.fire('Warning', 'Please enter an invoice number.', 'warning');
+    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+
+    if (!referenceNumber?.trim()) {
+      Swal.fire('Warning', `Please enter ${this.orderType === 'Inward' ? 'PO' : 'invoice'} number.`, 'warning');
       return;
     }
 
-    const reqBody = { INV_GET: this.invoicenumber };
+    const reqBody = { INV_GET: referenceNumber.trim() };
 
     this.spinner.show();
     this.service.VehicleInfofetch(reqBody).subscribe({
@@ -141,21 +370,20 @@ export class VechileInfoComponent implements OnInit {
           res.forEach((item: any) => {
             this.vehicles.push(this.createVehicleRow(item));
           });
-          Swal.fire('Success', 'Invoice details loaded successfully.', 'success');
+          Swal.fire('Success', 'Vehicle details loaded successfully.', 'success');
         } else {
           this.showTable = false;
-          Swal.fire('Info', 'No data found for this invoice number.', 'info');
+          Swal.fire('Info', 'No data found for this reference number.', 'info');
         }
       },
       error: (err) => {
         this.spinner.hide();
         console.error('API Error:', err);
-        Swal.fire('Error', 'Failed to fetch invoice details.', 'error');
+        Swal.fire('Error', 'Failed to fetch vehicle details.', 'error');
       }
     });
   }
 
-  // ✅ Save only selected rows
   saveVehicleInfo(action: 'stay' | 'next' | 'previous' = 'stay'): void {
     const selectedRows = this.getSelectedRows();
 
@@ -164,9 +392,19 @@ export class VechileInfoComponent implements OnInit {
       return;
     }
 
+    if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        text: 'Please select at least one reference row before saving'
+      });
+      return;
+    }
+
+    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+
     const cleanedRows = selectedRows.map(({ selected, ...veh }, index: number) => ({
       MANDT: '234',
-      VBELN: this.invoicenumber?.trim() || '',
+      VBELN: referenceNumber?.trim() || '',
       POSNR: (index + 1) * 10,
       ZVEH_LINE: '',
       ZTRX_TYPE: veh.ZTRX_TYPE,
@@ -178,7 +416,8 @@ export class VechileInfoComponent implements OnInit {
       ZVEH_NUM: veh.ZVEH_NUM,
       ZNOOFVEH: Number(veh.ZNOOFVEH),
       ZDNAME: veh.ZDNAME,
-      ZDNUMBER: veh.ZDNUMBER
+      ZDNUMBER: veh.ZDNUMBER,
+      ...(this.orderType === 'Outward' && this.selectedItems.length > 0 ? this.selectedItems[0] : {})
     }));
 
     this.spinner.show();
@@ -192,14 +431,20 @@ export class VechileInfoComponent implements OnInit {
       next: (res: any) => {
         this.spinner.hide();
         if (res?.NUMBER === '200') {
-          Swal.fire('Success', res.MSG || 'Selected Vehicle(s) saved successfully!', 'success');
-          if (action === 'next') {
-            // Navigate to next screen (e.g., Invoice Load Details or other)
-            this.router.navigate(['/transit-info']); 
-          } else if (action === 'previous') {
-            // Navigate back to Segment Info
-            this.router.navigate(['/segment-info']); 
-          }this.resetForm();
+          Swal.fire({
+            title: 'Success',
+            text: res.MSG || 'Selected Vehicle(s) saved successfully!',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          }).then(() => {
+            if (action === 'next') {
+              this.router.navigate(['/transit-info']);
+            } else if (action === 'previous') {
+              this.router.navigate(['/segment-info']);
+            } else {
+              this.resetForm();
+            }
+          });
         } else {
           Swal.fire('Error', res?.MSG || 'Failed to save selected vehicle info.', 'error');
         }
@@ -212,15 +457,25 @@ export class VechileInfoComponent implements OnInit {
     });
   }
 
-  // Reset the entire form
   resetForm(): void {
     this.VehicleForm.reset();
     this.vehicles.clear();
+    this.referenceItems.clear();
     this.addRow();
+    this.referenceItems.push(this.createReferenceRow());
     this.orderType = '';
     this.sapType = '';
     this.invoicenumber = '';
+    this.ponumber = '';
     this.showTable = false;
     this.isAllSelected = false;
+    this.searchOptionsList = [];
+    this.selectedItems = [];
+    this.searchReference = '';
+    this.selectedType = '';
+  }
+
+  isSap(): boolean {
+    return this.sapType === 'SAP';
   }
 }

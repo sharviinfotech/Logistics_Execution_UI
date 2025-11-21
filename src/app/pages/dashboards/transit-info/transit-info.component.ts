@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { GeneralserviceService } from 'src/app/generalservice.service';
 import { Component, OnInit } from '@angular/core';
@@ -17,10 +17,29 @@ import { Router } from '@angular/router';
 export class TransitInfoComponent implements OnInit {
   transitInfo!: FormGroup;
 
-  orderType: string = ''; // Inward / Outward
-  sapType: string = '';   // With SAP / Without SAP
+  orderType: string = '';
+  sapType: string = '';
   showForm = false;
   isEditMode: boolean = false;
+
+  ponumber: string = '';
+  // Removed: invoicenumber: string = ''; // Property is no longer bound in the main input section
+  previousOrderType: string | null = null;
+  previousSapType: string | null = null;
+
+  // Search functionality
+  selectedItems: any[] = [];
+  searchReference: string = '';
+  searchOptions = [
+    { key: 'NUM', label: 'Reference No' },
+    { key: 'INV_NO', label: 'Invoice No' },
+    { key: 'ODN_NO', label: 'ODN No' },
+    { key: 'SO_NUM', label: 'SO No' },
+    { key: 'LR_NO', label: 'LR NO' }
+  ];
+  selectedType: any = '';
+  searchOptionsList: any[] = [];
+  dropdownOpen = false;
 
   constructor(
     private fb: FormBuilder,
@@ -33,19 +52,32 @@ export class TransitInfoComponent implements OnInit {
     this.initializeForm();
   }
 
-  // ✅ Initialize form
   initializeForm(): void {
     this.transitInfo = this.fb.group({
       ponumber: [''],
-      invoicenumber: ['', Validators.required],
+      // Updated: Removed Validators.required from invoicenumber since the main input field is gone
+      invoicenumber: [''],
       physicalarrivedatdestinationdateandtime: [''],
       unloadingdateandtime: [''],
       podscanreceiveddateandtime: [''],
-      sit: ['']
+      sit: [''],
+      referenceItems: this.fb.array([this.createReferenceRow()])
     });
   }
 
-  // ✅ Auto update SIT based on fields
+  get referenceItems(): FormArray {
+    return this.transitInfo.get('referenceItems') as FormArray;
+  }
+
+  createReferenceRow(): FormGroup {
+    return this.fb.group({
+      referenceNumber: [''],
+      workOrderNumber: [''],
+      lrNumber: [''],
+      transporter: ['']
+    });
+  }
+
   updateSIT(): void {
     const field2 = this.transitInfo.get('unloadingdateandtime')?.value;
     const field3 = this.transitInfo.get('podscanreceiveddateandtime')?.value;
@@ -59,45 +91,243 @@ export class TransitInfoComponent implements OnInit {
     }
   }
 
-  // ✅ Order Type change (Inward/Outward)
   onOrderTypeChange(): void {
-    this.sapType = '';
-    this.showForm = false;
-    this.transitInfo.reset();
+    if (this.previousOrderType !== null && this.previousOrderType !== this.orderType) {
+      this.sapType = '';
+      this.previousSapType = null;
+      this.resetConditionalFields();
+    }
+    this.previousOrderType = this.orderType;
   }
 
-
-  // SAP Type change (With / Without SAP)
   onSapTypeChange(): void {
-    // 1) Fully reset the form to clear any previous values
-    this.transitInfo.reset();
+    if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
+      this.resetConditionalFields();
+    }
+    this.previousSapType = this.sapType;
 
-    // 2) Set view flag only when both orderType and sapType are selected
+    this.transitInfo.reset();
+    this.referenceItems.clear();
+    this.referenceItems.push(this.createReferenceRow());
+
+    // Show form only if both selections are made
     this.showForm = !!(this.orderType && this.sapType);
 
-    // 3) Reapply validators based on order type
     if (this.orderType === 'Inward') {
       this.transitInfo.get('ponumber')?.setValidators([Validators.required]);
       this.transitInfo.get('invoicenumber')?.clearValidators();
     } else if (this.orderType === 'Outward') {
-      this.transitInfo.get('invoicenumber')?.setValidators([Validators.required]);
+      // Updated: Removed Validators.required from invoicenumber. Outward validation is now implicit via search results/reference items.
+      this.transitInfo.get('invoicenumber')?.clearValidators();
       this.transitInfo.get('ponumber')?.clearValidators();
     } else {
-      // no order selected — clear validators
       this.transitInfo.get('ponumber')?.clearValidators();
       this.transitInfo.get('invoicenumber')?.clearValidators();
     }
 
-    // 4) Update validity so UI errors / touched status are consistent
     this.transitInfo.get('ponumber')?.updateValueAndValidity();
     this.transitInfo.get('invoicenumber')?.updateValueAndValidity();
 
-    // 5) Optional: console log to debug flow
     console.log('onSapTypeChange -> sapType:', this.sapType, ' showForm:', this.showForm);
   }
 
+  resetConditionalFields(): void {
+    this.showForm = false;
+    this.searchOptionsList = [];
+    this.selectedItems = [];
+    this.transitInfo.reset();
+    this.referenceItems.clear();
+    this.referenceItems.push(this.createReferenceRow());
+  }
 
-  // ✅ Format helpers
+  // Reference Table: Field Blur Handler
+  onFieldBlur(index: number, fieldKey: string): void {
+    if (index !== 0) return;
+
+    const firstRow = this.referenceItems.at(0) as FormGroup;
+    const values = firstRow.value;
+
+    if (
+      !values.referenceNumber &&
+      !values.workOrderNumber &&
+      !values.lrNumber &&
+      !values.transporter
+    ) {
+      this.referenceItems.clear();
+      this.referenceItems.push(this.createReferenceRow());
+      return;
+    }
+
+    const obj = {
+      REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
+      WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
+      LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
+      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : ''
+    };
+
+    console.log('🔹 Sending Object:', obj);
+
+    this.spinner.show();
+    this.service.GlobalReferenceNoFetch(obj).subscribe({
+      next: (res: any) => {
+        console.log('✅ GlobalRefSearch Response:', res);
+        this.spinner.hide();
+        this.populateReferenceRows(res);
+      },
+      error: err => {
+        console.error('❌ Ref Fetch Error:', err);
+        this.spinner.hide();
+      }
+    });
+  }
+
+  populateReferenceRows(data: any[]): void {
+    this.referenceItems.clear();
+
+    if (data && data.length > 0) {
+      data.forEach(d => {
+        this.referenceItems.push(
+          this.fb.group({
+            referenceNumber: [d.REF_NO || ''],
+            workOrderNumber: [d.WORK_ORDER_NO || ''],
+            lrNumber: [d.LR_NO || ''],
+            transporter: [d.TRANSPORTER || '']
+          })
+        );
+      });
+    } else {
+      Swal.fire({
+        icon: 'info',
+        title: 'No Records Found',
+        text: 'No matching reference details were found.',
+        timer: 1500,
+        showConfirmButton: false,
+        width: '300px'
+      });
+      this.referenceItems.push(this.createReferenceRow());
+    }
+  }
+
+  onCheckboxChange(event: Event, index: number): void {
+    const checkbox = event.target as HTMLInputElement;
+    const rowValue = (this.referenceItems.at(index) as FormGroup).value;
+
+    if (checkbox.checked) {
+      const exists = this.selectedItems.some(
+        (item) =>
+          item.referenceNumber === rowValue.referenceNumber &&
+          item.workOrderNumber === rowValue.workOrderNumber &&
+          item.lrNumber === rowValue.lrNumber &&
+          item.transporter === rowValue.transporter
+      );
+      if (!exists) {
+        this.selectedItems.push(rowValue);
+      }
+    } else {
+      this.selectedItems = this.selectedItems.filter(
+        (item) =>
+          !(
+            item.referenceNumber === rowValue.referenceNumber &&
+            item.workOrderNumber === rowValue.workOrderNumber &&
+            item.lrNumber === rowValue.lrNumber &&
+            item.transporter === rowValue.transporter
+          )
+      );
+    }
+
+    console.log('✅ Selected Items:', this.selectedItems);
+  }
+
+  isItemSelected(index: number): boolean {
+    const rowValue = (this.referenceItems.at(index) as FormGroup).value;
+
+    return this.selectedItems.some(
+      (item) =>
+        item.referenceNumber === rowValue.referenceNumber &&
+        item.workOrderNumber === rowValue.workOrderNumber &&
+        item.lrNumber === rowValue.lrNumber &&
+        item.transporter === rowValue.transporter
+    );
+  }
+
+  // Search functionality
+  onSearchReference() {
+    if (!this.searchReference?.trim()) {
+      Swal.fire('Please enter a value', '', 'warning');
+      return;
+    }
+
+    if (!this.selectedType) {
+      Swal.fire('Please select a search type', '', 'info');
+      return;
+    }
+
+    let payload: any = {
+      NUM: '',
+      INV_NO: '',
+      ODN_NO: '',
+      SO_NUM: '',
+      LR_NO: ''
+    };
+    payload[this.selectedType] = this.searchReference.trim();
+
+    console.log('🔍 Payload:', payload);
+
+    this.spinner.show();
+    this.service.global_Fields_SearchOption(payload).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        if (res.length > 0) {
+          this.searchOptionsList = res;
+          // Updated: Reset form data when search results are loaded
+          this.transitInfo.reset();
+          this.referenceItems.clear();
+          this.referenceItems.push(this.createReferenceRow());
+          this.selectedItems = []; 
+          
+          this.showForm = false;
+          Swal.fire('Data fetched successfully!', '', 'success');
+        } else {
+          Swal.fire('No records found', '', 'info');
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('❌ Error:', err);
+        Swal.fire('Error fetching data', '', 'error');
+      }
+    });
+  }
+
+  toggleDropdown() {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
+  selectSearchType(option: any) {
+    this.selectedType = option;
+    this.dropdownOpen = false;
+  }
+
+  onInputChange(type: 'purchase'): void {
+    // Updated: Removed 'invoice' type
+    const value = this.ponumber;
+    if (!value || value.trim() === '') {
+      this.showForm = false;
+    }
+  }
+
+  getForm(type: 'purchase'): void {
+    // Updated: Removed 'invoice' type and logic
+    const value = this.ponumber;
+    if (!value || value.trim() === '') return;
+    
+    // You can add API call here if needed to fetch transit info
+    this.showForm = true;
+
+    // Optional: Populate PO Number in the main form if fetched by the 'GET' button
+    this.transitInfo.get('ponumber')?.setValue(value);
+  }
+
   private formatDate(date: string): string {
     if (!date) return '';
     return date.split('T')[0];
@@ -108,7 +338,6 @@ export class TransitInfoComponent implements OnInit {
     return datetime;
   }
 
-  // ✅ SAVE BUTTON CLICK
   saveTransitInfo(action: 'stay' | 'next' | 'previous' = 'stay'): void {
     this.transitInfo.markAllAsTouched();
 
@@ -123,13 +352,39 @@ export class TransitInfoComponent implements OnInit {
       return;
     }
 
+    if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        text: 'Please select at least one reference row before saving'
+      });
+      return;
+    }
+    
+    // Check if Outward with SAP needs an Invoice Number or if it relies only on Reference Items.
+    // Assuming the Invoice Number field in transitInfo formGroup (which you left in the HTML) is filled via search or manual entry for the final save.
+    if (this.orderType === 'Outward' && !this.transitInfo.get('invoicenumber')?.value?.trim()) {
+         Swal.fire({
+            icon: 'warning',
+            text: 'Invoice Number is required for Outward orders. Please enter it in the form.',
+            timer: 4000
+        });
+        return;
+    }
+
+
     const formValue = this.transitInfo.value;
+    
+    // Updated: Now that the Outward input field is gone, we rely on the control value
+    const referenceNumber = this.orderType === 'Inward' ? 
+      this.transitInfo.get('ponumber')?.value : 
+      this.transitInfo.get('invoicenumber')?.value;
 
     const record = {
-      INV_NO: formValue.invoicenumber || '',
+      INV_NO: referenceNumber || '',
       PHY_ARRIVE_DEST: this.formatDate(formValue.physicalarrivedatdestinationdateandtime),
       UNLOADING_DT: this.formatDateTime(formValue.unloadingdateandtime),
-      POD_SCAN: this.formatDateTime(formValue.podscanreceiveddateandtime)
+      POD_SCAN: this.formatDateTime(formValue.podscanreceiveddateandtime),
+      ...(this.orderType === 'Outward' && this.selectedItems.length > 0 ? this.selectedItems[0] : {})
     };
 
     this.spinner.show();
@@ -162,13 +417,11 @@ export class TransitInfoComponent implements OnInit {
             timer: 3000
           }).then(() => {
             if (action === 'next') {
-              this.router.navigate(['/freight-billing']);   // ✅ Next screen
-            }
-            else if (action === 'previous') {
-              this.router.navigate(['/vechile-info']);      // ✅ Previous screen
-            }
-            else {
-              this.resetAll();  // ✅ Stay same screen
+              this.router.navigate(['/freight-billing']);
+            } else if (action === 'previous') {
+              this.router.navigate(['/vechile-info']);
+            } else {
+              this.resetAll();
             }
           });
         } else {
@@ -191,12 +444,27 @@ export class TransitInfoComponent implements OnInit {
     });
   }
 
-
-  // ✅ Reset helper
   resetAll(): void {
     this.transitInfo.reset();
+    this.referenceItems.clear();
+    this.referenceItems.push(this.createReferenceRow());
     this.showForm = false;
     this.orderType = '';
     this.sapType = '';
+    this.ponumber = '';
+    // Removed: this.invoicenumber = ''; 
+    this.searchOptionsList = [];
+    this.selectedItems = [];
+    this.searchReference = '';
+    this.selectedType = '';
+  }
+
+  cancelEdit(): void {
+    this.isEditMode = false;
+    this.resetAll();
+  }
+
+  isSap(): boolean {
+    return this.sapType === 'SAP';
   }
 }

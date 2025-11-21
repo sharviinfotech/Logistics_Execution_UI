@@ -21,7 +21,7 @@
     <br />
 
     <!-- SAP TYPE -->
-    <div *ngIf="orderType" class="sap-row" style="display: flex !important;">
+    <div *ngIf="orderType" class="sap-row" style="display: flex !important; margin-bottom: 10px;">
       <div class="form-radio optional sap-radio">
         <label>
           <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
@@ -29,10 +29,89 @@
         </label>
 
         <label>
-          <input type="radio" [(ngModel)]="sapType" value="Non-SSAP" (change)="onSapTypeChange()" />
+          <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
           <span>Without SAP</span>
         </label>
       </div>
+      <br />
+    </div>
+
+    <!-- Reference Table and Search (Only for Outward) -->
+    <div class="input-row" *ngIf="sapType && orderType === 'Outward'">
+
+      <!-- Reference Table (with FormArray) -->
+      <form [formGroup]="FreightBilling">
+        <div id="refTable" class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Select</th>
+                <th>Sl.No</th>
+                <th>Reference Number</th>
+                <th>Work Order Number</th>
+                <th>LR Number</th>
+                <th>Transporter</th>
+              </tr>
+            </thead>
+
+            <tbody formArrayName="referenceItems">
+              <tr *ngFor="let item of referenceItems.controls; let i = index" [formGroupName]="i">
+                <td>
+                  <input type="checkbox" (change)="onCheckboxChange($event, i)" [checked]="isItemSelected(i)" />
+                </td>
+
+                <td>{{ i + 1 }}</td>
+
+                <td>
+                  <input type="text" formControlName="referenceNumber" placeholder="Enter Ref. No."
+                    (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
+                    (keydown.tab)="onFieldBlur(i, 'REF_NO')" [readonly]="i !== 0" />
+                </td>
+
+                <td>
+                  <input type="text" formControlName="workOrderNumber" placeholder="Enter Work Order No."
+                    (blur)="onFieldBlur(i, 'WORK_ORDER_NO')" (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
+                    (keydown.tab)="onFieldBlur(i, 'WORK_ORDER_NO')" [readonly]="i !== 0" />
+                </td>
+
+                <td>
+                  <input type="text" formControlName="lrNumber" placeholder="Enter LR No."
+                    (blur)="onFieldBlur(i, 'LR_NO')" (keydown.enter)="onFieldBlur(i, 'LR_NO')"
+                    (keydown.tab)="onFieldBlur(i, 'LR_NO')" [readonly]="i !== 0" />
+                </td>
+
+                <td>
+                  <input type="text" formControlName="transporter" placeholder="Enter Transporter"
+                    (blur)="onFieldBlur(i, 'TRANSPORTER')" (keydown.enter)="onFieldBlur(i, 'TRANSPORTER')"
+                    (keydown.tab)="onFieldBlur(i, 'TRANSPORTER')" [readonly]="i !== 0" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </form>
+
+      <!-- Global Search Bar (Both SAP and Non-SAP for Outward) -->
+      <div class="input-row input-flex">
+        <div class="search-bar-wrapper-global">
+          <div class="search-container">
+            <div class="search-box">
+              <select class="search-type-select" [(ngModel)]="selectedType" name="searchType">
+                <option value="" disabled selected>Select</option>
+                <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
+              </select>
+
+              <input type="text" class="search-input" placeholder="Enter Reference / Invoice / ODN / SO Number"
+                [(ngModel)]="searchReference" name="searchReference" (keyup.enter)="onSearchReference()" />
+
+              <button type="button" class="search-btn-global" (click)="onSearchReference()">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- MAIN FORM -->
@@ -95,7 +174,7 @@
         Cancel
       </button>
 
-      <button class="btn btn-md btn-raised btnSave" (click)="saveFreightBilling()">
+      <button class="btn btn-md btn-raised btnSave" (click)="saveFreightBilling('stay')">
         Save
       </button>
 
@@ -111,6 +190,45 @@
   </div>
 </div>
 
+<!-- Search Results Table -->
+<div class="card" style="margin-top: 10px;" *ngIf="searchOptionsList?.length > 0">
+  <div class="card-body-LE">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped text-center">
+        <thead>
+          <tr>
+            <th>Ref No</th>
+            <th>Invoice No</th>
+            <th>ODN No</th>
+            <th>Freight Bill No</th>
+            <th>Freight Bill Date</th>
+            <th>Physical Submission Date</th>
+            <th>Freight Charges</th>
+            <th>Work Order</th>
+            <th>Bill Submission</th>
+            <th>LR No</th>
+            <th>Transporter</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of searchOptionsList">
+            <td>{{ item.ZREFNO || item.NUM || '-' }}</td>
+            <td>{{ item.ZINV_NO || item.INV_NO || '-' }}</td>
+            <td>{{ item.ZODN_NO || item.ODN_NO || '-' }}</td>
+            <td>{{ item.ZBILLNO || item.BILLNO || '-' }}</td>
+            <td>{{ item.ZBILLDATE || item.BILLDATE | date: 'dd-MM-yyyy' }}</td>
+            <td>{{ item.ZPHY_DATE || item.PHY_DATE | date: 'dd-MM-yyyy' }}</td>
+            <td>{{ item.ZFRT_CHARGES || item.FRT_CHARGES | number: '1.2-2' }}</td>
+            <td>{{ item.ZORDER_NO || item.ORDER_NO || '-' }}</td>
+            <td>{{ item.ZBILL_SUBMISSION || item.BILL_SUBMISSION || '-' }}</td>
+            <td>{{ item.ZLRNO || item.LR_NO || '-' }}</td>
+            <td>{{ item.ZTRANSPORTER || item.TRANSPORTER || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 <!-- ✅ MODAL FOR FREIGHT CALCULATION -->
 <ng-template #calculateTotalpopup let-c="close">

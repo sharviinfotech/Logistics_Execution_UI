@@ -196,9 +196,12 @@
 
       <!-- Invoice Date / Reference Date -->
       <div class="form-field">
-        <input type="date" formControlName="InvoiceeDate" placeholder=" " *ngIf="isSap()" />
-        <input type="date" formControlName="ReferenceDate" placeholder=" " *ngIf="!isSap()" />
-        <label>{{ isSap() ? 'Invoice Date' : 'Reference Date' }}</label>
+         <input 
+            type="date" 
+            [formControlName]="isSap() ? 'InvoiceDate' : 'ReferenceDate'" 
+            placeholder=" "
+          />
+          <label>{{ isSap() ? 'Invoice Date' : 'Reference Date' }}</label>
       </div>
 
       <!-- Basic Shipment -->
@@ -368,7 +371,7 @@
       </div>
 
       <!-- Destination Zone -->
-      <div class="form-field" [ngClass]="{'grayReadOnly': !isSap() && OrderInfo.value.DestinationZone}">
+      <div class="form-field" [ngClass]="{'grayReadOnly': isSap() && OrderInfo.value.DestinationZone}">
         <input type="text" formControlName="DestinationZone" readonly />
         <label>Destination Zone</label>
       </div>
