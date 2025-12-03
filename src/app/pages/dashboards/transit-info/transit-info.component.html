@@ -99,7 +99,7 @@
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
                   <option value="" disabled selected>Select</option>
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
@@ -119,7 +119,7 @@
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
                   <option value="" disabled selected>Select</option>
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
@@ -213,16 +213,16 @@
         </thead>
         <tbody>
           <tr *ngFor="let item of searchOptionsList">
-            <td>{{ item.ZREFNO || item.NUM || '-' }}</td>
-            <td>{{ item.ZINV_NO || item.INV_NO || '-' }}</td>
-            <td>{{ item.ZODN_NO || item.ODN_NO || '-' }}</td>
-            <td>{{ item.ZPHY_ARRIVE_DEST || item.PHY_ARRIVE_DEST | date: 'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZUNLOADING_DT || item.UNLOADING_DT || '-' }}</td>
-            <td>{{ item.ZPOD_SCAN || item.POD_SCAN || '-' }}</td>
-            <td>{{ item.ZSIT || item.SIT || '-' }}</td>
-            <td>{{ item.ZWORK_ORDER || item.WORK_ORDER_NO || '-' }}</td>
-            <td>{{ item.ZLRNO || item.LR_NO || '-' }}</td>
-            <td>{{ item.ZTRANSPORTER || item.TRANSPORTER || '-' }}</td>
+            <td>{{ item.ZREFNO }}</td>
+            <td>{{ item.ZINV_NO  }}</td>
+            <td>{{ item.ZODN_NO  }}</td>
+            <td>{{ item.ZPHY_ARRIVE_DEST  | date: 'dd-MM-yyyy' }}</td>
+            <td>{{ item.ZUNLOADING_DT }}</td>
+            <td>{{ item.ZPOD_SCAN }}</td>
+            <td>{{ item.ZSIT  }}</td>
+            <td>{{ item.ZWORK_ORDER  }}</td>
+            <td>{{ item.ZLRNO  }}</td>
+            <td>{{ item.ZTRANSPORTER  }}</td>
           </tr>
         </tbody>
       </table>

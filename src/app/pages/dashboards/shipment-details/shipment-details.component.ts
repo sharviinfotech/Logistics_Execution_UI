@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import{ Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, FormArray, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { GeneralserviceService } from 'src/app/generalservice.service';
 import { NgxSpinnerService, NgxSpinnerModule } from 'ngx-spinner';
 import Swal from 'sweetalert2';
+import { finalize } from 'rxjs/operators';
 import { SpinnerService } from 'src/app/spinner.service';
 import { Router } from '@angular/router';
 
@@ -24,24 +25,24 @@ export class ShipmentDetailsComponent implements OnInit {
   // Form and variables
   ProductInfo!: FormGroup;
   isEditMode = false;
-  showForm = false;
+ showForm = false; 
   orderType: string = '';
   sapType: string = '';
   ponumber: string = '';
   invoicenumber: string = '';
   TypeofmaterialList: any = [];
   IncotermsList: any[] = [];
-  Incoterms: string = '';
+  ZINCO: string = '';
   isAllSelected: boolean = false;
 
   selectedItems: any[] = [];
   searchReference: string = '';
-  searchOptions = [
-    { key: 'NUM', label: 'Reference No' },
-    { key: 'INV_NO', label: 'Invoice No' },
-    { key: 'ODN_NO', label: 'ODN No' },
-    { key: 'SO_NUM', label: 'SO No' },
-    { key: 'LR_NO', label: 'LR NO' }
+ searchOptions = [
+    { key: 'ref_no', label: 'Reference No' },
+    { key: 'inv_no', label: 'Invoice No' },
+    { key: 'odn_no', label: 'ODN No' },
+    { key: 'so_no', label: 'SO No' },
+    { key: 'lr_no', label: 'LR NO' }
   ];
   selectedType: any = '';
   searchOptionsList: any[] = [];
@@ -60,13 +61,13 @@ export class ShipmentDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.ProductInfo = this.fb.group({
-      Incoterms: ['', Validators.required],
-      InsuranceScope: ['', Validators.required],
-      Kilometres: [null, [Validators.required, Validators.min(0)]],
+      ZINCO: ['', Validators.required],
+      ZINS_SCPOE: ['', Validators.required],
+      ZKM: [null, [Validators.required, Validators.min(0)]],
       items: this.fb.array([this.createItemRow()]),
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
-    this.fetchTypeofmaterial();
+    
     this.fetchIncoterms();
   }
 
@@ -84,23 +85,48 @@ export class ShipmentDetailsComponent implements OnInit {
   createItemRow(): FormGroup {
     return this.fb.group({
       selected: [false],
-      Product: ['', Validators.required],
-      TypeOfMaterial: ['', Validators.required],
-      MaterialDescription: ['', Validators.required],
-      Noofseats: [null, [Validators.required, Validators.min(1)]],
-      AhLoadedInTruck: [null, [Validators.required, Validators.min(0)]],
-      ShipmentWeight: [null, [Validators.required, Validators.min(0)]],
-      BatteryCondition: ['']
+      ZMAPID: [''],
+      ZPRODUCT: ['', Validators.required],
+      MTBEZ: ['', Validators.required],
+      MAKTX: ['', Validators.required],
+      ZSETS: [null, [Validators.required, Validators.min(1)]],
+      ZAH: [null, [Validators.required, Validators.min(0)]], 
+      ZSHIP_WT: [null, [Validators.required, Validators.min(0)]],
+     ZBATCOND : [''],
+      MANDT: [''],
+        ZREFNO: [''],
+        ZLINE_NO: [''],
+        VBELN: [''],
+        POSNR: [''],
+        ZSO_NO: [''],
+        ZODN_NO: [''],
+        MTART: [''],          
+        ZINS_SCPOE: [''],
+        ZPIN_PLT: [''],
+        ZPIN_STP: [''],
+        ZKM: [''],
+        ZWORK_ORDER:[''],
+        ZLRNO: [''],
+        ZTRANSPORTER: [''],
+
     });
   }
+
+  
 
   // Create one reference row
   createReferenceRow(): FormGroup {
     return this.fb.group({
+      MAPID: [''],
       referenceNumber: [''],
       workOrderNumber: [''],
       lrNumber: [''],
-      transporter: ['']
+      transporter: [''],
+      soNumber: [''],        // Sales Order Number
+      odnNumber: [''],       // ODN Number
+      materialType: [''],    // Material Type (MTART)
+      plantCode: [''],       // Plant Code (ZPIN_PLT)
+      shippingPoint: ['']    // Shipping Point (ZPIN_STP)
     });
   }
 
@@ -177,6 +203,7 @@ export class ShipmentDetailsComponent implements OnInit {
     const values = firstRow.value;
 
     if (
+      
       !values.referenceNumber &&
       !values.workOrderNumber &&
       !values.lrNumber &&
@@ -188,6 +215,7 @@ export class ShipmentDetailsComponent implements OnInit {
     }
 
     const obj = {
+     
       REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
@@ -217,10 +245,16 @@ export class ShipmentDetailsComponent implements OnInit {
       data.forEach(d => {
         this.referenceItems.push(
           this.fb.group({
-            referenceNumber: [d.REF_NO || ''],
-            workOrderNumber: [d.WORK_ORDER_NO || ''],
-            lrNumber: [d.LR_NO || ''],
-            transporter: [d.TRANSPORTER || '']
+            MAPID: [d.MAPID   ],
+            referenceNumber: [d.REF_NO || d.referenceNumber || ''],
+            workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
+            lrNumber: [d.LR_NO || d.lrNumber || ''],
+            transporter: [d.TRANSPORTER || d.transporter || ''],
+            soNumber: [d.SO_NO || d.soNumber || ''],        // Sales Order Number
+            odnNumber: [d.ODN_NO || d.odnNumber || ''],     // ODN Number
+            materialType: [d.MTART || d.materialType || ''], // Material Type
+            plantCode: [d.PLANT_CODE || d.ZPIN_PLT || d.plantCode || ''],  // Plant Code
+            shippingPoint: [d.SHIPPING_POINT || d.ZPIN_STP || d.shippingPoint || '']  // Shipping Point
           })
         );
       });
@@ -237,6 +271,29 @@ export class ShipmentDetailsComponent implements OnInit {
     }
   }
 
+  onchangeMAPID(index: number) {
+  const rowForm = this.items.at(index) as FormGroup;
+  const selectedMapId = rowForm.get('ZMAPID')?.value;
+  console.log("Selected MAPID:", selectedMapId);
+
+  // Find object based on selected MAPID
+  const selectedObj = this.selectedItems.find(item => item.MAPID == selectedMapId);
+
+  console.log("Selected MAPID object:", selectedObj);
+
+  if (selectedObj) {
+    rowForm.patchValue({
+      ZREFNO: selectedObj.referenceNumber || "",
+      ZWORK_ORDER: selectedObj.workOrderNumber || "",
+      ZLRNO: selectedObj.lrNumber || "",
+      ZTRANSPORTER: selectedObj.transporter || "",
+      ZMAPID: selectedObj.MAPID || ""
+    });
+  }
+  console.log("Updated items form:", this.items.value);
+}
+
+
   onCheckboxChange(event: Event, index: number): void {
     const checkbox = event.target as HTMLInputElement;
     const rowValue = (this.referenceItems.at(index) as FormGroup).value;
@@ -244,10 +301,13 @@ export class ShipmentDetailsComponent implements OnInit {
     if (checkbox.checked) {
       const exists = this.selectedItems.some(
         (item) =>
+          item.MAPID === rowValue.MAPID && 
           item.referenceNumber === rowValue.referenceNumber &&
           item.workOrderNumber === rowValue.workOrderNumber &&
           item.lrNumber === rowValue.lrNumber &&
-          item.transporter === rowValue.transporter
+          item.transporter === rowValue.transporter &&
+          item.soNumber === rowValue.soNumber &&
+          item.odnNumber === rowValue.odnNumber
       );
       if (!exists) {
         this.selectedItems.push(rowValue);
@@ -256,10 +316,13 @@ export class ShipmentDetailsComponent implements OnInit {
       this.selectedItems = this.selectedItems.filter(
         (item) =>
           !(
+            item.MAPID === rowValue.MAPID &&
             item.referenceNumber === rowValue.referenceNumber &&
             item.workOrderNumber === rowValue.workOrderNumber &&
             item.lrNumber === rowValue.lrNumber &&
-            item.transporter === rowValue.transporter
+            item.transporter === rowValue.transporter &&
+            item.soNumber === rowValue.soNumber &&
+            item.odnNumber === rowValue.odnNumber
           )
       );
     }
@@ -272,55 +335,82 @@ export class ShipmentDetailsComponent implements OnInit {
 
     return this.selectedItems.some(
       (item) =>
+        item.MAPID === rowValue.MAPID &&
         item.referenceNumber === rowValue.referenceNumber &&
         item.workOrderNumber === rowValue.workOrderNumber &&
         item.lrNumber === rowValue.lrNumber &&
-        item.transporter === rowValue.transporter
+        item.transporter === rowValue.transporter &&
+        item.soNumber === rowValue.soNumber &&
+        item.odnNumber === rowValue.odnNumber
     );
   }
 
-  // Search functionality
-  onSearchReference() {
-    if (!this.searchReference?.trim()) {
-      Swal.fire('Please enter a value', '', 'warning');
-      return;
-    }
-
-    if (!this.selectedType) {
-      Swal.fire('Please select a search type', '', 'info');
-      return;
-    }
-
-    let payload: any = {
-      NUM: '',
-      INV_NO: '',
-      ODN_NO: '',
-      SO_NUM: '',
-      LR_NO: ''
-    };
-    payload[this.selectedType] = this.searchReference.trim();
-
-    console.log('🔍 Payload:', payload);
-
-    this.spinner.show();
-    this.service.global_Fields_SearchOption(payload).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        if (res.length > 0) {
-          this.searchOptionsList = res;
-          this.showForm = false;
-          Swal.fire('Data fetched successfully!', '', 'success');
-        } else {
-          Swal.fire('No records found', '', 'info');
-        }
-      },
-      error: (err) => {
-        this.spinner.hide();
-        console.error('❌ Error:', err);
-        Swal.fire('Error fetching data', '', 'error');
-      }
-    });
+   onSearchTypeChange(): void {
+    // Reset data when search type changes
+    this.searchReference = '';
+    this.searchOptionsList = [];
+    this.showForm = false;
+    console.log('🔄 Search type changed. Data reset.');
   }
+
+  // Search functionality
+   onSearchReference() {
+      if (!this.searchReference?.trim()) {
+        Swal.fire('Please enter a value', '', 'warning');
+        return;
+      }
+  
+      if (!this.selectedType) {
+        Swal.fire('Please select a search type', '', 'info');
+        return;
+      }
+      let payload1: any = {
+       
+      "global": "SHIPMENT DETAILS",
+      "data": {
+          "ref_no": "",
+          "inv_no": "",
+          "so_no": "",
+          "transporter": "",
+          "lr_no": "",
+          "workorder_no": "",
+          "sales_person": "",
+          "location": "",
+          "odn_no": "",
+          "vehicle_no": "",
+          "freight_billno": "",
+          "nature_damage": "",
+          "claim_status": ""   
+      }
+      };
+      payload1.data[this.selectedType] = this.searchReference.trim();
+  
+      console.log('🔍 Payload1:', payload1);
+      this.spinner.show();
+      this.service.global_Fields_SearchOption(payload1).subscribe({
+        next: (res: any) => {
+          this.spinner.hide();
+          console.log('✅ Search Response:', res);
+          if (res.NUMBER == "100" && res.STATUS == "FALSE") {
+            this.searchOptionsList = [];
+           
+           
+            Swal.fire('', res.MESSAGE, 'warning');
+          } else {
+            Swal.fire('No records found', '', 'info');
+             this.searchOptionsList = res.HEADER;
+            this.showForm = false;
+           
+            Swal.fire('Data fetched successfully!', '', 'success');
+          }
+        },
+        error: (err) => {
+          this.spinner.hide();
+          console.error('❌ Error:', err);
+          Swal.fire('Error fetching data', '', 'error');
+        }
+      });
+    }
 
   // Product checkbox methods
   allSelected(): boolean {
@@ -336,6 +426,7 @@ export class ShipmentDetailsComponent implements OnInit {
 
   onRowCheckboxChange(): void {
     this.isAllSelected = this.allSelected();
+    console.log('All Selected:', this.items.value);
   }
 
   getSelectedRows() {
@@ -370,21 +461,37 @@ export class ShipmentDetailsComponent implements OnInit {
           this.items.clear();
           
           this.ProductInfo.patchValue({
-            Incoterms: firstItem.ZINCO || '',
-            InsuranceScope: firstItem.ZINS_SCPOE || '',
-            Kilometres: firstItem.ZKM !== null && firstItem.ZKM !== undefined ? firstItem.ZKM : null
+            ZINCO: firstItem.ZINCO || '',
+            ZINS_SCPOE: firstItem.ZINS_SCPOE || '',
+            ZKM: firstItem.ZKM !== null && firstItem.ZKM !== undefined ? firstItem.ZKM : null
           });
 
           result.forEach((item: any) => {
             this.items.push(this.fb.group({
               selected: [false],
-              Product: [item.ZPRODUCT || ''],
-              TypeOfMaterial: [item.MTBEZ || ''],
-              MaterialDescription: [item.MAKTX || ''],
-              Noofseats: [item.ZSETS || 0, [Validators.min(1)]],
-              AhLoadedInTruck: [item.ZAH || 0],
-              ShipmentWeight: [item.ZSHIP_WT || 0],
-              BatteryCondition: [item.ZBATCOND || '']
+              ZPRODUCT: [item.ZPRODUCT || ''],
+              MTBEZ: [item.MTBEZ || ''],
+              MAKTX: [item.MAKTX || ''],
+              ZSETS: [item.ZSETS || 0, [Validators.min(1)]],
+              ZAH: [item.ZAH || 0],
+              ZSHIP_WT: [item.ZSHIP_WT || 0],
+              ZBATCOND: [item.ZBATCOND || ''],
+              MANDT: [item.MANDT || ''],
+              ZREFNO: [item.ZREFNO || ''],
+              ZLINE_NO: [item.ZLINE_NO || ''],
+              VBELN: [item.VBELN || ''],
+              POSNR: [item.POSNR || ''],
+              ZSO_NO: [item.ZSO_NO || ''],
+              ZODN_NO: [item.ZODN_NO || ''],
+              MTART: [item.MTART || ''],
+              ZINS_SCPOE: [item.ZINS_SCPOE || ''],
+              ZPIN_PLT: [item.ZPIN_PLT || ''],
+              ZPIN_STP: [item.ZPIN_STP || ''],
+              ZKM: [item.ZKM || 0],
+              ZWORK_ORDER: [item.ZWORK_ORDER || ''],
+              ZLRNO: [item.ZLRNO || ''],
+              ZTRANSPORTER: [item.ZTRANSPORTER || ''],
+              ZMAPID: [ '']
             }));
           });
           
@@ -415,104 +522,126 @@ export class ShipmentDetailsComponent implements OnInit {
   }
 
   // Save functionality
-  saveShipmentOutward(action: 'stay' | 'next' | 'previous' = 'stay'): void {
-    const selectedProductRows = this.getSelectedRows();
-    const selectedReferenceRows = this.referenceItems.controls
-      .filter((_, idx) => this.isItemSelected(idx))
-      .map(item => item.value);
+ saveShipmentOutward(action: 'stay' | 'next' | 'previous' = 'stay'): void {
+  const filtered = this.items.value
+  .filter((row: any) => row.selected === true)
+  .map(({ selected, ...rest }) => rest);  // remove selected key
 
-    if (selectedProductRows.length === 0) {
-      Swal.fire({
-        title: 'Warning',
-        text: 'Please select at least one product row to save.',
-        icon: 'warning',
-        timer: 3000,
-        showConfirmButton: false
-      });
-      return;
-    }
+    console.log(filtered);
 
-    if (this.orderType === 'Outward' && selectedReferenceRows.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        text: 'Please select at least one reference row before saving'
-      });
-      return;
-    }
 
-    const commonFields = {
-      Incoterms: this.ProductInfo.get('Incoterms')?.value,
-      InsuranceScope: this.ProductInfo.get('InsuranceScope')?.value,
-      Kilometres: this.ProductInfo.get('Kilometres')?.value
-    };
+  if (filtered.length === 0) {
+    Swal.fire({
+      title: 'Warning',
+      text: 'Please select at least one product row to save.',
+      icon: 'warning',
+      timer: 3000,
+      confirmButtonText: 'Ok',
+    });
+    return;
+  }
 
-    const cleanedRows = selectedProductRows.map(({ selected, ...rest }) => ({
-      ...rest,
-      ...commonFields,
-      ...(this.orderType === 'Outward' && selectedReferenceRows.length > 0 ? selectedReferenceRows[0] : {})
-    }));
+  if (this.orderType === 'Outward' && filtered.length === 0) {
+    Swal.fire({
+      icon: 'warning',
+      text: 'Please select at least one reference row before saving'
+    });
+    return;
+  }
 
-    console.log("Saving selected rows:", cleanedRows);
-    this.spinner.show();
+  const formValue = this.ProductInfo.value;
 
-    const saveOperation = this.sapType === 'SAP'
-      ? this.service.ShipmentOutwardSave(cleanedRows)
-      : this.service.shipmentdetailsNonSapSave(cleanedRows);
+  const commonFields = {
+    ZINCO: this.ProductInfo.get('ZINCO')?.value || '',
+    ZINS_SCPOE: this.ProductInfo.get('ZINS_SCPOE')?.value || '',
+    ZKM: this.ProductInfo.get('ZKM')?.value || 0
+  };
 
-    saveOperation.subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        
-        if (res.NUMBER == "200") {
-          Swal.fire({
-            title: 'Success',
-            text: res.MSG || 'Selected rows saved successfully!',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-          }).then(() => {
-            if (action === 'next') {
-              this.router.navigate(['/invoice-load-details']);
-            } else if (action === 'previous') {
-              this.router.navigate(['/order-info']);
-            } else {
-              this.resetForm();
-            }
-          });
-        } else {
-          Swal.fire({
-            title: 'Error',
-            text: res.MSG || 'Save Failed',
-            icon: 'error',
-            confirmButtonText: 'Ok'
-          });
-        }
-      },
-      error: (err) => {
-        this.spinner.hide();
-        console.error("Save Error:", err);
+  // Map each selected product row with corresponding reference data
+  // const cleanedRows = selectedProductRows.map((row, index) => {
+   
+  //   const referenceData = this.orderType === 'Outward' && selectedReferenceRows.length > 0 
+  //     ? (selectedReferenceRows[index] || selectedReferenceRows[0])
+  //     : {};
+
+  //   return {
+  //     MANDT: "", // Set appropriate MANDT value
+  //     ZREFNO: referenceData.referenceNumber || "",
+  //     ZLINE_NO: index + 1,
+  //     VBELN: this.invoicenumber || "",
+  //     POSNR: index + 1, 
+  //     ZSO_NO: referenceData.soNumber || "",
+  //     ZODN_NO: referenceData.odnNumber || "",
+  //     ZPRODUCT: row.Product || "",
+  //     MTART: row.MTART || row.materialType || "",
+  //     MTBEZ: row.MTBEZ || "",
+  //     MAKTX: row.MAKTX || "",
+  //     ZSETS: row.ZSETS || 0,
+  //     ZAH: row.ZAH || 0,
+  //     ZSHIP_WT: row.ZSHIP_WT || 0,
+  //     ZBATCOND: row.ZBATCOND || "",
+  //     ZINCO: commonFields.ZINCO,
+  //     ZINS_SCPOE: commonFields.ZINS_SCPOE,
+  //    ZPIN_PLT:  referenceData.plantCode || "",
+  //      ZPIN_STP:  referenceData.shippingPoint || "",
+  //     ZKM: commonFields.ZKM,
+  //     ZWORK_ORDER: referenceData.workOrderNumber || "",
+  //     ZLRNO: referenceData.lrNumber || "",
+  //     ZTRANSPORTER: referenceData.transporter || "",
+  //     ZMAPID: referenceData.MAPID || row.MAPID || "" 
+  //   };
+  // });
+
+  console.log("📤 Saving payload:", filtered);
+  
+  this.spinner.show();
+  
+  // Send as array directly (based on your API request format)
+  this.service.ShipmentOutwardSave(filtered).subscribe({
+    next: (res: any) => {
+      this.spinner.hide();
+      console.log("✅ SAP Save Response:", res);
+      
+      if (res.NUMBER === '200' && res.MSG) {
+        Swal.fire({
+          title: 'Success',
+          text: res.MSG,
+          icon: 'success',
+          confirmButtonText: 'Ok',
+        }).then(() => {
+          if (action === 'next') {
+            this.router.navigate(['/invoice-load-details']);
+          } else if (action === 'previous') {
+            this.router.navigate(['/order-info']);
+          } else {
+            // Optionally reset form or refresh data
+            this.resetForm();
+          }
+        });
+      } else {
         Swal.fire({
           title: 'Error',
-          text: 'Something went wrong while saving shipment details.',
+          text: res.MSG || 'Failed to save data',
           icon: 'error',
           confirmButtonText: 'Ok'
         });
       }
-    });
-  }
+    },
+    error: (err) => {
+      this.spinner.hide();
+      console.error("❌ Error saving shipment details:", err);
+      Swal.fire({
+        title: 'Error',
+        text: 'Failed to save shipment details.',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
+    }
+  });
+}
+  
 
-  fetchTypeofmaterial() {
-    this.spinner.show();
-    this.service.getTypeofmaterial().subscribe({
-      next: (res: any) => {
-        this.TypeofmaterialList = Array.isArray(res) ? res : (res?.data || []);
-        this.spinner.hide();
-      },
-      error: (err) => {
-        console.error("Error fetching Type of Material:", err);
-        this.spinner.hide();
-      }
-    });
-  }
+  
 
   fetchIncoterms() {
     this.spinner.show();
@@ -547,20 +676,20 @@ export class ShipmentDetailsComponent implements OnInit {
           this.items.clear();
           const firstItem = res[0];
           this.ProductInfo.patchValue({
-            Incoterms: firstItem.ZINCO || '',
-            InsuranceScope: firstItem.ZINS_SCPOE || '',
-            Kilometres: firstItem.ZKM || 0
+            ZINCO: firstItem.ZINCO || '',
+            ZINS_SCPOE: firstItem.ZINS_SCPOE || '',
+            ZKM: firstItem.ZKM || 0
           });
           res.forEach((item: any) => {
             this.items.push(this.fb.group({
               selected: [false],
-              Product: [item.ZPRODUCT || ''],
-              TypeOfMaterial: [item.MTART || ''],
-              MaterialDescription: [item.MAKTX || ''],
-              Noofseats: [item.ZSETS || 0, [Validators.min(1)]],
-              AhLoadedInTruck: [item.ZAH || 0],
-              ShipmentWeight: [item.ZSHIP_WT || 0],
-              BatteryCondition: [item.ZBATCOND || '']
+              ZPRODUCT: [item.ZPRODUCT || ''],
+              MTART: [item.MTART || ''],
+              MAKTX: [item.MAKTX || ''],
+              ZSETS: [item.ZSETS || 0, [Validators.min(1)]],
+              ZAH: [item.ZAH || 0],
+              ZSHIP_WT: [item.ZSHIP_WT || 0],
+              ZBATCOND: [item.ZBATCOND || '']
             }));
           });
           this.showForm = true;
@@ -594,6 +723,6 @@ export class ShipmentDetailsComponent implements OnInit {
 
   selectSearchType(option: any) {
     this.selectedType = option;
-    this.dropdownOpen = false;
-  }
+this.dropdownOpen = false;
+}
 }

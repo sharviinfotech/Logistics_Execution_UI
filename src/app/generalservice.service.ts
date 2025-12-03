@@ -149,6 +149,9 @@ export class GeneralserviceService {
   getTypeofmaterial() {
     return this.http.get<any>(environment.baseUrl + 'api/external/LE/ShipmentDetails/Nonsap/f4_Typeofmaterial');
   }
+   PlantBasedDivison(obj) {
+     return this.http.put(environment.baseUrl + 'api/external/LE/orderInfo/Outward/withoutsap/PlantBasedDivison', obj);
+  }
   Incoterms(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/ShipmentDetails/Nonsap/f4_Incoterms', obj);
   }
@@ -259,10 +262,10 @@ export class GeneralserviceService {
   }
 
    GlobalReferenceNoFetch(obj) {
-    return this.http.post(environment.baseUrl + 'api/external//LE/orderinfo/GlobalReferenceNoFetch', obj);
+    return this.http.post(environment.baseUrl + 'api/external/LE/orderinfo/GlobalReferenceNoFetch', obj);
   }
    global_Fields_SearchOption(obj) {
-    return this.http.post(environment.baseUrl + 'api/external//LE/orderinfo/global_Fields_SearchOption', obj);
+    return this.http.post(environment.baseUrl + 'api/external/LE/orderinfo/global_Fields_SearchOption', obj);
   }
 
 

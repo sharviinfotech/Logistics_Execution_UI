@@ -17,6 +17,7 @@ export class VechileInfoComponent implements OnInit {
 
   VehicleForm!: FormGroup;
   orderType: string = '';
+  showForm = false; 
   sapType: string = '';
   invoicenumber: string = '';
   ponumber: string = '';
@@ -29,12 +30,19 @@ export class VechileInfoComponent implements OnInit {
   selectedItems: any[] = [];
   searchReference: string = '';
   searchOptions = [
-    { key: 'NUM', label: 'Reference No' },
-    { key: 'INV_NO', label: 'Invoice No' },
-    { key: 'ODN_NO', label: 'ODN No' },
-    { key: 'SO_NUM', label: 'SO No' },
-    { key: 'LR_NO', label: 'LR NO' }
-  ];
+    { key: 'ref_no', label: 'Reference No' },
+    { key: 'inv_no', label: 'Invoice No' },
+    { key: 'odn_no', label: 'ODN No' },
+    { key: 'so_no', label: 'SO No' },
+    { key: 'transporter', label: 'Transporter' },
+    { key: 'lr_no', label: 'LR NO' },
+    { key: 'workorder_no', label: 'Workorder No' },
+    {key :"sales_person",label: 'Sales Person'},
+    {key :"location",label: 'Location'},
+    {key :"vehicle_no",label: 'Vehicle No'},
+
+ 
+  ]
   selectedType: any = '';
   searchOptionsList: any[] = [];
   dropdownOpen = false;
@@ -281,6 +289,14 @@ export class VechileInfoComponent implements OnInit {
     );
   }
 
+   onSearchTypeChange(): void {
+    // Reset data when search type changes
+    this.searchReference = '';
+    this.searchOptionsList = [];
+    this.showForm = false;
+    console.log('🔄 Search type changed. Data reset.');
+  }
+
   // Search functionality
   onSearchReference() {
     if (!this.searchReference?.trim()) {
@@ -293,24 +309,38 @@ export class VechileInfoComponent implements OnInit {
       return;
     }
 
-    let payload: any = {
-      NUM: '',
-      INV_NO: '',
-      ODN_NO: '',
-      SO_NUM: '',
-      LR_NO: ''
-    };
-    payload[this.selectedType] = this.searchReference.trim();
 
-    console.log('🔍 Payload:', payload);
+    let payload1: any = {
+     
+    "global": "VEHICLE INFO",
+    "data": {
+        "ref_no": "",
+        "inv_no": "",
+        "so_no": "",
+        "transporter": "",
+        "lr_no": "",
+        "workorder_no": "",
+        "sales_person": "",
+        "location": "",
+        "odn_no": "",
+        "vehicle_no": "",
+        "freight_billno": "",
+        "nature_damage": "",
+        "claim_status": ""
+   
+    }
+    };
+    payload1.data[this.selectedType] = this.searchReference.trim();
+
+    console.log('🔍 Payload:', payload1);
 
     this.spinner.show();
-    this.service.global_Fields_SearchOption(payload).subscribe({
+    this.service.global_Fields_SearchOption(payload1).subscribe({
       next: (res: any) => {
         this.spinner.hide();
         if (res.length > 0) {
           this.searchOptionsList = res;
-          this.showTable = false;
+          this.showForm = false;
           Swal.fire('Data fetched successfully!', '', 'success');
         } else {
           Swal.fire('No records found', '', 'info');

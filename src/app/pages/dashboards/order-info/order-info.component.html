@@ -134,7 +134,7 @@
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
                   <option value="" disabled selected>Select</option>
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
@@ -155,7 +155,7 @@
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
                   <option value="" disabled selected>Select</option>
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
@@ -257,6 +257,9 @@
         <label>Plant</label>
       </div>
 
+      <!-- Division (Auto-populated) -->
+      
+
       <!-- Transaction Type -->
       <div class="form-field">
         <select formControlName="TransactionType">
@@ -332,9 +335,28 @@
       </div>
 
       <!-- Customer -->
-      <div class="form-field">
-        <input type="text" formControlName="Customer" placeholder=" " />
-        <label>Customer</label>
+      <!-- Customer Field with ng-select for better performance -->
+      <div class="form-field" [class.filled]="OrderInfo.get('Customer')?.value">
+        <ng-container *ngIf="!isSap(); else sapCustomer">
+          <ng-select 
+            [items]="customerList" 
+            bindLabel="CUSTOMER_NAME" 
+            bindValue="CUSTOMER_NAME"
+            formControlName="Customer" 
+            [searchable]="true" 
+            [virtualScroll]="true" 
+            placeholder="Select Customer"
+            (change)="onCustomerChange()"
+            class="w-full">
+            <ng-template ng-option-tmp let-item="item">
+              {{ item.CUSTOMER }} - {{ item.CUSTOMER_NAME }}
+            </ng-template>
+          </ng-select>
+        </ng-container>
+        <ng-template #sapCustomer>
+          <input type="text" formControlName="Customer" readonly />
+        </ng-template>
+        <label>Customer Name</label>
       </div>
 
       <!-- Customer Group -->
@@ -345,8 +367,26 @@
 
       <!-- C/nee -->
       <div class="form-field">
-        <input type="text" formControlName="CNee" placeholder=" " />
-        <label>C/nee</label>
+        <ng-container *ngIf="!isSap(); else sapCnee">
+          <ng-select 
+            [items]="customerList" 
+            bindLabel="CUSTOMER_NAME" 
+            bindValue="CUSTOMER_NAME"
+            formControlName="CNee" 
+            [searchable]="true" 
+            [virtualScroll]="true" 
+            placeholder="Select Consignee"
+            (change)="onCneeeChange()"
+            class="w-full">
+            <ng-template ng-option-tmp let-item="item">
+              {{ item.CUSTOMER }} - {{ item.CUSTOMER_NAME }}
+            </ng-template>
+          </ng-select>
+        </ng-container>
+        <ng-template #sapCnee>
+          <input type="text" formControlName="CNee" readonly />
+        </ng-template>
+        <label>Consignee Name</label>
       </div>
 
       <!-- Destination Location -->
@@ -370,7 +410,7 @@
         <label>Designation State</label>
       </div>
 
-      <!-- Destination Zone -->
+     
       <div class="form-field" [ngClass]="{'grayReadOnly': isSap() && OrderInfo.value.DestinationZone}">
         <input type="text" formControlName="DestinationZone" readonly />
         <label>Destination Zone</label>

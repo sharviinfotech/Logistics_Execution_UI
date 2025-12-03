@@ -96,7 +96,7 @@
         <div class="search-bar-wrapper-global">
           <div class="search-container">
             <div class="search-box">
-              <select class="search-type-select" [(ngModel)]="selectedType" name="searchType">
+              <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
                 <option value="" disabled selected>Select</option>
                 <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
               </select>
@@ -212,17 +212,17 @@
         </thead>
         <tbody>
           <tr *ngFor="let item of searchOptionsList">
-            <td>{{ item.ZREFNO || item.NUM || '-' }}</td>
-            <td>{{ item.ZINV_NO || item.INV_NO || '-' }}</td>
-            <td>{{ item.ZODN_NO || item.ODN_NO || '-' }}</td>
-            <td>{{ item.ZBILLNO || item.BILLNO || '-' }}</td>
-            <td>{{ item.ZBILLDATE || item.BILLDATE | date: 'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZPHY_DATE || item.PHY_DATE | date: 'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZFRT_CHARGES || item.FRT_CHARGES | number: '1.2-2' }}</td>
-            <td>{{ item.ZORDER_NO || item.ORDER_NO || '-' }}</td>
-            <td>{{ item.ZBILL_SUBMISSION || item.BILL_SUBMISSION || '-' }}</td>
-            <td>{{ item.ZLRNO || item.LR_NO || '-' }}</td>
-            <td>{{ item.ZTRANSPORTER || item.TRANSPORTER || '-' }}</td>
+            <td>{{ item.ZREFNO  }}</td>
+            <td>{{ item.ZINV_NO  }}</td>
+            <td>{{ item.ZODN_NO  }}</td>
+            <td>{{ item.ZBILLNO  }}</td>
+            <td>{{ item.ZBILLDATE | date: 'dd-MM-yyyy' }}</td>
+            <td>{{ item.ZPHY_DATE  | date: 'dd-MM-yyyy' }}</td>
+            <td>{{ item.ZFRT_CHARGES  | number: '1.2-2' }}</td>
+            <td>{{ item.ZORDER_NO }}</td>
+            <td>{{ item.ZBILL_SUBMISSION  }}</td>
+            <td>{{ item.ZLRNO  }}</td>
+            <td>{{ item.ZTRANSPORTER  }}</td>
           </tr>
         </tbody>
       </table>

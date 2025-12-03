@@ -121,7 +121,7 @@
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
                   <option value="" disabled selected>Select</option>
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
@@ -142,7 +142,7 @@
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
                   <option value="" disabled selected>Select</option>
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
@@ -241,20 +241,20 @@
         </thead>
         <tbody>
           <tr *ngFor="let item of searchOptionsList">
-            <td>{{ item.ZREFNO || item.NUM || '-' }}</td>
-            <td>{{ item.ZINV_NO || item.INV_NO || '-' }}</td>
-            <td>{{ item.ZODN_NO || item.ODN_NO || '-' }}</td>
-            <td>{{ item.ZTRX_TYPE || item.TYPE_SHIPMENT || '-' }}</td>
-            <td>{{ item.ZTRANSPOTER || item.TRANSPORTER || '-' }}</td>
-            <td>{{ item.ZLRNO || item.LR_NO || '-' }}</td>
-            <td>{{ item.ZTRUC_TYPE || item.VEHICLE_TYPE || '-' }}</td>
-            <td>{{ item.ZTRUC_WT || item.PASSING_WEIGHT || '-' }}</td>
-            <td>{{ item.ZTRUC_VOL || item.TRUCK_VOLUME || '-' }}</td>
-            <td>{{ item.ZVEH_NUM || item.VEHICLE_NUMBER || '-' }}</td>
-            <td>{{ item.ZNOOFVEH || item.NO_OF_VEHICLES || '-' }}</td>
-            <td>{{ item.ZDNAME || item.DRIVER_NAME || '-' }}</td>
-            <td>{{ item.ZDNUMBER || item.DRIVER_MOBILE || '-' }}</td>
-            <td>{{ item.ZWORK_ORDER || item.WORK_ORDER_NO || '-' }}</td>
+            <td>{{ item.ZREFNO }}</td>
+            <td>{{ item.ZINV_NO  }}</td>
+            <td>{{ item.ZODN_NO  }}</td>
+            <td>{{ item.ZTRX_TYPE  }}</td>
+            <td>{{ item.ZTRANSPOTER }}</td>
+            <td>{{ item.ZLRNO  }}</td>
+            <td>{{ item.ZTRUC_TYPE  }}</td>
+            <td>{{ item.ZTRUC_WT  }}</td>
+            <td>{{ item.ZTRUC_VOL  }}</td>
+            <td>{{ item.ZVEH_NUM  }}</td>
+            <td>{{ item.ZNOOFVEH  }}</td>
+            <td>{{ item.ZDNAME  }}</td>
+            <td>{{ item.ZDNUMBER  }}</td>
+            <td>{{ item.ZWORK_ORDER  }}</td>
           </tr>
         </tbody>
       </table>

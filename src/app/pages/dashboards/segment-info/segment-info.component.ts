@@ -48,11 +48,11 @@ export class SegmentInfoComponent implements OnInit {
   selectedItems: any[] = [];
   searchReference: string = '';
   searchOptions = [
-    { key: 'NUM', label: 'Reference No' },
-    { key: 'INV_NO', label: 'Invoice No' },
-    { key: 'ODN_NO', label: 'ODN No' },
-    { key: 'SO_NUM', label: 'SO No' },
-    { key: 'LR_NO', label: 'LR NO' }
+    { key: 'ref_no', label: 'Reference No' },
+    { key: 'inv_no', label: 'Invoice No' },
+    { key: 'odn_no', label: 'ODN No' },
+    { key: 'so_no', label: 'SO No' },
+    { key: 'lr_no', label: 'LR NO' }
   ];
   selectedType: any = '';
   searchOptionsList: any[] = [];
@@ -336,49 +336,72 @@ export class SegmentInfoComponent implements OnInit {
         item.transporter === rowValue.transporter
     );
   }
+    onSearchTypeChange(): void {
+    // Reset data when search type changes
+    this.searchReference = '';
+    this.searchOptionsList = [];
+    this.showForm = false;
+    console.log('🔄 Search type changed. Data reset.');
+  }
 
   // Search functionality
-  onSearchReference() {
-    if (!this.searchReference?.trim()) {
-      Swal.fire('Please enter a value', '', 'warning');
-      return;
-    }
-
-    if (!this.selectedType) {
-      Swal.fire('Please select a search type', '', 'info');
-      return;
-    }
-
-    let payload: any = {
-      NUM: '',
-      INV_NO: '',
-      ODN_NO: '',
-      SO_NUM: '',
-      LR_NO: ''
-    };
-    payload[this.selectedType] = this.searchReference.trim();
-
-    console.log('🔍 Payload:', payload);
-
-    this.spinner.show();
-    this.service.global_Fields_SearchOption(payload).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        if (res.length > 0) {
-          this.searchOptionsList = res;
-          this.showForm = false;
-          Swal.fire('Data fetched successfully!', '', 'success');
-        } else {
-          Swal.fire('No records found', '', 'info');
+   onSearchReference() {
+        if (!this.searchReference?.trim()) {
+          Swal.fire('Please enter a value', '', 'warning');
+          return;
         }
-      },
-      error: (err) => {
-        this.spinner.hide();
-        console.error('❌ Error:', err);
-        Swal.fire('Error fetching data', '', 'error');
+    
+        if (!this.selectedType) {
+          Swal.fire('Please select a search type', '', 'info');
+          return;
+        }
+        let payload1: any = {
+         
+        "global": "SEGMENT INFO",
+        "data": {
+            "ref_no": "",
+            "inv_no": "",
+            "so_no": "",
+            "transporter": "",
+            "lr_no": "",
+            "workorder_no": "",
+            "sales_person": "",
+            "location": "",
+            "odn_no": "",
+            "vehicle_no": "",
+            "freight_billno": "",
+            "nature_damage": "",
+            "claim_status": ""   
+        }
+        };
+        payload1.data[this.selectedType] = this.searchReference.trim();
+    
+        console.log('🔍 Payload1:', payload1);
+        this.spinner.show();
+        this.service.global_Fields_SearchOption(payload1).subscribe({
+        next: (res: any) => {
+          this.spinner.hide();
+          console.log('✅ Search Response:', res);
+          if (res.NUMBER == "100" && res.STATUS == "FALSE") {
+            this.searchOptionsList = [];
+           
+           
+            Swal.fire('', res.MESSAGE, 'warning');
+          } else {
+            Swal.fire('No records found', '', 'info');
+             this.searchOptionsList = res.HEADER;
+            this.showForm = false;
+           
+            Swal.fire('Data fetched successfully!', '', 'success');
+          }
+        },
+        error: (err) => {
+          this.spinner.hide();
+          console.error('❌ Error:', err);
+          Swal.fire('Error fetching data', '', 'error');
+        }
+      });
       }
-    });
-  }
 
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;

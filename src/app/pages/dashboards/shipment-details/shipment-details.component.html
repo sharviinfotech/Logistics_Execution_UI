@@ -57,6 +57,7 @@
                 <tr>
                   <th>Select</th>
                   <th>Sl.No</th>
+                  <th>Map ID</th>
                   <th>Reference Number</th>
                   <th>Work Order Number</th>
                   <th>LR Number</th>
@@ -69,8 +70,12 @@
                   <td>
                     <input type="checkbox" (change)="onCheckboxChange($event, i)" [checked]="isItemSelected(i)" />
                   </td>
-
                   <td>{{ i + 1 }}</td>
+
+                  <td>
+                    <input type="text" formControlName="MAPID" placeholder="Enter Map ID"
+                      readonly>
+                  </td>
 
                   <td>
                     <input type="text" formControlName="referenceNumber" placeholder="Enter Ref. No."
@@ -118,7 +123,7 @@
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
                   <option value="" disabled selected>Select</option>
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
@@ -139,7 +144,7 @@
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
                   <option value="" disabled selected>Select</option>
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
@@ -164,11 +169,10 @@
 
       <!-- COMMON FIELDS -->
       <div class="form-grid" [formGroup]="ProductInfo">
-
         <!-- Incoterms -->
         <div class="form-field">
           <ng-container *ngIf="!isSap(); else incSap">
-            <select formControlName="Incoterms">
+            <select formControlName="ZINCO">
               <option value="">Select Incoterm</option>
               <option *ngFor="let i of IncotermsList" [value]="i.INCO1">
                 {{ i.INCO1 }} - {{ i.BEZEI }}
@@ -177,7 +181,7 @@
           </ng-container>
 
           <ng-template #incSap>
-            <input type="text" formControlName="Incoterms" readonly />
+            <input type="text" formControlName="ZINCO" readonly />
           </ng-template>
 
           <label>Incoterms</label>
@@ -185,7 +189,7 @@
 
         <!-- Insurance Scope -->
         <div class="form-field">
-          <select formControlName="InsuranceScope">
+          <select formControlName="ZINS_SCPOE">
             <option value="">Select Insurance Scope</option>
             <option *ngFor="let option of insuranceScopeOptions" [value]="option">
               {{ option }}
@@ -196,7 +200,7 @@
 
         <!-- Kilometres -->
         <div class="form-field">
-          <input type="number" formControlName="Kilometres" min="0" placeholder=" " />
+          <input type="number" formControlName="ZKM" min="0" placeholder=" " />
           <label>Kilometres</label>
         </div>
 
@@ -212,6 +216,7 @@
               <tr>
                 <th><input type="checkbox" (change)="toggleAllSelection($event)" [checked]="isAllSelected" /></th>
                 <th>SI.No.</th>
+                <th>Map ID</th>
                 <th>Product</th>
                 <th>Type of Material</th>
                 <th>Material Description</th>
@@ -231,41 +236,55 @@
                 <td>{{ i + 1 }}</td>
 
                 <td>
-                  <select formControlName="Product">
+                  <select formControlName="ZMAPID" (change)="onchangeMAPID(i)">
+                    <option value="">Select</option>
+                    <option *ngFor="let option of selectedItems" [value]="option.MAPID">
+                      {{ option.MAPID }}
+                    </option>
+                  </select>
+
+                </td>
+
+                <td>
+                  <select formControlName="ZPRODUCT">
                     <option value="">Select Product</option>
                     <option *ngFor="let option of productOptions" [value]="option">{{ option }}</option>
                   </select>
                 </td>
 
                 <td>
-                  <ng-container *ngIf="!isSap(); else matSAP">
-                    <select formControlName="TypeOfMaterial" (change)="onTypeOfMaterialChange()">
+                    <select formControlName="MTBEZ">
                       <option value="">Select Type</option>
-                      <option *ngFor="let m of TypeofmaterialList" [value]="m.MTART">
-                        {{ m.MTART }} - {{ m.MTBEZ }}
-                      </option>
+
+                      <option value="Batteries">Batteries</option>
+                      <option value="Acid">Acid</option>
+                      <option value="Electronic Goods">Electronic Goods</option>
+                      <option value="Scrap">Scrap</option>
+                      <option value="Rack">Rack</option>
+                      <option value="Stack Box">Stack Box</option>
+                      <option value="Packing material">Packing material</option>
+                      <option value="T-CAS">T-CAS</option>
+                      <option value="PC Wire">PC Wire</option>
+                      <option value="Raw material">Raw material</option>
+                      <option value="Contrate Product">Contrate Product</option>
+
                     </select>
-                  </ng-container>
+                  </td>
 
-                  <ng-template #matSAP>
-                    <input type="text" formControlName="TypeOfMaterial" readonly />
-                  </ng-template>
-                </td>
+                <td><input type="text" formControlName="MTART" /></td>
 
-                <td><input type="text" formControlName="MaterialDescription" /></td>
-
-                <td><input type="number" formControlName="Noofseats" min="0" /></td>
+                <td><input type="number" formControlName="ZSETS" min="0" /></td>
 
                 <td>
-                  <input type="number" formControlName="AhLoadedInTruck" min="0"
-                         *ngIf="item.get('Product')?.value === 'Batteries'" />
+                  <input type="number" formControlName="ZAH" min="0"
+                         *ngIf="item.get('ZPRODUCT')?.value === 'Batteries'" />
                 </td>
 
-                <td><input type="number" formControlName="ShipmentWeight" /></td>
+                <td><input type="number" formControlName="ZSHIP_WT" /></td>
 
                 <td>
-                  <select formControlName="BatteryCondition"
-                          *ngIf="item.get('Product')?.value === 'Batteries'">
+                  <select formControlName="ZBATCOND"
+                          *ngIf="item.get('ZPRODUCT')?.value === 'Batteries'">
                     <option value="">Select Condition</option>
                     <option *ngFor="let opt of batteryConditionOptions" [value]="opt">
                       {{ opt }}
@@ -301,9 +320,7 @@
 </div>
 
 <!-- Search Results Table -->
-<div class="card" style="margin-top: 10px;" *ngIf="searchOptionsList?.length > 0">
-  <div class="card-body-LE">
-    <div class="table-responsive">
+    <div *ngIf="searchOptionsList?.length > 0" class="table-responsive mt-3">
       <table class="table table-bordered table-striped text-center">
         <thead>
           <tr>
@@ -328,26 +345,25 @@
         </thead>
         <tbody>
           <tr *ngFor="let item of searchOptionsList">
-            <td>{{ item.ZREFNO || item.NUM || '-' }}</td>
-            <td>{{ item.ZINV_NO || item.INV_NO || '-' }}</td>
-            <td>{{ item.ZODN_NO || item.ODN_NO || '-' }}</td>
-            <td>{{ item.ZSO_NUM || item.SO_NUM || '-' }}</td>
-            <td>{{ item.ZPRODUCT || item.PRODUCT || '-' }}</td>
-            <td>{{ item.MTART || item.TYPE_OF_MATERIAL || '-' }}</td>
-            <td>{{ item.MAKTX || item.MATERIAL_DESC || '-' }}</td>
-            <td>{{ item.ZSETS || item.NO_OF_SETS || '-' }}</td>
-            <td>{{ item.ZAH || item.AH_LOADED || '-' }}</td>
-            <td>{{ item.ZSHIP_WT || item.SHIPMENT_WEIGHT | number: '1.2-2' }}</td>
-            <td>{{ item.ZBATCOND || item.BATTERY_CONDITION || '-' }}</td>
-            <td>{{ item.ZINCO || item.INCOTERMS || '-' }}</td>
-            <td>{{ item.ZINS_SCPOE || item.INSURANCE_SCOPE || '-' }}</td>
-            <td>{{ item.ZKM || item.KILOMETRES || '-' }}</td>
-            <td>{{ item.ZWORK_ORDER || item.WORK_ORDER_NO || '-' }}</td>
-            <td>{{ item.ZLRNO || item.LR_NO || '-' }}</td>
-            <td>{{ item.ZTRANSPORTER || item.TRANSPORTER || '-' }}</td>
+            <td>{{ item.ZREFNO}}</td>
+            <td>{{ item.ZINV_NO }}</td>
+            <td>{{ item.ZODN_NO }}</td>
+            <td>{{ item.ZSO_NUM }}</td>
+            <td>{{ item.ZPRODUCT }}</td>
+            <td>{{ item.MTART }}</td>
+            <td>{{ item.MAKTX }}</td>
+            <td>{{ item.ZSETS }}</td>
+            <td>{{ item.ZAH }}</td>
+            <td>{{ item.ZSHIP_WT  | number: '1.2-2' }}</td>
+            <td>{{ item.ZBATCOND  }}</td>
+            <td>{{ item.ZINCO  }}</td>
+            <td>{{ item.ZINS_SCPOE }}</td>
+            <td>{{ item.ZKM  }}</td>
+            <td>{{ item.ZWORK_ORDER  }}</td>
+            <td>{{ item.ZLRNO }}</td>
+            <td>{{ item.ZTRANSPORTER }}</td>
           </tr>
         </tbody>
       </table>
     </div>
-  </div>
-</div>
+  

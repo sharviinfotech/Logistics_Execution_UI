@@ -120,7 +120,7 @@
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
                   <option value="" disabled selected>Select</option>
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
@@ -250,22 +250,22 @@
         </thead>
         <tbody>
           <tr *ngFor="let item of searchOptionsList">
-            <td>{{ item.ZREFNO || item.NUM || '-' }}</td>
-            <td>{{ item.ZINV_NO || item.INV_NO || item.VBELN || '-' }}</td>
-            <td>{{ item.ZODN_NO || item.ODN_NO || '-' }}</td>
-            <td>{{ item.ZSO_NUM || item.SO_NUM || '-' }}</td>
-            <td>{{ item.ZTRUC_TYPE || item.TRUCK_TYPE || '-' }}</td>
-            <td>{{ item.ZPASS_WT || item.PASSING_WEIGHT || '-' }}</td>
-            <td>{{ item.ZACT_LOAD || item.ACTUAL_LOAD || '-' }}</td>
-            <td>{{ item.ZACT_VOL || item.ACTUAL_VOLUME || '-' }}</td>
-            <td>{{ item.ZLF_VOL || item.LOADING_FACTOR_VOL || '-' }}</td>
-            <td>{{ item.ZLF_WT || item.LOADING_FACTOR_WT || '-' }}</td>
-            <td>{{ item.ZWEEK_SF || item.WEEK_SHIPMENT || '-' }}</td>
-            <td>{{ item.ZEWAYBILL_NO || item.EWAY_BILL_NO || '-' }}</td>
-            <td>{{ item.ZEWAYBILL_DT || item.EWAY_BILL_DATE | date: 'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZWORK_ORDER || item.WORK_ORDER_NO || '-' }}</td>
-            <td>{{ item.ZLRNO || item.LR_NO || '-' }}</td>
-            <td>{{ item.ZTRANSPORTER || item.TRANSPORTER || '-' }}</td>
+            <td>{{ item.ZREFNO  }}</td>
+            <td>{{ item.ZINV_NO  }}</td>
+            <td>{{ item.ZODN_NO }}</td>
+            <td>{{ item.ZSO_NUM }}</td>
+            <td>{{ item.ZTRUC_TYPE  }}</td>
+            <td>{{ item.ZPASS_WT }}</td>
+            <td>{{ item.ZACT_LOAD  }}</td>
+            <td>{{ item.ZACT_VOL }}</td>
+            <td>{{ item.ZLF_VOL  }}</td>
+            <td>{{ item.ZLF_WT  }}</td>
+            <td>{{ item.ZWEEK_SF }}</td>
+            <td>{{ item.ZEWAYBILL_NO  }}</td>
+            <td>{{ item.ZEWAYBILL_DT  | date: 'dd-MM-yyyy' }}</td>
+            <td>{{ item.ZWORK_ORDER  }}</td>
+            <td>{{ item.ZLRNO }}</td>
+            <td>{{ item.ZTRANSPORTER  }}</td>
           </tr>
         </tbody>
       </table>

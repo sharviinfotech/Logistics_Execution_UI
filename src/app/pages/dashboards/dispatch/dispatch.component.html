@@ -52,7 +52,7 @@
 
     <div class="table-responsive">
       <form [formGroup]="dispatchForm" *ngIf="showForm">
-      <table class="table table-bordered">
+      <table class="table table-bordered table-striped text-center">
         <thead>
           <tr>
             <th>SI.No</th>
@@ -120,7 +120,21 @@
               </div>
             </td>
 
-            <td ><input type="text" formControlName="Transporter"></td>
+            <td >
+              <div class="d-flex align-items-center">
+                <!-- Transporter Dropdown -->
+                 <select 
+                      formControlName="Transporter"
+                      (change)="onchangeTransporter(i)">
+                      <option value="">Select Transporter</option>
+                      <option *ngFor="let transporter of VendorCodeList"
+                        [value]="transporter.TRANSPORTER">
+                  {{ transporter.TRANSPORTER }}
+                      </option>
+                    </select>
+              </div>
+
+            </td>
             <td><input type="text" formControlName="NoOfLRs"></td>
             <td><input type="text" formControlName="LRNumber"></td>
             <td><input type="text" formControlName="LoadingPoints"></td>

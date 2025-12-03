@@ -33,12 +33,12 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   // Search functionality
   selectedItems: any[] = [];
   searchReference: string = '';
-  searchOptions = [
-    { key: 'NUM', label: 'Reference No' },
-    { key: 'INV_NO', label: 'Invoice No' },
-    { key: 'ODN_NO', label: 'ODN No' },
-    { key: 'SO_NUM', label: 'SO No' },
-    { key: 'LR_NO', label: 'LR NO' }
+ searchOptions = [
+    { key: 'ref_no', label: 'Reference No' },
+    { key: 'inv_no', label: 'Invoice No' },
+    { key: 'odn_no', label: 'ODN No' },
+    { key: 'so_no', label: 'SO No' },
+    { key: 'lr_no', label: 'LR NO' }
   ];
   selectedType: any = '';
   searchOptionsList: any[] = [];
@@ -46,6 +46,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
   previousOrderType: string | null = null;
   previousSapType: string | null = null;
+  showForm: boolean;
 
   constructor(
     private fb: FormBuilder,
@@ -245,7 +246,6 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
     console.log('✅ Selected Items:', this.selectedItems);
   }
-
   isItemSelected(index: number): boolean {
     const rowValue = (this.referenceItems.at(index) as FormGroup).value;
 
@@ -259,47 +259,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   }
 
   // Search functionality
-  onSearchReference() {
-    if (!this.searchReference?.trim()) {
-      Swal.fire('Please enter a value', '', 'warning');
-      return;
-    }
 
-    if (!this.selectedType) {
-      Swal.fire('Please select a search type', '', 'info');
-      return;
-    }
-
-    let payload: any = {
-      NUM: '',
-      INV_NO: '',
-      ODN_NO: '',
-      SO_NUM: '',
-      LR_NO: ''
-    };
-    payload[this.selectedType] = this.searchReference.trim();
-
-    console.log('🔍 Payload:', payload);
-
-    this.spinner.show();
-    this.service.global_Fields_SearchOption(payload).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        if (res.length > 0) {
-          this.searchOptionsList = res;
-          this.showTable = false;
-          Swal.fire('Data fetched successfully!', '', 'success');
-        } else {
-          Swal.fire('No records found', '', 'info');
-        }
-      },
-      error: (err) => {
-        this.spinner.hide();
-        console.error('❌ Error:', err);
-        Swal.fire('Error fetching data', '', 'error');
-      }
-    });
-  }
 
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
@@ -372,10 +332,17 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
     const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
 
-    const payload = this.invoices.value.map((item: any) => ({
+    const payload = this.invoices.value.map((item: any, index: number) => ({
       MANDT: item.MANDT || '234',
       VBELN: referenceNumber,
       POSNR: item.POSNR || 10,
+      ZREFNO: this.orderType === 'Outward' ? this.selectedItems[0]?.referenceNumber || 0 : 0,
+      ZWORK_ORDER: this.selectedItems[0]?.workOrderNumber || "",
+      ZLRNO: this.selectedItems[0]?.lrNumber || "",
+      ZTRANSPORTER: this.selectedItems[0]?.transporter || "",
+      ZLINE_NO: index + 1,
+      ZSO_NO: "",
+      ZODN_NO: "",
       ZTRUC_TYPE: item.ZTRUC_TYPE,
       ZPASS_WT: item.ZPASS_WT,
       ZACT_LOAD: Number(item.ZACT_LOAD),
@@ -389,7 +356,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     }));
 
     this.spinner.show();
-    this.service.InvoiceloaddetailsSave({ NSAP_LOAD: payload }).subscribe({
+    this.service.InvoiceloaddetailsSave({ payload }).subscribe({
       next: (res: any) => {
         this.spinner.hide();
         if (res?.NUMBER === '200') {
@@ -435,21 +402,27 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     }
 
     const payload = {
-      NSAP_LOAD: this.invoices.value.map((inv: any) => ({
-        MANDT: '234',
-        VBELN: this.invoicenumber || '0000000000',
-        POSNR: 10,
-        ZTRUC_TYPE: inv.ZTRUC_TYPE,
-        ZPASS_WT: inv.ZPASS_WT,
-        ZACT_LOAD: inv.ZACT_LOAD,
-        ZACT_VOL: inv.ZACT_VOL,
-        ZLF_VOL: inv.ZLF_VOL,
-        ZLF_WT: inv.ZLF_WT,
-        ZWEEK_SF: inv.ZWEEK_SF,
-        ZEWAYBILL_NO: inv.ZEWAYBILL_NO,
-        ZEWAYBILL_DT: inv.ZEWAYBILL_DT,
-        ...(this.orderType === 'Outward' && this.selectedItems.length > 0 ? this.selectedItems[0] : {})
-      })),
+      NSAP_LOAD: this.invoices.value.map((inv: any) => {
+        const selectedRow = this.orderType === 'Outward' && this.selectedItems.length > 0 ? this.selectedItems[0] : {};
+        return {
+          MANDT: '234',
+          REF_NO: selectedRow.referenceNumber || "",
+          WORK_ORDER_NO: selectedRow.workOrderNumber || "",
+          LR_NO: selectedRow.lrNumber || "",
+          TRANSPORTER: selectedRow.transporter || "",
+          VBELN: this.invoicenumber || '0000000000',
+          POSNR: 10,
+          ZTRUC_TYPE: inv.ZTRUC_TYPE,
+          ZPASS_WT: inv.ZPASS_WT,
+          ZACT_LOAD: inv.ZACT_LOAD,
+          ZACT_VOL: inv.ZACT_VOL,
+          ZLF_VOL: inv.ZLF_VOL,
+          ZLF_WT: inv.ZLF_WT,
+          ZWEEK_SF: inv.ZWEEK_SF,
+          ZEWAYBILL_NO: inv.ZEWAYBILL_NO,
+          ZEWAYBILL_DT: inv.ZEWAYBILL_DT
+        };
+      }),
     };
 
     this.spinner.show();
@@ -564,4 +537,68 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   isSap(): boolean {
     return this.sapType === 'SAP';
   }
+
+   onSearchTypeChange(): void {
+    
+    this.searchReference = '';
+    this.searchOptionsList = [];
+    this.showForm = false;
+    console.log('🔄 Search type changed. Data reset.');
+  }
+
+
+   onSearchReference() {
+        if (!this.searchReference?.trim()) {
+          Swal.fire('Please enter a value', '', 'warning');
+          return;
+        }
+    
+        if (!this.selectedType) {
+          Swal.fire('Please select a search type', '', 'info');
+          return;
+        }
+        let payload1: any = {
+         
+        "global": "INVOICE LOAD DETAILS",
+        "data": {
+            "ref_no": "",
+            "inv_no": "",
+            "so_no": "",
+            "transporter": "",
+            "lr_no": "",
+            "workorder_no": "",
+            "sales_person": "",
+            "location": "",
+            "odn_no": "",
+            "vehicle_no": "",
+            "freight_billno": "",
+            "nature_damage": "",
+            "claim_status": ""   
+        }
+        };
+        payload1.data[this.selectedType] = this.searchReference.trim();
+    
+        console.log('🔍 Payload1:', payload1);
+        this.spinner.show();
+        this.service.global_Fields_SearchOption(payload1).subscribe({
+        next: (res: any) => {
+          this.spinner.hide();
+          console.log('✅ Search Response:', res);
+          if (res.NUMBER == "100" && res.STATUS == "FALSE") {
+            this.searchOptionsList = [];
+            Swal.fire('', res.MESSAGE, 'warning');
+          } else {
+            Swal.fire('No records found', '', 'info');
+             this.searchOptionsList = res.HEADER;
+            this.showForm = false;        
+            Swal.fire('Data fetched successfully!', '', 'success');
+          }
+        },
+        error: (err) => {
+          this.spinner.hide();
+          console.error('❌ Error:', err);
+          Swal.fire('Error fetching data', '', 'error');
+        }
+      });
+      }
 }

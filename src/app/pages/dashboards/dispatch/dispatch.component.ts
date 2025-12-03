@@ -397,6 +397,24 @@ export class DispatchComponent implements OnInit {
       }
     );
   }
+  fetchTransporter(): void {
+    this.spinner.show();
+    this.service.fetchVendorCode().subscribe(
+      (res: any) => {
+        if (res) {
+          console.log("✅ Transporter Data Fetched:", res);
+          this.spinner.hide();
+        } else {
+          console.warn("⚠️ No transporter data found");
+          Swal.fire("No Transporter Found", "", "warning");
+        }
+      },
+      error => {
+        console.error("❌ Transporter Fetch Error:", error);
+        this.spinner.hide();
+      }
+    );
+  }
 
   onchangeVendorCode(index: number) {
     const rowsArray = this.dispatchForm.get('rows') as FormArray;
@@ -416,6 +434,26 @@ export class DispatchComponent implements OnInit {
       console.log("No Vendor Code selected");
       currentRow.patchValue({
         Transporter: ''
+      });
+    }
+  }
+  onchangeTransporter(index: number) {
+    const rowsArray = this.dispatchForm.get('rows') as FormArray;
+    const currentRow = rowsArray.at(index);
+    const selectedTransporter = currentRow.get('Transporter')?.value;
+
+    const transporterObj = this.VendorCodeList.find(
+      (item) => item.TRANSPORTER == selectedTransporter
+    );
+    if (transporterObj) {
+      console.log("Selected Transporter Object:", transporterObj);
+      currentRow.patchValue({
+        VendorCode: transporterObj.VENDOR_CODE
+      });
+    } else {
+      console.log("No Transporter selected");
+      currentRow.patchValue({
+        VendorCode: ''
       });
     }
   }
