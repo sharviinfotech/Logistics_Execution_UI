@@ -28,12 +28,14 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   invoicenumber = '';
   ponumber = '';
   showTable = false;
+  isAllSelected: boolean = false;
   vehicleTypes: any[] = [];
+  
 
   // Search functionality
   selectedItems: any[] = [];
   searchReference: string = '';
- searchOptions = [
+  searchOptions = [
     { key: 'ref_no', label: 'Reference No' },
     { key: 'inv_no', label: 'Invoice No' },
     { key: 'odn_no', label: 'ODN No' },
@@ -46,7 +48,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
   previousOrderType: string | null = null;
   previousSapType: string | null = null;
-  showForm: boolean;
+  showForm: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -73,29 +75,63 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   }
 
   createInvoiceRow(data?: any): FormGroup {
-    return this.fb.group({
-      MANDT: [data?.MANDT || '234'],
-      VBELN: [data?.VBELN || this.invoicenumber],
-      POSNR: [data?.POSNR || ''],
-      ZTRUC_TYPE: [data?.ZTRUC_TYPE || '', Validators.required],
-      ZPASS_WT: [data?.ZPASS_WT || '', Validators.required],
-      ZACT_LOAD: [data?.ZACT_LOAD || '', Validators.required],
-      ZACT_VOL: [data?.ZACT_VOL || '', Validators.required],
-      ZLF_VOL: [data?.ZLF_VOL || '', Validators.required],
-      ZLF_WT: [data?.ZLF_WT || '', Validators.required],
-      ZWEEK_SF: [data?.ZWEEK_SF || '', Validators.required],
-      ZEWAYBILL_NO: [data?.ZEWAYBILL_NO || '', Validators.required],
-      ZEWAYBILL_DT: [data?.ZEWAYBILL_DT || '', Validators.required],
+  return this.fb.group({
+    selected: [false],
+    ZMAPID: [data?.ZMAPID || ''],
+    MANDT: [data?.MANDT || '234'],
+    VBELN: [data?.VBELN || this.invoicenumber],
+    POSNR: [data?.POSNR || ''],
+    ZTRUC_TYPE: [data?.ZTRUC_TYPE || '', Validators.required],
+    ZTRUC_WT: [data?.ZTRUC_WT || '', Validators.required],
+    ZACT_LOAD: [data?.ZACT_LOAD || '', Validators.required],
+    ZACT_VOL: [data?.ZACT_VOL || '', Validators.required],
+    ZLF_VOL: [data?.ZLF_VOL || '', Validators.required],
+    ZLF_WT: [data?.ZLF_WT || '', Validators.required],
+    ZWEEK_SF: [data?.ZWEEK_SF || '', Validators.required],
+    ZEWAYBILL_NO: [data?.ZEWAYBILL_NO || '', Validators.required],
+    ZEWAYBILL_DT: [data?.ZEWAYBILL_DT || '', Validators.required],
+    // ✅ Add these reference fields like shipment-details
+    ZREFNO: [data?.ZREFNO || ''],
+    ZWORK_ORDER: [data?.ZWORK_ORDER || ''],
+    ZLRNO: [data?.ZLRNO || ''],
+    ZTRANSPORTER: [data?.ZTRANSPORTER || ''],
+    ZSO_NO: [data?.ZSO_NO || ''],
+    ZODN_NO: [data?.ZODN_NO || '']
+  });
+}
+
+  createReferenceRow(): FormGroup {
+  return this.fb.group({
+    MAPID: [''],
+    referenceNumber: [''],
+    workOrderNumber: [''],
+    lrNumber: [''],
+    transporter: [''],
+    soNumber: [''],        
+    odnNumber: [''],   
     });
   }
 
-  createReferenceRow(): FormGroup {
-    return this.fb.group({
-      referenceNumber: [''],
-      workOrderNumber: [''],
-      lrNumber: [''],
-      transporter: ['']
-    });
+  toggleAllSelection(event: any): void {
+    const isChecked = event.target.checked;
+    this.isAllSelected = isChecked;
+    this.invoices.controls.forEach(ctrl => ctrl.get('selected')?.setValue(isChecked));
+  }
+
+  onRowCheckboxChange(): void {
+    this.isAllSelected = this.allSelected();
+    console.log('All Selected:', this.invoices.value);
+  }
+
+  allSelected(): boolean {
+    return this.invoices.controls.length > 0 &&
+           this.invoices.controls.every(ctrl => ctrl.get('selected')?.value === true);
+  }
+
+  getSelectedRows() {
+    return this.invoices.controls
+      .map(ctrl => ctrl.value)
+      .filter(row => row.selected);
   }
 
   addRow(data?: any): void {
@@ -149,12 +185,36 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     this.referenceItems.push(this.createReferenceRow());
   }
 
+  onchangeMAPID(index: number) {
+  const rowForm = this.invoices.at(index) as FormGroup;
+  const selectedMapId = rowForm.get('ZMAPID')?.value;
+  console.log("Selected MAPID:", selectedMapId);
+
+  const selectedObj = this.selectedItems.find(item => item.MAPID == selectedMapId);
+  console.log("Selected MAPID object:", selectedObj);
+
+  if (selectedObj) {
+    rowForm.patchValue({
+      ZREFNO: selectedObj.referenceNumber || "",
+      ZWORK_ORDER: selectedObj.workOrderNumber || "",
+      ZLRNO: selectedObj.lrNumber || "",
+      ZTRANSPORTER: selectedObj.transporter || "",
+      ZMAPID: selectedObj.MAPID || ""
+    });
+  }
+  console.log("Updated invoices form:", this.invoices.value);
+}
+
   // Reference Table: Field Blur Handler
   onFieldBlur(index: number, fieldKey: string): void {
     if (index !== 0) return;
 
-    const firstRow = this.referenceItems.at(0) as FormGroup;
-    const values = firstRow.value;
+    // Safety: ensure referenceItems exists and has at least one row
+    if (!this.referenceItems || this.referenceItems.length === 0) return;
+
+    const firstRow = this.referenceItems.at(0) as FormGroup | undefined;
+    if (!firstRow) return;
+    const values = firstRow.value || {};
 
     if (
       !values.referenceNumber &&
@@ -194,13 +254,16 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     this.referenceItems.clear();
 
     if (data && data.length > 0) {
-      data.forEach(d => {
-        this.referenceItems.push(
-          this.fb.group({
-            referenceNumber: [d.REF_NO || ''],
-            workOrderNumber: [d.WORK_ORDER_NO || ''],
-            lrNumber: [d.LR_NO || ''],
-            transporter: [d.TRANSPORTER || '']
+    data.forEach(d => {
+      this.referenceItems.push(
+        this.fb.group({
+          MAPID: [d.MAPID || ''], 
+          referenceNumber: [d.REF_NO || d.referenceNumber || ''],
+          workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
+          lrNumber: [d.LR_NO || d.lrNumber || ''],
+          transporter: [d.TRANSPORTER || d.transporter || ''],
+          soNumber: [d.SO_NO || d.soNumber || ''],
+          odnNumber: [d.ODN_NO || d.odnNumber || ''],
           })
         );
       });
@@ -218,48 +281,55 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   }
 
   onCheckboxChange(event: Event, index: number): void {
-    const checkbox = event.target as HTMLInputElement;
-    const rowValue = (this.referenceItems.at(index) as FormGroup).value;
+  const checkbox = event.target as HTMLInputElement;
+  const rowValue = (this.referenceItems.at(index) as FormGroup).value;
 
-    if (checkbox.checked) {
-      const exists = this.selectedItems.some(
-        (item) =>
-          item.referenceNumber === rowValue.referenceNumber &&
-          item.workOrderNumber === rowValue.workOrderNumber &&
-          item.lrNumber === rowValue.lrNumber &&
-          item.transporter === rowValue.transporter
-      );
-      if (!exists) {
-        this.selectedItems.push(rowValue);
-      }
-    } else {
-      this.selectedItems = this.selectedItems.filter(
-        (item) =>
-          !(
-            item.referenceNumber === rowValue.referenceNumber &&
-            item.workOrderNumber === rowValue.workOrderNumber &&
-            item.lrNumber === rowValue.lrNumber &&
-            item.transporter === rowValue.transporter
-          )
-      );
-    }
-
-    console.log('✅ Selected Items:', this.selectedItems);
-  }
-  isItemSelected(index: number): boolean {
-    const rowValue = (this.referenceItems.at(index) as FormGroup).value;
-
-    return this.selectedItems.some(
+  if (checkbox.checked) {
+    const exists = this.selectedItems.some(
       (item) =>
+        item.MAPID === rowValue.MAPID && 
         item.referenceNumber === rowValue.referenceNumber &&
         item.workOrderNumber === rowValue.workOrderNumber &&
         item.lrNumber === rowValue.lrNumber &&
-        item.transporter === rowValue.transporter
+        item.transporter === rowValue.transporter &&
+        item.soNumber === rowValue.soNumber &&
+        item.odnNumber === rowValue.odnNumber
+    );
+    if (!exists) {
+      this.selectedItems.push(rowValue);
+    }
+  } else {
+    this.selectedItems = this.selectedItems.filter(
+      (item) =>
+        !(
+          item.MAPID === rowValue.MAPID && 
+          item.referenceNumber === rowValue.referenceNumber &&
+          item.workOrderNumber === rowValue.workOrderNumber &&
+          item.lrNumber === rowValue.lrNumber &&
+          item.transporter === rowValue.transporter &&
+          item.soNumber === rowValue.soNumber &&
+          item.odnNumber === rowValue.odnNumber
+        )
     );
   }
 
-  // Search functionality
+  console.log('✅ Selected Items:', this.selectedItems);
+}
 
+ isItemSelected(index: number): boolean {
+  const rowValue = (this.referenceItems.at(index) as FormGroup).value;
+
+  return this.selectedItems.some(
+    (item) =>
+      item.MAPID === rowValue.MAPID && 
+      item.referenceNumber === rowValue.referenceNumber &&
+      item.workOrderNumber === rowValue.workOrderNumber &&
+      item.lrNumber === rowValue.lrNumber &&
+      item.transporter === rowValue.transporter &&
+      item.soNumber === rowValue.soNumber &&
+      item.odnNumber === rowValue.odnNumber
+  );
+}
 
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
@@ -280,6 +350,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     }
 
     const payload = { INV_GET: referenceNumber.trim() };
+    
     this.spinner.show();
 
     this.service.Invoiceloaddetailsfetch(payload).subscribe({
@@ -315,145 +386,158 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   }
 
   // ✅ SAVE FOR SAP
-  saveInvoiceDetails(action: 'stay' | 'next' | 'previous' = 'stay'): void {
-    this.InvoiceForm.markAllAsTouched();
-    if (this.InvoiceForm.invalid) {
-      Swal.fire('Error', 'Please fill all required fields', 'error');
-      return;
-    }
+      saveInvoiceDetails(action: 'stay' | 'next' | 'previous' = 'stay'): void {
+  const filtered = this.invoices.value
+    .filter((row: any) => row.selected === true)
+    .map(({ selected, ...rest }) => rest);
 
-    if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        text: 'Please select at least one reference row before saving'
-      });
-      return;
-    }
-
-    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
-
-    const payload = this.invoices.value.map((item: any, index: number) => ({
-      MANDT: item.MANDT || '234',
-      VBELN: referenceNumber,
-      POSNR: item.POSNR || 10,
-      ZREFNO: this.orderType === 'Outward' ? this.selectedItems[0]?.referenceNumber || 0 : 0,
-      ZWORK_ORDER: this.selectedItems[0]?.workOrderNumber || "",
-      ZLRNO: this.selectedItems[0]?.lrNumber || "",
-      ZTRANSPORTER: this.selectedItems[0]?.transporter || "",
-      ZLINE_NO: index + 1,
-      ZSO_NO: "",
-      ZODN_NO: "",
-      ZTRUC_TYPE: item.ZTRUC_TYPE,
-      ZPASS_WT: item.ZPASS_WT,
-      ZACT_LOAD: Number(item.ZACT_LOAD),
-      ZACT_VOL: Number(item.ZACT_VOL),
-      ZLF_VOL: Number(item.ZLF_VOL),
-      ZLF_WT: item.ZLF_WT,
-      ZWEEK_SF: item.ZWEEK_SF,
-      ZEWAYBILL_NO: item.ZEWAYBILL_NO,
-      ZEWAYBILL_DT: item.ZEWAYBILL_DT,
-      ...(this.orderType === 'Outward' && this.selectedItems.length > 0 ? this.selectedItems[0] : {})
-    }));
-
-    this.spinner.show();
-    this.service.InvoiceloaddetailsSave({ payload }).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        if (res?.NUMBER === '200') {
-          Swal.fire({
-            title: 'Success',
-            text: res.MSG || 'Saved Successfully',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-          }).then(() => {
-            if (action === 'next') {
-              this.router.navigate(['/segment-info']);
-            } else if (action === 'previous') {
-              this.router.navigate(['/shipment-details']);
-            } else {
-              this.resetForm();
-            }
-          });
-        } else {
-          Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
-        }
-      },
-      error: () => {
-        this.spinner.hide();
-        Swal.fire('Error', 'Save failed', 'error');
-      }
+  if (filtered.length === 0) {
+    Swal.fire({
+      title: 'Warning',
+      text: 'Please select at least one row to save.',
+      icon: 'warning',
+      timer: 3000,
+      confirmButtonText: 'Ok',
     });
+    return;
   }
 
-  // ✅ SAVE NON-SAP
-  saveInvoiceNonsapDetails(action: 'stay' | 'next' | 'previous' = 'stay'): void {
-    this.InvoiceForm.markAllAsTouched();
-    if (this.InvoiceForm.invalid) {
-      Swal.fire('Error', 'Please fill all required fields', 'error');
-      return;
-    }
-
-    if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        text: 'Please select at least one reference row before saving'
-      });
-      return;
-    }
-
-    const payload = {
-      NSAP_LOAD: this.invoices.value.map((inv: any) => {
-        const selectedRow = this.orderType === 'Outward' && this.selectedItems.length > 0 ? this.selectedItems[0] : {};
-        return {
-          MANDT: '234',
-          REF_NO: selectedRow.referenceNumber || "",
-          WORK_ORDER_NO: selectedRow.workOrderNumber || "",
-          LR_NO: selectedRow.lrNumber || "",
-          TRANSPORTER: selectedRow.transporter || "",
-          VBELN: this.invoicenumber || '0000000000',
-          POSNR: 10,
-          ZTRUC_TYPE: inv.ZTRUC_TYPE,
-          ZPASS_WT: inv.ZPASS_WT,
-          ZACT_LOAD: inv.ZACT_LOAD,
-          ZACT_VOL: inv.ZACT_VOL,
-          ZLF_VOL: inv.ZLF_VOL,
-          ZLF_WT: inv.ZLF_WT,
-          ZWEEK_SF: inv.ZWEEK_SF,
-          ZEWAYBILL_NO: inv.ZEWAYBILL_NO,
-          ZEWAYBILL_DT: inv.ZEWAYBILL_DT
-        };
-      }),
-    };
-
-    this.spinner.show();
-    this.service.InvoiceloaddetailsNonSap(payload).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        if (res?.NUMBER === '200') {
-          Swal.fire({
-            title: 'Success',
-            text: res.MSG || 'Saved Successfully',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-          }).then(() => {
-            if (action === 'next') {
-              this.router.navigate(['/segment-info']);
-            } else if (action === 'previous') {
-              this.router.navigate(['/shipment-details']);
-            } else {
-              this.resetForm();
-            }
-          });
-        } else {
-          Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
-        }
-      },
-      error: () => {
-        this.spinner.hide();
-        Swal.fire('Error', 'Save failed', 'error');
-      }
-    });
+  this.InvoiceForm.markAllAsTouched();
+  if (this.InvoiceForm.invalid) {
+    Swal.fire('Error', 'Please fill all required fields', 'error');
+    return;
   }
+
+  if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
+    Swal.fire({
+      icon: 'warning',
+      text: 'Please select at least one reference row before saving'
+    });
+    return;
+  }
+
+  const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+
+  // ✅ Map using data from ZMAPID selection in each row
+  // const payload = filtered.map((item: any, index: number) => ({
+  //   VBELN: referenceNumber,
+  //   POSNR: item.POSNR || '',
+  //   ZREFNO: item.ZREFNO || '',
+  //   ZWORK_ORDER: item.ZWORK_ORDER || '',
+  //   ZLRNO: item.ZLRNO || '',
+  //   ZTRANSPORTER: item.ZTRANSPORTER || '',
+  //   ZLINE_NO: index + 1,
+  //   ZSO_NO: "",
+  //   ZODN_NO: "",
+  //   ZTRUC_TYPE: item.ZTRUC_TYPE,
+  //   ZTRUC_WT: item.ZTRUC_WT,
+  //   ZACT_LOAD: Number(item.ZACT_LOAD),
+  //   ZACT_VOL: Number(item.ZACT_VOL),
+  //   ZLF_VOL: Number(item.ZLF_VOL),
+  //   ZLF_WT: item.ZLF_WT,
+  //   ZWEEK_SF: item.ZWEEK_SF,
+  //   ZEWAYBILL_NO: item.ZEWAYBILL_NO,
+  //   ZEWAYBILL_DT: item.ZEWAYBILL_DT,
+  //   ZMAPID: item.ZMAPID || '',
+  // }));
+
+  this.spinner.show();
+  this.service.InvoiceloaddetailsSave(filtered).subscribe({
+    next: (res: any) => {
+      this.spinner.hide();
+      if (res?.NUMBER === '200') {
+        Swal.fire({
+          title: 'Success',
+          text: res.MSG || 'Saved Successfully',
+          icon: 'success',
+          confirmButtonText: 'Ok'
+        }).then(() => {
+          if (action === 'next') {
+            this.router.navigate(['/segment-info']);
+          } else if (action === 'previous') {
+            this.router.navigate(['/shipment-details']);
+          } else {
+            this.resetForm();
+          }
+        });
+      } else {
+        Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
+      }
+    },
+    error: () => {
+      this.spinner.hide();
+      Swal.fire('Error', 'Save failed', 'error');
+    }
+  });
+}
+
+// 8. ✅ Update saveInvoiceNonsapDetails similarly
+saveInvoiceNonsapDetails(action: 'stay' | 'next' | 'previous' = 'stay'): void {
+  this.InvoiceForm.markAllAsTouched();
+  if (this.InvoiceForm.invalid) {
+    Swal.fire('Error', 'Please fill all required fields', 'error');
+    return;
+  }
+
+  if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
+    Swal.fire({
+      icon: 'warning',
+      text: 'Please select at least one reference row before saving'
+    });
+    return;
+  }
+
+  const payload = {
+    NSAP_LOAD: this.invoices.value.map((inv: any) => ({
+      MANDT: '',
+      REF_NO: inv.ZREFNO || "",
+      WORK_ORDER_NO: inv.ZWORK_ORDER || "",
+      LR_NO: inv.ZLRNO || "",
+      TRANSPORTER: inv.ZTRANSPORTER || "",
+      VBELN: this.invoicenumber || '0000000000',
+      POSNR: 10,
+      ZTRUC_TYPE: inv.ZTRUC_TYPE,
+      ZTRUC_WT: inv.ZTRUC_WT,
+      ZACT_LOAD: inv.ZACT_LOAD,
+      ZACT_VOL: inv.ZACT_VOL,
+      ZLF_VOL: inv.ZLF_VOL,
+      ZLF_WT: inv.ZLF_WT,
+      ZWEEK_SF: inv.ZWEEK_SF,
+      ZEWAYBILL_NO: inv.ZEWAYBILL_NO,
+      ZEWAYBILL_DT: inv.ZEWAYBILL_DT,
+      MAPID: inv.ZMAPID || "",
+    })),
+  };
+
+  this.spinner.show();
+  this.service.InvoiceloaddetailsNonSap(payload).subscribe({
+    next: (res: any) => {
+      this.spinner.hide();
+      if (res?.NUMBER === '200') {
+        Swal.fire({
+          title: 'Success',
+          text: res.MSG || 'Saved Successfully',
+          icon: 'success',
+          confirmButtonText: 'Ok'
+        }).then(() => {
+          if (action === 'next') {
+            this.router.navigate(['/segment-info']);
+          } else if (action === 'previous') {
+            this.router.navigate(['/shipment-details']);
+          } else {
+            this.resetForm();
+          }
+        });
+      } else {
+        Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
+      }
+    },
+    error: () => {
+      this.spinner.hide();
+      Swal.fire('Error', 'Save failed', 'error');
+    }
+  });
+}
 
   onSave(action: 'stay' | 'next' | 'previous' = 'stay'): void {
     if (this.sapType === 'SAP') {
@@ -482,45 +566,46 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     this.selectedType = '';
   }
 
-  onTruckTypeChange(i: number): void {
-    // ✅ If NON-SAP, do not call API
-    if (this.sapType === 'Non-SAP') {
-      return;
+   onTruckTypeChange(i: number): void {
+  if (this.sapType === 'Non-SAP') return;
+
+  const row = this.invoices.at(i);
+  const selectedTruck = row.get('ZTRUC_TYPE')?.value;
+  const selectedActualLoad = row.get('ZACT_LOAD')?.value;
+  const selectedActualVolume = row.get('ZACT_VOL')?.value;
+
+  if (!selectedTruck) return;
+
+  const payload = {
+    TRUCK: selectedTruck,
+  ZACT_LOAD: Number(selectedActualLoad),
+  ZACT_VOL: Number(selectedActualVolume)
+  };
+
+  this.spinner.show();
+  this.service.sapget(payload).subscribe({
+    next: (res: any) => {
+      this.spinner.hide();
+
+      const data = Array.isArray(res) ? res[0] : res;
+      if (!data) return;
+
+      // convert numeric response to string if your form expects string
+      row.patchValue({
+        ZTRUC_TYPE: data.ZTRUC_TYPE ?? '',
+        ZACT_LOAD: data.ZACT_LOAD !== undefined ? data.ZACT_LOAD : '',
+        ZACT_VOL: data.ZACT_VOL !== undefined ? String(data.ZACT_VOL) : '',
+        ZLF_VOL: data.ZLF_VOL !== undefined ? String(data.ZLF_VOL) : '',
+        ZLF_WT: data.ZLF_WT ?? '',
+        ZTRUC_WT: data.ZTRUC_WT ?? ''
+      }, { emitEvent: false }); // optional: avoid triggering valueChanges
+    },
+    error: () => {
+      this.spinner.hide();
+      Swal.fire("Error", "SAP Truck API failed", "error");
     }
-
-    const row = this.invoices.at(i);
-    const selectedTruck = row.get('ZTRUC_TYPE')?.value;
-
-    if (!selectedTruck) return;
-
-    const payload = {
-      TRUCK: selectedTruck,
-      ZACT_LOAD: 10,
-      ZACT_VOL: "90"
-    };
-
-    this.spinner.show();
-    this.service.sapget(payload).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-
-        const data = Array.isArray(res) ? res[0] : res;
-        if (!data) return;
-
-        row.patchValue({
-          ZTRUC_TYPE: data.ZTRUC_TYPE || '',
-          ZACT_LOAD: data.ZACT_LOAD || '',
-          ZACT_VOL: data.ZACT_VOL || '',
-          ZLF_VOL: data.ZLF_VOL || '',
-          ZLF_WT: data.ZLF_WT || ''
-        });
-      },
-      error: () => {
-        this.spinner.hide();
-        Swal.fire("Error", "SAP Truck API failed", "error");
-      }
-    });
-  }
+  });
+}
 
   // ✅ LOAD VEHICLE TYPES
   getVehicleTypes(): void {
@@ -538,67 +623,67 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     return this.sapType === 'SAP';
   }
 
-   onSearchTypeChange(): void {
-    
+  onSearchTypeChange(): void {
     this.searchReference = '';
     this.searchOptionsList = [];
     this.showForm = false;
     console.log('🔄 Search type changed. Data reset.');
   }
 
+  onSearchReference() {
+    if (!this.searchReference?.trim()) {
+      Swal.fire('Please enter a value', '', 'warning');
+      return;
+    }
 
-   onSearchReference() {
-        if (!this.searchReference?.trim()) {
-          Swal.fire('Please enter a value', '', 'warning');
-          return;
-        }
-    
-        if (!this.selectedType) {
-          Swal.fire('Please select a search type', '', 'info');
-          return;
-        }
-        let payload1: any = {
-         
-        "global": "INVOICE LOAD DETAILS",
-        "data": {
-            "ref_no": "",
-            "inv_no": "",
-            "so_no": "",
-            "transporter": "",
-            "lr_no": "",
-            "workorder_no": "",
-            "sales_person": "",
-            "location": "",
-            "odn_no": "",
-            "vehicle_no": "",
-            "freight_billno": "",
-            "nature_damage": "",
-            "claim_status": ""   
-        }
-        };
-        payload1.data[this.selectedType] = this.searchReference.trim();
-    
-        console.log('🔍 Payload1:', payload1);
-        this.spinner.show();
-        this.service.global_Fields_SearchOption(payload1).subscribe({
-        next: (res: any) => {
-          this.spinner.hide();
-          console.log('✅ Search Response:', res);
-          if (res.NUMBER == "100" && res.STATUS == "FALSE") {
-            this.searchOptionsList = [];
-            Swal.fire('', res.MESSAGE, 'warning');
-          } else {
-            Swal.fire('No records found', '', 'info');
-             this.searchOptionsList = res.HEADER;
-            this.showForm = false;        
-            Swal.fire('Data fetched successfully!', '', 'success');
-          }
-        },
-        error: (err) => {
-          this.spinner.hide();
-          console.error('❌ Error:', err);
-          Swal.fire('Error fetching data', '', 'error');
-        }
-      });
+    if (!this.selectedType) {
+      Swal.fire('Please select a search type', '', 'info');
+      return;
+    }
+
+    let payload1: any = {
+      "global": "INVOICE LOAD DETAILS",
+      "data": {
+        "ref_no": "",
+        "inv_no": "",
+        "so_no": "",
+        "transporter": "",
+        "lr_no": "",
+        "workorder_no": "",
+        "sales_person": "",
+        "location": "",
+        "odn_no": "",
+        "vehicle_no": "",
+        "freight_billno": "",
+        "nature_damage": "",
+        "claim_status": ""   
       }
+    };
+    payload1.data[this.selectedType] = this.searchReference.trim();
+
+    console.log('🔍 Payload1:', payload1);
+    this.spinner.show();
+    this.service.global_Fields_SearchOption(payload1).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        console.log('✅ Search Response:', res);
+        if (res.NUMBER == "100" && res.STATUS == "FALSE") {
+          this.searchOptionsList = [];
+          Swal.fire('', res.MESSAGE, 'warning');
+        } else if (res.HEADER && res.HEADER.length > 0) {
+          this.searchOptionsList = res.HEADER;
+          this.showForm = true;        
+          Swal.fire('Data fetched successfully!', '', 'success');
+        } else {
+          this.searchOptionsList = [];
+          Swal.fire('No records found', '', 'info');
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('❌ Error:', err);
+        Swal.fire('Error fetching data', '', 'error');
+      }
+    });
+  }
 }

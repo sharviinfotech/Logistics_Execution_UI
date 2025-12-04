@@ -528,8 +528,6 @@ export class ShipmentDetailsComponent implements OnInit {
   .map(({ selected, ...rest }) => rest);  // remove selected key
 
     console.log(filtered);
-
-
   if (filtered.length === 0) {
     Swal.fire({
       title: 'Warning',
