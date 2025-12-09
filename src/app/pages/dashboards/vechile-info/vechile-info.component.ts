@@ -46,6 +46,7 @@ export class VechileInfoComponent implements OnInit {
   selectedType: any = '';
   searchOptionsList: any[] = [];
   dropdownOpen = false;
+  
 
   constructor(
     private fb: FormBuilder,
@@ -73,6 +74,8 @@ export class VechileInfoComponent implements OnInit {
   createVehicleRow(data?: any): FormGroup {
     return this.fb.group({
       selected: [false],
+      
+      ZMAPID: [data?.ZMAPID || ''],
       ZTRX_TYPE: [data?.ZTRX_TYPE || '', Validators.required],
       ZTRANSPOTER: [data?.ZTRANSPOTER || '', Validators.required],
       ZLRNO: [data?.ZLRNO || '', Validators.required],
@@ -83,15 +86,24 @@ export class VechileInfoComponent implements OnInit {
       ZNOOFVEH: [data?.ZNOOFVEH || '', [Validators.required, Validators.min(1)]],
       ZDNAME: [data?.ZDNAME || '', Validators.required],
       ZDNUMBER: [data?.ZDNUMBER || '', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
+       ZREFNO: [data?.ZREFNO || ''],
+    ZWORK_ORDER: [data?.ZWORK_ORDER || ''],
+    
+    // ZTRANSPORTER: [data?.ZTRANSPORTER || ''],
+    ZSO_NO: [data?.ZSO_NO || ''],
+    ZODN_NO: [data?.ZODN_NO || '']
     });
   }
 
   createReferenceRow(): FormGroup {
     return this.fb.group({
+       MAPID: [''],
       referenceNumber: [''],
       workOrderNumber: [''],
       lrNumber: [''],
-      transporter: ['']
+      transporter: [''],
+      soNumber: [''],        
+    odnNumber: [''],   
     });
   }
 
@@ -142,6 +154,7 @@ export class VechileInfoComponent implements OnInit {
 
   onRowCheckboxChange(): void {
     this.isAllSelected = this.allSelected();
+     console.log('All Selected:', this.vehicles.value);
   }
 
   getSelectedRows() {
@@ -178,6 +191,26 @@ export class VechileInfoComponent implements OnInit {
     this.addRow();
     this.referenceItems.push(this.createReferenceRow());
   }
+
+  onchangeMAPID(index: number) {
+  const rowForm = this.vehicles.at(index) as FormGroup;
+  const selectedMapId = rowForm.get('ZMAPID')?.value;
+  console.log("Selected MAPID:", selectedMapId);
+
+  const selectedObj = this.selectedItems.find(item => item.MAPID == selectedMapId);
+  console.log("Selected MAPID object:", selectedObj);
+
+  if (selectedObj) {
+    rowForm.patchValue({
+      ZREFNO: selectedObj.referenceNumber || "",
+      ZWORK_ORDER: selectedObj.workOrderNumber || "",
+      ZLRNO: selectedObj.lrNumber || "",
+      ZTRANSPORTER: selectedObj.transporter || "",
+      ZMAPID: selectedObj.MAPID || ""
+    });
+  }
+  console.log("Updated invoices form:", this.vehicles.value);
+}
 
   // Reference Table: Field Blur Handler
   onFieldBlur(index: number, fieldKey: string): void {
@@ -227,10 +260,13 @@ export class VechileInfoComponent implements OnInit {
       data.forEach(d => {
         this.referenceItems.push(
           this.fb.group({
-            referenceNumber: [d.REF_NO || ''],
-            workOrderNumber: [d.WORK_ORDER_NO || ''],
-            lrNumber: [d.LR_NO || ''],
-            transporter: [d.TRANSPORTER || '']
+           MAPID: [d.MAPID || ''], 
+          referenceNumber: [d.REF_NO || d.referenceNumber || ''],
+          workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
+          lrNumber: [d.LR_NO || d.lrNumber || ''],
+          transporter: [d.TRANSPORTER || d.transporter || ''],
+          soNumber: [d.SO_NO || d.soNumber || ''],
+          odnNumber: [d.ODN_NO || d.odnNumber || ''],
           })
         );
       });
@@ -254,10 +290,13 @@ export class VechileInfoComponent implements OnInit {
     if (checkbox.checked) {
       const exists = this.selectedItems.some(
         (item) =>
+          item.MAPID === rowValue.MAPID && 
           item.referenceNumber === rowValue.referenceNumber &&
           item.workOrderNumber === rowValue.workOrderNumber &&
           item.lrNumber === rowValue.lrNumber &&
-          item.transporter === rowValue.transporter
+          item.transporter === rowValue.transporter &&
+          item.soNumber === rowValue.soNumber &&
+          item.odnNumber === rowValue.odnNumber
       );
       if (!exists) {
         this.selectedItems.push(rowValue);
@@ -266,10 +305,13 @@ export class VechileInfoComponent implements OnInit {
       this.selectedItems = this.selectedItems.filter(
         (item) =>
           !(
+            item.MAPID === rowValue.MAPID && 
             item.referenceNumber === rowValue.referenceNumber &&
             item.workOrderNumber === rowValue.workOrderNumber &&
             item.lrNumber === rowValue.lrNumber &&
-            item.transporter === rowValue.transporter
+            item.transporter === rowValue.transporter &&
+             item.soNumber === rowValue.soNumber &&
+            item.odnNumber === rowValue.odnNumber
           )
       );
     }
@@ -282,10 +324,13 @@ export class VechileInfoComponent implements OnInit {
 
     return this.selectedItems.some(
       (item) =>
+        item.MAPID === rowValue.MAPID && 
         item.referenceNumber === rowValue.referenceNumber &&
         item.workOrderNumber === rowValue.workOrderNumber &&
         item.lrNumber === rowValue.lrNumber &&
-        item.transporter === rowValue.transporter
+        item.transporter === rowValue.transporter &&
+        item.soNumber === rowValue.soNumber &&
+        item.odnNumber === rowValue.odnNumber
     );
   }
 
@@ -415,9 +460,23 @@ export class VechileInfoComponent implements OnInit {
   }
 
   saveVehicleInfo(action: 'stay' | 'next' | 'previous' = 'stay'): void {
-    const selectedRows = this.getSelectedRows();
+     const filtered = this.vehicles.value
+    .filter((row: any) => row.selected === true)
+    .map(({ selected, ...rest }) => rest);
 
-    if (selectedRows.length === 0) {
+  if (filtered.length === 0) {
+    Swal.fire({
+      title: 'Warning',
+      text: 'Please select at least one row to save.',
+      icon: 'warning',
+      timer: 3000,
+      confirmButtonText: 'Ok',
+    });
+    return;
+  }
+
+
+    if (filtered.length === 0) {
       Swal.fire('Warning', 'Please select at least one row to save.', 'warning');
       return;
     }
@@ -432,30 +491,30 @@ export class VechileInfoComponent implements OnInit {
 
     const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
 
-    const cleanedRows = selectedRows.map(({ selected, ...veh }, index: number) => ({
-      MANDT: '234',
-      VBELN: referenceNumber?.trim() || '',
-      POSNR: (index + 1) * 10,
-      ZVEH_LINE: '',
-      ZTRX_TYPE: veh.ZTRX_TYPE,
-      ZTRANSPOTER: veh.ZTRANSPOTER,
-      ZLRNO: veh.ZLRNO,
-      ZTRUC_TYPE: veh.ZTRUC_TYPE,
-      ZTRUC_WT: veh.ZTRUC_WT,
-      ZTRUC_VOL: Number(veh.ZTRUC_VOL),
-      ZVEH_NUM: veh.ZVEH_NUM,
-      ZNOOFVEH: Number(veh.ZNOOFVEH),
-      ZDNAME: veh.ZDNAME,
-      ZDNUMBER: veh.ZDNUMBER,
-      ...(this.orderType === 'Outward' && this.selectedItems.length > 0 ? this.selectedItems[0] : {})
-    }));
+    // const cleanedRows = filtered.map(({ selected, ...veh }, index: number) => ({
+    //   MANDT: '234',
+    //   VBELN: referenceNumber?.trim() || '',
+    //   POSNR: (index + 1) * 10,
+    //   ZVEH_LINE: '',
+    //   ZTRX_TYPE: veh.ZTRX_TYPE,
+    //   ZTRANSPOTER: veh.ZTRANSPOTER,
+    //   ZLRNO: veh.ZLRNO,
+    //   ZTRUC_TYPE: veh.ZTRUC_TYPE,
+    //   ZTRUC_WT: veh.ZTRUC_WT,
+    //   ZTRUC_VOL: Number(veh.ZTRUC_VOL),
+    //   ZVEH_NUM: veh.ZVEH_NUM,
+    //   ZNOOFVEH: Number(veh.ZNOOFVEH),
+    //   ZDNAME: veh.ZDNAME,
+    //   ZDNUMBER: veh.ZDNUMBER,
+    //   ...(this.orderType === 'Outward' && this.selectedItems.length > 0 ? this.selectedItems[0] : {})
+    // }));
 
     this.spinner.show();
 
     const apiCall =
       this.sapType === 'SAP'
-        ? this.service.VehicleInfosave(cleanedRows)
-        : this.service.VehicleInfoNonSap(cleanedRows);
+        ? this.service.VehicleInfosave(filtered)
+        : this.service.VehicleInfoNonSap(filtered);
 
     apiCall.subscribe({
       next: (res: any) => {

@@ -271,8 +271,7 @@
                     </select>
                   </td>
 
-                <td><input type="text" formControlName="MTART" /></td>
-
+                <td><input type="text" formControlName="MAKTX" readonly /></td>
                 <td><input type="number" formControlName="ZSETS" min="0" /></td>
 
                 <td>
@@ -320,50 +319,55 @@
 </div>
 
 <!-- Search Results Table -->
-    <div *ngIf="searchOptionsList?.length > 0" class="table-responsive mt-3">
-      <table class="table table-bordered table-striped text-center">
-        <thead>
-          <tr>
-            <th>Ref No</th>
-            <th>Invoice No</th>
-            <th>ODN No</th>
-            <th>SO No</th>
-            <th>Product</th>
-            <th>Type of Material</th>
-            <th>Material Description</th>
-            <th>No of Sets</th>
-            <th>Ah Loaded</th>
-            <th>Shipment Weight</th>
-            <th>Battery Condition</th>
-            <th>Incoterms</th>
-            <th>Insurance Scope</th>
-            <th>Kilometres</th>
-            <th>Work Order</th>
-            <th>LR No</th>
-            <th>Transporter</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of searchOptionsList">
-            <td>{{ item.ZREFNO}}</td>
-            <td>{{ item.ZINV_NO }}</td>
-            <td>{{ item.ZODN_NO }}</td>
-            <td>{{ item.ZSO_NUM }}</td>
-            <td>{{ item.ZPRODUCT }}</td>
-            <td>{{ item.MTART }}</td>
-            <td>{{ item.MAKTX }}</td>
-            <td>{{ item.ZSETS }}</td>
-            <td>{{ item.ZAH }}</td>
-            <td>{{ item.ZSHIP_WT  | number: '1.2-2' }}</td>
-            <td>{{ item.ZBATCOND  }}</td>
-            <td>{{ item.ZINCO  }}</td>
-            <td>{{ item.ZINS_SCPOE }}</td>
-            <td>{{ item.ZKM  }}</td>
-            <td>{{ item.ZWORK_ORDER  }}</td>
-            <td>{{ item.ZLRNO }}</td>
-            <td>{{ item.ZTRANSPORTER }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- Search Results Table -->
+<div *ngIf="searchOptionsList?.length > 0" class="table-responsive mt-3">
+  <table class="table table-bordered table-striped text-center">
+    <thead>
+      <tr>
+        <th>Map ID</th>
+        <th>Ref No</th>
+        <th>Invoice No</th>
+        <th>ODN No</th>
+        <th>SO No</th>
+        <th>Product</th>
+        <th>Material Type</th>
+        <th>Type of Material</th>
+        <th>Material Description</th>
+        <th>No of Sets</th>
+        <th>Ah Loaded</th>
+        <th>Shipment Weight</th>
+        <th>Battery Condition</th>
+        <th>Incoterms</th>
+        <th>Insurance Scope</th>
+        <th>Kilometres</th>
+        <th>Work Order</th>
+        <th>LR No</th>
+        <th>Transporter</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of searchOptionsList">
+        <td>{{ item.ZMAPID || '-' }}</td>
+        <td>{{ item.ZREFNO || '-' }}</td>
+        <td>{{ item.VBELN || '-' }}</td>
+        <td>{{ item.ZODN_NO || '-' }}</td>
+        <td>{{ item.ZSO_NO || '-' }}</td>
+        <td>{{ item.ZPRODUCT || '-' }}</td>
+        <td>{{ item.MTART || '-' }}</td>
+        <td>{{ item.MTBEZ || '-' }}</td>
+        <td>{{ item.MAKTX || '-' }}</td>
+        <td>{{ item.ZSETS || '-' }}</td>
+        <td>{{ item.ZAH || '-' }}</td>
+        <td>{{ item.ZSHIP_WT | number: '1.2-2' }}</td>
+        <td>{{ item.ZBATCOND || '-' }}</td>
+        <td>{{ item.ZINCO || '-' }}</td>
+        <td>{{ item.ZINS_SCPOE || '-' }}</td>
+        <td>{{ item.ZKM || '-' }}</td>
+        <td>{{ item.ZWORK_ORDER || '-' }}</td>
+        <td>{{ item.ZLRNO || '-' }}</td>
+        <td>{{ item.ZTRANSPORTER || '-' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
   

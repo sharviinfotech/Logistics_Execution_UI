@@ -24,12 +24,14 @@ export class SegmentInfoComponent implements OnInit {
   orderType: string = '';
   sapType: string = '';
   ponumber: string = '';
+  
   invoicenumber: string = '';
   previousOrderType: string | null = null;
   previousSapType: string | null = null;
 
   // F4 lists from backend
   supplierList: any[] = [];
+  
   segmentList: any[] = [];
   custGrpList: any[] = [];
   branchList: any[] = [];
@@ -37,7 +39,7 @@ export class SegmentInfoComponent implements OnInit {
 
   // showF4 flags
   showF4 = {
-    SALES_EMP: false,
+    SALE_PERSON: false,
     SEGMENT: false,
     CUST_PROF: false,
     BRANCH: false,
@@ -68,7 +70,7 @@ export class SegmentInfoComponent implements OnInit {
   ngOnInit(): void {
     this.segmentInfo = this.fb.group({
       INV_VBELN: [''],
-      SALES_EMP: ['', Validators.required],
+      SALE_PERSON: ['', Validators.required],
       SEGMENT: ['', Validators.required],
       APPTYP: ['', Validators.required],
       CUST_PROF: [''],
@@ -101,13 +103,15 @@ export class SegmentInfoComponent implements OnInit {
       referenceNumber: [''],
       workOrderNumber: [''],
       lrNumber: [''],
-      transporter: ['']
+      transporter: [''],
+      soNumber: [''],          
+      odnNumber: ['']     
     });
   }
 
   resetF4Flags() {
     this.showF4 = {
-      SALES_EMP: false,
+       SALE_PERSON: false,
       SEGMENT: false,
       CUST_PROF: false,
       BRANCH: false,
@@ -117,7 +121,7 @@ export class SegmentInfoComponent implements OnInit {
 
   enableAllF4() {
     this.showF4 = {
-      SALES_EMP: true,
+      SALE_PERSON: true,
       SEGMENT: true,
       CUST_PROF: true,
       BRANCH: true,
@@ -206,8 +210,14 @@ export class SegmentInfoComponent implements OnInit {
 
   patchForm(data: any) {
     this.segmentInfo.patchValue({
+      REF_NO: data.REFNO || '',
+      WORK_ORDER_NO: data.WORK_ORDER || '',
+      LR_NO: data.LRNO || '',
+      TRANSPORTER: data.TRANSPORTER || '',
+      SONO: data.SO_NUM || '',
+      ODN_NO: data.ODN_NUM || '',
       INV_VBELN: data.INV_NUM || '',
-      SALES_EMP: data.SALE_PERSON || '',
+      SALE_PERSON: data.SALE_PERSON || '', 
       SEGMENT: data.SEGMENT || '',
       APPTYP: data.APPTYP || '',
       CUST_PROF: data.CUST_PROFILE || '',
@@ -219,7 +229,7 @@ export class SegmentInfoComponent implements OnInit {
     });
 
     this.showF4 = {
-      SALES_EMP: !data.SALE_PERSON,
+      SALE_PERSON: !data.SALE_PERSON,
       SEGMENT: !data.SEGMENT,
       CUST_PROF: !data.CUST_PROFILE,
       BRANCH: !data.BRANCH,
@@ -278,7 +288,10 @@ export class SegmentInfoComponent implements OnInit {
             referenceNumber: [d.REF_NO || ''],
             workOrderNumber: [d.WORK_ORDER_NO || ''],
             lrNumber: [d.LR_NO || ''],
-            transporter: [d.TRANSPORTER || '']
+            transporter: [d.TRANSPORTER || ''],
+            soNumber: [d.SO_NO || d.soNumber || ''],        // Sales Order Number
+            odnNumber: [d.ODN_NO || d.odnNumber || ''],     // ODN Number
+
           })
         );
       });
@@ -443,80 +456,99 @@ export class SegmentInfoComponent implements OnInit {
   }
 
   saveSegmentInfoWithSAP(action: 'stay' | 'next' | 'previous' = 'stay'): void {
-    this.segmentInfo.markAllAsTouched();
-
-    if (this.segmentInfo.invalid) {
-      Swal.fire({
-        title: 'Validation Error',
-        text: 'Please fill all required fields before saving.',
-        icon: 'warning',
-        confirmButtonText: 'Ok',
-      });
-      return;
-    }
-
-    if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        text: 'Please select at least one reference row before saving'
-      });
-      return;
-    }
-
-    const formValue = this.segmentInfo.value;
-    const payload = {
-      SAVE: [
-        {
-          INV_VBELN: formValue.INV_VBELN,
-          SALES_EMP: formValue.SALES_EMP,
-          SEGMENT: formValue.SEGMENT,
-          APPTYP: formValue.APPTYP,
-          CUST_PROF: formValue.CUST_PROF,
-          BRANCH: formValue.BRANCH,
-          BRANCH_ZONE: formValue.BRANCH_ZONE,
-          TAT_TYPE: formValue.TAT_Type,
-          TAT_DAYS: formValue.TAT_DAYS,
-          ETA_DATE: formValue.ETA_DATE,
-          ...(this.orderType === 'Outward' && this.selectedItems.length > 0 ? this.selectedItems[0] : {})
-        },
-      ],
-    };
-
-    this.spinner.show();
-    this.service.SegmentInfoOutwardSave(payload).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        if (res.STATUS == 'true' || res.NUMBER == '200') {
-          Swal.fire({
-            title: 'Success',
-            text: res.MESSAGE,
-            icon: 'success',
-            confirmButtonText: 'Ok',
-          }).then(() => {
-            if (action === 'next') {
-              this.router.navigate(['/vehicle-info']);
-            } else if (action === 'previous') {
-              this.router.navigate(['/invoice-load-details']);
-            } else {
-              this.segmentInfo.reset();
-              this.showForm = false;
-            }
-          });
-        } else {
-          Swal.fire({
-            title: '',
-            text: res.MESSAGE,
-            icon: 'warning',
-            confirmButtonText: 'Ok',
-          });
-        }
-      },
-      error: () => {
-        this.spinner.hide();
-        Swal.fire('Server error while saving', '', 'error');
-      },
+  this.segmentInfo.markAllAsTouched();
+  
+  if (this.segmentInfo.invalid) {
+    Swal.fire({
+      title: 'Validation Error',
+      text: 'Please fill all required fields before saving.',
+      icon: 'warning',
+      confirmButtonText: 'Ok',
     });
+    return;
   }
+
+  // ✅ For Outward orders, validate selection
+  if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
+    Swal.fire({
+      icon: 'warning',
+      text: 'Please select at least one reference row before saving'
+    });
+    return;
+  }
+
+  const formValue = this.segmentInfo.value;
+  
+  // ✅ Get reference data from selected items
+  let referenceData = {};
+  if (this.orderType === 'Outward' && this.selectedItems.length > 0) {
+    const selected = this.selectedItems[0];
+    referenceData = {
+      REFNO: selected.referenceNumber || 0,
+      WORK_ORDER: selected.workOrderNumber || '',
+      LRNO: selected.lrNumber || '',
+      TRANSPORTER: selected.transporter || '',
+      SONO: selected.SONO || '',  
+      ODN_NO: selected.ODN_NO || ''  
+    };
+  }
+
+  const payload = {
+    SAVE: [
+      {
+        ...referenceData,  // ✅ Spread reference data first
+        INV_NUM: formValue.INV_VBELN || this.invoicenumber || '',
+        SALE_PERSON: formValue.SALE_PERSON || '',
+        SEGMENT: formValue.SEGMENT || '',
+        APPTYP: formValue.APPTYP || '',
+        CUST_PROFILE: formValue.CUST_PROF || '',
+        BRANCH: formValue.BRANCH || '',
+        BRANCH_ZONE: formValue.BRANCH_ZONE || '',
+        TAT_TYPE: formValue.TAT_Type || '',
+        TAT: formValue.TAT_DAYS || '',
+        ETA: formValue.ETA_DATE || ''
+      },
+    ],
+  };
+
+  console.log('📤 Saving Segment Info with payload:', payload);
+
+  this.spinner.show();
+  this.service.SegmentInfoOutwardSave(payload).subscribe({
+    next: (res: any) => {
+      this.spinner.hide();
+      if (res.STATUS == 'true' || res.NUMBER == '200') {
+        Swal.fire({
+          title: 'Success',
+          text: res.MESSAGE,
+          icon: 'success',
+          confirmButtonText: 'Ok',
+        }).then(() => {
+          if (action === 'next') {
+            this.router.navigate(['/vehicle-info']);
+          } else if (action === 'previous') {
+            this.router.navigate(['/invoice-load-details']);
+          } else {
+            this.segmentInfo.reset();
+            this.selectedItems = [];  // ✅ Clear selected items
+            this.showForm = false;
+          }
+        });
+      } else {
+        Swal.fire({
+          title: '',
+          text: res.MESSAGE,
+          icon: 'warning',
+          confirmButtonText: 'Ok',
+        });
+      }
+    },
+    error: () => {
+      this.spinner.hide();
+      Swal.fire('Server error while saving', '', 'error');
+    },
+  });
+}
 
   TatTypeChange(): void {
     const formValue = this.segmentInfo.value;
@@ -622,7 +654,7 @@ export class SegmentInfoComponent implements OnInit {
     const payload = {
       CREATE: [
         {
-          SALES_EMP: formValue.SALES_EMP,
+          SALE_PERSON: formValue. SALE_PERSON,
           SEGMENT: formValue.SEGMENT,
           APPTYP: formValue.APPTYP,
           CUST_PROF: formValue.CUST_PROF,

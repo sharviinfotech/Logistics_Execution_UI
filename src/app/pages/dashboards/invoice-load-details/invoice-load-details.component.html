@@ -177,9 +177,9 @@
               <th>Truck Type</th>
               <th>Passing Weight</th>
               <th>Actual Load (Tons)</th>
-              <th>Loading Factor (Weight)</th>
+              <th>Loading factor% (w.r.t weight)</th>
               <th>Actual Volume Occupied</th>
-              <th>Loading Factor (Volume)</th>
+              <th>Loading Factor w.r.t Volume</th>
               <th>Week Wise Shipment Flow</th>
               <th>Eway Bill Number</th>
               <th>Eway Bill Expiry Date</th>
@@ -213,9 +213,9 @@
 
               <td><input type="text" formControlName="ZTRUC_WT" /></td>
               <td><input type="number" formControlName="ZACT_LOAD" /></td>
-              <td><input type="text" formControlName= "ZLF_VOL"/></td>
+              <td><input type="text" formControlName= "ZLF_WT"/></td>
               <td><input type="text" formControlName="ZACT_VOL" (change)="onTruckTypeChange(i)"/></td>
-              <td><input type="text" formControlName="ZLF_WT" /></td>
+              <td><input type="text" formControlName="ZLF_VOL" /></td>
               <td><input type="text" formControlName="ZWEEK_SF" /></td>
               <td><input type="text" formControlName="ZEWAYBILL_NO" /></td>
               <td><input type="date" formControlName="ZEWAYBILL_DT" /></td>
@@ -248,6 +248,7 @@
       <table class="table table-bordered table-striped text-center">
         <thead>
           <tr>
+            <th>Map ID</th>
             <th>Ref No</th>
             <th>Invoice No</th>
             <th>ODN No</th>
@@ -268,10 +269,11 @@
         </thead>
         <tbody>
           <tr *ngFor="let item of searchOptionsList">
+           <td>{{ item.ZMAPID }}</td>
             <td>{{ item.ZREFNO  }}</td>
-            <td>{{ item.ZINV_NO  }}</td>
+            <td>{{ item.VBELN  }}</td>
             <td>{{ item.ZODN_NO }}</td>
-            <td>{{ item.ZSO_NUM }}</td>
+            <td>{{ item.ZSO_NO }}</td>
             <td>{{ item.ZTRUC_TYPE  }}</td>
             <td>{{ item.ZTRUC_WT }}</td>
             <td>{{ item.ZACT_LOAD  }}</td>

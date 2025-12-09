@@ -32,7 +32,6 @@ export class ShipmentDetailsComponent implements OnInit {
   invoicenumber: string = '';
   TypeofmaterialList: any = [];
   IncotermsList: any[] = [];
-  ZINCO: string = '';
   isAllSelected: boolean = false;
 
   selectedItems: any[] = [];
@@ -94,13 +93,14 @@ export class ShipmentDetailsComponent implements OnInit {
       ZSHIP_WT: [null, [Validators.required, Validators.min(0)]],
      ZBATCOND : [''],
       MANDT: [''],
-        ZREFNO: [''],
+      ZREFNO: [''],
         ZLINE_NO: [''],
         VBELN: [''],
         POSNR: [''],
         ZSO_NO: [''],
         ZODN_NO: [''],
-        MTART: [''],          
+        MTART: [''],
+        ZINCO: [''],       
         ZINS_SCPOE: [''],
         ZPIN_PLT: [''],
         ZPIN_STP: [''],
@@ -484,6 +484,7 @@ export class ShipmentDetailsComponent implements OnInit {
               ZSO_NO: [item.ZSO_NO || ''],
               ZODN_NO: [item.ZODN_NO || ''],
               MTART: [item.MTART || ''],
+              ZINCO: [item.ZINCO || ''],
               ZINS_SCPOE: [item.ZINS_SCPOE || ''],
               ZPIN_PLT: [item.ZPIN_PLT || ''],
               ZPIN_STP: [item.ZPIN_STP || ''],

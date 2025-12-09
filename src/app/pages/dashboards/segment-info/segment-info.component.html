@@ -162,10 +162,10 @@
   <form class="form-grid" [formGroup]="segmentInfo" *ngIf="showForm">
 
     <!-- Sales Person -->
-    <div class="form-field" [class.filled]="segmentInfo.get('SALES_EMP')?.value">
-      <ng-container *ngIf="sapType === 'Non-SAP' || showF4.SALES_EMP; else sapSales">
+    <div class="form-field" [class.filled]="segmentInfo.get('SALE_PERSON')?.value">
+      <ng-container *ngIf="sapType === 'Non-SAP' || showF4.SALE_PERSON; else sapSales">
         <ng-select [items]="supplierList" bindLabel="SUPPLIER_NAME" bindValue="SUPPLIER_NAME"
-          formControlName="SALES_EMP" [searchable]="true" [virtualScroll]="true" placeholder="Select Sales Person"
+          formControlName="SALE_PERSON" [searchable]="true" [virtualScroll]="true" placeholder="Select Sales Person"
           class="w-full">
           <ng-template ng-option-tmp let-item="item">
             {{ item.SUPPLIER }} - {{ item.SUPPLIER_NAME }}
@@ -174,7 +174,7 @@
       </ng-container>
 
       <ng-template #sapSales>
-        <input type="text" formControlName="SALES_EMP" placeholder=" " readonly />
+        <input type="text" formControlName="SALE_PERSON" placeholder=" " readonly />
       </ng-template>
 
       <label>Sales Person</label>
@@ -297,6 +297,7 @@
             <th>Ref No</th>
             <th>Invoice No</th>
             <th>ODN No</th>
+            <th>SO NO</th>
             <th>Sales Person</th>
             <th>Segment</th>
             <th>Application Type</th>
@@ -313,21 +314,22 @@
         </thead>
         <tbody>
           <tr *ngFor="let item of searchOptionsList">
-            <td>{{ item.ZREFNO || item.NUM || '-' }}</td>
-            <td>{{ item.ZINV_NO || item.INV_NO || '-' }}</td>
-            <td>{{ item.ZODN_NO || item.ODN_NO || '-' }}</td>
-            <td>{{ item.ZSALE_PERSON || item.SALES_EMP || '-' }}</td>
-            <td>{{ item.ZSEGMENT || item.SEGMENT || '-' }}</td>
-            <td>{{ item.ZAPPTYP || item.APPTYP || '-' }}</td>
-            <td>{{ item.ZCUST_PROFILE || item.CUST_PROF || '-' }}</td>
-            <td>{{ item.ZBRANCH || item.BRANCH || '-' }}</td>
-            <td>{{ item.ZBRANCH_ZONE || item.BRANCH_ZONE || '-' }}</td>
-            <td>{{ item.ZTAT_TYPE || item.TAT_TYPE || '-' }}</td>
-            <td>{{ item.ZTAT || item.TAT_DAYS || '-' }}</td>
-            <td>{{ item.ZETA || item.ETA_DATE || '-' }}</td>
-            <td>{{ item.ZWORK_ORDER || item.WORK_ORDER_NO || '-' }}</td>
-            <td>{{ item.ZLRNO || item.LR_NO || '-' }}</td>
-            <td>{{ item.ZTRANSPORTER || item.TRANSPORTER || '-' }}</td>
+            <td>{{ item.REFNO  }}</td>
+            <td>{{ item.INV_NO  }}</td>
+            <td>{{ item.SONO }}</td>
+            <td>{{ item.ODN_NO  }}</td>
+            <td>{{ item.SALE_PERSON  }}</td>
+            <td>{{ item.SEGMENT  }}</td>
+            <td>{{ item.APPTYP  }}</td>
+            <td>{{ item.CUST_PROFILE  }}</td>
+            <td>{{ item.BRANCH  }}</td>
+            <td>{{ item.BRANCH_ZONE  }}</td>
+            <td>{{ item.TAT_TYPE  }}</td>
+            <td>{{ item.TAT  }}</td>
+            <td>{{ item.ETA  }}</td>
+            <td>{{ item.WORK_ORDER }}</td>
+            <td>{{ item.LRNO  }}</td>
+            <td>{{ item.TRANSPORTER  }}</td>
           </tr>
         </tbody>
       </table>

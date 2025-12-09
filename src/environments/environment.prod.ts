@@ -11,10 +11,8 @@ export const environment = {
     appId: '',
     measurementId: ''
   },
-   // baseUrl:'http://localhost:3000/',
-  // baseUrl:'http://125.22.172.147:3000/',
-  // baseUrl:'http://192.168.1.18:3000/', // with vpn
-
-   // baseUrl:'http://14.99.143.250:3001/', // public ip production
-    baseUrl: '/',
+   // baseUrl: 'http://localhost:3001/', // local server
+  // apiUrl:'http://localhost:9091/',
+  // apiUrl:'https://ims.hbl.in/api/'
+   baseUrl:'http://10.10.4.178:3001/', // server
 };
