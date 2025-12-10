@@ -11,6 +11,7 @@ import Swal from 'sweetalert2';
 import { GeneralserviceService } from 'src/app/generalservice.service';
 import { Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { co } from '@fullcalendar/core/internal-common';
 
 @Component({
   selector: 'app-insurance-claim-tracking',
@@ -41,8 +42,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   // Search functionality
   selectedItems: any[] = [];
   searchReference: string = '';
-  
-   searchOptions = [
+
+  searchOptions = [
     { key: 'ref_no', label: 'Reference No' },
     { key: 'inv_no', label: 'Invoice No' },
     { key: 'odn_no', label: 'ODN No' },
@@ -50,12 +51,12 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     { key: 'transporter', label: 'Transporter' },
     { key: 'lr_no', label: 'LR NO' },
     { key: 'workorder_no', label: 'Workorder No' },
-    {key :"sales_person",label: 'Sales Person'},
-    {key :"location",label: 'Location'},
-    {key :"vehicle_no",label: 'Vehicle No'},
-    {key :"freight_billno",label: 'Freight Bill No'},
-    {key :"nature_damage",label: 'Nature of Damage'},
-    {key :"claim_status",label: 'Claim Status'},
+    { key: "sales_person", label: 'Sales Person' },
+    { key: "location", label: 'Location' },
+    { key: "vehicle_no", label: 'Vehicle No' },
+    { key: "freight_billno", label: 'Freight Bill No' },
+    { key: "nature_damage", label: 'Nature of Damage' },
+    { key: "claim_status", label: 'Claim Status' },
   ];
   selectedType: any = '';
   searchOptionsList: any[] = [];
@@ -133,6 +134,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
   addItemRow() {
     const row = this.fb.group({
+      ZREFNO: [''],
+      ZLINE_NO: [''],
       INV_NO: [''],
       POSNR: [''],
       VEH_LINE: [''],
@@ -141,11 +144,15 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       LR_NO: [''],
       AH: [''],
       NO_SETS: [''],
-      TRANSPORTER: ['']
+      TRANSPORTER: [''],
+      ZWORK_ORDER: [''],
+      ZBILLNO: [''],
+      ZMAPID: ['']
     });
 
     this.itemsTable.push(row);
   }
+
 
   removeItemRow(i: number) {
     this.itemsTable.removeAt(i);
@@ -217,7 +224,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
     const obj = {
       global_scr: 'INSURANCE CLAIM STATUS',
-      REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '', 
+      REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : ''
@@ -246,7 +253,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       data.forEach(d => {
         this.items.push(
           this.fb.group({
-            MAPID: [d.MAPID || ''], 
+            MAPID: [d.MAPID || ''],
             referenceNumber: [d.REF_NO || ''],
             workOrderNumber: [d.WORK_ORDER_NO || ''],
             lrNumber: [d.LR_NO || ''],
@@ -274,7 +281,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     if (checkbox.checked) {
       const exists = this.selectedItems.some(
         (item) =>
-           item.MAPID === rowValue.MAPID && 
+          item.MAPID === rowValue.MAPID &&
           item.referenceNumber === rowValue.referenceNumber &&
           item.workOrderNumber === rowValue.workOrderNumber &&
           item.lrNumber === rowValue.lrNumber &&
@@ -287,7 +294,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       this.selectedItems = this.selectedItems.filter(
         (item) =>
           !(
-             item.MAPID === rowValue.MAPID && 
+            item.MAPID === rowValue.MAPID &&
             item.referenceNumber === rowValue.referenceNumber &&
             item.workOrderNumber === rowValue.workOrderNumber &&
             item.lrNumber === rowValue.lrNumber &&
@@ -304,7 +311,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
     return this.selectedItems.some(
       (item) =>
-         item.MAPID === rowValue.MAPID && 
+        item.MAPID === rowValue.MAPID &&
         item.referenceNumber === rowValue.referenceNumber &&
         item.workOrderNumber === rowValue.workOrderNumber &&
         item.lrNumber === rowValue.lrNumber &&
@@ -312,26 +319,26 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     );
   }
   onchangeMAPID(index: number) {
-  const rowForm = this.items.at(index) as FormGroup;
-  const selectedMapId = rowForm.get('ZMAPID')?.value;
-  console.log("Selected MAPID:", selectedMapId);
+    const rowForm = this.items.at(index) as FormGroup;
+    const selectedMapId = rowForm.get('ZMAPID')?.value;
+    console.log("Selected MAPID:", selectedMapId);
 
-  const selectedObj = this.selectedItems.find(item => item.MAPID == selectedMapId);
-  console.log("Selected MAPID object:", selectedObj);
+    const selectedObj = this.selectedItems.find(item => item.MAPID == selectedMapId);
+    console.log("Selected MAPID object:", selectedObj);
 
-  if (selectedObj) {
-    rowForm.patchValue({
-      ZREFNO: selectedObj.referenceNumber || "",
-      ZWORK_ORDER: selectedObj.workOrderNumber || "",
-      ZLRNO: selectedObj.lrNumber || "",
-      ZTRANSPORTER: selectedObj.transporter || "",
-      ZMAPID: selectedObj.MAPID || ""
-    });
+    if (selectedObj) {
+      rowForm.patchValue({
+        ZREFNO: selectedObj.referenceNumber || "",
+        ZWORK_ORDER: selectedObj.workOrderNumber || "",
+        ZLRNO: selectedObj.lrNumber || "",
+        ZTRANSPORTER: selectedObj.transporter || "",
+        ZMAPID: selectedObj.MAPID || ""
+      });
+    }
+    console.log("Updated invoices form:", this.items.value);
   }
-  console.log("Updated invoices form:", this.items.value);
-}
 
-   onSearchTypeChange(): void {
+  onSearchTypeChange(): void {
     // Reset data when search type changes
     this.searchReference = '';
     this.searchOptionsList = [];
@@ -340,62 +347,76 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   }
 
   // Search functionality
-   onSearchReference() {
-         if (!this.searchReference?.trim()) {
-           Swal.fire('Please enter a value', '', 'warning');
-           return;
-         }
-     
-         if (!this.selectedType) {
-           Swal.fire('Please select a search type', '', 'info');
-           return;
-         }
-     
-     
-         let payload1: any = {
-          
-         "global": "INSURANCE CLAIM STATUS",
-         "data": {
-             "REF_NO": "",
-            "INV_NO": "",
-            "SO_NO": "",
-            "TRANSPORTER": "",
-            "LR_NO": "",
-            "WORKORDER_NO": "",
-            "SALES_PERSON": "",
-            "LOCATION": "",
-            "ODN_NO": "",
-            "VEHICLE_NO": "",
-            "FREIGHT_BILLNO": "",
-            "PRODUCT":"",
-            "ROUTE":"",
-            "NATURE_DAMAGE": "",
-            "CLAIM_STATUS": ""
-        }
-         };
-         payload1.data[this.selectedType] = this.searchReference.trim();
-     
-         console.log('🔍 Payload:', payload1);
-     
-         this.spinner.show();
-         this.service.global_Fields_SearchOption(payload1).subscribe({
-           next: (res: any) => {
-             this.spinner.hide();
-             if (res.length > 0) {
-               this.searchOptionsList = res;
-               this.showForm = false;
-               Swal.fire('Data fetched successfully!', '', 'success');
-             } else {
-               Swal.fire('No records found', '', 'info');
-             }
-           },
-           error: (err) => {
-             this.spinner.hide();
-             console.error('❌ Error:', err);
-             Swal.fire('Error fetching data', '', 'error');
-           }
-         });
-       }
+  onSearchReference() {
+    if (!this.searchReference?.trim()) {
+      Swal.fire('Please enter a value', '', 'warning');
+      return;
+    }
+
+    if (!this.selectedType) {
+      Swal.fire('Please select a search type', '', 'info');
+      return;
+    }
+
+    const fieldMap: any = {
+      ref_no: "REF_NO",
+      inv_no: "INV_NO",
+      so_no: "SO_NO",
+      transporter: "TRANSPORTER",
+      lr_no: "LR_NO",
+      workorder_no: "WORKORDER_NO",
+      sales_person: "SALES_PERSON",
+      location: "LOCATION",
+      odn_no: "ODN_NO",
+      vehicle_no: "VEHICLE_NO",
+      freight_billno: "FREIGHT_BILLNO",
+      nature_damage: "NATURE_DAMAGE",
+      claim_status: "CLAIM_STATUS"
+    };
+
+    const backendKey = fieldMap[this.selectedType];
+
+    let payload1: any = {
+      global: "INSURANCE CLAIM STATUS",
+      data: {
+        REF_NO: "",
+        INV_NO: "",
+        SO_NO: "",
+        TRANSPORTER: "",
+        LR_NO: "",
+        WORKORDER_NO: "",
+        SALES_PERSON: "",
+        LOCATION: "",
+        ODN_NO: "",
+        VEHICLE_NO: "",
+        FREIGHT_BILLNO: "",
+        PRODUCT: "",
+        ROUTE: "",
+        NATURE_DAMAGE: "",
+        CLAIM_STATUS: ""
+      }
+    };
+
+    payload1.data[backendKey] = this.searchReference.trim();
+
+    console.log("FINAL Payload => ", payload1);
+
+    // 🔹 Now call your API here if needed
+    this.spinner.show();
+    this.service.global_Fields_SearchOption(payload1).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        this.searchOptionsList = res || [];
+        this.showForm = this.searchOptionsList.length > 0;
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error(err);
+        Swal.fire("Error fetching data", '', 'error');
+      }
+    });
+  }
+
 
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
@@ -426,11 +447,11 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     };
 
     this.spinner.show();
-    
-    const apiCall = this.sapType === 'SAP' 
+
+    const apiCall = this.sapType === 'SAP'
       ? this.service.InsuranceClaimTrackingfetch(payload)
       : this.service.fetchinvoicelistnonsap(payload);
-      console.log("API call",apiCall)
+    console.log("API call", apiCall)
     apiCall.subscribe({
       next: (res: any) => {
         this.spinner.hide();
@@ -445,7 +466,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
         this.showForm = false;
         this.showTable = true;
-        
+
         this.HeaderForm.patchValue({
           INV_NO: header.INV_NO,
           FI: header.FI,
@@ -476,6 +497,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
         items.forEach((x: any) => {
           const row = this.fb.group({
+            ZREFNO: [x.ZREFNO],
+            ZLINE_NO: [x.ZLINE_NO],
             INV_NO: [x.INV_NO],
             POSNR: [x.POSNR],
             VEH_LINE: [x.VEH_LINE],
@@ -484,11 +507,15 @@ export class InsuranceClaimTrackingComponent implements OnInit {
             LR_NO: [x.LR_NO],
             AH: [x.AH],
             NO_SETS: [x.NO_SETS],
-            TRANSPORTER: [x.TRANSPORTER]
+            TRANSPORTER: [x.TRANSPORTER],
+            ZWORK_ORDER: [x.ZWORK_ORDER],
+            ZBILLNO: [x.ZBILLNO],
+            ZMAPID: [x.ZMAPID]
           });
 
           this.itemsTable.push(row);
         });
+
       },
       error: (err) => {
         this.spinner.hide();
@@ -499,29 +526,18 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   }
 
   saveSAP(action: 'stay' | 'next' | 'previous' = 'stay') {
-     const filtered = this.items.value
-    .filter((row: any) => row.selected === true)
-    .map(({ selected, ...rest }) => rest);
 
-  if (filtered.length === 0) {
-    Swal.fire({
-      title: 'Warning',
-      text: 'Please select at least one row to save.',
-      icon: 'warning',
-      timer: 3000,
-      confirmButtonText: 'Ok',
-    });
-    return;
-  }
-    if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
+    if (this.selectedItems.length === 0) {
       Swal.fire({
+        title: 'Warning',
+        text: 'Please select at least one row to save.',
         icon: 'warning',
-        text: 'Please select at least one reference row before saving'
+        timer: 3000
       });
       return;
     }
 
-    const referenceNumber = this.orderType === 'Inward' ? this.invoicenumber : this.invoicenumber;
+    const referenceNumber = this.invoicenumber;
 
     this.HeaderForm.patchValue({
       INV_NO: referenceNumber
@@ -534,7 +550,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     const payload = {
       HEADER: {
         ...this.HeaderForm.value,
-        ...(this.orderType === 'Outward' && this.selectedItems.length > 0 ? this.selectedItems[0] : {})
+        ...this.selectedItems[0]   // first selected row
       },
       ITEM: this.ItemForm.value.ITEMS
     };
@@ -543,39 +559,20 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     this.service.InsuranceClaimTrackingSave(payload).subscribe({
       next: (res: any) => {
         this.spinner.hide();
-
-        if (res?.STATUS === "TRUE" || res?.STATUS === true || res?.NUMBER === '200') {
+        if (res?.STATUS === "TRUE" || res?.NUMBER === '200') {
           Swal.fire({
-            text: "✅ Data Saved Successfully!",
+            text: "Data Saved Successfully!",
             icon: "success",
-            showConfirmButton: false,
-            timer: 900,
-            willClose: () => {
-              if (action === 'next') {
-                this.router.navigate(['/next-screen']); // Change to your next route
-              } else if (action === 'previous') {
-                this.router.navigate(['/transit-damage-info']);
-              } else {
-                this.resetForms();
-              }
-            }
-          });
-        } else {
-          Swal.fire({
-            text: "⚠️ Save Failed: " + (res.MESSAGE || ''),
-            icon: "warning"
+            timer: 1000,
+            showConfirmButton: false
+          }).then(() => {
+            this.resetForms();
           });
         }
-      },
-      error: (err) => {
-        this.spinner.hide();
-        Swal.fire({
-          text: "❌ Error while saving",
-          icon: "error"
-        });
       }
     });
   }
+
 
   saveNonSAP(action: 'stay' | 'next' | 'previous' = 'stay') {
     if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
