@@ -43,7 +43,7 @@ export class FreightBillingComponent implements OnInit {
   // Search functionality
   selectedItems: any[] = [];
   searchReference: string = '';
-   searchOptions = [
+  searchOptions = [
     { key: 'ref_no', label: 'Reference No' },
     { key: 'inv_no', label: 'Invoice No' },
     { key: 'odn_no', label: 'ODN No' },
@@ -51,10 +51,10 @@ export class FreightBillingComponent implements OnInit {
     { key: 'transporter', label: 'Transporter' },
     { key: 'lr_no', label: 'LR NO' },
     { key: 'workorder_no', label: 'Workorder No' },
-    {key :"sales_person",label: 'Sales Person'},
-    {key :"location",label: 'Location'},
-    {key :"vehicle_no",label: 'Vehicle No'},
-    {key :"freight_billno",label: 'Freight Bill No'},
+    { key: "sales_person", label: 'Sales Person' },
+    { key: "location", label: 'Location' },
+    { key: "vehicle_no", label: 'Vehicle No' },
+    { key: "freight_billno", label: 'Freight Bill No' },
   ]
   selectedType: any = '';
   searchOptionsList: any[] = [];
@@ -78,6 +78,7 @@ export class FreightBillingComponent implements OnInit {
   initializeForm(): void {
     this.FreightBilling = this.fb.group({
       ponumber: [''],
+      REFNO: [''],
       invoicenumber: [''],
       FreightBillNumber: ['', Validators.required],
       FreightBillDate: ['', Validators.required],
@@ -85,7 +86,10 @@ export class FreightBillingComponent implements OnInit {
       FreightCharges: ['', [Validators.required, Validators.min(0)]],
       WorkOrderNumber: [''],
       BillSubmission: ['', Validators.required],
+      LRNO: [''],
+      TRANSPORTER: [''],
       referenceItems: this.fb.array([this.createReferenceRow()])
+
     });
     this.loadInitialData();
   }
@@ -104,43 +108,73 @@ export class FreightBillingComponent implements OnInit {
   }
 
   setupWorkOrderListener(): void {
+    const fields = [
+      'FreightBillNumber',
+      'FreightBillDate',
+      'FreightBillPhysicalSubmissionDate',
+      'FreightCharges'
+    ];
+
+    // FIRST TIME → ENABLE ALL FIELDS BY DEFAULT
+    fields.forEach(f => {
+      this.FreightBilling.get(f)?.enable({ emitEvent: false });
+    });
+
     this.FreightBilling.get('WorkOrderNumber')?.valueChanges.subscribe((value) => {
-      if (value && value !== '') {
-        this.FreightBilling.get('FreightBillNumber')?.clearValidators();
-        this.FreightBilling.get('FreightBillNumber')?.disable();
-        this.FreightBilling.get('FreightBillNumber')?.setValue('');
 
-        this.FreightBilling.get('FreightBillDate')?.clearValidators();
-        this.FreightBilling.get('FreightBillDate')?.disable();
-        this.FreightBilling.get('FreightBillDate')?.setValue('');
-
-        this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.clearValidators();
-        this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.disable();
-        this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.setValue('');
-
-        this.FreightBilling.get('FreightCharges')?.clearValidators();
-        this.FreightBilling.get('FreightCharges')?.disable();
-        this.FreightBilling.get('FreightCharges')?.setValue('');
-      } else {
-        this.FreightBilling.get('FreightBillNumber')?.setValidators([Validators.required]);
-        this.FreightBilling.get('FreightBillNumber')?.enable();
-
-        this.FreightBilling.get('FreightBillDate')?.setValidators([Validators.required]);
-        this.FreightBilling.get('FreightBillDate')?.enable();
-
-        this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.setValidators([Validators.required]);
-        this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.enable();
-
-        this.FreightBilling.get('FreightCharges')?.setValidators([Validators.required, Validators.min(0)]);
-        this.FreightBilling.get('FreightCharges')?.enable();
+      // → WORK ORDER NUMBER select chesina ENABLE
+      if (value === 'WORK ORDER NUMBER') {
+        fields.forEach(f => {
+          this.FreightBilling.get(f)?.enable();
+        });
       }
 
-      this.FreightBilling.get('FreightBillNumber')?.updateValueAndValidity();
-      this.FreightBilling.get('FreightBillDate')?.updateValueAndValidity();
-      this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.updateValueAndValidity();
-      this.FreightBilling.get('FreightCharges')?.updateValueAndValidity();
+      // → Rate Contract / Customer Transporter / Local Transporter / Company Vehicle → DISABLE
+      else if (value && value !== '') {
+        fields.forEach(f => {
+          this.FreightBilling.get(f)?.disable();
+          this.FreightBilling.get(f)?.setValue('');
+        });
+      }
+
+      // → EMPTY select chesina (Select Option) → ENABLE
+      else {
+        fields.forEach(f => {
+          this.FreightBilling.get(f)?.enable();
+        });
+      }
     });
   }
+
+
+  disableFreightFields() {
+    const fields = ['FreightBillNumber', 'FreightBillDate', 'FreightBillPhysicalSubmissionDate', 'FreightCharges'];
+    fields.forEach(f => {
+      this.FreightBilling.get(f)?.clearValidators();
+      this.FreightBilling.get(f)?.disable();
+      this.FreightBilling.get(f)?.setValue('');
+    });
+  }
+
+  enableFreightFields() {
+    this.FreightBilling.get('FreightBillNumber')?.setValidators([Validators.required]);
+    this.FreightBilling.get('FreightBillDate')?.setValidators([Validators.required]);
+    this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.setValidators([Validators.required]);
+    this.FreightBilling.get('FreightCharges')?.setValidators([Validators.required, Validators.min(0)]);
+
+    this.FreightBilling.get('FreightBillNumber')?.enable();
+    this.FreightBilling.get('FreightBillDate')?.enable();
+    this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.enable();
+    this.FreightBilling.get('FreightCharges')?.enable();
+  }
+
+  updateFreightValidators() {
+    this.FreightBilling.get('FreightBillNumber')?.updateValueAndValidity();
+    this.FreightBilling.get('FreightBillDate')?.updateValueAndValidity();
+    this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.updateValueAndValidity();
+    this.FreightBilling.get('FreightCharges')?.updateValueAndValidity();
+  }
+
 
   onOrderTypeChange(): void {
     if (this.previousOrderType !== null && this.previousOrderType !== this.orderType) {
@@ -207,6 +241,7 @@ export class FreightBillingComponent implements OnInit {
     }
 
     const obj = {
+      global_scr: 'FREIGHT BILLING',
       REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
@@ -257,6 +292,7 @@ export class FreightBillingComponent implements OnInit {
   }
 
   onCheckboxChange(event: Event, index: number): void {
+    this.selectedItems = [];
     const checkbox = event.target as HTMLInputElement;
     const rowValue = (this.referenceItems.at(index) as FormGroup).value;
 
@@ -298,7 +334,7 @@ export class FreightBillingComponent implements OnInit {
     );
   }
 
-   onSearchTypeChange(): void {
+  onSearchTypeChange(): void {
     // Reset data when search type changes
     this.searchReference = '';
     this.searchOptionsList = [];
@@ -307,60 +343,60 @@ export class FreightBillingComponent implements OnInit {
   }
 
   // Search functionality
- onSearchReference() {
-      if (!this.searchReference?.trim()) {
-        Swal.fire('Please enter a value', '', 'warning');
-        return;
-      }
-  
-      if (!this.selectedType) {
-        Swal.fire('Please select a search type', '', 'info');
-        return;
-      }
-  
-  
-      let payload1: any = {
-       
+  onSearchReference() {
+    if (!this.searchReference?.trim()) {
+      Swal.fire('Please enter a value', '', 'warning');
+      return;
+    }
+
+    if (!this.selectedType) {
+      Swal.fire('Please select a search type', '', 'info');
+      return;
+    }
+
+
+    let payload1: any = {
+
       "global": "FREIGHT BILLING",
       "data": {
-          "ref_no": "",
-          "inv_no": "",
-          "so_no": "",
-          "transporter": "",
-          "lr_no": "",
-          "workorder_no": "",
-          "sales_person": "",
-          "location": "",
-          "odn_no": "",
-          "vehicle_no": "",
-          "freight_billno": "",
-          "nature_damage": "",
-          "claim_status": ""
+        "ref_no": "",
+        "inv_no": "",
+        "so_no": "",
+        "transporter": "",
+        "lr_no": "",
+        "workorder_no": "",
+        "sales_person": "",
+        "location": "",
+        "odn_no": "",
+        "vehicle_no": "",
+        "freight_billno": "",
+        "nature_damage": "",
+        "claim_status": ""
       }
-      };
-      payload1.data[this.selectedType] = this.searchReference.trim();
-  
-      console.log('🔍 Payload:', payload1);
-  
-      this.spinner.show();
-      this.service.global_Fields_SearchOption(payload1).subscribe({
-        next: (res: any) => {
-          this.spinner.hide();
-          if (res.length > 0) {
-            this.searchOptionsList = res;
-            this.showForm = false;
-            Swal.fire('Data fetched successfully!', '', 'success');
-          } else {
-            Swal.fire('No records found', '', 'info');
-          }
-        },
-        error: (err) => {
-          this.spinner.hide();
-          console.error('❌ Error:', err);
-          Swal.fire('Error fetching data', '', 'error');
+    };
+    payload1.data[this.selectedType] = this.searchReference.trim();
+
+    console.log('🔍 Payload:', payload1);
+
+    this.spinner.show();
+    this.service.global_Fields_SearchOption(payload1).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        if (res.HEADER.length > 0) {
+          this.searchOptionsList = res.HEADER;
+          this.showForm = false;
+          Swal.fire('Data fetched successfully!', '', 'success');
+        } else {
+          Swal.fire('No records found', '', 'info');
         }
-      });
-    }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('❌ Error:', err);
+        Swal.fire('Error fetching data', '', 'error');
+      }
+    });
+  }
 
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
@@ -416,17 +452,27 @@ export class FreightBillingComponent implements OnInit {
       });
       return;
     }
+    const ref =
+      this.orderType === 'Outward'
+        ? this.selectedItems[0]
+        : this.referenceItems.at(0)?.value || {};
+    console.log("ref", ref);
 
+    console.log("formValue", formValue);
     const record = {
       INV_NO: formValue.invoicenumber || formValue.ponumber || '',
+      REFNO: ref.referenceNumber || '',
       BILLNO: formValue.FreightBillNumber || '',
       BILLDATE: formValue.FreightBillDate || '',
       PHY_DATE: formValue.FreightBillPhysicalSubmissionDate || '',
       FRT_CHARGES: formValue.FreightCharges || 0,
       ORDER_NO: formValue.WorkOrderNumber || '',
+      WORKORDER: ref.workOrderNumber || '',
+      LRNO: ref.lrNumber || formValue.LRNO || '',
+      TRANSPORTER: ref.transporter || '',
       BILL_SUBMISSION: formValue.BillSubmission,
-      ...(this.orderType === 'Outward' && this.selectedItems.length > 0 ? this.selectedItems[0] : {})
     };
+    console.log("record", record);
 
     this.spinner.show();
 

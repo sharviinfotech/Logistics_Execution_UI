@@ -96,7 +96,8 @@
         <div class="search-bar-wrapper-global">
           <div class="search-container">
             <div class="search-box">
-              <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
+              <select class="search-type-select" [(ngModel)]="selectedType" name="searchType"
+                (change)="onSearchTypeChange()">
                 <option value="" disabled selected>Select</option>
                 <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
               </select>
@@ -128,6 +129,19 @@
       </div>
 
       <div class="form-field">
+        <select formControlName="WorkOrderNumber">
+          <option value="">Select Option</option>
+          <option value="Rate contract">Rate contract</option>
+          <option value="WORK ORDER NUMBER">work order number</option>
+          <option value="Customer Transporter">Customer Transporter</option>
+          <option value="Local Transporter">Local Transporter</option>
+          <option value="Company vehicle">Company vehicle</option>
+        </select>
+        <label>Work Order Number</label>
+      </div>
+
+
+      <div class="form-field">
         <input type="number" formControlName="FreightBillNumber" placeholder=" " />
         <label>Freight Bill Number</label>
       </div>
@@ -148,17 +162,6 @@
         <label>Freight Charges</label>
       </div>
 
-      <div class="form-field">
-        <select formControlName="WorkOrderNumber">
-          <option value="">Select Option</option>
-          <option value="Rate contract">Rate contract</option>
-          <option value="WORK ORDER NUMBER">WORK ORDER NUMBER</option>
-          <option value="Customer Transporter">Customer Transporter</option>
-          <option value="Local Transporter">Local Transporter</option>
-          <option value="Company vehicle">Company vehicle</option>
-        </select>
-        <label>Work Order Number</label>
-      </div>
 
       <div class="form-field">
         <input type="text" formControlName="BillSubmission" placeholder=" " />
@@ -204,25 +207,27 @@
             <th>Freight Bill Date</th>
             <th>Physical Submission Date</th>
             <th>Freight Charges</th>
-            <th>Work Order</th>
+            <th>work order</th>
             <th>Bill Submission</th>
+            <th>work order type</th>
             <th>LR No</th>
             <th>Transporter</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let item of searchOptionsList">
-            <td>{{ item.ZREFNO  }}</td>
-            <td>{{ item.ZINV_NO  }}</td>
-            <td>{{ item.ZODN_NO  }}</td>
-            <td>{{ item.ZBILLNO  }}</td>
+            <td>{{ item.ZREFNO }}</td>
+            <td>{{ item.ZINV_NO }}</td>
+            <td>{{ item.ZODN_NO }}</td>
+            <td>{{ item.ZBILLNO }}</td>
             <td>{{ item.ZBILLDATE | date: 'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZPHY_DATE  | date: 'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZFRT_CHARGES  | number: '1.2-2' }}</td>
-            <td>{{ item.ZORDER_NO }}</td>
-            <td>{{ item.ZBILL_SUBMISSION  }}</td>
-            <td>{{ item.ZLRNO  }}</td>
-            <td>{{ item.ZTRANSPORTER  }}</td>
+            <td>{{ item.ZPHY_DATE | date: 'dd-MM-yyyy' }}</td>
+            <td>{{ item.ZFRT_CHARGES | number: '1.2-2' }}</td>
+            <td>{{ item.ZWORK_ORDER }}</td>
+            <td>{{ item.ZBILL_SUBMISSION }}</td>
+            <td>{{ item.ZWORKORDER }}</td>
+            <td>{{ item.ZLRNO }}</td>
+            <td>{{ item.ZTRANSPORTER }}</td>
           </tr>
         </tbody>
       </table>
