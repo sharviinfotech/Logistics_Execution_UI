@@ -240,6 +240,7 @@
             <th>Ref No</th>
             <th>Invoice No</th>
             <th>ODN No</th>
+            <th>SO NO</th>
             <th>Type of Shipment</th>
             <th>Transporter</th>
             <th>LR No</th>
@@ -256,10 +257,11 @@
         <tbody>
           <tr *ngFor="let item of searchOptionsList">
             <td>{{ item.ZREFNO }}</td>
-            <td>{{ item.ZINV_NO  }}</td>
+            <td>{{ item.VBELN  }}</td>
             <td>{{ item.ZODN_NO  }}</td>
+            <td>{{ item.ZSONO  }}</td>
             <td>{{ item.ZTRX_TYPE  }}</td>
-            <td>{{ item.ZTRANSPOTER }}</td>
+            <td>{{ item.ZTRANSPORTER }}</td>
             <td>{{ item.ZLRNO  }}</td>
             <td>{{ item.ZTRUC_TYPE  }}</td>
             <td>{{ item.ZTRUC_WT  }}</td>
@@ -269,6 +271,7 @@
             <td>{{ item.ZDNAME  }}</td>
             <td>{{ item.ZDNUMBER  }}</td>
             <td>{{ item.ZWORK_ORDER  }}</td>
+
           </tr>
         </tbody>
       </table>

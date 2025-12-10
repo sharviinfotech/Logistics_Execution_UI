@@ -195,6 +195,7 @@ export class TransitDamageInfoComponent implements OnInit {
     }
 
     const obj = {
+      global_scr: 'TRANSIT DAMAGE INFO',
       REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
@@ -309,7 +310,7 @@ export class TransitDamageInfoComponent implements OnInit {
    
        let payload1: any = {
         
-       "global": "FREIGHT BILLING",
+       "global": "TRANSIT DAMAGE INFO",
        "data": {
            "REF_NO": "",
           "INV_NO": "",

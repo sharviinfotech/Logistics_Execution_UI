@@ -213,7 +213,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     }
 
     const obj = {
-      REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
+      global_scr: 'INSURANCE CLAIM STATUS',
+      REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '', 
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : ''
@@ -327,7 +328,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
      
          let payload1: any = {
           
-         "global": "FREIGHT BILLING",
+         "global": "INSURANCE CLAIM STATUS",
          "data": {
              "REF_NO": "",
             "INV_NO": "",

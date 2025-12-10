@@ -72,9 +72,12 @@ export class VechileInfoComponent implements OnInit {
   }
 
   createVehicleRow(data?: any): FormGroup {
+    console.log("createVehicleRow data",data)
     return this.fb.group({
       selected: [false],
-      
+      VBELN:[data?.VBELN],
+      MANDT:[data?.MANDT],
+      POSNR:[data?.POSNR],
       ZMAPID: [data?.ZMAPID || ''],
       ZTRX_TYPE: [data?.ZTRX_TYPE || '', Validators.required],
       ZTRANSPOTER: [data?.ZTRANSPOTER || '', Validators.required],
@@ -86,11 +89,11 @@ export class VechileInfoComponent implements OnInit {
       ZNOOFVEH: [data?.ZNOOFVEH || '', [Validators.required, Validators.min(1)]],
       ZDNAME: [data?.ZDNAME || '', Validators.required],
       ZDNUMBER: [data?.ZDNUMBER || '', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
-       ZREFNO: [data?.ZREFNO || ''],
-    ZWORK_ORDER: [data?.ZWORK_ORDER || ''],
+      ZREFNO: [data?.ZREFNO || ''],
+     ZWORK_ORDER: [data?.ZWORK_ORDER || ''],
     
     // ZTRANSPORTER: [data?.ZTRANSPORTER || ''],
-    ZSO_NO: [data?.ZSO_NO || ''],
+    ZSO_NO: [data?.ZSONO || ''],
     ZODN_NO: [data?.ZODN_NO || '']
     });
   }
@@ -103,7 +106,7 @@ export class VechileInfoComponent implements OnInit {
       lrNumber: [''],
       transporter: [''],
       soNumber: [''],        
-    odnNumber: [''],   
+      odnNumber: [''],   
     });
   }
 
@@ -205,7 +208,7 @@ export class VechileInfoComponent implements OnInit {
       ZREFNO: selectedObj.referenceNumber || "",
       ZWORK_ORDER: selectedObj.workOrderNumber || "",
       ZLRNO: selectedObj.lrNumber || "",
-      ZTRANSPORTER: selectedObj.transporter || "",
+      ZTRANSPOTER: selectedObj.transporter || "",
       ZMAPID: selectedObj.MAPID || ""
     });
   }
@@ -231,6 +234,7 @@ export class VechileInfoComponent implements OnInit {
     }
 
     const obj = {
+      global_scr: 'VEHICLE INFO',  
       REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
@@ -383,8 +387,11 @@ export class VechileInfoComponent implements OnInit {
     this.service.global_Fields_SearchOption(payload1).subscribe({
       next: (res: any) => {
         this.spinner.hide();
-        if (res.length > 0) {
-          this.searchOptionsList = res;
+        console.log("HEADER", res.HEADER )
+        if (res?.HEADER?.length > 0) {
+
+          this.searchOptionsList = res.HEADER;
+          this.showTable = false;
           this.showForm = false;
           Swal.fire('Data fetched successfully!', '', 'success');
         } else {

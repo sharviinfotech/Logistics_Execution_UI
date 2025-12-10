@@ -789,6 +789,7 @@ export class OrderInfoComponent implements OnInit {
     }
 
     const obj = {
+      global_scr: 'ORDER INFO',
       REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',

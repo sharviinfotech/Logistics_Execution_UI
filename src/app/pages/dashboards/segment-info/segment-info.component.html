@@ -273,7 +273,7 @@
 
     <!-- ETA -->
     <div class="form-field" [class.filled]="segmentInfo.get('ETA_DATE')?.value">
-      <input type="text" formControlName="ETA_DATE" placeholder=" " />
+      <input type="date" formControlName="ETA_DATE" placeholder=" " />
       <label>ETA</label>
     </div>
 
@@ -314,22 +314,22 @@
         </thead>
         <tbody>
           <tr *ngFor="let item of searchOptionsList">
-            <td>{{ item.REFNO  }}</td>
-            <td>{{ item.INV_NO  }}</td>
-            <td>{{ item.SONO }}</td>
-            <td>{{ item.ODN_NO  }}</td>
-            <td>{{ item.SALE_PERSON  }}</td>
-            <td>{{ item.SEGMENT  }}</td>
-            <td>{{ item.APPTYP  }}</td>
-            <td>{{ item.CUST_PROFILE  }}</td>
-            <td>{{ item.BRANCH  }}</td>
-            <td>{{ item.BRANCH_ZONE  }}</td>
-            <td>{{ item.TAT_TYPE  }}</td>
-            <td>{{ item.TAT  }}</td>
-            <td>{{ item.ETA  }}</td>
-            <td>{{ item.WORK_ORDER }}</td>
-            <td>{{ item.LRNO  }}</td>
-            <td>{{ item.TRANSPORTER  }}</td>
+            <td>{{ item.ZREFNO  }}</td>
+            <td>{{ item.ZINV_NUM  }}</td>
+            <td>{{ item.ZSO_NO }}</td>
+            <td>{{ item.ZODN_NO  }}</td>
+            <td>{{ item.ZSALE_PERSON  }}</td>
+            <td>{{ item.ZSEGMENT  }}</td>
+            <td>{{ item.ZAPPTYP  }}</td>
+            <td>{{ item.ZCUST_PROFILE  }}</td>
+            <td>{{ item.ZBRANCH }}</td>
+            <td>{{ item.ZBRANCH_ZONE  }}</td>
+            <td>{{ item.ZTAT_TYPE  }}</td>
+            <td>{{ item.ZTAT }}</td>
+            <td>{{ item.ZETA  }}</td>
+            <td>{{ item.ZWORK_ORDER }}</td>
+            <td>{{ item.ZLRNO  }}</td>
+            <td>{{ item.ZTRANSPORTER  }}</td>
           </tr>
         </tbody>
       </table>

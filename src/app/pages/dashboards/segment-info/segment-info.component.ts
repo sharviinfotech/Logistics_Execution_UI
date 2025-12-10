@@ -256,6 +256,7 @@ export class SegmentInfoComponent implements OnInit {
     }
 
     const obj = {
+      global_scr: 'SEGMENT INFO',
       REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
@@ -388,33 +389,31 @@ export class SegmentInfoComponent implements OnInit {
         }
         };
         payload1.data[this.selectedType] = this.searchReference.trim();
-    
-        console.log('🔍 Payload1:', payload1);
-        this.spinner.show();
-        this.service.global_Fields_SearchOption(payload1).subscribe({
-        next: (res: any) => {
-          this.spinner.hide();
-          console.log('✅ Search Response:', res);
-          if (res.NUMBER == "100" && res.STATUS == "FALSE") {
-            this.searchOptionsList = [];
-           
-           
-            Swal.fire('', res.MESSAGE, 'warning');
-          } else {
-            Swal.fire('No records found', '', 'info');
-             this.searchOptionsList = res.HEADER;
-            this.showForm = false;
-           
-            Swal.fire('Data fetched successfully!', '', 'success');
-          }
-        },
-        error: (err) => {
-          this.spinner.hide();
-          console.error('❌ Error:', err);
-          Swal.fire('Error fetching data', '', 'error');
+
+    console.log('🔍 Payload:', payload1);
+
+    this.spinner.show();
+    this.service.global_Fields_SearchOption(payload1).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        console.log("HEADER", res.HEADER )
+        if (res?.HEADER?.length > 0) {
+
+          this.searchOptionsList = res.HEADER;
+          
+          this.showForm = false;
+          Swal.fire('Data fetched successfully!', '', 'success');
+        } else {
+          Swal.fire('No records found', '', 'info');
         }
-      });
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('❌ Error:', err);
+        Swal.fire('Error fetching data', '', 'error');
       }
+    });
+  }
 
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
@@ -578,7 +577,7 @@ export class SegmentInfoComponent implements OnInit {
         if (res && (res.TAT || res.ETA)) {
           this.segmentInfo.patchValue({
             TAT_DAYS: res.TAT || '',
-            ETA_DATE: res.ETA || ''
+            ETA_DATE: res.ETA || '' 
           });
         } else {
           Swal.fire('No TAT data found for selected type', '', 'info');
