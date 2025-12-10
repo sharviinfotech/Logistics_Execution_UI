@@ -427,9 +427,7 @@ export class TransitInfoComponent implements OnInit {
 
     }
 
-    // -------------------------
-    // FINAL PAYLOAD
-    // -------------------------
+
     const payload = {
       HEAD,
       ITEM
