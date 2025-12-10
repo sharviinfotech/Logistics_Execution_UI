@@ -31,9 +31,12 @@ export class TransitDamageInfoComponent implements OnInit {
   ItemForm!: FormGroup;
 
   showTable = false;
+  ShowHeaderForm = false;
+  SavedDataShow = false;
   showForm = false;
   isEditMode = false;
-  
+  isAllSelected: boolean = false;
+
 
   previousOrderType: string | null = null;
   previousSapType: string | null = null;
@@ -41,7 +44,7 @@ export class TransitDamageInfoComponent implements OnInit {
   // Search functionality
   selectedItems: any[] = [];
   searchReference: string = '';
-   searchOptions = [
+  searchOptions = [
     { key: 'ref_no', label: 'Reference No' },
     { key: 'inv_no', label: 'Invoice No' },
     { key: 'odn_no', label: 'ODN No' },
@@ -49,14 +52,13 @@ export class TransitDamageInfoComponent implements OnInit {
     { key: 'transporter', label: 'Transporter' },
     { key: 'lr_no', label: 'LR NO' },
     { key: 'workorder_no', label: 'Workorder No' },
-    {key :"sales_person",label: 'Sales Person'},
-    {key :"location",label: 'Location'},
-    {key :"vehicle_no",label: 'Vehicle No'},
-    {key :"freight_billno",label: 'Freight Bill No'},
-    {key :"product",label: 'Product'},
-    {key :"route",label: 'Route'},
-
-  ]
+    { key: "sales_person", label: 'Sales Person' },
+    { key: "location", label: 'Location' },
+    { key: "vehicle_no", label: 'Vehicle No' },
+    { key: "freight_billno", label: 'Freight Bill No' },
+    { key: "product", label: 'Product' },
+    { key: "route", label: 'Route' },
+  ];
   selectedType: any = '';
   searchOptionsList: any[] = [];
   dropdownOpen = false;
@@ -86,7 +88,12 @@ export class TransitDamageInfoComponent implements OnInit {
       SETTLEMENT: [''],
       CLOSING_DT: [''],
       IMAGES: [''],
-
+      ODN_NO: [''],
+      SONO: [''],
+      SALE_PERSON: [''],
+      LOCATION: [''],
+      ROUTE: [''],
+      REFNO: [''],
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
   }
@@ -124,7 +131,11 @@ export class TransitDamageInfoComponent implements OnInit {
       VEH_LINE: [''],
       TRUCK_NO: [''],
       LR_NO: [''],
-      TRANSPORTER: ['']
+      TRANSPORTER: [''],
+      REFNO: [''],
+      WORK_ORDER: [''],
+      PRODUCT: [''],
+      BILLNO: [''],
     });
 
     this.items.push(row);
@@ -170,6 +181,7 @@ export class TransitDamageInfoComponent implements OnInit {
 
   resetConditionalFields(): void {
     this.showTable = false;
+    this.ShowHeaderForm = false;
     this.showForm = false;
     this.searchOptionsList = [];
     this.selectedItems = [];
@@ -251,25 +263,25 @@ export class TransitDamageInfoComponent implements OnInit {
     }
   }
 
-   onchangeMAPID(index: number) {
-  const rowForm = this.items.at(index) as FormGroup;
-  const selectedMapId = rowForm.get('ZMAPID')?.value;
-  console.log("Selected MAPID:", selectedMapId);
+  onchangeMAPID(index: number) {
+    const rowForm = this.items.at(index) as FormGroup;
+    const selectedMapId = rowForm.get('ZMAPID')?.value;
+    console.log("Selected MAPID:", selectedMapId);
 
-  const selectedObj = this.selectedItems.find(item => item.MAPID == selectedMapId);
-  console.log("Selected MAPID object:", selectedObj);
+    const selectedObj = this.selectedItems.find(item => item.MAPID == selectedMapId);
+    console.log("Selected MAPID object:", selectedObj);
 
-  if (selectedObj) {
-    rowForm.patchValue({
-      ZREFNO: selectedObj.referenceNumber || "",
-      ZWORK_ORDER: selectedObj.workOrderNumber || "",
-      ZLRNO: selectedObj.lrNumber || "",
-      ZTRANSPORTER: selectedObj.transporter || "",
-      ZMAPID: selectedObj.MAPID || ""
-    });
+    if (selectedObj) {
+      rowForm.patchValue({
+        REFNO: selectedObj.referenceNumber || "",
+        WORK_ORDER: selectedObj.workOrderNumber || "",
+        LR_NO: selectedObj.lrNumber || "",
+        TRANSPORTER: selectedObj.transporter || "",
+        ZMAPID: selectedObj.MAPID || ""
+      });
+    }
+    console.log("Updated items form:", this.items.value);
   }
-  console.log("Updated invoices form:", this.items.value);
-}
 
   onCheckboxChange(event: Event, index: number): void {
     const checkbox = event.target as HTMLInputElement;
@@ -317,7 +329,6 @@ export class TransitDamageInfoComponent implements OnInit {
   }
 
   onSearchTypeChange(): void {
-    // Reset data when search type changes
     this.searchReference = '';
     this.searchOptionsList = [];
     this.showForm = false;
@@ -330,7 +341,8 @@ export class TransitDamageInfoComponent implements OnInit {
       Swal.fire('Please enter a value', '', 'warning');
       return;
     }
-
+    this.SavedDataShow = false;
+    this.ShowHeaderForm = false;
     if (!this.selectedType) {
       Swal.fire('Please select a search type', '', 'info');
       return;
@@ -358,18 +370,47 @@ export class TransitDamageInfoComponent implements OnInit {
     };
     payload1.data[this.selectedType] = this.searchReference.trim();
 
-    console.log('🔍 Payload:', payload1);
-
+    console.log('🔍 Payload1:', payload1);
     this.spinner.show();
     this.service.global_Fields_SearchOption(payload1).subscribe({
       next: (res: any) => {
         this.spinner.hide();
-        if (res.length > 0) {
-          this.searchOptionsList = res;
-          this.showForm = false;
-          Swal.fire('Data fetched successfully!', '', 'success');
+        console.log('✅ Search Response:', res);
+        if (res.NUMBER == "100" && res.STATUS == "FALSE") {
+          this.searchOptionsList = [];
+
+
+          Swal.fire('', res.MESSAGE, 'warning');
         } else {
-          Swal.fire('No records found', '', 'info');
+         
+          this.searchOptionsList = res.ITEMS;
+          this.showForm = false;
+          this.SavedDataShow = true;
+          this.ShowHeaderForm = true;
+          this.showTable = false;
+          const header = res.HEADER?.[0];
+          console.log("HEADER PATCH",header)
+          this.HeaderForm.patchValue({
+            INV_NO: header.ZINV_NO,
+            INV_DATE: header.ZINV_DATE,
+            FSR_RPT_DT: header.ZFSR_RPT_DT,
+            BASIC_VALUE: header.ZBASIC_VALUE,
+            INC_DATE: header.ZINC_DATE,
+            CUSTOMER: header.ZCUSTOMER,
+            CONSIGN_NAME: header.ZCONSIGN_NAME,
+            DAMAGE_RMK: header.ZDAMAGE_RMK,
+            SETTLEMENT: header.ZSETTLEMENT,
+            CLOSING_DT: header.ZCLOSING_DT,
+            IMAGES: header.ZIMAGES,
+            ODN_NO: header.ODN_NO,
+            SONO: header.SONO,
+            SALE_PERSON: header.ZSALE_PERSON,
+            LOCATION: header.ZLOCATION,
+            ROUTE: header.ZROUTE,
+            REFNO: header.ZREFNO,
+          });
+
+          Swal.fire('Data fetched successfully!', '', 'success');
         }
       },
       error: (err) => {
@@ -380,19 +421,33 @@ export class TransitDamageInfoComponent implements OnInit {
     });
   }
 
-  toggleDropdown() {
-    this.dropdownOpen = !this.dropdownOpen;
+  allSelected(): boolean {
+    return this.items.controls.length > 0 &&
+      this.items.controls.every(ctrl => ctrl.get('selected')?.value === true);
   }
 
-  selectSearchType(option: any) {
-    this.selectedType = option;
-    this.dropdownOpen = false;
+  toggleAllSelection(event: any): void {
+    const isChecked = event.target.checked;
+    this.isAllSelected = isChecked;
+    this.items.controls.forEach(ctrl => ctrl.get('selected')?.setValue(isChecked));
+  }
+
+  onRowCheckboxChange(): void {
+    this.isAllSelected = this.allSelected();
+    console.log('All Selected:', this.items.value);
+  }
+
+  getSelectedRows() {
+    return this.items.controls
+      .map(ctrl => ctrl.value)
+      .filter(row => row.selected);
   }
 
   onInputChange(type: 'purchase' | 'invoice'): void {
     const value = type === 'purchase' ? this.ponumber : this.invoicenumber;
     if (!value || value.trim() === '') {
       this.showTable = false;
+      this.ShowHeaderForm = false;
       this.showForm = false;
     }
   }
@@ -431,6 +486,7 @@ export class TransitDamageInfoComponent implements OnInit {
         const items = res[0].ITEM;
 
         this.showTable = true;
+        this.ShowHeaderForm = true;
         this.showForm = true;
 
         this.HeaderForm.patchValue({
@@ -444,7 +500,13 @@ export class TransitDamageInfoComponent implements OnInit {
           DAMAGE_RMK: header.DAMAGE_RMK,
           SETTLEMENT: header.SETTLEMENT,
           CLOSING_DT: header.CLOSING_DT,
-          IMAGES: header.IMAGES
+          IMAGES: header.IMAGES,
+          ODN_NO: header.ODN_NO,
+          SONO: header.SONO,
+          SALE_PERSON: header.SALE_PERSON,
+          LOCATION: header.LOCATION,
+          ROUTE: header.ROUTE,
+          REFNO: header.REFNO,
         });
 
         while (this.items.length !== 0) {
@@ -454,13 +516,17 @@ export class TransitDamageInfoComponent implements OnInit {
         items.forEach((x: any) => {
           const row = this.fb.group({
             selected: [false],
-            MAPID: [''],
+            ZMAPID: [x.MAPID || ''],
             INV_NO: [x.INV_NO],
+            REFNO: [x.REFNO],
+            BILLNO: [x.BILLNO],
+            PRODUCT: [x.PRODUCT],
             POSNR: [x.POSNR],
             VEH_LINE: [x.VEH_LINE],
             TRUCK_NO: [x.TRUCK_NO],
             LR_NO: [x.LR_NO],
-            TRANSPORTER: [x.TRANSPORTER]
+            TRANSPORTER: [x.TRANSPORTER],
+            WORK_ORDER: [x.WORK_ORDER]
           });
 
           this.items.push(row);
@@ -475,74 +541,77 @@ export class TransitDamageInfoComponent implements OnInit {
   }
 
   onSaveActionSap(action: 'stay' | 'next' | 'previous' = 'stay') {
+    const filtered = this.items.value
+      .filter((row: any) => row.selected === true)
+      .map(({ selected, ...rest }) => rest);
 
-  const filtered = this.items.value
-    .filter((row: any) => row.selected === true)
-    .map(({ selected, ...rest }) => rest);  // remove selected key
+    if (filtered.length === 0) {
+      Swal.fire({
+        title: 'Warning',
+        text: 'Please select at least one product row to save.',
+        icon: 'warning',
+        timer: 3000,
+        confirmButtonText: 'Ok',
+      });
+      return;
+    }
 
-  if (filtered.length === 0) {
-    Swal.fire({
-      title: 'Warning',
-      text: 'Please select at least one product row to save.',
-      icon: 'warning',
-      timer: 3000,
-      confirmButtonText: 'Ok',
-    });
-    return;
-  }
+    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
 
-  const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+    // Get header form value and remove referenceItems array
+    const headerValue = { ...this.HeaderForm.value };
+    delete headerValue.referenceItems;
 
-  this.HeaderForm.patchValue({
-    INV_NO: referenceNumber
-  });
+    headerValue.INV_NO = referenceNumber;
 
-  // FIXED: Apply INV_NO to selected rows only
-  filtered.forEach(row => row.INV_NO = referenceNumber);
+    filtered.forEach(row => row.INV_NO = referenceNumber);
 
-  const payload = {
-    HEADER: this.HeaderForm.value,   // Use header only
-    ITEM: filtered                   // FIXED: send selected rows only
-  };
+    const payload = {
+      HEADER: headerValue,
+      ITEM: filtered
+    };
 
-  this.spinner.show();
-  this.service.TransitDamageInfoSave(payload).subscribe({
-    next: (res: any) => {
-      this.spinner.hide();
+    console.log("📤 Final Payload:", payload);
 
-      if (res?.STATUS === "TRUE") {
-        Swal.fire({
-          text: "✅ Data Saved Successfully!",
-          icon: "success",
-          showConfirmButton: false,
-          timer: 900,
-          willClose: () => {
-            if (action === 'next') {
-              this.router.navigate(['/insurance-claim-tracking']);
-            } else if (action === 'previous') {
-              this.router.navigate(['/freight-billing']);
-            } else {
-              this.resetForms();
+    this.spinner.show();
+    this.service.TransitDamageInfoSave(payload).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+
+        if (res?.STATUS === "TRUE") {
+          Swal.fire({
+            text: "✅ Data Saved Successfully!",
+            icon: "success",
+            showConfirmButton: false,
+            timer: 900,
+            title: 'Warning',
+            confirmButtonText: 'Ok',
+            willClose: () => {
+              if (action === 'next') {
+                this.router.navigate(['/insurance-claim-tracking']);
+              } else if (action === 'previous') {
+                this.router.navigate(['/freight-billing']);
+              } else {
+                this.resetForms();
+              }
             }
-          }
-        });
-      } else {
+          });
+        } else {
+          Swal.fire({
+            text: "⚠️ Save Failed: " + (res.MESSAGE || ''),
+            icon: "warning"
+          });
+        }
+      },
+      error: () => {
+        this.spinner.hide();
         Swal.fire({
-          text: "⚠️ Save Failed: " + (res.MESSAGE || ''),
-          icon: "warning"
+          text: "❌ Error while saving",
+          icon: "error"
         });
       }
-    },
-    error: () => {
-      this.spinner.hide();
-      Swal.fire({
-        text: "❌ Error while saving",
-        icon: "error"
-      });
-    }
-  });
-}
-
+    });
+  }
 
   fetchInvoiceDetailsnonsap() {
     const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
@@ -570,6 +639,7 @@ export class TransitDamageInfoComponent implements OnInit {
         const items = res[0].ITEM;
 
         this.showTable = true;
+        this.ShowHeaderForm = true;
         this.showForm = true;
 
         this.HeaderForm.patchValue({
@@ -592,12 +662,18 @@ export class TransitDamageInfoComponent implements OnInit {
 
         items.forEach((x: any) => {
           const row = this.fb.group({
+            selected: [false],
+            ZMAPID: [''],
             INV_NO: [x.INV_NO],
             POSNR: [x.POSNR],
             VEH_LINE: [x.VEH_LINE],
             TRUCK_NO: [x.TRUCK_NO],
             LR_NO: [x.LR_NO],
-            TRANSPORTER: [x.TRANSPORTER]
+            TRANSPORTER: [x.TRANSPORTER],
+            REFNO: [''],
+            WORK_ORDER: [''],
+            PRODUCT: [''],
+            BILLNO: ['']
           });
 
           this.items.push(row);
@@ -622,21 +698,22 @@ export class TransitDamageInfoComponent implements OnInit {
 
     const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
 
-    this.HeaderForm.patchValue({
-      INV_NO: referenceNumber
-    });
+    // Get header form value and remove referenceItems array
+    const headerValue = { ...this.HeaderForm.value };
+    delete headerValue.referenceItems;
+
+    headerValue.INV_NO = referenceNumber;
 
     this.items.controls.forEach(row => {
       row.patchValue({ INV_NO: referenceNumber });
     });
 
     const payload = {
-      HEADER: {
-        ...this.HeaderForm.value,
-        ...(this.orderType === 'Outward' && this.selectedItems.length > 0 ? this.selectedItems[0] : {})
-      },
+      HEADER: headerValue,
       ITEM: this.ItemForm.value.ITEMS
     };
+
+    console.log("📤 Non-SAP Final Payload:", payload);
 
     this.spinner.show();
     this.service.withoutsapSave(payload).subscribe({
@@ -674,6 +751,15 @@ export class TransitDamageInfoComponent implements OnInit {
         });
       }
     });
+  }
+
+  toggleDropdown() {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
+  selectSearchType(option: any) {
+    this.selectedType = option;
+    this.dropdownOpen = false;
   }
 
   isSap(): boolean {

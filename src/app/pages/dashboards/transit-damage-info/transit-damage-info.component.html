@@ -169,7 +169,7 @@
     <br />
 
     <!-- ✅ HEADER FORM -->
-    <form [formGroup]="HeaderForm" *ngIf="showTable" class="form-grid">
+    <form [formGroup]="HeaderForm" *ngIf="ShowHeaderForm" class="form-grid">
 
       <div class="form-field">
         <input type="date" formControlName="INV_DATE" placeholder=" " />
@@ -312,44 +312,40 @@
 </div>
 
 <!-- Search Results Table -->
-<div class="card" style="margin-top: 10px;" *ngIf="searchOptionsList?.length > 0">
+<div class="card" style="margin-top: 10px;" *ngIf="SavedDataShow">
   <div class="card-body-LE">
     <div class="table-responsive">
       <table class="table table-bordered table-striped text-center">
         <thead>
           <tr>
-            <th>Ref No</th>
+            <th>Map ID</th>
+             <th>Ref No</th>
             <th>Invoice No</th>
-            <th>Invoice Date</th>
-            <th>FSR Report Date</th>
-            <th>Basic Value</th>
-            <th>Incident Date</th>
-            <th>Customer</th>
-           
-            <th>Damage Remarks</th>
-            <th>Settlement</th>
-            <th>Closing Date</th>
+            <th>Vehile Line</th>
+            <th>Vehicle Number</th>
+            <th>Bill NO</th>
+            <th>Product</th>
             <th>Work Order</th>
             <th>LR No</th>
             <th>Transporter</th>
+
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let item of searchOptionsList">
-            <td>{{ item.ZREFNO || item.NUM || '-' }}</td>
-            <td>{{ item.ZINV_NO || item.INV_NO || '-' }}</td>
-            <td>{{ item.ZINV_DATE || item.INV_DATE | date: 'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZFSR_RPT_DT || item.FSR_RPT_DT | date: 'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZBASIC_VALUE || item.BASIC_VALUE | number: '1.2-2' }}</td>
-            <td>{{ item.ZINC_DATE || item.INC_DATE | date: 'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZCUSTOMER || item.CUSTOMER || '-' }}</td>
-            <td>{{ item.ZCONSIGN_NAME || item.CONSIGN_NAME || '-' }}</td>
-            <td>{{ item.ZDAMAGE_RMK || item.DAMAGE_RMK || '-' }}</td>
-            <td>{{ item.ZSETTLEMENT || item.SETTLEMENT || '-' }}</td>
-            <td>{{ item.ZCLOSING_DT || item.CLOSING_DT | date: 'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZWORK_ORDER || item.WORK_ORDER_NO || '-' }}</td>
-            <td>{{ item.ZLRNO || item.LR_NO || '-' }}</td>
-            <td>{{ item.ZTRANSPORTER || item.TRANSPORTER || '-' }}</td>
+            <td>{{ item.ZMAPID }}</td>
+            <td>{{ item.ZREFNO  }}</td>
+            <td>{{ item.ZINV_NO  }}</td>
+            <td>{{ item.ZVEH_LINE  }}</td>
+            <td>{{ item.ZTRUCK_NO }}</td>
+            <td>{{ item.ZBILLNO }}</td>
+            <td>{{ item.ZPRODUCT }}</td>
+            <td>{{ item.ZWORK_ORDER}}</td>
+            <td>{{ item.ZLRNO}}</td>
+            <td>{{ item.ZTRANSPORTER}}</td>
+
+
+            
           </tr>
         </tbody>
       </table>
