@@ -30,7 +30,7 @@ export class TransitInfoComponent implements OnInit {
   // Search functionality
   selectedItems: any[] = [];
   searchReference: string = '';
-   searchOptions = [
+  searchOptions = [
     { key: 'ref_no', label: 'Reference No' },
     { key: 'inv_no', label: 'Invoice No' },
     { key: 'odn_no', label: 'ODN No' },
@@ -38,9 +38,9 @@ export class TransitInfoComponent implements OnInit {
     { key: 'transporter', label: 'Transporter' },
     { key: 'lr_no', label: 'LR NO' },
     { key: 'workorder_no', label: 'Workorder No' },
-    {key :"sales_person",label: 'Sales Person'},
-    {key :"location",label: 'Location'},
-    {key :"vehicle_no",label: 'Vehicle No'},
+    { key: "sales_person", label: 'Sales Person' },
+    { key: "location", label: 'Location' },
+    { key: "vehicle_no", label: 'Vehicle No' },
   ]
   selectedType: any = '';
   searchOptionsList: any[] = [];
@@ -164,6 +164,7 @@ export class TransitInfoComponent implements OnInit {
     }
 
     const obj = {
+      global_scr: 'TRANSIT INFO',
       REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
@@ -255,7 +256,7 @@ export class TransitInfoComponent implements OnInit {
     );
   }
 
-   onSearchTypeChange(): void {
+  onSearchTypeChange(): void {
     // Reset data when search type changes
     this.searchReference = '';
     this.searchOptionsList = [];
@@ -264,61 +265,61 @@ export class TransitInfoComponent implements OnInit {
   }
 
   // Search functionality
- onSearchReference() {
-     if (!this.searchReference?.trim()) {
-       Swal.fire('Please enter a value', '', 'warning');
-       return;
-     }
- 
-     if (!this.selectedType) {
-       Swal.fire('Please select a search type', '', 'info');
-       return;
-     }
- 
- 
-     let payload1: any = {
-      
-     "global": "TRANSIT INFO",
-     "data": {
-         "ref_no": "",
-         "inv_no": "",
-         "so_no": "",
-         "transporter": "",
-         "lr_no": "",
-         "workorder_no": "",
-         "sales_person": "",
-         "location": "",
-         "odn_no": "",
-         "vehicle_no": "",
-         "freight_billno": "",
-         "nature_damage": "",
-         "claim_status": ""
-    
-     }
-     };
-     payload1.data[this.selectedType] = this.searchReference.trim();
- 
-     console.log('🔍 Payload:', payload1);
- 
-     this.spinner.show();
-     this.service.global_Fields_SearchOption(payload1).subscribe({
-       next: (res: any) => {
-         this.spinner.hide();
-         if (res.length > 0) {
-           this.searchOptionsList = res;
-           this.showForm = false;
-           Swal.fire('Data fetched successfully!', '', 'success');
-         } else {
-           Swal.fire('No records found', '', 'info');
-         }
-       },
-       error: (err) => {
-         this.spinner.hide();
-         console.error('❌ Error:', err);
-         Swal.fire('Error fetching data', '', 'error');
-       }
-     });
-   }
+  onSearchReference() {
+    if (!this.searchReference?.trim()) {
+      Swal.fire('Please enter a value', '', 'warning');
+      return;
+    }
+
+    if (!this.selectedType) {
+      Swal.fire('Please select a search type', '', 'info');
+      return;
+    }
+
+
+    let payload1: any = {
+
+      "global": "TRANSIT INFO",
+      "data": {
+        "ref_no": "",
+        "inv_no": "",
+        "so_no": "",
+        "transporter": "",
+        "lr_no": "",
+        "workorder_no": "",
+        "sales_person": "",
+        "location": "",
+        "odn_no": "",
+        "vehicle_no": "",
+        "freight_billno": "",
+        "nature_damage": "",
+        "claim_status": ""
+
+      }
+    };
+    payload1.data[this.selectedType] = this.searchReference.trim();
+
+    console.log('🔍 Payload:', payload1);
+
+    this.spinner.show();
+    this.service.global_Fields_SearchOption(payload1).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        if (res.length > 0) {
+          this.searchOptionsList = res;
+          this.showForm = false;
+          Swal.fire('Data fetched successfully!', '', 'success');
+        } else {
+          Swal.fire('No records found', '', 'info');
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('❌ Error:', err);
+        Swal.fire('Error fetching data', '', 'error');
+      }
+    });
+  }
 
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
@@ -341,7 +342,7 @@ export class TransitInfoComponent implements OnInit {
     // Updated: Removed 'invoice' type and logic
     const value = this.ponumber;
     if (!value || value.trim() === '') return;
-    
+
     // You can add API call here if needed to fetch transit info
     this.showForm = true;
 
@@ -367,103 +368,103 @@ export class TransitInfoComponent implements OnInit {
         title: 'Validation Error',
         text: 'Please fill all required fields before saving.',
         icon: 'warning',
-        confirmButtonText: 'Ok',
         timer: 4000
       });
       return;
     }
 
     if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        text: 'Please select at least one reference row before saving'
-      });
+      Swal.fire({ icon: 'warning', text: 'Please select at least one reference row before saving' });
       return;
     }
-    
-    // Check if Outward with SAP needs an Invoice Number or if it relies only on Reference Items.
-    // Assuming the Invoice Number field in transitInfo formGroup (which you left in the HTML) is filled via search or manual entry for the final save.
-    if (this.orderType === 'Outward' && !this.transitInfo.get('invoicenumber')?.value?.trim()) {
-         Swal.fire({
-            icon: 'warning',
-            text: 'Invoice Number is required for Outward orders. Please enter it in the form.',
-            timer: 4000
-        });
-        return;
+
+    const f = this.transitInfo.value;
+
+
+    const HEAD = {
+      REFNO: this.orderType === 'Inward'
+        ? this.transitInfo.get('ponumber')?.value || ''
+        : (this.selectedItems[0]?.referenceNumber || ''),
+
+      INV_NO: this.orderType === 'Inward'
+        ? this.transitInfo.get('ponumber')?.value || ''
+        : this.transitInfo.get('invoicenumber')?.value || '',
+
+      PY_ARRIVED_DEST: this.formatDate(f.physicalarrivedatdestinationdateandtime),
+      UNLOADING_DT: this.formatDateTime(f.unloadingdateandtime),
+      POD_SCAN: this.formatDateTime(f.podscanreceiveddateandtime),
+      SIT_SALE: f.sit || ''
+    };
+
+
+    let ITEM: any[] = [];
+
+    if (this.orderType === 'Inward') {
+
+      ITEM.push({
+        REFNO: HEAD.REFNO,
+        INV_NO: HEAD.INV_NO,
+        POSNR: 10,
+        VEH_LINE: 1,
+        VEH_NUM: "",
+        LRNO: "",
+        WORK_ORDER: "",
+        TRANSPORTER: ""
+      });
+
+    } else {
+
+      ITEM = this.selectedItems.map((item, idx) => ({
+        REFNO: item.referenceNumber,
+        INV_NO: this.transitInfo.get('invoicenumber')?.value || '',
+        POSNR: (idx + 1) * 10,   // 10, 20, 30...
+        VEH_LINE: idx + 1,
+        VEH_NUM: "",
+        LRNO: item.lrNumber,
+        WORK_ORDER: item.workOrderNumber,
+        TRANSPORTER: item.transporter
+      }));
+
     }
 
-
-    const formValue = this.transitInfo.value;
-    
-    // Updated: Now that the Outward input field is gone, we rely on the control value
-    const referenceNumber = this.orderType === 'Inward' ? 
-      this.transitInfo.get('ponumber')?.value : 
-      this.transitInfo.get('invoicenumber')?.value;
-
-    const record = {
-      INV_NO: referenceNumber || '',
-      PHY_ARRIVE_DEST: this.formatDate(formValue.physicalarrivedatdestinationdateandtime),
-      UNLOADING_DT: this.formatDateTime(formValue.unloadingdateandtime),
-      POD_SCAN: this.formatDateTime(formValue.podscanreceiveddateandtime),
-      ...(this.orderType === 'Outward' && this.selectedItems.length > 0 ? this.selectedItems[0] : {})
+    // -------------------------
+    // FINAL PAYLOAD
+    // -------------------------
+    const payload = {
+      HEAD,
+      ITEM
     };
+
+    console.log("FINAL TRANSIT PAYLOAD:", payload);
 
     this.spinner.show();
 
-    let request$;
-
-    if (this.sapType === 'SAP') {
-      request$ = this.service.TransitInfoSave({ SAVE: [record] });
-    } else if (this.sapType === 'Non-SAP') {
-      request$ = this.service.TransitInfoNonSap({ CREATE: [record] });
-    } else {
-      this.spinner.hide();
-      Swal.fire({
-        title: 'Missing Selection',
-        text: 'Please select SAP Type before saving.',
-        icon: 'warning',
-        timer: 3000
-      });
-      return;
-    }
+    let request$ = this.service.TransitInfoSave(payload);
 
     request$.subscribe({
       next: (res: any) => {
         this.spinner.hide();
 
-        if (res.STATUS == 'true' || res.NUMBER == '200') {
-          Swal.fire({
-            text: res.MESSAGE || 'Transit Info saved successfully!',
-            icon: 'success',
-            timer: 3000
-          }).then(() => {
-            if (action === 'next') {
-              this.router.navigate(['/freight-billing']);
-            } else if (action === 'previous') {
-              this.router.navigate(['/vechile-info']);
-            } else {
-              this.resetAll();
-            }
-          });
+        if (res.STATUS?.toUpperCase() === 'TRUE' || res.NUMBER === '200') {
+          Swal.fire({ text: res.MESSAGE, icon: 'success', timer: 3000 })
+            .then(() => {
+              if (action === 'next') this.router.navigate(['/freight-billing']);
+              else if (action === 'previous') this.router.navigate(['/vechile-info']);
+              else this.resetAll();
+            });
         } else {
-          Swal.fire({
-            text: res.MESSAGE || 'Failed to save!',
-            icon: 'error',
-            timer: 3000
-          });
+          Swal.fire({ text: res.MESSAGE, icon: 'error', timer: 3000 });
         }
       },
       error: (err) => {
         this.spinner.hide();
-        Swal.fire({
-          title: 'Error',
-          text: `Error: ${err.status} - ${err.statusText}`,
-          icon: 'error',
-          timer: 3000
-        });
+        Swal.fire({ title: 'Error', text: `Error: ${err.status} - ${err.statusText}`, icon: 'error', timer: 3000 });
       }
     });
   }
+
+
+
 
   resetAll(): void {
     this.transitInfo.reset();
