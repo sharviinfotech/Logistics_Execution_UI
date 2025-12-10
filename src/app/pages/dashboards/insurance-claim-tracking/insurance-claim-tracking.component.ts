@@ -37,6 +37,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   previousOrderType: string | null = null;
   previousSapType: string | null = null;
 
+
   // Search functionality
   selectedItems: any[] = [];
   searchReference: string = '';
@@ -75,6 +76,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
   buildHeaderForm() {
     this.HeaderForm = this.fb.group({
+      ZMAPID: [''],
       INV_NO: [''],
       FI: [''],
       REP_DATE: [''],
@@ -121,6 +123,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
   createReferenceRow(): FormGroup {
     return this.fb.group({
+      MAPID: [''],
       referenceNumber: [''],
       workOrderNumber: [''],
       lrNumber: [''],
@@ -243,6 +246,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       data.forEach(d => {
         this.items.push(
           this.fb.group({
+            MAPID: [d.MAPID || ''], 
             referenceNumber: [d.REF_NO || ''],
             workOrderNumber: [d.WORK_ORDER_NO || ''],
             lrNumber: [d.LR_NO || ''],
@@ -270,6 +274,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     if (checkbox.checked) {
       const exists = this.selectedItems.some(
         (item) =>
+           item.MAPID === rowValue.MAPID && 
           item.referenceNumber === rowValue.referenceNumber &&
           item.workOrderNumber === rowValue.workOrderNumber &&
           item.lrNumber === rowValue.lrNumber &&
@@ -282,6 +287,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       this.selectedItems = this.selectedItems.filter(
         (item) =>
           !(
+             item.MAPID === rowValue.MAPID && 
             item.referenceNumber === rowValue.referenceNumber &&
             item.workOrderNumber === rowValue.workOrderNumber &&
             item.lrNumber === rowValue.lrNumber &&
@@ -298,12 +304,32 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
     return this.selectedItems.some(
       (item) =>
+         item.MAPID === rowValue.MAPID && 
         item.referenceNumber === rowValue.referenceNumber &&
         item.workOrderNumber === rowValue.workOrderNumber &&
         item.lrNumber === rowValue.lrNumber &&
         item.transporter === rowValue.transporter
     );
   }
+  onchangeMAPID(index: number) {
+  const rowForm = this.items.at(index) as FormGroup;
+  const selectedMapId = rowForm.get('ZMAPID')?.value;
+  console.log("Selected MAPID:", selectedMapId);
+
+  const selectedObj = this.selectedItems.find(item => item.MAPID == selectedMapId);
+  console.log("Selected MAPID object:", selectedObj);
+
+  if (selectedObj) {
+    rowForm.patchValue({
+      ZREFNO: selectedObj.referenceNumber || "",
+      ZWORK_ORDER: selectedObj.workOrderNumber || "",
+      ZLRNO: selectedObj.lrNumber || "",
+      ZTRANSPORTER: selectedObj.transporter || "",
+      ZMAPID: selectedObj.MAPID || ""
+    });
+  }
+  console.log("Updated invoices form:", this.items.value);
+}
 
    onSearchTypeChange(): void {
     // Reset data when search type changes
@@ -404,7 +430,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     const apiCall = this.sapType === 'SAP' 
       ? this.service.InsuranceClaimTrackingfetch(payload)
       : this.service.fetchinvoicelistnonsap(payload);
-
+      console.log("API call",apiCall)
     apiCall.subscribe({
       next: (res: any) => {
         this.spinner.hide();
@@ -418,7 +444,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         const items = res[0].ITEM;
 
         this.showForm = false;
-
+        this.showTable = true;
+        
         this.HeaderForm.patchValue({
           INV_NO: header.INV_NO,
           FI: header.FI,
@@ -472,6 +499,20 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   }
 
   saveSAP(action: 'stay' | 'next' | 'previous' = 'stay') {
+     const filtered = this.items.value
+    .filter((row: any) => row.selected === true)
+    .map(({ selected, ...rest }) => rest);
+
+  if (filtered.length === 0) {
+    Swal.fire({
+      title: 'Warning',
+      text: 'Please select at least one row to save.',
+      icon: 'warning',
+      timer: 3000,
+      confirmButtonText: 'Ok',
+    });
+    return;
+  }
     if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
       Swal.fire({
         icon: 'warning',

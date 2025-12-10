@@ -33,6 +33,7 @@ export class TransitDamageInfoComponent implements OnInit {
   showTable = false;
   showForm = false;
   isEditMode = false;
+  
 
   previousOrderType: string | null = null;
   previousSapType: string | null = null;
@@ -85,6 +86,7 @@ export class TransitDamageInfoComponent implements OnInit {
       SETTLEMENT: [''],
       CLOSING_DT: [''],
       IMAGES: [''],
+
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
   }
@@ -105,6 +107,7 @@ export class TransitDamageInfoComponent implements OnInit {
 
   createReferenceRow(): FormGroup {
     return this.fb.group({
+      MAPID: [''],
       referenceNumber: [''],
       workOrderNumber: [''],
       lrNumber: [''],
@@ -114,6 +117,8 @@ export class TransitDamageInfoComponent implements OnInit {
 
   addItemRow() {
     const row = this.fb.group({
+      selected: [false],
+      ZMAPID: [''],
       INV_NO: [''],
       POSNR: [''],
       VEH_LINE: [''],
@@ -225,10 +230,11 @@ export class TransitDamageInfoComponent implements OnInit {
       data.forEach(d => {
         this.referenceItems.push(
           this.fb.group({
-            referenceNumber: [d.REF_NO || ''],
-            workOrderNumber: [d.WORK_ORDER_NO || ''],
-            lrNumber: [d.LR_NO || ''],
-            transporter: [d.TRANSPORTER || '']
+            MAPID: [d.MAPID || ''],
+            referenceNumber: [d.REF_NO || d.referenceNumber || ''],
+            workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
+            lrNumber: [d.LR_NO || d.lrNumber || ''],
+            transporter: [d.TRANSPORTER || d.transporter || '']
           })
         );
       });
@@ -245,6 +251,26 @@ export class TransitDamageInfoComponent implements OnInit {
     }
   }
 
+   onchangeMAPID(index: number) {
+  const rowForm = this.items.at(index) as FormGroup;
+  const selectedMapId = rowForm.get('ZMAPID')?.value;
+  console.log("Selected MAPID:", selectedMapId);
+
+  const selectedObj = this.selectedItems.find(item => item.MAPID == selectedMapId);
+  console.log("Selected MAPID object:", selectedObj);
+
+  if (selectedObj) {
+    rowForm.patchValue({
+      ZREFNO: selectedObj.referenceNumber || "",
+      ZWORK_ORDER: selectedObj.workOrderNumber || "",
+      ZLRNO: selectedObj.lrNumber || "",
+      ZTRANSPORTER: selectedObj.transporter || "",
+      ZMAPID: selectedObj.MAPID || ""
+    });
+  }
+  console.log("Updated invoices form:", this.items.value);
+}
+
   onCheckboxChange(event: Event, index: number): void {
     const checkbox = event.target as HTMLInputElement;
     const rowValue = (this.referenceItems.at(index) as FormGroup).value;
@@ -252,6 +278,7 @@ export class TransitDamageInfoComponent implements OnInit {
     if (checkbox.checked) {
       const exists = this.selectedItems.some(
         (item) =>
+          item.MAPID === rowValue.MAPID &&
           item.referenceNumber === rowValue.referenceNumber &&
           item.workOrderNumber === rowValue.workOrderNumber &&
           item.lrNumber === rowValue.lrNumber &&
@@ -264,6 +291,7 @@ export class TransitDamageInfoComponent implements OnInit {
       this.selectedItems = this.selectedItems.filter(
         (item) =>
           !(
+            item.MAPID === rowValue.MAPID &&
             item.referenceNumber === rowValue.referenceNumber &&
             item.workOrderNumber === rowValue.workOrderNumber &&
             item.lrNumber === rowValue.lrNumber &&
@@ -280,6 +308,7 @@ export class TransitDamageInfoComponent implements OnInit {
 
     return this.selectedItems.some(
       (item) =>
+        item.MAPID === rowValue.MAPID &&
         item.referenceNumber === rowValue.referenceNumber &&
         item.workOrderNumber === rowValue.workOrderNumber &&
         item.lrNumber === rowValue.lrNumber &&
@@ -287,7 +316,7 @@ export class TransitDamageInfoComponent implements OnInit {
     );
   }
 
-   onSearchTypeChange(): void {
+  onSearchTypeChange(): void {
     // Reset data when search type changes
     this.searchReference = '';
     this.searchOptionsList = [];
@@ -296,62 +325,60 @@ export class TransitDamageInfoComponent implements OnInit {
   }
 
   // Search functionality
- onSearchReference() {
-       if (!this.searchReference?.trim()) {
-         Swal.fire('Please enter a value', '', 'warning');
-         return;
-       }
-   
-       if (!this.selectedType) {
-         Swal.fire('Please select a search type', '', 'info');
-         return;
-       }
-   
-   
-       let payload1: any = {
-        
-       "global": "TRANSIT DAMAGE INFO",
-       "data": {
-           "REF_NO": "",
-          "INV_NO": "",
-          "SO_NO": "",
-          "TRANSPORTER": "",
-          "LR_NO": "",
-          "WORKORDER_NO": "",
-          "SALES_PERSON": "",
-          "LOCATION": "",
-          "ODN_NO": "",
-          "VEHICLE_NO": "",
-          "FREIGHT_BILLNO": "",
-          "PRODUCT":"",
-          "ROUTE":"",
-          "NATURE_DAMAGE": "",
-          "CLAIM_STATUS": ""
+  onSearchReference() {
+    if (!this.searchReference?.trim()) {
+      Swal.fire('Please enter a value', '', 'warning');
+      return;
+    }
+
+    if (!this.selectedType) {
+      Swal.fire('Please select a search type', '', 'info');
+      return;
+    }
+
+    let payload1: any = {
+      "global": "TRANSIT DAMAGE INFO",
+      "data": {
+        "REF_NO": "",
+        "INV_NO": "",
+        "SO_NO": "",
+        "TRANSPORTER": "",
+        "LR_NO": "",
+        "WORKORDER_NO": "",
+        "SALES_PERSON": "",
+        "LOCATION": "",
+        "ODN_NO": "",
+        "VEHICLE_NO": "",
+        "FREIGHT_BILLNO": "",
+        "PRODUCT": "",
+        "ROUTE": "",
+        "NATURE_DAMAGE": "",
+        "CLAIM_STATUS": ""
       }
-       };
-       payload1.data[this.selectedType] = this.searchReference.trim();
-   
-       console.log('🔍 Payload:', payload1);
-   
-       this.spinner.show();
-       this.service.global_Fields_SearchOption(payload1).subscribe({
-         next: (res: any) => {
-           this.spinner.hide();
-           if (res.length > 0) {
-             this.searchOptionsList = res;
-             this.showForm = false;
-             Swal.fire('Data fetched successfully!', '', 'success');
-           } else {
-             Swal.fire('No records found', '', 'info');
-           }
-         },
-         error: (err) => {
-           this.spinner.hide();
-           console.error('❌ Error:', err);
-           Swal.fire('Error fetching data', '', 'error');
-         }
-       });
-     }
+    };
+    payload1.data[this.selectedType] = this.searchReference.trim();
+
+    console.log('🔍 Payload:', payload1);
+
+    this.spinner.show();
+    this.service.global_Fields_SearchOption(payload1).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        if (res.length > 0) {
+          this.searchOptionsList = res;
+          this.showForm = false;
+          Swal.fire('Data fetched successfully!', '', 'success');
+        } else {
+          Swal.fire('No records found', '', 'info');
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('❌ Error:', err);
+        Swal.fire('Error fetching data', '', 'error');
+      }
+    });
+  }
 
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
@@ -426,6 +453,8 @@ export class TransitDamageInfoComponent implements OnInit {
 
         items.forEach((x: any) => {
           const row = this.fb.group({
+            selected: [false],
+            MAPID: [''],
             INV_NO: [x.INV_NO],
             POSNR: [x.POSNR],
             VEH_LINE: [x.VEH_LINE],
@@ -446,69 +475,74 @@ export class TransitDamageInfoComponent implements OnInit {
   }
 
   onSaveActionSap(action: 'stay' | 'next' | 'previous' = 'stay') {
-    if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        text: 'Please select at least one reference row before saving'
-      });
-      return;
-    }
 
-    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+  const filtered = this.items.value
+    .filter((row: any) => row.selected === true)
+    .map(({ selected, ...rest }) => rest);  // remove selected key
 
-    this.HeaderForm.patchValue({
-      INV_NO: referenceNumber
+  if (filtered.length === 0) {
+    Swal.fire({
+      title: 'Warning',
+      text: 'Please select at least one product row to save.',
+      icon: 'warning',
+      timer: 3000,
+      confirmButtonText: 'Ok',
     });
+    return;
+  }
 
-    this.items.controls.forEach(row => {
-      row.patchValue({ INV_NO: referenceNumber });
-    });
+  const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
 
-    const payload = {
-      HEADER: {
-        ...this.HeaderForm.value,
-        ...(this.orderType === 'Outward' && this.selectedItems.length > 0 ? this.selectedItems[0] : {})
-      },
-      ITEM: this.ItemForm.value.ITEMS
-    };
+  this.HeaderForm.patchValue({
+    INV_NO: referenceNumber
+  });
 
-    this.spinner.show();
-    this.service.TransitDamageInfoSave(payload).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
+  // FIXED: Apply INV_NO to selected rows only
+  filtered.forEach(row => row.INV_NO = referenceNumber);
 
-        if (res?.STATUS === "TRUE" || res?.STATUS === true) {
-          Swal.fire({
-            text: "✅ Data Saved Successfully!",
-            icon: "success",
-            showConfirmButton: false,
-            timer: 900,
-            willClose: () => {
-              if (action === 'next') {
-                this.router.navigate(['/insurance-claim-tracking']);
-              } else if (action === 'previous') {
-                this.router.navigate(['/freight-billing']);
-              } else {
-                this.resetForms();
-              }
-            }
-          });
-        } else {
-          Swal.fire({
-            text: "⚠️ Save Failed: " + (res.MESSAGE || ''),
-            icon: "warning"
-          });
-        }
-      },
-      error: (err) => {
-        this.spinner.hide();
+  const payload = {
+    HEADER: this.HeaderForm.value,   // Use header only
+    ITEM: filtered                   // FIXED: send selected rows only
+  };
+
+  this.spinner.show();
+  this.service.TransitDamageInfoSave(payload).subscribe({
+    next: (res: any) => {
+      this.spinner.hide();
+
+      if (res?.STATUS === "TRUE") {
         Swal.fire({
-          text: "❌ Error while saving",
-          icon: "error"
+          text: "✅ Data Saved Successfully!",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 900,
+          willClose: () => {
+            if (action === 'next') {
+              this.router.navigate(['/insurance-claim-tracking']);
+            } else if (action === 'previous') {
+              this.router.navigate(['/freight-billing']);
+            } else {
+              this.resetForms();
+            }
+          }
+        });
+      } else {
+        Swal.fire({
+          text: "⚠️ Save Failed: " + (res.MESSAGE || ''),
+          icon: "warning"
         });
       }
-    });
-  }
+    },
+    error: () => {
+      this.spinner.hide();
+      Swal.fire({
+        text: "❌ Error while saving",
+        icon: "error"
+      });
+    }
+  });
+}
+
 
   fetchInvoiceDetailsnonsap() {
     const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
