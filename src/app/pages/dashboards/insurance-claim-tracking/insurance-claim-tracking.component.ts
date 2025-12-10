@@ -11,7 +11,6 @@ import Swal from 'sweetalert2';
 import { GeneralserviceService } from 'src/app/generalservice.service';
 import { Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { co } from '@fullcalendar/core/internal-common';
 
 @Component({
   selector: 'app-insurance-claim-tracking',
@@ -21,7 +20,7 @@ import { co } from '@fullcalendar/core/internal-common';
   styleUrls: ['./insurance-claim-tracking.component.css']
 })
 export class InsuranceClaimTrackingComponent implements OnInit {
-
+  // Form variables
   orderType: any;
   sapType: any;
   invoicenumber: any;
@@ -29,53 +28,56 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
   HeaderForm!: FormGroup;
   ItemForm!: FormGroup;
-  OrderInfo!: FormGroup;
 
+  // UI state
+  showTable = false;
+  ShowHeaderForm = false;
+  SavedDataShow = false;
   showForm = false;
   isEditMode = false;
-  showTable = false;
+  isAllSelected = false;
 
+  // Track previous selections
   previousOrderType: string | null = null;
   previousSapType: string | null = null;
 
-
   // Search functionality
   selectedItems: any[] = [];
-  searchReference: string = '';
-
-  searchOptions = [
-    { key: 'ref_no', label: 'Reference No' },
-    { key: 'inv_no', label: 'Invoice No' },
-    { key: 'odn_no', label: 'ODN No' },
-    { key: 'so_no', label: 'SO No' },
-    { key: 'transporter', label: 'Transporter' },
-    { key: 'lr_no', label: 'LR NO' },
-    { key: 'workorder_no', label: 'Workorder No' },
-    { key: "sales_person", label: 'Sales Person' },
-    { key: "location", label: 'Location' },
-    { key: "vehicle_no", label: 'Vehicle No' },
-    { key: "freight_billno", label: 'Freight Bill No' },
-    { key: "nature_damage", label: 'Nature of Damage' },
-    { key: "claim_status", label: 'Claim Status' },
-  ];
+  searchReference = '';
   selectedType: any = '';
   searchOptionsList: any[] = [];
   dropdownOpen = false;
+
+  searchOptions = [
+    { key: 'REF_NO', label: 'Reference No' },
+    { key: 'INV_NO', label: 'Invoice No' },
+    { key: 'ODN_NO', label: 'ODN No' },
+    { key: 'SO_NO', label: 'SO No' },
+    { key: 'TRANSPORTER', label: 'Transporter' },
+    { key: 'LR_NO', label: 'LR NO' },
+    { key: 'WORKORDER_NO', label: 'Workorder No' },
+    { key: 'SALES_PERSON', label: 'Sales Person' },
+    { key: 'LOCATION', label: 'Location' },
+    { key: 'VEHICLE_NO', label: 'Vehicle No' },
+    { key: 'FREIGHT_BILLNO', label: 'Freight Bill No' },
+    { key: 'NATURE_DAMAGE', label: 'Nature of Damage' },
+    { key: 'CLAIM_STATUS', label: 'Claim Status' }
+  ];
 
   constructor(
     private fb: FormBuilder,
     private service: GeneralserviceService,
     private router: Router,
     private spinner: NgxSpinnerService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.buildHeaderForm();
     this.buildItemForm();
-    this.buildOrderInfoForm();
   }
 
-  buildHeaderForm() {
+  // Form Builders
+  buildHeaderForm(): void {
     this.HeaderForm = this.fb.group({
       ZMAPID: [''],
       INV_NO: [''],
@@ -98,30 +100,27 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       PAY_ST: [''],
       PAY_INFO: [''],
       UTR: [''],
-      CLM_SET_DT: ['']
+      CLM_SET_DT: [''],
+      referenceItems: this.fb.array([this.createReferenceRow()])
     });
   }
 
-  buildItemForm() {
+  buildItemForm(): void {
     this.ItemForm = this.fb.group({
       ITEMS: this.fb.array([])
     });
   }
 
-  buildOrderInfoForm() {
-    this.OrderInfo = this.fb.group({
-      items: this.fb.array([this.createReferenceRow()])
-    });
-  }
-
+  // Form Array Getters
   get items(): FormArray {
-    return this.OrderInfo.get('items') as FormArray;
-  }
-
-  get itemsTable(): FormArray {
     return this.ItemForm.get('ITEMS') as FormArray;
   }
 
+  get referenceItems(): FormArray {
+    return this.HeaderForm.get('referenceItems') as FormArray;
+  }
+
+  // Row Creation
   createReferenceRow(): FormGroup {
     return this.fb.group({
       MAPID: [''],
@@ -132,8 +131,9 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     });
   }
 
-  addItemRow() {
+  addItemRow(): void {
     const row = this.fb.group({
+      selected: [false],
       ZREFNO: [''],
       ZLINE_NO: [''],
       INV_NO: [''],
@@ -150,32 +150,48 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       ZMAPID: ['']
     });
 
-    this.itemsTable.push(row);
+    this.items.push(row);
   }
 
-
-  removeItemRow(i: number) {
-    this.itemsTable.removeAt(i);
+  removeItemRow(i: number): void {
+    this.items.removeAt(i);
   }
 
-  resetForms() {
+  // Reset Functions
+  resetForms(): void {
     this.HeaderForm.reset();
-    this.items.clear();
-    this.items.push(this.createReferenceRow());
+    this.referenceItems.clear();
+    this.referenceItems.push(this.createReferenceRow());
 
-    while (this.itemsTable.length !== 0) {
-      this.itemsTable.removeAt(0);
+    while (this.items.length !== 0) {
+      this.items.removeAt(0);
     }
 
-    this.invoicenumber = "";
-    this.ponumber = "";
+    this.invoicenumber = '';
+    this.ponumber = '';
     this.searchOptionsList = [];
     this.selectedItems = [];
     this.searchReference = '';
     this.selectedType = '';
   }
 
-  onOrderTypeSelection() {
+  resetConditionalFields(): void {
+    this.showTable = false;
+    this.ShowHeaderForm = false;
+    this.showForm = false;
+    this.searchOptionsList = [];
+    this.selectedItems = [];
+    this.HeaderForm.reset();
+    this.referenceItems.clear();
+    this.referenceItems.push(this.createReferenceRow());
+    
+    while (this.items.length !== 0) {
+      this.items.removeAt(0);
+    }
+  }
+
+  // Order Type & SAP Type Selection
+  onOrderTypeSelection(): void {
     if (this.previousOrderType !== null && this.previousOrderType !== this.orderType) {
       this.sapType = null;
       this.previousSapType = null;
@@ -184,7 +200,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     this.previousOrderType = this.orderType;
   }
 
-  onSapTypeSelection() {
+  onSapTypeSelection(): void {
     if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
       this.resetConditionalFields();
     }
@@ -192,23 +208,11 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     this.resetForms();
   }
 
-  resetConditionalFields(): void {
-    this.showForm = false;
-    this.searchOptionsList = [];
-    this.selectedItems = [];
-    this.HeaderForm.reset();
-    this.items.clear();
-    this.items.push(this.createReferenceRow());
-    while (this.itemsTable.length !== 0) {
-      this.itemsTable.removeAt(0);
-    }
-  }
-
   // Reference Table: Field Blur Handler
   onFieldBlur(index: number, fieldKey: string): void {
     if (index !== 0) return;
 
-    const firstRow = this.items.at(0) as FormGroup;
+    const firstRow = this.referenceItems.at(0) as FormGroup;
     const values = firstRow.value;
 
     if (
@@ -217,8 +221,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       !values.lrNumber &&
       !values.transporter
     ) {
-      this.items.clear();
-      this.items.push(this.createReferenceRow());
+      this.referenceItems.clear();
+      this.referenceItems.push(this.createReferenceRow());
       return;
     }
 
@@ -247,17 +251,17 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   }
 
   populateReferenceRows(data: any[]): void {
-    this.items.clear();
+    this.referenceItems.clear();
 
     if (data && data.length > 0) {
       data.forEach(d => {
-        this.items.push(
+        this.referenceItems.push(
           this.fb.group({
             MAPID: [d.MAPID || ''],
-            referenceNumber: [d.REF_NO || ''],
-            workOrderNumber: [d.WORK_ORDER_NO || ''],
-            lrNumber: [d.LR_NO || ''],
-            transporter: [d.TRANSPORTER || '']
+            referenceNumber: [d.REF_NO || d.referenceNumber || ''],
+            workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
+            lrNumber: [d.LR_NO || d.lrNumber || ''],
+            transporter: [d.TRANSPORTER || d.transporter || '']
           })
         );
       });
@@ -270,17 +274,39 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         showConfirmButton: false,
         width: '300px'
       });
-      this.items.push(this.createReferenceRow());
+      this.referenceItems.push(this.createReferenceRow());
     }
   }
 
+  // Map ID Change Handler
+  onchangeMAPID(index: number): void {
+    const rowForm = this.items.at(index) as FormGroup;
+    const selectedMapId = rowForm.get('ZMAPID')?.value;
+    console.log('Selected MAPID:', selectedMapId);
+
+    const selectedObj = this.selectedItems.find(item => item.MAPID == selectedMapId);
+    console.log('Selected MAPID object:', selectedObj);
+
+    if (selectedObj) {
+      rowForm.patchValue({
+        ZREFNO: selectedObj.referenceNumber || '',
+        ZWORK_ORDER: selectedObj.workOrderNumber || '',
+        LR_NO: selectedObj.lrNumber || '',
+        TRANSPORTER: selectedObj.transporter || '',
+        ZMAPID: selectedObj.MAPID || ''
+      });
+    }
+    console.log('Updated items form:', this.items.value);
+  }
+
+  // Checkbox Selection Logic
   onCheckboxChange(event: Event, index: number): void {
     const checkbox = event.target as HTMLInputElement;
-    const rowValue = (this.items.at(index) as FormGroup).value;
+    const rowValue = (this.referenceItems.at(index) as FormGroup).value;
 
     if (checkbox.checked) {
       const exists = this.selectedItems.some(
-        (item) =>
+        item =>
           item.MAPID === rowValue.MAPID &&
           item.referenceNumber === rowValue.referenceNumber &&
           item.workOrderNumber === rowValue.workOrderNumber &&
@@ -292,7 +318,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       }
     } else {
       this.selectedItems = this.selectedItems.filter(
-        (item) =>
+        item =>
           !(
             item.MAPID === rowValue.MAPID &&
             item.referenceNumber === rowValue.referenceNumber &&
@@ -307,10 +333,9 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   }
 
   isItemSelected(index: number): boolean {
-    const rowValue = (this.items.at(index) as FormGroup).value;
-
+    const rowValue = (this.referenceItems.at(index) as FormGroup).value;
     return this.selectedItems.some(
-      (item) =>
+      item =>
         item.MAPID === rowValue.MAPID &&
         item.referenceNumber === rowValue.referenceNumber &&
         item.workOrderNumber === rowValue.workOrderNumber &&
@@ -318,154 +343,178 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         item.transporter === rowValue.transporter
     );
   }
-  onchangeMAPID(index: number) {
-    const rowForm = this.items.at(index) as FormGroup;
-    const selectedMapId = rowForm.get('ZMAPID')?.value;
-    console.log("Selected MAPID:", selectedMapId);
 
-    const selectedObj = this.selectedItems.find(item => item.MAPID == selectedMapId);
-    console.log("Selected MAPID object:", selectedObj);
-
-    if (selectedObj) {
-      rowForm.patchValue({
-        ZREFNO: selectedObj.referenceNumber || "",
-        ZWORK_ORDER: selectedObj.workOrderNumber || "",
-        ZLRNO: selectedObj.lrNumber || "",
-        ZTRANSPORTER: selectedObj.transporter || "",
-        ZMAPID: selectedObj.MAPID || ""
-      });
-    }
-    console.log("Updated invoices form:", this.items.value);
+  allSelected(): boolean {
+    return this.items.controls.length > 0 &&
+      this.items.controls.every(ctrl => ctrl.get('selected')?.value === true);
   }
 
+  toggleAllSelection(event: any): void {
+    const isChecked = event.target.checked;
+    this.isAllSelected = isChecked;
+    this.items.controls.forEach(ctrl => ctrl.get('selected')?.setValue(isChecked));
+  }
+
+  onRowCheckboxChange(): void {
+    this.isAllSelected = this.allSelected();
+    console.log('All Selected:', this.items.value);
+  }
+
+  getSelectedRows() {
+    return this.items.controls
+      .map(ctrl => ctrl.value)
+      .filter(row => row.selected);
+  }
+
+  // Search Type Change
   onSearchTypeChange(): void {
-    // Reset data when search type changes
     this.searchReference = '';
     this.searchOptionsList = [];
     this.showForm = false;
     console.log('🔄 Search type changed. Data reset.');
   }
 
-  // Search functionality
-  onSearchReference() {
+  // Search Functionality
+  onSearchReference(): void {
     if (!this.searchReference?.trim()) {
       Swal.fire('Please enter a value', '', 'warning');
       return;
     }
-
+    
+    this.SavedDataShow = false;
+    this.ShowHeaderForm = false;
+    
     if (!this.selectedType) {
       Swal.fire('Please select a search type', '', 'info');
       return;
     }
 
-    const fieldMap: any = {
-      ref_no: "REF_NO",
-      inv_no: "INV_NO",
-      so_no: "SO_NO",
-      transporter: "TRANSPORTER",
-      lr_no: "LR_NO",
-      workorder_no: "WORKORDER_NO",
-      sales_person: "SALES_PERSON",
-      location: "LOCATION",
-      odn_no: "ODN_NO",
-      vehicle_no: "VEHICLE_NO",
-      freight_billno: "FREIGHT_BILLNO",
-      nature_damage: "NATURE_DAMAGE",
-      claim_status: "CLAIM_STATUS"
-    };
-
-    const backendKey = fieldMap[this.selectedType];
-
     let payload1: any = {
-      global: "INSURANCE CLAIM STATUS",
+      global: 'INSURANCE CLAIM STATUS',
       data: {
-        REF_NO: "",
-        INV_NO: "",
-        SO_NO: "",
-        TRANSPORTER: "",
-        LR_NO: "",
-        WORKORDER_NO: "",
-        SALES_PERSON: "",
-        LOCATION: "",
-        ODN_NO: "",
-        VEHICLE_NO: "",
-        FREIGHT_BILLNO: "",
-        PRODUCT: "",
-        ROUTE: "",
-        NATURE_DAMAGE: "",
-        CLAIM_STATUS: ""
+        REF_NO: '',
+        INV_NO: '',
+        SO_NO: '',
+        TRANSPORTER: '',
+        LR_NO: '',
+        WORKORDER_NO: '',
+        SALES_PERSON: '',
+        LOCATION: '',
+        ODN_NO: '',
+        VEHICLE_NO: '',
+        FREIGHT_BILLNO: '',
+        PRODUCT: '',
+        ROUTE: '',
+        NATURE_DAMAGE: '',
+        CLAIM_STATUS: ''
       }
     };
+    
+    payload1.data[this.selectedType] = this.searchReference.trim();
 
-    payload1.data[backendKey] = this.searchReference.trim();
-
-    console.log("FINAL Payload => ", payload1);
-
-    // 🔹 Now call your API here if needed
+    console.log('🔍 Payload1:', payload1);
     this.spinner.show();
     this.service.global_Fields_SearchOption(payload1).subscribe({
       next: (res: any) => {
         this.spinner.hide();
-        this.searchOptionsList = res || [];
-        this.showForm = this.searchOptionsList.length > 0;
+        console.log('✅ Search Response:', res);
+        
+        if (res.NUMBER == '100' && res.STATUS == 'FALSE') {
+          this.searchOptionsList = [];
+          Swal.fire('', res.MESSAGE, 'warning');
+        } else {
+          this.searchOptionsList = res.ITEMS;
+          this.showForm = false;
+          this.SavedDataShow = true;
+          this.ShowHeaderForm = true;
+          this.showTable = false;
+          
+          const header = res.HEADER?.[0];
+          console.log('HEADER PATCH', header);
+          
+          this.HeaderForm.patchValue({
+            INV_NO: header.ZINV_NO,
+            FI: header.ZFI,
+            REP_DATE: header.ZREP_DATE,
+            CLAIM_REF: header.ZCLAIM_REF,
+            INV_DATE: header.ZINV_DATE,
+            INV_BV: header.ZINV_BV,
+            LOSS_DCL: header.ZLOSS_DCL,
+            CLM_RF: header.ZCLM_RF,
+            SOL_VAL: header.ZSOL_VAL,
+            CUSTOMER: header.ZCUSTOMER,
+            SO_NO: header.ZSO_NO,
+            LOCATION: header.ZLOCATION,
+            DAMAGE_RMK: header.ZDAMAGE_RMK,
+            CLM_INF: header.ZCLM_INF,
+            CLM_ST: header.ZCLM_ST,
+            CLM_DOC_ST: header.ZCLM_DOC_ST,
+            COURIER_DET: header.ZCOURIER_DET,
+            PAY_ST: header.ZPAY_ST,
+            PAY_INFO: header.ZPAY_INFO,
+            UTR: header.ZUTR,
+            CLM_SET_DT: header.ZCLM_SET_DT,
+            SALE_PERSON: header.ZSALE_PERSON,
+            REFNO: header.ZREFNO
+          });
+
+          Swal.fire('Data fetched successfully!', '', 'success');
+        }
       },
-      error: (err) => {
+      error: err => {
         this.spinner.hide();
-        console.error(err);
-        Swal.fire("Error fetching data", '', 'error');
+        console.error('❌ Error:', err);
+        Swal.fire('Error fetching data', '', 'error');
       }
     });
   }
 
-
-  toggleDropdown() {
-    this.dropdownOpen = !this.dropdownOpen;
-  }
-
-  selectSearchType(option: any) {
-    this.selectedType = option;
-    this.dropdownOpen = false;
-  }
-
+  // Input Change
   onInputChange(type: 'purchase' | 'invoice'): void {
     const value = type === 'purchase' ? this.ponumber : this.invoicenumber;
     if (!value || value.trim() === '') {
+      this.showTable = false;
+      this.ShowHeaderForm = false;
       this.showForm = false;
     }
   }
 
-  fetchInvoiceDetails() {
-    const referenceNumber = this.orderType === 'Inward' ? this.invoicenumber : this.invoicenumber;
+  // Get Form
+  getForm(type: 'purchase' | 'invoice'): void {
+    if (this.sapType === 'SAP') {
+      this.fetchInvoiceDetails();
+    } else if (this.sapType === 'Non-SAP') {
+      this.fetchInvoiceDetailsnonsap();
+    }
+  }
+
+  // Fetch Invoice Details (SAP)
+  fetchInvoiceDetails(): void {
+    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
 
     if (!referenceNumber) {
-      Swal.fire('Warning', 'Please enter invoice/PO number', 'warning');
+      Swal.fire('Warning', `Please enter ${this.orderType === 'Inward' ? 'PO' : 'Invoice'} number`, 'warning');
       return;
     }
 
-    const payload = {
-      VBELN: referenceNumber
-    };
+    const payload = { VBELN: referenceNumber };
 
     this.spinner.show();
-
-    const apiCall = this.sapType === 'SAP'
-      ? this.service.InsuranceClaimTrackingfetch(payload)
-      : this.service.fetchinvoicelistnonsap(payload);
-    console.log("API call", apiCall)
-    apiCall.subscribe({
+    this.service.InsuranceClaimTrackingfetch(payload).subscribe({
       next: (res: any) => {
         this.spinner.hide();
 
         if (!res || res.length === 0) {
-          Swal.fire("No data found", '', 'info');
+          Swal.fire('No data found', '', 'info');
           return;
         }
 
         const header = res[0].HEADER;
         const items = res[0].ITEM;
 
-        this.showForm = false;
         this.showTable = true;
+        this.ShowHeaderForm = true;
+        this.showForm = true;
 
         this.HeaderForm.patchValue({
           INV_NO: header.INV_NO,
@@ -491,12 +540,14 @@ export class InsuranceClaimTrackingComponent implements OnInit {
           CLM_SET_DT: header.CLM_SET_DT
         });
 
-        while (this.itemsTable.length !== 0) {
-          this.itemsTable.removeAt(0);
+        while (this.items.length !== 0) {
+          this.items.removeAt(0);
         }
 
         items.forEach((x: any) => {
           const row = this.fb.group({
+            selected: [false],
+            ZMAPID: [x.MAPID || ''],
             ZREFNO: [x.ZREFNO],
             ZLINE_NO: [x.ZLINE_NO],
             INV_NO: [x.INV_NO],
@@ -509,112 +560,67 @@ export class InsuranceClaimTrackingComponent implements OnInit {
             NO_SETS: [x.NO_SETS],
             TRANSPORTER: [x.TRANSPORTER],
             ZWORK_ORDER: [x.ZWORK_ORDER],
-            ZBILLNO: [x.ZBILLNO],
-            ZMAPID: [x.ZMAPID]
+            ZBILLNO: [x.ZBILLNO]
           });
 
-          this.itemsTable.push(row);
+          this.items.push(row);
         });
-
       },
-      error: (err) => {
+      error: err => {
         this.spinner.hide();
         console.error(err);
-        Swal.fire("Error fetching data", '', 'error');
+        Swal.fire('Error fetching data', '', 'error');
       }
     });
   }
 
-  saveSAP(action: 'stay' | 'next' | 'previous' = 'stay') {
+  // Save SAP
+  onSaveActionSap(action: 'stay' | 'next' | 'previous' = 'stay'): void {
+    const filtered = this.items.value
+      .filter((row: any) => row.selected === true)
+      .map(({ selected, ...rest }) => rest);
 
-    if (this.selectedItems.length === 0) {
+    if (filtered.length === 0) {
       Swal.fire({
         title: 'Warning',
-        text: 'Please select at least one row to save.',
+        text: 'Please select at least one product row to save.',
         icon: 'warning',
-        timer: 3000
+        timer: 3000,
+        confirmButtonText: 'Ok'
       });
       return;
     }
 
-    const referenceNumber = this.invoicenumber;
+    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
 
-    this.HeaderForm.patchValue({
-      INV_NO: referenceNumber
-    });
+    const headerValue = { ...this.HeaderForm.value };
+    delete headerValue.referenceItems;
 
-    this.itemsTable.controls.forEach(row => {
-      row.patchValue({ INV_NO: referenceNumber });
-    });
+    headerValue.INV_NO = referenceNumber;
+
+    filtered.forEach(row => (row.INV_NO = referenceNumber));
 
     const payload = {
-      HEADER: {
-        ...this.HeaderForm.value,
-        ...this.selectedItems[0]   // first selected row
-      },
-      ITEM: this.ItemForm.value.ITEMS
+      HEADER: headerValue,
+      ITEM: filtered
     };
+
+    console.log('📤 Final Payload:', payload);
 
     this.spinner.show();
     this.service.InsuranceClaimTrackingSave(payload).subscribe({
       next: (res: any) => {
         this.spinner.hide();
-        if (res?.STATUS === "TRUE" || res?.NUMBER === '200') {
+
+        if (res?.STATUS === 'TRUE') {
           Swal.fire({
-            text: "Data Saved Successfully!",
-            icon: "success",
-            timer: 1000,
-            showConfirmButton: false
-          }).then(() => {
-            this.resetForms();
-          });
-        }
-      }
-    });
-  }
-
-
-  saveNonSAP(action: 'stay' | 'next' | 'previous' = 'stay') {
-    if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        text: 'Please select at least one reference row before saving'
-      });
-      return;
-    }
-
-    const referenceNumber = this.orderType === 'Inward' ? this.invoicenumber : this.invoicenumber;
-
-    this.HeaderForm.patchValue({
-      INV_NO: referenceNumber
-    });
-
-    this.itemsTable.controls.forEach(row => {
-      row.patchValue({ INV_NO: referenceNumber });
-    });
-
-    const payload = {
-      HEADER: {
-        ...this.HeaderForm.value,
-        ...(this.orderType === 'Outward' && this.selectedItems.length > 0 ? this.selectedItems[0] : {})
-      },
-      ITEM: this.ItemForm.value.ITEMS
-    };
-
-    this.spinner.show();
-    this.service.Nonsapsave(payload).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-
-        if (res?.STATUS === "TRUE" || res?.STATUS === true || res?.NUMBER === '200') {
-          Swal.fire({
-            text: "✅ Data Saved Successfully!",
-            icon: "success",
+            text: '✅ Data Saved Successfully!',
+            icon: 'success',
             showConfirmButton: false,
             timer: 900,
             willClose: () => {
               if (action === 'next') {
-                this.router.navigate(['/next-screen']); // Change to your next route
+                this.router.navigate(['/next-screen']);
               } else if (action === 'previous') {
                 this.router.navigate(['/transit-damage-info']);
               } else {
@@ -624,19 +630,180 @@ export class InsuranceClaimTrackingComponent implements OnInit {
           });
         } else {
           Swal.fire({
-            text: "⚠️ Save Failed: " + (res.MESSAGE || ''),
-            icon: "warning"
+            text: '⚠️ Save Failed: ' + (res.MESSAGE || ''),
+            icon: 'warning'
           });
         }
       },
       error: () => {
         this.spinner.hide();
         Swal.fire({
-          text: "❌ Error while saving data",
-          icon: "error"
+          text: '❌ Error while saving',
+          icon: 'error'
         });
       }
     });
+  }
+
+  // Fetch Invoice Details Non-SAP
+  fetchInvoiceDetailsnonsap(): void {
+    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+
+    if (!referenceNumber) {
+      Swal.fire('Warning', `Please enter ${this.orderType === 'Inward' ? 'PO' : 'Invoice'} number`, 'warning');
+      return;
+    }
+
+    const payload = { VBELN: referenceNumber };
+
+    this.spinner.show();
+    this.service.fetchinvoicelistnonsap(payload).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+
+        if (!res || res.length === 0) {
+          Swal.fire('No data found', '', 'info');
+          return;
+        }
+
+        const header = res[0].HEADER;
+        const items = res[0].ITEM;
+
+        this.showTable = true;
+        this.ShowHeaderForm = true;
+        this.showForm = true;
+
+        this.HeaderForm.patchValue({
+          INV_NO: header.INV_NO,
+          FI: header.FI,
+          REP_DATE: header.REP_DATE,
+          CLAIM_REF: header.CLAIM_REF,
+          INV_DATE: header.INV_DATE,
+          INV_BV: header.INV_BV,
+          LOSS_DCL: header.LOSS_DCL,
+          CLM_RF: header.CLM_RF,
+          SOL_VAL: header.SOL_VAL,
+          CUSTOMER: header.CUSTOMER,
+          SO_NO: header.SO_NO,
+          LOCATION: header.LOCATION,
+          DAMAGE_RMK: header.DAMAGE_RMK,
+          CLM_INF: header.CLM_INF,
+          CLM_ST: header.CLM_ST,
+          CLM_DOC_ST: header.CLM_DOC_ST,
+          COURIER_DET: header.COURIER_DET,
+          PAY_ST: header.PAY_ST,
+          PAY_INFO: header.PAY_INFO,
+          UTR: header.UTR,
+          CLM_SET_DT: header.CLM_SET_DT
+        });
+
+        while (this.items.length !== 0) {
+          this.items.removeAt(0);
+        }
+
+        items.forEach((x: any) => {
+          const row = this.fb.group({
+            selected: [false],
+            ZMAPID: [''],
+            ZREFNO: [''],
+            ZLINE_NO: [x.ZLINE_NO],
+            INV_NO: [x.INV_NO],
+            POSNR: [x.POSNR],
+            VEH_LINE: [x.VEH_LINE],
+            VEHICLE: [x.VEHICLE],
+            TRUCK_NO: [x.TRUCK_NO],
+            LR_NO: [x.LR_NO],
+            AH: [x.AH],
+            NO_SETS: [x.NO_SETS],
+            TRANSPORTER: [x.TRANSPORTER],
+            ZWORK_ORDER: [''],
+            ZBILLNO: ['']
+          });
+
+          this.items.push(row);
+        });
+      },
+      error: err => {
+        this.spinner.hide();
+        console.error(err);
+        Swal.fire('Error fetching NON-SAP data', '', 'error');
+      }
+    });
+  }
+
+  // Save Non-SAP
+  onSaveNonSap(action: 'stay' | 'next' | 'previous' = 'stay'): void {
+    if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        text: 'Please select at least one reference row before saving'
+      });
+      return;
+    }
+
+    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+
+    const headerValue = { ...this.HeaderForm.value };
+    delete headerValue.referenceItems;
+
+    headerValue.INV_NO = referenceNumber;
+
+    this.items.controls.forEach(row => {
+      row.patchValue({ INV_NO: referenceNumber });
+    });
+
+    const payload = {
+      HEADER: headerValue,
+      ITEM: this.ItemForm.value.ITEMS
+    };
+
+    console.log('📤 Non-SAP Final Payload:', payload);
+
+    this.spinner.show();
+    this.service.Nonsapsave(payload).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+
+        if (res?.STATUS === 'TRUE' || res?.STATUS === true) {
+          Swal.fire({
+            text: '✅ Data Saved Successfully!',
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 900,
+            willClose: () => {
+              if (action === 'next') {
+                this.router.navigate(['/next-screen']);
+              } else if (action === 'previous') {
+                this.router.navigate(['/transit-damage-info']);
+              } else {
+                this.resetForms();
+              }
+            }
+          });
+        } else {
+          Swal.fire({
+            text: '⚠️ Save Failed: ' + (res.MESSAGE || ''),
+            icon: 'warning'
+          });
+        }
+      },
+      error: () => {
+        this.spinner.hide();
+        Swal.fire({
+          text: '❌ Error while saving data',
+          icon: 'error'
+        });
+      }
+    });
+  }
+
+  toggleDropdown(): void {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
+  selectSearchType(option: any): void {
+    this.selectedType = option;
+    this.dropdownOpen = false;
   }
 
   isSap(): boolean {
