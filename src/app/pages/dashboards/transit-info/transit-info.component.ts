@@ -299,26 +299,31 @@ export class TransitInfoComponent implements OnInit {
     };
     payload1.data[this.selectedType] = this.searchReference.trim();
 
-    console.log('🔍 Payload:', payload1);
-
-    this.spinner.show();
-    this.service.global_Fields_SearchOption(payload1).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        if (res.length > 0) {
-          this.searchOptionsList = res;
-          this.showForm = false;
-          Swal.fire('Data fetched successfully!', '', 'success');
-        } else {
-          Swal.fire('No records found', '', 'info');
-        }
-      },
-      error: (err) => {
-        this.spinner.hide();
-        console.error('❌ Error:', err);
-        Swal.fire('Error fetching data', '', 'error');
-      }
-    });
+    console.log('🔍 Payload1:', payload1);
+          this.spinner.show();
+          this.service.global_Fields_SearchOption(payload1).subscribe({
+            next: (res: any) => {
+              this.spinner.hide();
+              console.log('✅ Search Response:', res);
+              if (res.NUMBER == "100" && res.STATUS == "FALSE") {
+                this.searchOptionsList = [];
+               
+               
+                Swal.fire('', res.MESSAGE, 'warning');
+              } else {
+                Swal.fire('No records found', '', 'info');
+                 this.searchOptionsList = res.HEADER;
+                this.showForm = false;
+               
+                Swal.fire('Data fetched successfully!', '', 'success');
+              }
+            },
+            error: (err) => {
+              this.spinner.hide();
+              console.error('❌ Error:', err);
+              Swal.fire('Error fetching data', '', 'error');
+            }
+          });
   }
 
   toggleDropdown() {

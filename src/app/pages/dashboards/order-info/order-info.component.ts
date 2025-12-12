@@ -771,46 +771,37 @@ export class OrderInfoComponent implements OnInit {
     }
   }
 
-  onFieldBlur(index: number, fieldKey: string): void {
-    if (index !== 0) return;
+   onFieldBlur(index: number, fieldKey: string): void {
 
-    const firstRow = this.items.at(0) as FormGroup;
-    const values = firstRow.value;
-
-    if (
-      !values.referenceNumber &&
-      !values.workOrderNumber &&
-      !values.lrNumber &&
-      !values.transporter
-    ) {
-      this.items.clear();
-      this.items.push(this.createItemRow());
-      return;
-    }
-
-    const obj = {
-      global_scr: 'ORDER INFO',
-      REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
-      WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
-      LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
-      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : ''
-    };
-
-    console.log('🔹 Sending Object:', obj);
-
-    this.spinner.show();
-    this.service.GlobalReferenceNoFetch(obj).subscribe({
-      next: (res: any) => {
-        console.log('✅ GlobalRefSearch Response:', res);
-        this.spinner.hide();
-        this.populateRows(res);
-      },
-      error: err => {
-        console.error('❌ Ref Fetch Error:', err);
-        this.spinner.hide();
-      }
-    });
+  // Ensure FormArray has at least one row
+  if (!this.items || this.items.length === 0) {
+    console.warn('⚠️ items FormArray is empty on blur');
+    return;
   }
+
+  // Only first row should trigger API
+  if (index !== 0) return;
+
+  const firstRow = this.items.at(0) as FormGroup;
+
+  if (!firstRow) {
+    console.warn('⚠️ First row is undefined');
+    return;
+  }
+
+  const values = firstRow.value || {};
+
+  if (
+    !values.referenceNumber &&
+    !values.workOrderNumber &&
+    !values.lrNumber &&
+    !values.transporter
+  ) {
+    this.items.clear();
+    this.items.push(this.createItemRow());
+    return;
+  }
+}
 
   populateRows(data: any[]): void {
     this.items.clear();

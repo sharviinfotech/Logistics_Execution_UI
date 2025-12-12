@@ -118,7 +118,7 @@
           </div>
         </div>
 
-        <div class="input-row input-flex" *ngIf="sapType === 'Non-SAP'">
+        <div class="input-row input-flex" *ngIf="sapType === 'Non-SAP'" style="width: auto;">
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
@@ -206,10 +206,15 @@
             <th>Ref No</th>
             <th>Invoice No</th>
             <th>ODN No</th>
+            <th>SO NO</th>
+            <th>Sales Person</th>
             <th>Physical Arrival Date</th>
             <th>Unloading Date & Time</th>
             <th>POD Scan Date & Time</th>
             <th>SIT/SALE</th>
+            <th>Location</th>
+            <th>Vehicle Line</th>
+            <th>Vehicle Number</th>
             <th>Work Order</th>
             <th>LR No</th>
             <th>Transporter</th>
@@ -220,13 +225,18 @@
             <td>{{ item.ZREFNO }}</td>
             <td>{{ item.ZINV_NO }}</td>
             <td>{{ item.ZODN_NO }}</td>
-            <td>{{ item.ZPHY_ARRIVE_DEST | date: 'dd-MM-yyyy' }}</td>
+            <td>{{ item.ZSONO }}</td>
+            <td>{{ item.ZSALE_PERSON }}</td>
+            <td>{{ item.ZPY_ARRIVED_DEST | date: 'dd-MM-yyyy' }}</td>
             <td>{{ item.ZUNLOADING_DT }}</td>
             <td>{{ item.ZPOD_SCAN }}</td>
-            <td>{{ item.ZSIT }}</td>
-            <td>{{ item.ZWORK_ORDER }}</td>
-            <td>{{ item.ZLRNO }}</td>
-            <td>{{ item.ZTRANSPORTER }}</td>
+            <td>{{ item.ZSIT_SALE }}</td>
+            <td>{{ item.ZLOCATION }}</td>
+            <td>{{ item.ZVEH_LINE }}</td>
+            <td>{{ item.ZVEH_NUM }}</td>
+            <td>{{ item.ZWORK_ORDER}}</td>
+            <td>{{ item.ZLRNO}}</td>
+            <td>{{ item.ZTRANSPORTER}}</td>
           </tr>
         </tbody>
       </table>

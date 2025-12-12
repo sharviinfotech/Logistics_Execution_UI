@@ -246,7 +246,7 @@ export class DispatchComponent implements OnInit {
   }
 
   // ✅ FETCH REFERENCE NUMBER DATA
-  onSearchReference() {
+ onSearchReference() {
     if (!this.searchReference?.trim()) {
       Swal.fire('Please enter a Reference Number', '', 'warning');
       return;
@@ -255,28 +255,47 @@ export class DispatchComponent implements OnInit {
     const payload = { RNO: this.searchReference };
 
     this.spinner.show();
-    this.service.fetchReferencenumber(payload).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        console.log("✅ Reference Data:", res);
+    let request$;
+    
+    if (this.sapType === 'SAP') {
+      request$ = this.service.fetchReferencenumber(payload);
+    } else if (this.sapType === 'Non-SAP') {
+      request$ = this.service.fetchReferencenumberWithoutSap(payload);
+    }
+    
+    
+    if (request$) { 
+        request$.subscribe({ // <-- This is the correction
+            next: (res: any) => {
+                this.spinner.hide();
+                console.log("✅ Reference Data:", res);
 
-        const records = Array.isArray(res) ? res : res?.data || [];
-        if (records.length > 0) {
-          this.populateDispatchForm(records);
-          this.isUpdateMode = true;
-          this.showForm = true;
-          Swal.fire('Data fetched successfully!', '', 'success');
-        } else {
-          Swal.fire('No record found for this Reference Number', '', 'info');
-        }
-      },
-      error: (err) => {
+                // Added safe access to res?.data for robustness
+                const records = Array.isArray(res) ? res : res?.data || []; 
+                if (records.length > 0) {
+                    this.populateDispatchForm(records);
+                    this.isUpdateMode = true;
+                    this.showForm = true;
+                    Swal.fire('Data fetched successfully!', '', 'success');
+                } else {
+                    Swal.fire('No record found for this Reference Number', '', 'info');
+                }
+            },
+            error: (err) => {
+                this.spinner.hide();
+                console.error('❌ Fetch error:', err);
+                Swal.fire('Error fetching Reference Number data', '', 'error');
+            }
+        });
+    } else {
+        // Optional: Handle case where sapType is neither 'SAP' nor 'Non-SAP'
         this.spinner.hide();
-        console.error('❌ Fetch error:', err);
-        Swal.fire('Error fetching Reference Number data', '', 'error');
-      }
-    });
-  }
+        console.warn('⚠️ Invalid sapType:', this.sapType);
+        Swal.fire('Invalid SAP Type configuration', '', 'error');
+    }
+}
+
+  
 
   // ✅ POPULATE FORM WITH FETCHED DATA
   populateDispatchForm(records: any[]) {

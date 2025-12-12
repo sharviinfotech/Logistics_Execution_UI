@@ -257,6 +257,12 @@ export class GeneralserviceService {
  fetchReferencenumber(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/Dispatch/Outward/ReferenceNumber/fetch', obj);
   }
+
+  fetchReferencenumberWithoutSap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/Dispatch/Outward/ReferenceNumber/WithoutSap/fetch', obj);
+  }
+
+
   fetchReferencenumberEdit(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/Dispatch/Outward/ReferenceNumber/edit', obj);
   }

@@ -165,7 +165,7 @@
 
 
     <!-- COMMON FIELDS + PRODUCT TABLE -->
-    <div *ngIf="showForm">
+    <div *ngIf="showForm" >
 
       <!-- COMMON FIELDS -->
       <div class="form-grid" [formGroup]="ProductInfo">
@@ -359,9 +359,9 @@
         <td>{{ item.ZAH || '-' }}</td>
         <td>{{ item.ZSHIP_WT | number: '1.2-2' }}</td>
         <td>{{ item.ZBATCOND || '-' }}</td>
-        <td>{{ item.ZINCO || '-' }}</td>
-        <td>{{ item.ZINS_SCPOE || '-' }}</td>
-        <td>{{ item.ZKM || '-' }}</td>
+        <td>{{ item.ZINCO }}</td>
+        <td>{{ item.ZINS_SCPOE }}</td>
+        <td>{{ item.ZKM }}</td>
         <td>{{ item.ZWORK_ORDER || '-' }}</td>
         <td>{{ item.ZLRNO || '-' }}</td>
         <td>{{ item.ZTRANSPORTER || '-' }}</td>
