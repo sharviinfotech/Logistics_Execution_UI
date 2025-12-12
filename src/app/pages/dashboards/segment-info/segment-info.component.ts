@@ -24,14 +24,14 @@ export class SegmentInfoComponent implements OnInit {
   orderType: string = '';
   sapType: string = '';
   ponumber: string = '';
-  
+
   invoicenumber: string = '';
   previousOrderType: string | null = null;
   previousSapType: string | null = null;
 
   // F4 lists from backend
   supplierList: any[] = [];
-  
+
   segmentList: any[] = [];
   custGrpList: any[] = [];
   branchList: any[] = [];
@@ -104,14 +104,16 @@ export class SegmentInfoComponent implements OnInit {
       workOrderNumber: [''],
       lrNumber: [''],
       transporter: [''],
-      soNumber: [''],          
-      odnNumber: ['']     
+      soNumber: [''],
+      odnNumber: [''],
+      SONO: [''],       // ✔ match backend
+      ODN_NO: ['']
     });
   }
 
   resetF4Flags() {
     this.showF4 = {
-       SALE_PERSON: false,
+      SALE_PERSON: false,
       SEGMENT: false,
       CUST_PROF: false,
       BRANCH: false,
@@ -214,10 +216,10 @@ export class SegmentInfoComponent implements OnInit {
       WORK_ORDER_NO: data.WORK_ORDER || '',
       LR_NO: data.LRNO || '',
       TRANSPORTER: data.TRANSPORTER || '',
-      SONO: data.SO_NUM || '',
-      ODN_NO: data.ODN_NUM || '',
+      SO_NO: data.SO_NO || '',
+      ODN_NO: data.ODN_NO || '',
       INV_VBELN: data.INV_NUM || '',
-      SALE_PERSON: data.SALE_PERSON || '', 
+      SALE_PERSON: data.SALE_PERSON || '',
       SEGMENT: data.SEGMENT || '',
       APPTYP: data.APPTYP || '',
       CUST_PROF: data.CUST_PROFILE || '',
@@ -290,8 +292,8 @@ export class SegmentInfoComponent implements OnInit {
             workOrderNumber: [d.WORK_ORDER_NO || ''],
             lrNumber: [d.LR_NO || ''],
             transporter: [d.TRANSPORTER || ''],
-            soNumber: [d.SO_NO || d.soNumber || ''],        // Sales Order Number
-            odnNumber: [d.ODN_NO || d.odnNumber || ''],     // ODN Number
+            SONO: [d.SONO || d.SO_NO || ''],
+            ODN_NO: [d.ODN_NO || ''],  // ODN Number
 
           })
         );
@@ -314,6 +316,8 @@ export class SegmentInfoComponent implements OnInit {
     const rowValue = (this.referenceItems.at(index) as FormGroup).value;
 
     if (checkbox.checked) {
+
+      // check duplicate
       const exists = this.selectedItems.some(
         (item) =>
           item.referenceNumber === rowValue.referenceNumber &&
@@ -321,10 +325,14 @@ export class SegmentInfoComponent implements OnInit {
           item.lrNumber === rowValue.lrNumber &&
           item.transporter === rowValue.transporter
       );
+
       if (!exists) {
         this.selectedItems.push(rowValue);
       }
+
     } else {
+
+      // remove unchecked row
       this.selectedItems = this.selectedItems.filter(
         (item) =>
           !(
@@ -336,8 +344,9 @@ export class SegmentInfoComponent implements OnInit {
       );
     }
 
-    console.log('✅ Selected Items:', this.selectedItems);
+    console.log('Selected Items:', this.selectedItems);
   }
+
 
   isItemSelected(index: number): boolean {
     const rowValue = (this.referenceItems.at(index) as FormGroup).value;
@@ -350,7 +359,8 @@ export class SegmentInfoComponent implements OnInit {
         item.transporter === rowValue.transporter
     );
   }
-    onSearchTypeChange(): void {
+
+  onSearchTypeChange(): void {
     // Reset data when search type changes
     this.searchReference = '';
     this.searchOptionsList = [];
@@ -359,36 +369,36 @@ export class SegmentInfoComponent implements OnInit {
   }
 
   // Search functionality
-   onSearchReference() {
-        if (!this.searchReference?.trim()) {
-          Swal.fire('Please enter a value', '', 'warning');
-          return;
-        }
-    
-        if (!this.selectedType) {
-          Swal.fire('Please select a search type', '', 'info');
-          return;
-        }
-        let payload1: any = {
-         
-        "global": "SEGMENT INFO",
-        "data": {
-            "ref_no": "",
-            "inv_no": "",
-            "so_no": "",
-            "transporter": "",
-            "lr_no": "",
-            "workorder_no": "",
-            "sales_person": "",
-            "location": "",
-            "odn_no": "",
-            "vehicle_no": "",
-            "freight_billno": "",
-            "nature_damage": "",
-            "claim_status": ""   
-        }
-        };
-        payload1.data[this.selectedType] = this.searchReference.trim();
+  onSearchReference() {
+    if (!this.searchReference?.trim()) {
+      Swal.fire('Please enter a value', '', 'warning');
+      return;
+    }
+
+    if (!this.selectedType) {
+      Swal.fire('Please select a search type', '', 'info');
+      return;
+    }
+    let payload1: any = {
+
+      "global": "SEGMENT INFO",
+      "data": {
+        "ref_no": "",
+        "inv_no": "",
+        "so_no": "",
+        "transporter": "",
+        "lr_no": "",
+        "workorder_no": "",
+        "sales_person": "",
+        "location": "",
+        "odn_no": "",
+        "vehicle_no": "",
+        "freight_billno": "",
+        "nature_damage": "",
+        "claim_status": ""
+      }
+    };
+    payload1.data[this.selectedType] = this.searchReference.trim();
 
     console.log('🔍 Payload:', payload1);
 
@@ -396,11 +406,11 @@ export class SegmentInfoComponent implements OnInit {
     this.service.global_Fields_SearchOption(payload1).subscribe({
       next: (res: any) => {
         this.spinner.hide();
-        console.log("HEADER", res.HEADER )
+        console.log("HEADER", res.HEADER)
         if (res?.HEADER?.length > 0) {
 
           this.searchOptionsList = res.HEADER;
-          
+
           this.showForm = false;
           Swal.fire('Data fetched successfully!', '', 'success');
         } else {
@@ -455,99 +465,98 @@ export class SegmentInfoComponent implements OnInit {
   }
 
   saveSegmentInfoWithSAP(action: 'stay' | 'next' | 'previous' = 'stay'): void {
-  this.segmentInfo.markAllAsTouched();
-  
-  if (this.segmentInfo.invalid) {
-    Swal.fire({
-      title: 'Validation Error',
-      text: 'Please fill all required fields before saving.',
-      icon: 'warning',
-      confirmButtonText: 'Ok',
-    });
-    return;
-  }
+    this.segmentInfo.markAllAsTouched();
 
-  // ✅ For Outward orders, validate selection
-  if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
-    Swal.fire({
-      icon: 'warning',
-      text: 'Please select at least one reference row before saving'
-    });
-    return;
-  }
+    if (this.segmentInfo.invalid) {
+      Swal.fire({
+        title: 'Validation Error',
+        text: 'Please fill all required fields before saving.',
+        icon: 'warning',
+        confirmButtonText: 'Ok',
+      });
+      return;
+    }
 
-  const formValue = this.segmentInfo.value;
-  
-  // ✅ Get reference data from selected items
-  let referenceData = {};
-  if (this.orderType === 'Outward' && this.selectedItems.length > 0) {
-    const selected = this.selectedItems[0];
-    referenceData = {
-      REFNO: selected.referenceNumber || 0,
-      WORK_ORDER: selected.workOrderNumber || '',
-      LRNO: selected.lrNumber || '',
-      TRANSPORTER: selected.transporter || '',
-      SONO: selected.SONO || '',  
-      ODN_NO: selected.ODN_NO || ''  
+    // Outward validation
+    if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        text: 'Please select at least one reference row before saving'
+      });
+      return;
+    }
+
+    const formValue = this.segmentInfo.value;
+
+    // BUILD MULTIPLE RECORDS
+    let saveArray: any[] = [];
+
+    if (this.orderType === 'Outward') {
+      this.selectedItems.forEach(item => {
+        saveArray.push({
+          REFNO: item.referenceNumber || 0,
+          WORK_ORDER: item.workOrderNumber || '',
+          LRNO: item.lrNumber || '',
+          TRANSPORTER: item.transporter || '',
+          SO_NO: item.SONO || '',           // ✅ FIXED: Read from item.SONO
+          ODN_NO: item.ODN_NO || '',        // ✅ Already correct
+
+          INV_NUM: formValue.INV_VBELN || this.invoicenumber || '',
+          SALE_PERSON: formValue.SALE_PERSON || '',
+          SEGMENT: formValue.SEGMENT || '',
+          APPTYP: formValue.APPTYP || '',
+          CUST_PROFILE: formValue.CUST_PROF || '',
+          BRANCH: formValue.BRANCH || '',
+          BRANCH_ZONE: formValue.BRANCH_ZONE || '',
+          TAT_TYPE: formValue.TAT_Type || '',
+          TAT: formValue.TAT_DAYS || '',
+          ETA: formValue.ETA_DATE || ''
+        });
+      });
+    }
+
+    const payload = {
+      SAVE: saveArray
     };
+
+    console.log("✅ Saving Segment Info with SO_NO & ODN_NO:", payload);
+
+    this.spinner.show();
+    this.service.SegmentInfoOutwardSave(payload).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        if (res.STATUS == 'true' || res.NUMBER == '200') {
+          Swal.fire({
+            title: 'Success',
+            text: res.MESSAGE,
+            icon: 'success',
+            confirmButtonText: 'Ok',
+          }).then(() => {
+            if (action === 'next') {
+              this.router.navigate(['/vehicle-info']);
+            } else if (action === 'previous') {
+              this.router.navigate(['/invoice-load-details']);
+            } else {
+              this.segmentInfo.reset();
+              this.selectedItems = [];
+              this.showForm = false;
+            }
+          });
+        } else {
+          Swal.fire({
+            text: res.MESSAGE,
+            icon: 'warning',
+            confirmButtonText: 'Ok',
+          });
+        }
+      },
+      error: () => {
+        this.spinner.hide();
+        Swal.fire('Server error while saving', '', 'error');
+      }
+    });
   }
 
-  const payload = {
-    SAVE: [
-      {
-        ...referenceData,  // ✅ Spread reference data first
-        INV_NUM: formValue.INV_VBELN || this.invoicenumber || '',
-        SALE_PERSON: formValue.SALE_PERSON || '',
-        SEGMENT: formValue.SEGMENT || '',
-        APPTYP: formValue.APPTYP || '',
-        CUST_PROFILE: formValue.CUST_PROF || '',
-        BRANCH: formValue.BRANCH || '',
-        BRANCH_ZONE: formValue.BRANCH_ZONE || '',
-        TAT_TYPE: formValue.TAT_Type || '',
-        TAT: formValue.TAT_DAYS || '',
-        ETA: formValue.ETA_DATE || ''
-      },
-    ],
-  };
-
-  console.log('📤 Saving Segment Info with payload:', payload);
-
-  this.spinner.show();
-  this.service.SegmentInfoOutwardSave(payload).subscribe({
-    next: (res: any) => {
-      this.spinner.hide();
-      if (res.STATUS == 'true' || res.NUMBER == '200') {
-        Swal.fire({
-          title: 'Success',
-          text: res.MESSAGE,
-          icon: 'success',
-          confirmButtonText: 'Ok',
-        }).then(() => {
-          if (action === 'next') {
-            this.router.navigate(['/vehicle-info']);
-          } else if (action === 'previous') {
-            this.router.navigate(['/invoice-load-details']);
-          } else {
-            this.segmentInfo.reset();
-            this.selectedItems = [];  // ✅ Clear selected items
-            this.showForm = false;
-          }
-        });
-      } else {
-        Swal.fire({
-          title: '',
-          text: res.MESSAGE,
-          icon: 'warning',
-          confirmButtonText: 'Ok',
-        });
-      }
-    },
-    error: () => {
-      this.spinner.hide();
-      Swal.fire('Server error while saving', '', 'error');
-    },
-  });
-}
 
   TatTypeChange(): void {
     const formValue = this.segmentInfo.value;
@@ -577,7 +586,7 @@ export class SegmentInfoComponent implements OnInit {
         if (res && (res.TAT || res.ETA)) {
           this.segmentInfo.patchValue({
             TAT_DAYS: res.TAT || '',
-            ETA_DATE: res.ETA || '' 
+            ETA_DATE: res.ETA || ''
           });
         } else {
           Swal.fire('No TAT data found for selected type', '', 'info');
@@ -653,7 +662,7 @@ export class SegmentInfoComponent implements OnInit {
     const payload = {
       CREATE: [
         {
-          SALE_PERSON: formValue. SALE_PERSON,
+          SALE_PERSON: formValue.SALE_PERSON,
           SEGMENT: formValue.SEGMENT,
           APPTYP: formValue.APPTYP,
           CUST_PROF: formValue.CUST_PROF,

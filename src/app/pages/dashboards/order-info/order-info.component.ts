@@ -12,7 +12,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 @Component({
   selector: 'app-order-info',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, SharedModule,NgSelectModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, SharedModule, NgSelectModule],
   templateUrl: './order-info.component.html',
   styleUrls: ['./order-info.component.css']
 })
@@ -122,22 +122,22 @@ export class OrderInfoComponent implements OnInit {
     this.previousSapType = null;
   }
   updateSearchOptionLabels(): void {
-        const isSapMode = this.isSap(); // uses this.sapType === 'SAP'
+    const isSapMode = this.isSap(); // uses this.sapType === 'SAP'
 
-        // Find the 'INV_NO' object in the searchOptions array (index 1)
-        const invoiceOption = this.searchOptions.find(option => option.key === 'INV_NO');
+    // Find the 'INV_NO' object in the searchOptions array (index 1)
+    const invoiceOption = this.searchOptions.find(option => option.key === 'INV_NO');
 
-        if (invoiceOption) {
-            if (isSapMode) {
-                // With SAP: Display 'Invoice Number'
-                invoiceOption.label = 'Invoice Number'; 
-            } else {
-                // Without SAP: Display 'DC Reference Number'
-                invoiceOption.label = 'DC Reference Number';
-            }
-            console.log(`🔍 Updated INV_NO label to: ${invoiceOption.label}`);
-        }
+    if (invoiceOption) {
+      if (isSapMode) {
+        // With SAP: Display 'Invoice Number'
+        invoiceOption.label = 'Invoice Number';
+      } else {
+        // Without SAP: Display 'DC Reference Number'
+        invoiceOption.label = 'DC Reference Number';
+      }
+      console.log(`🔍 Updated INV_NO label to: ${invoiceOption.label}`);
     }
+  }
 
   setConditionalValidators(): void {
     console.log('🔧 Setting validators for sapType:', this.sapType);
@@ -173,75 +173,75 @@ export class OrderInfoComponent implements OnInit {
   }
 
   onPlantChange(): void {
-  const selectedPlant = this.OrderInfo.get('Plant')?.value;
-  console.log("🌱 Plant selected:", selectedPlant);
+    const selectedPlant = this.OrderInfo.get('Plant')?.value;
+    console.log("🌱 Plant selected:", selectedPlant);
 
-  // Only fetch division for Non-SAP mode
-  if (!this.isSap() && selectedPlant) {
-    // Find the selected plant object from plantList
-    const plantObj = this.plantList?.find(
-      (p: any) => p.PLANT_DESC === selectedPlant
-    );
-
-    if (plantObj && plantObj.PLANT) {
-      const payload = {
-        WERKS: plantObj.PLANT
-      };
-
-      console.log("📤 Fetching division for plant code:", plantObj.PLANT);
-      this.spinner.show();
-
-      this.service.PlantBasedDivison(payload).subscribe(
-        (res: any) => {
-          console.log("✅ Division Response:", res);
-          this.spinner.hide();
-
-          if (res && res.DIVISION) {
-            // Find matching division from divisionList
-            const divisionObj = this.divisionList?.find(
-              (d: any) => d.DIVISION === res.DIVISION
-            );
-
-            if (divisionObj) {
-              // Set the full division description (same as dropdown shows)
-              this.OrderInfo.patchValue({
-                Division: divisionObj.DIVISION_DESC
-              });
-              console.log("✅ Division set to:", divisionObj.DIVISION_DESC);
-            } else {
-              // Fallback: set just the division code if no match found
-              this.OrderInfo.patchValue({
-                Division: res.DIVISION
-              });
-              console.log("⚠️ Division set to code:", res.DIVISION);
-            }
-          } else {
-            console.warn("⚠️ No DIVISION in response");
-          }
-        },
-        (error) => {
-          console.error("❌ Error fetching division:", error);
-          this.spinner.hide();
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Failed to fetch division for selected plant',
-            timer: 2000
-          });
-        }
+    // Only fetch division for Non-SAP mode
+    if (!this.isSap() && selectedPlant) {
+      // Find the selected plant object from plantList
+      const plantObj = this.plantList?.find(
+        (p: any) => p.PLANT_DESC === selectedPlant
       );
+
+      if (plantObj && plantObj.PLANT) {
+        const payload = {
+          WERKS: plantObj.PLANT
+        };
+
+        console.log("📤 Fetching division for plant code:", plantObj.PLANT);
+        this.spinner.show();
+
+        this.service.PlantBasedDivison(payload).subscribe(
+          (res: any) => {
+            console.log("✅ Division Response:", res);
+            this.spinner.hide();
+
+            if (res && res.DIVISION) {
+              // Find matching division from divisionList
+              const divisionObj = this.divisionList?.find(
+                (d: any) => d.DIVISION === res.DIVISION
+              );
+
+              if (divisionObj) {
+                // Set the full division description (same as dropdown shows)
+                this.OrderInfo.patchValue({
+                  Division: divisionObj.DIVISION_DESC
+                });
+                console.log("✅ Division set to:", divisionObj.DIVISION_DESC);
+              } else {
+                // Fallback: set just the division code if no match found
+                this.OrderInfo.patchValue({
+                  Division: res.DIVISION
+                });
+                console.log("⚠️ Division set to code:", res.DIVISION);
+              }
+            } else {
+              console.warn("⚠️ No DIVISION in response");
+            }
+          },
+          (error) => {
+            console.error("❌ Error fetching division:", error);
+            this.spinner.hide();
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to fetch division for selected plant',
+              timer: 2000
+            });
+          }
+        );
+      } else {
+        console.warn("⚠️ Plant object not found for:", selectedPlant);
+        // Clear division if plant is invalid
+        this.OrderInfo.patchValue({
+          Division: ''
+        });
+      }
     } else {
-      console.warn("⚠️ Plant object not found for:", selectedPlant);
-      // Clear division if plant is invalid
-      this.OrderInfo.patchValue({
-        Division: ''
-      });
+      console.log("ℹ️ Skipping division fetch - SAP mode or no plant selected");
     }
-  } else {
-    console.log("ℹ️ Skipping division fetch - SAP mode or no plant selected");
   }
-}
-  
+
 
   onDivisionChange(): void {
     const code = this.OrderInfo.get('Division')?.value;
@@ -438,7 +438,7 @@ export class OrderInfoComponent implements OnInit {
       formattedInvoiceDate = this.convertToDateFormat(data.INV_DATE);
       console.log("📝 Formatted INV_DATE:", formattedInvoiceDate);
     }
-     console.log("📝 isSap():", this.isSap());
+    console.log("📝 isSap():", this.isSap());
     console.log("📝 Will set InvoiceDate to:", this.isSap() ? formattedInvoiceDate : '');
     console.log("📝 Will set ReferenceDate to:", !this.isSap() ? formattedInvoiceDate : '');
 
@@ -459,7 +459,7 @@ export class OrderInfoComponent implements OnInit {
       BillingTransactionType: data.TRAN_TEXT_BILL || '',
       Division: data.DIVISION_TEXT || data.DIVISION || '',
       SubDivision: data.SUB_DIVISION || '',
-      RefNumber: data.SO_REF_NO || '',
+      RefNumber: data.ZSO_NO || '',
       Customer: data.CUST_NAME || '',
       CustomerGroup: data.CUST_GROUP || '',
       CNee: data.CNEE_NAME || '',
@@ -554,7 +554,7 @@ export class OrderInfoComponent implements OnInit {
       TRAN_TEXT_BILL: formValue.BillingTransactionType,
       DIVISION: formValue.Division,
       SUB_DIVISION: formValue.SubDivision,
-      SO_REF_NO: formValue.RefNumber,
+      ZSO_NO: formValue.RefNumber,
       CUST_NAME: formValue.Customer,
       CUST_GROUP: formValue.CustomerGroup,
       CNEE_NAME: formValue.CNee,
@@ -684,22 +684,22 @@ export class OrderInfoComponent implements OnInit {
   }
 
   // ✅ Helper method to convert "2015-12-14" to "2015-12-14T00:00"
- private convertToDateFormat(date: string): string {
+  private convertToDateFormat(date: string): string {
     if (!date) return '';
 
     if (date.includes('T')) {
-    return date.split('T')[0]; 
-  }
-  if (/^\d{8}$/.test(date)) {
-    const year = date.substring(0, 4);
-    const month = date.substring(4, 6);
-    const day = date.substring(6, 8);
-    return `${year}-${month}-${day}`;
-  }
+      return date.split('T')[0];
+    }
+    if (/^\d{8}$/.test(date)) {
+      const year = date.substring(0, 4);
+      const month = date.substring(4, 6);
+      const day = date.substring(6, 8);
+      return `${year}-${month}-${day}`;
+    }
 
-  // Already in correct format "2015-12-14"
-  return date;
-}
+    // Already in correct format "2015-12-14"
+    return date;
+  }
 
   onInputChange(type: 'purchase' | 'invoice'): void {
     const value = type === 'purchase' ? this.ponumber : this.invoicenumber;
@@ -732,21 +732,21 @@ export class OrderInfoComponent implements OnInit {
     );
   }
 
-    fetchCustomers(): void {
-      this.spinner.show();
-      this.service.getAllCustomerList().subscribe(
-        (res: any) => {
-          console.log('📥 Customer list fetched:', res);
-          // normalize to expected structure if needed
-          this.customerList = Array.isArray(res) ? res : (res?.data || []);
-          this.spinner.hide();
-        },
-        (error) => {
-          console.error('❌ Customer fetch error:', error);
-          this.spinner.hide();
-        }
-      );
-    }
+  fetchCustomers(): void {
+    this.spinner.show();
+    this.service.getAllCustomerList().subscribe(
+      (res: any) => {
+        console.log('📥 Customer list fetched:', res);
+        // normalize to expected structure if needed
+        this.customerList = Array.isArray(res) ? res : (res?.data || []);
+        this.spinner.hide();
+      },
+      (error) => {
+        console.error('❌ Customer fetch error:', error);
+        this.spinner.hide();
+      }
+    );
+  }
 
   fetchzonechange(): void {
     if (this.OrderInfo.value.DestinationState) {
@@ -966,9 +966,9 @@ export class OrderInfoComponent implements OnInit {
       return;
     }
     let payload1: any = {
-     
-    "global": "ORDER INFO",
-    "data": {
+
+      "global": "ORDER INFO",
+      "data": {
         "ref_no": "",
         "inv_no": "",
         "so_no": "",
@@ -982,36 +982,36 @@ export class OrderInfoComponent implements OnInit {
         "freight_billno": "",
         "nature_damage": "",
         "claim_status": ""
-   
-    }
+
+      }
     };
     payload1.data[this.selectedType] = this.searchReference.trim();
 
     console.log('🔍 Payload1:', payload1);
     this.spinner.show();
     this.service.global_Fields_SearchOption(payload1).subscribe({
-        next: (res: any) => {
-          this.spinner.hide();
-          console.log('✅ Search Response:', res);
-          if (res.NUMBER == "100" && res.STATUS == "FALSE") {
-            this.searchOptionsList = [];
-           
-           
-            Swal.fire('', res.MESSAGE, 'warning');
-          } else {
-            Swal.fire('No records found', '', 'info');
-             this.searchOptionsList = res.HEADER;
-            this.showForm = false;
-           
-            Swal.fire('Data fetched successfully!', '', 'success');
-          }
-        },
-        error: (err) => {
-          this.spinner.hide();
-          console.error('❌ Error:', err);
-          Swal.fire('Error fetching data', '', 'error');
+      next: (res: any) => {
+        this.spinner.hide();
+        console.log('✅ Search Response:', res);
+        if (res.NUMBER == "100" && res.STATUS == "FALSE") {
+          this.searchOptionsList = [];
+
+
+          Swal.fire('', res.MESSAGE, 'warning');
+        } else {
+          Swal.fire('No records found', '', 'info');
+          this.searchOptionsList = res.HEADER;
+          this.showForm = false;
+
+          Swal.fire('Data fetched successfully!', '', 'success');
         }
-      });
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('❌ Error:', err);
+        Swal.fire('Error fetching data', '', 'error');
+      }
+    });
   }
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
@@ -1019,5 +1019,5 @@ export class OrderInfoComponent implements OnInit {
   selectSearchType(option: any) {
     this.selectedType = option;
     this.dropdownOpen = false;
-  } 
+  }
 }
