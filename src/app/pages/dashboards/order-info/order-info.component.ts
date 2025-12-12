@@ -771,37 +771,60 @@ export class OrderInfoComponent implements OnInit {
     }
   }
 
-   onFieldBlur(index: number, fieldKey: string): void {
+  onFieldBlur(index: number, fieldKey: string): void {
 
-  // Ensure FormArray has at least one row
-  if (!this.items || this.items.length === 0) {
-    console.warn('⚠️ items FormArray is empty on blur');
-    return;
+    if (!this.items || this.items.length === 0) return;
+    if (index !== 0) return;
+
+    const firstRow = this.items.at(0) as FormGroup;
+    const values = firstRow.value || {};
+
+    if (
+      !values.referenceNumber &&
+      !values.workOrderNumber &&
+      !values.lrNumber &&
+      !values.transporter
+    ) {
+      this.items.clear();
+      this.items.push(this.createItemRow());
+      return;
+    }
+
+    const obj = {
+      global_scr: 'ORDER INFO',
+      REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
+      WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
+      LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
+      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : ''
+    };
+
+    console.log('🔹 Sending Object:', obj);
+
+    this.spinner.show();
+
+    let apiCall;
+
+    // 🎯 CONDITION BASED API CALL
+    if (this.sapType === 'SAP') {
+      apiCall = this.service.GlobalReferenceNoFetch(obj); // POST
+    } else {
+      apiCall = this.service.GlobalReferenceNoFetchwithoutsap(obj); // PUT
+    }
+
+    apiCall.subscribe({
+      next: (res: any) => {
+        console.log('✅ Response:', res);
+        this.spinner.hide();
+        this.populateRows(res);
+      },
+      error: err => {
+        console.error('❌ Error:', err);
+        this.spinner.hide();
+      }
+    });
   }
 
-  // Only first row should trigger API
-  if (index !== 0) return;
 
-  const firstRow = this.items.at(0) as FormGroup;
-
-  if (!firstRow) {
-    console.warn('⚠️ First row is undefined');
-    return;
-  }
-
-  const values = firstRow.value || {};
-
-  if (
-    !values.referenceNumber &&
-    !values.workOrderNumber &&
-    !values.lrNumber &&
-    !values.transporter
-  ) {
-    this.items.clear();
-    this.items.push(this.createItemRow());
-    return;
-  }
-}
 
   populateRows(data: any[]): void {
     this.items.clear();

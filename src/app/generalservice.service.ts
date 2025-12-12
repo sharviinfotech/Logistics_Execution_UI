@@ -149,8 +149,8 @@ export class GeneralserviceService {
   getTypeofmaterial() {
     return this.http.get<any>(environment.baseUrl + 'api/external/LE/ShipmentDetails/Nonsap/f4_Typeofmaterial');
   }
-   PlantBasedDivison(obj) {
-     return this.http.put(environment.baseUrl + 'api/external/LE/orderInfo/Outward/withoutsap/PlantBasedDivison', obj);
+  PlantBasedDivison(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/orderInfo/Outward/withoutsap/PlantBasedDivison', obj);
   }
   Incoterms(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/ShipmentDetails/Nonsap/f4_Incoterms', obj);
@@ -173,10 +173,10 @@ export class GeneralserviceService {
   getssc() {
     return this.http.get(environment.baseUrl + 'api/external/LE/segmentInfo/f4_getAllDetails',);
   }
-   fetchTAT(obj: any) {
+  fetchTAT(obj: any) {
     return this.http.put(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/withSap/TAT_Type', obj);
   }
-   fetchNonSapTAT(obj: any) {
+  fetchNonSapTAT(obj: any) {
     return this.http.put(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/NonSap/TAT_Type', obj);
   }
   fetchzoneTat(obj) {
@@ -250,11 +250,11 @@ export class GeneralserviceService {
   DispatchNonSapSave(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/Dispatch/Outward/withoutsap/Save', obj);
   }
-   fetchVendorCode() {
+  fetchVendorCode() {
     return this.http.get(environment.baseUrl + 'api/external/LE/Dispatch/Outward/F4Vendorcode/fetch');
   }
-  
- fetchReferencenumber(obj) {
+
+  fetchReferencenumber(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/Dispatch/Outward/ReferenceNumber/fetch', obj);
   }
 
@@ -267,10 +267,14 @@ export class GeneralserviceService {
     return this.http.post(environment.baseUrl + 'api/external/LE/Dispatch/Outward/ReferenceNumber/edit', obj);
   }
 
-   GlobalReferenceNoFetch(obj) {
+  GlobalReferenceNoFetch(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/orderinfo/GlobalReferenceNoFetch', obj);
   }
-   global_Fields_SearchOption(obj) {
+
+  GlobalReferenceNoFetchwithoutsap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/orderinfo/GlobalReferenceNoFetchwithoutsap', obj);
+  }
+  global_Fields_SearchOption(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/orderinfo/global_Fields_SearchOption', obj);
   }
 

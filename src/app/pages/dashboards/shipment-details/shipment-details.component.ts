@@ -1,4 +1,4 @@
-import{ Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, FormArray, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { GeneralserviceService } from 'src/app/generalservice.service';
@@ -25,7 +25,7 @@ export class ShipmentDetailsComponent implements OnInit {
   // Form and variables
   ProductInfo!: FormGroup;
   isEditMode = false;
- showForm = false; 
+  showForm = false;
   orderType: string = '';
   sapType: string = '';
   ponumber: string = '';
@@ -36,7 +36,7 @@ export class ShipmentDetailsComponent implements OnInit {
 
   selectedItems: any[] = [];
   searchReference: string = '';
- searchOptions = [
+  searchOptions = [
     { key: 'ref_no', label: 'Reference No' },
     { key: 'inv_no', label: 'Invoice No' },
     { key: 'odn_no', label: 'ODN No' },
@@ -56,7 +56,7 @@ export class ShipmentDetailsComponent implements OnInit {
     private spinner: NgxSpinnerService,
     public spinnerService: SpinnerService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.ProductInfo = this.fb.group({
@@ -66,7 +66,7 @@ export class ShipmentDetailsComponent implements OnInit {
       items: this.fb.array([this.createItemRow()]),
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
-    
+
     this.fetchIncoterms();
   }
 
@@ -89,30 +89,30 @@ export class ShipmentDetailsComponent implements OnInit {
       MTBEZ: ['', Validators.required],
       MAKTX: ['', Validators.required],
       ZSETS: [null, [Validators.required, Validators.min(1)]],
-      ZAH: [null, [Validators.required, Validators.min(0)]], 
+      ZAH: [null, [Validators.required, Validators.min(0)]],
       ZSHIP_WT: [null, [Validators.required, Validators.min(0)]],
-     ZBATCOND : [''],
+      ZBATCOND: [''],
       MANDT: [''],
       ZREFNO: [''],
-        ZLINE_NO: [''],
-        VBELN: [''],
-        POSNR: [''],
-        ZSO_NO: [''],
-        ZODN_NO: [''],
-        MTART: [''],
-        ZINCO: [''],       
-        ZINS_SCPOE: [''],
-        ZPIN_PLT: [''],
-        ZPIN_STP: [''],
-        ZKM: [''],
-        ZWORK_ORDER:[''],
-        ZLRNO: [''],
-        ZTRANSPORTER: [''],
+      ZLINE_NO: [''],
+      VBELN: [''],
+      POSNR: [''],
+      ZSO_NO: [''],
+      ZODN_NO: [''],
+      MTART: [''],
+      ZINCO: [''],
+      ZINS_SCPOE: [''],
+      ZPIN_PLT: [''],
+      ZPIN_STP: [''],
+      ZKM: [''],
+      ZWORK_ORDER: [''],
+      ZLRNO: [''],
+      ZTRANSPORTER: [''],
 
     });
   }
 
-  
+
 
   // Create one reference row
   createReferenceRow(): FormGroup {
@@ -203,7 +203,7 @@ export class ShipmentDetailsComponent implements OnInit {
     const values = firstRow.value;
 
     if (
-      
+
       !values.referenceNumber &&
       !values.workOrderNumber &&
       !values.lrNumber &&
@@ -225,14 +225,23 @@ export class ShipmentDetailsComponent implements OnInit {
     console.log('🔹 Sending Object:', obj);
 
     this.spinner.show();
-    this.service.GlobalReferenceNoFetch(obj).subscribe({
+    let apiCall;
+
+    // 🎯 CONDITION BASED API CALL
+    if (this.sapType === 'SAP') {
+      apiCall = this.service.GlobalReferenceNoFetch(obj); // POST
+    } else {
+      apiCall = this.service.GlobalReferenceNoFetchwithoutsap(obj); // PUT
+    }
+
+    apiCall.subscribe({
       next: (res: any) => {
-        console.log('✅ GlobalRefSearch Response:', res);
+        console.log('✅ Response:', res);
         this.spinner.hide();
         this.populateReferenceRows(res);
       },
       error: err => {
-        console.error('❌ Ref Fetch Error:', err);
+        console.error('❌ Error:', err);
         this.spinner.hide();
       }
     });
@@ -245,7 +254,7 @@ export class ShipmentDetailsComponent implements OnInit {
       data.forEach(d => {
         this.referenceItems.push(
           this.fb.group({
-            MAPID: [d.MAPID   ],
+            MAPID: [d.MAPID],
             referenceNumber: [d.REF_NO || d.referenceNumber || ''],
             workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
             lrNumber: [d.LR_NO || d.lrNumber || ''],
@@ -272,26 +281,26 @@ export class ShipmentDetailsComponent implements OnInit {
   }
 
   onchangeMAPID(index: number) {
-  const rowForm = this.items.at(index) as FormGroup;
-  const selectedMapId = rowForm.get('ZMAPID')?.value;
-  console.log("Selected MAPID:", selectedMapId);
+    const rowForm = this.items.at(index) as FormGroup;
+    const selectedMapId = rowForm.get('ZMAPID')?.value;
+    console.log("Selected MAPID:", selectedMapId);
 
-  // Find object based on selected MAPID
-  const selectedObj = this.selectedItems.find(item => item.MAPID == selectedMapId);
+    // Find object based on selected MAPID
+    const selectedObj = this.selectedItems.find(item => item.MAPID == selectedMapId);
 
-  console.log("Selected MAPID object:", selectedObj);
+    console.log("Selected MAPID object:", selectedObj);
 
-  if (selectedObj) {
-    rowForm.patchValue({
-      ZREFNO: selectedObj.referenceNumber || "",
-      ZWORK_ORDER: selectedObj.workOrderNumber || "",
-      ZLRNO: selectedObj.lrNumber || "",
-      ZTRANSPORTER: selectedObj.transporter || "",
-      ZMAPID: selectedObj.MAPID || ""
-    });
+    if (selectedObj) {
+      rowForm.patchValue({
+        ZREFNO: selectedObj.referenceNumber || "",
+        ZWORK_ORDER: selectedObj.workOrderNumber || "",
+        ZLRNO: selectedObj.lrNumber || "",
+        ZTRANSPORTER: selectedObj.transporter || "",
+        ZMAPID: selectedObj.MAPID || ""
+      });
+    }
+    console.log("Updated items form:", this.items.value);
   }
-  console.log("Updated items form:", this.items.value);
-}
 
 
   onCheckboxChange(event: Event, index: number): void {
@@ -301,7 +310,7 @@ export class ShipmentDetailsComponent implements OnInit {
     if (checkbox.checked) {
       const exists = this.selectedItems.some(
         (item) =>
-          item.MAPID === rowValue.MAPID && 
+          item.MAPID === rowValue.MAPID &&
           item.referenceNumber === rowValue.referenceNumber &&
           item.workOrderNumber === rowValue.workOrderNumber &&
           item.lrNumber === rowValue.lrNumber &&
@@ -345,7 +354,7 @@ export class ShipmentDetailsComponent implements OnInit {
     );
   }
 
-   onSearchTypeChange(): void {
+  onSearchTypeChange(): void {
     // Reset data when search type changes
     this.searchReference = '';
     this.searchOptionsList = [];
@@ -354,68 +363,68 @@ export class ShipmentDetailsComponent implements OnInit {
   }
 
   // Search functionality
-   onSearchReference() {
-      if (!this.searchReference?.trim()) {
-        Swal.fire('Please enter a value', '', 'warning');
-        return;
-      }
-  
-      if (!this.selectedType) {
-        Swal.fire('Please select a search type', '', 'info');
-        return;
-      }
-      let payload1: any = {
-       
+  onSearchReference() {
+    if (!this.searchReference?.trim()) {
+      Swal.fire('Please enter a value', '', 'warning');
+      return;
+    }
+
+    if (!this.selectedType) {
+      Swal.fire('Please select a search type', '', 'info');
+      return;
+    }
+    let payload1: any = {
+
       "global": "SHIPMENT DETAILS",
       "data": {
-          "ref_no": "",
-          "inv_no": "",
-          "so_no": "",
-          "transporter": "",
-          "lr_no": "",
-          "workorder_no": "",
-          "sales_person": "",
-          "location": "",
-          "odn_no": "",
-          "vehicle_no": "",
-          "freight_billno": "",
-          "nature_damage": "",
-          "claim_status": ""   
+        "ref_no": "",
+        "inv_no": "",
+        "so_no": "",
+        "transporter": "",
+        "lr_no": "",
+        "workorder_no": "",
+        "sales_person": "",
+        "location": "",
+        "odn_no": "",
+        "vehicle_no": "",
+        "freight_billno": "",
+        "nature_damage": "",
+        "claim_status": ""
       }
-      };
-      payload1.data[this.selectedType] = this.searchReference.trim();
-  
-      console.log('🔍 Payload1:', payload1);
-      this.spinner.show();
-      this.service.global_Fields_SearchOption(payload1).subscribe({
-        next: (res: any) => {
-          this.spinner.hide();
-          console.log('✅ Search Response:', res);
-          if (res.NUMBER == "100" && res.STATUS == "FALSE") {
-            this.searchOptionsList = [];
-           
-           
-            Swal.fire('', res.MESSAGE, 'warning');
-          } else {
-            Swal.fire('No records found', '', 'info');
-             this.searchOptionsList = res.HEADER;
-            this.showForm = false;
-           
-            Swal.fire('Data fetched successfully!', '', 'success');
-          }
-        },
-        error: (err) => {
-          this.spinner.hide();
-          console.error('❌ Error:', err);
-          Swal.fire('Error fetching data', '', 'error');
+    };
+    payload1.data[this.selectedType] = this.searchReference.trim();
+
+    console.log('🔍 Payload1:', payload1);
+    this.spinner.show();
+    this.service.global_Fields_SearchOption(payload1).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        console.log('✅ Search Response:', res);
+        if (res.NUMBER == "100" && res.STATUS == "FALSE") {
+          this.searchOptionsList = [];
+
+
+          Swal.fire('', res.MESSAGE, 'warning');
+        } else {
+          Swal.fire('No records found', '', 'info');
+          this.searchOptionsList = res.HEADER;
+          this.showForm = false;
+
+          Swal.fire('Data fetched successfully!', '', 'success');
         }
-      });
-    }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('❌ Error:', err);
+        Swal.fire('Error fetching data', '', 'error');
+      }
+    });
+  }
 
   // Product checkbox methods
   allSelected(): boolean {
     return this.items.controls.length > 0 &&
-           this.items.controls.every(ctrl => ctrl.get('selected')?.value === true);
+      this.items.controls.every(ctrl => ctrl.get('selected')?.value === true);
   }
 
   toggleAllSelection(event: any): void {
@@ -437,93 +446,92 @@ export class ShipmentDetailsComponent implements OnInit {
 
   // Fetch invoice details
   fetchInvoiceDetails() {
-  if (this.sapType !== 'SAP') {
-    alert('Please select "With SAP" first.');
-    return;
-  }
-
-  const referenceNumber =
-    this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
-
-  if (!referenceNumber?.trim()) {
-    alert(
-      `Please enter a valid ${
-        this.orderType === 'Inward' ? 'PO' : 'Invoice'
-      } Number`
-    );
-    return;
-  }
-
-  const payload = { INV_GET: referenceNumber.trim() };
-  this.spinner.show();
-
-  this.service.shipmentdetailsfetch(payload).subscribe({
-    next: (res: any) => {
-      // YOUR SAP RESPONSE IS ALWAYS ARRAY
-      const result = Array.isArray(res) ? res : [];
-
-      if (result.length === 0) {
-        alert('No data found for this reference.');
-        this.spinner.hide();
-        return;
-      }
-
-      const firstItem = result[0];
-
-      // Clear existing rows
-      this.items.clear();
-
-      // Patch top form (Product Info)
-      this.ProductInfo.patchValue({
-        ZINCO: firstItem.ZINCO || '',
-        ZINS_SCPOE: firstItem.ZINS_SCPOE || '',
-        ZKM: firstItem.ZKM ?? null
-      });
-
-      // Fill FormArray rows
-      result.forEach((item: any) => {
-        this.items.push(
-          this.fb.group({
-            selected: [false],
-            ZPRODUCT: [item.ZPRODUCT || ''],
-            MTBEZ: [item.MTBEZ || ''],
-            MAKTX: [item.MAKTX || ''],
-            ZSETS: [item.ZSETS || 0, [Validators.min(1)]],
-            ZAH: [item.ZAH || 0],
-            ZSHIP_WT: [item.ZSHIP_WT || 0],
-            ZBATCOND: [item.ZBATCOND || ''],
-            MANDT: [item.MANDT || ''],
-            ZREFNO: [item.ZREFNO || ''],
-            ZLINE_NO: [item.ZLINE_NO || ''],
-            VBELN: [item.VBELN || ''],
-            POSNR: [item.POSNR || ''],
-            ZSO_NO: [item.ZSO_NO || ''],
-            ZODN_NO: [item.ZODN_NO || ''],
-            MTART: [item.MTART || ''],
-            ZINCO: [item.ZINCO || ''],
-            ZINS_SCPOE: [item.ZINS_SCPOE || ''],
-            ZPIN_PLT: [item.ZPIN_PLT || ''],
-            ZPIN_STP: [item.ZPIN_STP || ''],
-            ZKM: [item.ZKM || ''],
-            ZWORK_ORDER: [item.ZWORK_ORDER || ''],
-            ZLRNO: [item.ZLRNO || ''],
-            ZTRANSPORTER: [item.ZTRANSPORTER || ''],
-            ZMAPID: [item.ZMAPID || 0]
-          })
-        );
-      });
-
-      this.showForm = true;
-      this.spinner.hide();
-    },
-
-    error: (err) => {
-      console.error('Error fetching data:', err);
-      alert('Error fetching data from SAP.');
-      this.spinner.hide();
+    if (this.sapType !== 'SAP') {
+      alert('Please select "With SAP" first.');
+      return;
     }
-  });
-}
+
+    const referenceNumber =
+      this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+
+    if (!referenceNumber?.trim()) {
+      alert(
+        `Please enter a valid ${this.orderType === 'Inward' ? 'PO' : 'Invoice'
+        } Number`
+      );
+      return;
+    }
+
+    const payload = { INV_GET: referenceNumber.trim() };
+    this.spinner.show();
+
+    this.service.shipmentdetailsfetch(payload).subscribe({
+      next: (res: any) => {
+        // YOUR SAP RESPONSE IS ALWAYS ARRAY
+        const result = Array.isArray(res) ? res : [];
+
+        if (result.length === 0) {
+          alert('No data found for this reference.');
+          this.spinner.hide();
+          return;
+        }
+
+        const firstItem = result[0];
+
+        // Clear existing rows
+        this.items.clear();
+
+        // Patch top form (Product Info)
+        this.ProductInfo.patchValue({
+          ZINCO: firstItem.ZINCO || '',
+          ZINS_SCPOE: firstItem.ZINS_SCPOE || '',
+          ZKM: firstItem.ZKM ?? null
+        });
+
+        // Fill FormArray rows
+        result.forEach((item: any) => {
+          this.items.push(
+            this.fb.group({
+              selected: [false],
+              ZPRODUCT: [item.ZPRODUCT || ''],
+              MTBEZ: [item.MTBEZ || ''],
+              MAKTX: [item.MAKTX || ''],
+              ZSETS: [item.ZSETS || 0, [Validators.min(1)]],
+              ZAH: [item.ZAH || 0],
+              ZSHIP_WT: [item.ZSHIP_WT || 0],
+              ZBATCOND: [item.ZBATCOND || ''],
+              MANDT: [item.MANDT || ''],
+              ZREFNO: [item.ZREFNO || ''],
+              ZLINE_NO: [item.ZLINE_NO || ''],
+              VBELN: [item.VBELN || ''],
+              POSNR: [item.POSNR || ''],
+              ZSO_NO: [item.ZSO_NO || ''],
+              ZODN_NO: [item.ZODN_NO || ''],
+              MTART: [item.MTART || ''],
+              ZINCO: [item.ZINCO || ''],
+              ZINS_SCPOE: [item.ZINS_SCPOE || ''],
+              ZPIN_PLT: [item.ZPIN_PLT || ''],
+              ZPIN_STP: [item.ZPIN_STP || ''],
+              ZKM: [item.ZKM || ''],
+              ZWORK_ORDER: [item.ZWORK_ORDER || ''],
+              ZLRNO: [item.ZLRNO || ''],
+              ZTRANSPORTER: [item.ZTRANSPORTER || ''],
+              ZMAPID: [item.ZMAPID || 0]
+            })
+          );
+        });
+
+        this.showForm = true;
+        this.spinner.hide();
+      },
+
+      error: (err) => {
+        console.error('Error fetching data:', err);
+        alert('Error fetching data from SAP.');
+        this.spinner.hide();
+      }
+    });
+  }
 
 
   onInputChange(type: 'purchase' | 'invoice'): void {
@@ -539,117 +547,117 @@ export class ShipmentDetailsComponent implements OnInit {
 
   // Save functionality
   saveShipmentOutward(action: 'stay' | 'next' | 'previous' = 'stay'): void {
-  // get selected rows (remove selected flag)
-  const selectedRows = this.items.value
-    .filter((row: any) => row.selected === true)
-    .map(({ selected, ...rest }) => rest);
+    // get selected rows (remove selected flag)
+    const selectedRows = this.items.value
+      .filter((row: any) => row.selected === true)
+      .map(({ selected, ...rest }) => rest);
 
-  console.log('🟦 selectedRows (raw):', selectedRows);
+    console.log('🟦 selectedRows (raw):', selectedRows);
 
-  if (selectedRows.length === 0) {
-    Swal.fire({
-      title: 'Warning',
-      text: 'Please select at least one product row to save.',
-      icon: 'warning',
-      timer: 3000,
-      confirmButtonText: 'Ok',
-    });
-    return;
-  }
+    if (selectedRows.length === 0) {
+      Swal.fire({
+        title: 'Warning',
+        text: 'Please select at least one product row to save.',
+        icon: 'warning',
+        timer: 3000,
+        confirmButtonText: 'Ok',
+      });
+      return;
+    }
 
-  if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
-    Swal.fire({
-      icon: 'warning',
-      text: 'Please select at least one reference row before saving'
-    });
-    return;
-  }
+    if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        text: 'Please select at least one reference row before saving'
+      });
+      return;
+    }
 
-  // parent (common) fields
-  const commonFields = {
-    ZINCO: this.ProductInfo.get('ZINCO')?.value || '',
-    ZINS_SCPOE: this.ProductInfo.get('ZINS_SCPOE')?.value || '',
-    ZKM: this.ProductInfo.get('ZKM')?.value ?? 0
-  };
-
-  // Build final payload: ensure ZINS_SCPOE & ZKM exist on each row (fallback to commonFields)
-  const finalPayload = selectedRows.map((row: any, idx: number) => {
-    // prefer item-level ZINS_SCPOE if not empty, otherwise parent
-    const itemZins = (row.ZINS_SCPOE && String(row.ZINS_SCPOE).trim() !== '') 
-                      ? row.ZINS_SCPOE 
-                      : commonFields.ZINS_SCPOE;
-
-    // for ZKM, use row.ZKM if not null/undefined, otherwise use parent (allow 0)
-    const itemZkm = (row.ZKM !== null && row.ZKM !== undefined && row.ZKM !== '') 
-                      ? row.ZKM 
-                      : commonFields.ZKM;
-
-    // also ensure ZINCO is present on row (fallback)
-    const itemZinco = (row.ZINCO && String(row.ZINCO).trim() !== '') 
-                        ? row.ZINCO 
-                        : commonFields.ZINCO;
-
-    return {
-      ...row,
-      ZINS_SCPOE: itemZins,
-      ZKM: itemZkm,
-      ZINCO: itemZinco,
-      // ensure numeric fields are numbers (optional)
-      ZSETS: row.ZSETS ?? 0,
-      ZAH: row.ZAH ?? 0,
-      ZSHIP_WT: row.ZSHIP_WT ?? 0,
-      // you can include any mapping with reference data here if needed later
+    // parent (common) fields
+    const commonFields = {
+      ZINCO: this.ProductInfo.get('ZINCO')?.value || '',
+      ZINS_SCPOE: this.ProductInfo.get('ZINS_SCPOE')?.value || '',
+      ZKM: this.ProductInfo.get('ZKM')?.value ?? 0
     };
-  });
 
-  console.log('📤 finalPayload (to send):', finalPayload);
+    // Build final payload: ensure ZINS_SCPOE & ZKM exist on each row (fallback to commonFields)
+    const finalPayload = selectedRows.map((row: any, idx: number) => {
+      // prefer item-level ZINS_SCPOE if not empty, otherwise parent
+      const itemZins = (row.ZINS_SCPOE && String(row.ZINS_SCPOE).trim() !== '')
+        ? row.ZINS_SCPOE
+        : commonFields.ZINS_SCPOE;
 
-  this.spinner.show();
-  this.service.ShipmentOutwardSave(finalPayload).subscribe({
-    next: (res: any) => {
-      this.spinner.hide();
-      console.log('✅ SAP Save Response:', res);
+      // for ZKM, use row.ZKM if not null/undefined, otherwise use parent (allow 0)
+      const itemZkm = (row.ZKM !== null && row.ZKM !== undefined && row.ZKM !== '')
+        ? row.ZKM
+        : commonFields.ZKM;
 
-      if (res && res.NUMBER === '200') {
-        Swal.fire({
-          title: 'Success',
-          text: res.MSG || 'Saved successfully',
-          icon: 'success',
-          confirmButtonText: 'Ok',
-        }).then(() => {
-          if (action === 'next') {
-            this.router.navigate(['/invoice-load-details']);
-          } else if (action === 'previous') {
-            this.router.navigate(['/order-info']);
-          } else {
-            this.resetForm();
-          }
-        });
-      } else {
+      // also ensure ZINCO is present on row (fallback)
+      const itemZinco = (row.ZINCO && String(row.ZINCO).trim() !== '')
+        ? row.ZINCO
+        : commonFields.ZINCO;
+
+      return {
+        ...row,
+        ZINS_SCPOE: itemZins,
+        ZKM: itemZkm,
+        ZINCO: itemZinco,
+        // ensure numeric fields are numbers (optional)
+        ZSETS: row.ZSETS ?? 0,
+        ZAH: row.ZAH ?? 0,
+        ZSHIP_WT: row.ZSHIP_WT ?? 0,
+        // you can include any mapping with reference data here if needed later
+      };
+    });
+
+    console.log('📤 finalPayload (to send):', finalPayload);
+
+    this.spinner.show();
+    this.service.ShipmentOutwardSave(finalPayload).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        console.log('✅ SAP Save Response:', res);
+
+        if (res && res.NUMBER === '200') {
+          Swal.fire({
+            title: 'Success',
+            text: res.MSG || 'Saved successfully',
+            icon: 'success',
+            confirmButtonText: 'Ok',
+          }).then(() => {
+            if (action === 'next') {
+              this.router.navigate(['/invoice-load-details']);
+            } else if (action === 'previous') {
+              this.router.navigate(['/order-info']);
+            } else {
+              this.resetForm();
+            }
+          });
+        } else {
+          Swal.fire({
+            title: 'Error',
+            text: (res && res.MSG) || 'Failed to save data',
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          });
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('❌ Error saving shipment details:', err);
         Swal.fire({
           title: 'Error',
-          text: (res && res.MSG) || 'Failed to save data',
+          text: 'Failed to save shipment details.',
           icon: 'error',
           confirmButtonText: 'Ok'
         });
       }
-    },
-    error: (err) => {
-      this.spinner.hide();
-      console.error('❌ Error saving shipment details:', err);
-      Swal.fire({
-        title: 'Error',
-        text: 'Failed to save shipment details.',
-        icon: 'error',
-        confirmButtonText: 'Ok'
-      });
-    }
-  });
-}
+    });
+  }
 
-  
 
-  
+
+
 
   fetchIncoterms() {
     this.spinner.show();
@@ -731,6 +739,6 @@ export class ShipmentDetailsComponent implements OnInit {
 
   selectSearchType(option: any) {
     this.selectedType = option;
-this.dropdownOpen = false;
-}
+    this.dropdownOpen = false;
+  }
 }
