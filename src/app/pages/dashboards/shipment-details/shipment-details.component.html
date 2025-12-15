@@ -204,6 +204,11 @@
           <label>Kilometres</label>
         </div>
 
+         <div class="form-field" *ngIf="sapType === 'Non-SAP'">
+          <input type="number" formControlName="INV_VBELN" min="0" placeholder=" " />
+          <label>DC Reference Number</label>
+        </div>
+
       </div>
 
       <!-- PRODUCT TABLE -->
@@ -270,7 +275,7 @@
                     </select>
                   </td>
 
-                <td><input type="text" formControlName="MAKTX" readonly /></td>
+                <td><input type="text" formControlName="MAKTX"  /></td>
                 <td><input type="number" formControlName="ZSETS" min="0" /></td>
 
                 <td>

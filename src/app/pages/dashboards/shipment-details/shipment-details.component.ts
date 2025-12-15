@@ -63,6 +63,7 @@ export class ShipmentDetailsComponent implements OnInit {
       ZINCO: ['', Validators.required],
       ZINS_SCPOE: ['', Validators.required],
       ZKM: [null, [Validators.required, Validators.min(0)]],
+      INV_VBELN: [''],
       items: this.fb.array([this.createItemRow()]),
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
@@ -105,6 +106,7 @@ export class ShipmentDetailsComponent implements OnInit {
       ZPIN_PLT: [''],
       ZPIN_STP: [''],
       ZKM: [''],
+      INV_VBELN: [''],
       ZWORK_ORDER: [''],
       ZLRNO: [''],
       ZTRANSPORTER: [''],
@@ -485,7 +487,8 @@ export class ShipmentDetailsComponent implements OnInit {
         this.ProductInfo.patchValue({
           ZINCO: firstItem.ZINCO || '',
           ZINS_SCPOE: firstItem.ZINS_SCPOE || '',
-          ZKM: firstItem.ZKM ?? null
+          ZKM: firstItem.ZKM ?? null,
+          INV_VBELN: firstItem.INV_VBELN || ''
         });
 
         // Fill FormArray rows
@@ -513,6 +516,7 @@ export class ShipmentDetailsComponent implements OnInit {
               ZPIN_PLT: [item.ZPIN_PLT || ''],
               ZPIN_STP: [item.ZPIN_STP || ''],
               ZKM: [item.ZKM || ''],
+              INV_VBELN: [item.INV_VBELN || ''],
               ZWORK_ORDER: [item.ZWORK_ORDER || ''],
               ZLRNO: [item.ZLRNO || ''],
               ZTRANSPORTER: [item.ZTRANSPORTER || ''],
@@ -577,36 +581,44 @@ export class ShipmentDetailsComponent implements OnInit {
     const commonFields = {
       ZINCO: this.ProductInfo.get('ZINCO')?.value || '',
       ZINS_SCPOE: this.ProductInfo.get('ZINS_SCPOE')?.value || '',
-      ZKM: this.ProductInfo.get('ZKM')?.value ?? 0
+      ZKM: this.ProductInfo.get('ZKM')?.value ?? 0,
+      INV_VBELN: this.ProductInfo.get('INV_VBELN')?.value || ''
     };
 
-    // Build final payload: ensure ZINS_SCPOE & ZKM exist on each row (fallback to commonFields)
+    
     const finalPayload = selectedRows.map((row: any, idx: number) => {
-      // prefer item-level ZINS_SCPOE if not empty, otherwise parent
+      
       const itemZins = (row.ZINS_SCPOE && String(row.ZINS_SCPOE).trim() !== '')
         ? row.ZINS_SCPOE
         : commonFields.ZINS_SCPOE;
 
-      // for ZKM, use row.ZKM if not null/undefined, otherwise use parent (allow 0)
+     
       const itemZkm = (row.ZKM !== null && row.ZKM !== undefined && row.ZKM !== '')
         ? row.ZKM
         : commonFields.ZKM;
 
-      // also ensure ZINCO is present on row (fallback)
+
+
+      
       const itemZinco = (row.ZINCO && String(row.ZINCO).trim() !== '')
         ? row.ZINCO
         : commonFields.ZINCO;
+
+        const itemINV_VBELN = (row.INV_VBELN && String(row.INV_VBELN).trim() !== '')
+        ? row.INV_VBELN
+        : commonFields.INV_VBELN;
 
       return {
         ...row,
         ZINS_SCPOE: itemZins,
         ZKM: itemZkm,
         ZINCO: itemZinco,
-        // ensure numeric fields are numbers (optional)
+        INV_VBELN: itemINV_VBELN,
+       
         ZSETS: row.ZSETS ?? 0,
         ZAH: row.ZAH ?? 0,
         ZSHIP_WT: row.ZSHIP_WT ?? 0,
-        // you can include any mapping with reference data here if needed later
+      
       };
     });
 
@@ -694,7 +706,8 @@ export class ShipmentDetailsComponent implements OnInit {
           this.ProductInfo.patchValue({
             ZINCO: firstItem.ZINCO || '',
             ZINS_SCPOE: firstItem.ZINS_SCPOE || '',
-            ZKM: firstItem.ZKM || 0
+            ZKM: firstItem.ZKM || 0,
+            INV_VBELN: firstItem.INV_VBELN || ''
           });
           res.forEach((item: any) => {
             this.items.push(this.fb.group({

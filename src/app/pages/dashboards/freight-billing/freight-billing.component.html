@@ -164,7 +164,7 @@
 
 
       <div class="form-field">
-        <input type="text" formControlName="BillSubmission" placeholder=" " />
+        <input type="date" formControlName="BillSubmission" placeholder=" " />
         <label>Bill Submission To F&A</label>
       </div>
 
@@ -203,15 +203,21 @@
             <th>Ref No</th>
             <th>Invoice No</th>
             <th>ODN No</th>
+            <th>SO NO</th>
+            <th>Sale Person</th>
             <th>Freight Bill No</th>
             <th>Freight Bill Date</th>
             <th>Physical Submission Date</th>
             <th>Freight Charges</th>
-            <th>work order</th>
+            <th>Work order</th>
             <th>Bill Submission</th>
-            <th>work order type</th>
+            <th>Work order type</th>
             <th>LR No</th>
             <th>Transporter</th>
+            <th>Location</th>
+            <th>Vehicle Number</th>
+             <th>Vehicle Line</th>
+
           </tr>
         </thead>
         <tbody>
@@ -219,6 +225,8 @@
             <td>{{ item.ZREFNO }}</td>
             <td>{{ item.ZINV_NO }}</td>
             <td>{{ item.ZODN_NO }}</td>
+            <td>{{ item.ZSONO }}</td>
+            <td>{{ item.ZSALE_PERSON }}</td>
             <td>{{ item.ZBILLNO }}</td>
             <td>{{ item.ZBILLDATE | date: 'dd-MM-yyyy' }}</td>
             <td>{{ item.ZPHY_DATE | date: 'dd-MM-yyyy' }}</td>
@@ -228,6 +236,9 @@
             <td>{{ item.ZWORKORDER }}</td>
             <td>{{ item.ZLRNO }}</td>
             <td>{{ item.ZTRANSPORTER }}</td>
+            <td>{{ item.ZLOCATION }}</td>
+            <td>{{ item.ZVEH_NUM }}</td>
+            <td>{{ item.ZVEH_LINE }}</td>
           </tr>
         </tbody>
       </table>

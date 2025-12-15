@@ -268,14 +268,21 @@ export class SegmentInfoComponent implements OnInit {
     console.log('🔹 Sending Object:', obj);
 
     this.spinner.show();
-    this.service.GlobalReferenceNoFetch(obj).subscribe({
+    let apiCall;
+    if (this.sapType === 'SAP') {
+      apiCall = this.service.GlobalReferenceNoFetch(obj); // POST
+    } else {
+      apiCall = this.service.GlobalReferenceNoFetchwithoutsap(obj); // PUT
+    }
+ 
+    apiCall.subscribe({
       next: (res: any) => {
-        console.log('✅ GlobalRefSearch Response:', res);
+        console.log('✅ Response:', res);
         this.spinner.hide();
         this.populateReferenceRows(res);
       },
       error: err => {
-        console.error('❌ Ref Fetch Error:', err);
+        console.error('❌ Error:', err);
         this.spinner.hide();
       }
     });

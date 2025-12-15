@@ -217,7 +217,7 @@
       <!-- Fiscal Year -->
       <div class="form-field" *ngIf="showFiscalFields"
         [ngClass]="{'grayReadOnly': OrderInfo.value.PhysicalDispatchDateTime}">
-        <input type="text" formControlName="FiscalYear" placeholder=" " readonly />
+        <input type="text" formControlName="FiscalYear" placeholder=" " disabled />
         <label>Fiscal Year</label>
       </div>
 
@@ -395,7 +395,7 @@
       </div>
 
 
-      <div class="form-field" [ngClass]="{'grayReadOnly': isSap() && OrderInfo.value.DestinationZone}">
+      <div class="form-field" [ngClass]="{'grayReadOnly':  OrderInfo.value.DestinationZone}">
         <input type="text" formControlName="DestinationZone" readonly />
         <label>Destination Zone</label>
       </div>

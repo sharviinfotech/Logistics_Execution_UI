@@ -444,7 +444,7 @@ export class OrderInfoComponent implements OnInit {
 
     this.OrderInfo.patchValue({
       TaxInvoice: data.INV_VBELN || '',
-      DCReference: data.DC_REF || '',
+      DCReference: data.INV_VBELN || '',
       InvoiceDate: this.isSap() ? formattedInvoiceDate : '',
       ReferenceDate: !this.isSap() ? formattedInvoiceDate : '',
       ODN: data.INV_ODNO || '',
@@ -459,7 +459,7 @@ export class OrderInfoComponent implements OnInit {
       BillingTransactionType: data.TRAN_TEXT_BILL || '',
       Division: data.DIVISION_TEXT || data.DIVISION || '',
       SubDivision: data.SUB_DIVISION || '',
-      RefNumber: data.ZSO_NO || '',
+      RefNumber: data.SO_REF_NO || '',
       Customer: data.CUST_NAME || '',
       CustomerGroup: data.CUST_GROUP || '',
       CNee: data.CNEE_NAME || '',
@@ -537,8 +537,7 @@ export class OrderInfoComponent implements OnInit {
       WORK_ORDER_NO: row.workOrderNumber || "",
       LR_NO: row.lrNumber || "",
       TRANSPORTER: row.transporter || "",
-      INV_VBELN: this.isSap() ? formValue.TaxInvoice : '',
-      DC_REF: this.isSap() ? '' : formValue.DCReference,
+      INV_VBELN: this.isSap() ? formValue.TaxInvoice : formValue.DCReference,
       INV_ODNO: formValue.ODN,
       INV_DATE: this.isSap()
         ? formValue.InvoiceDate
@@ -554,8 +553,9 @@ export class OrderInfoComponent implements OnInit {
       TRAN_TEXT_BILL: formValue.BillingTransactionType,
       DIVISION: formValue.Division,
       SUB_DIVISION: formValue.SubDivision,
-      ZSO_NO: formValue.RefNumber,
+      SO_REF_NO: formValue.RefNumber,
       CUST_NAME: formValue.Customer,
+      LINE_NO: row.lineNumber || "",
       CUST_GROUP: formValue.CustomerGroup,
       CNEE_NAME: formValue.CNee,
       DEST_LOC: formValue.DestinationLocation,

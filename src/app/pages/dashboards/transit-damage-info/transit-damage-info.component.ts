@@ -146,21 +146,28 @@ export class TransitDamageInfoComponent implements OnInit {
   }
 
   resetForms() {
-    this.HeaderForm.reset();
-    this.referenceItems.clear();
-    this.referenceItems.push(this.createReferenceRow());
+  this.HeaderForm.reset();
+  this.referenceItems.clear();
+  this.referenceItems.push(this.createReferenceRow());
 
-    while (this.items.length !== 0) {
-      this.items.removeAt(0);
-    }
-
-    this.invoicenumber = "";
-    this.ponumber = "";
-    this.searchOptionsList = [];
-    this.selectedItems = [];
-    this.searchReference = '';
-    this.selectedType = '';
+  while (this.items.length !== 0) {
+    this.items.removeAt(0);
   }
+
+  this.invoicenumber = "";
+  this.ponumber = "";
+  this.searchOptionsList = [];
+  this.selectedItems = [];
+  this.searchReference = '';
+  this.selectedType = '';
+
+  // ✅ Don't hide forms if Non-SAP is selected
+  if (this.sapType !== 'Non-SAP') {
+    this.ShowHeaderForm = false;
+    this.showTable = false;
+    this.showForm = false;
+  }
+}
 
   onOrderTypeSelection() {
     if (this.previousOrderType !== null && this.previousOrderType !== this.orderType) {
@@ -172,26 +179,50 @@ export class TransitDamageInfoComponent implements OnInit {
   }
 
   onSapTypeSelection() {
-    if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
-      this.resetConditionalFields();
-    }
-    this.previousSapType = this.sapType;
-    this.resetForms();
+  if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
+    this.resetConditionalFields();
   }
+  this.previousSapType = this.sapType;
+  this.resetForms();
+
+  // ✅ Auto-show forms for Non-SAP
+  if (this.sapType === 'Non-SAP') {
+    this.ShowHeaderForm = true;
+    this.showTable = true;
+    this.showForm = true;
+
+    // Add one empty row to items table
+    if (this.items.length === 0) {
+      this.addItemRow();
+    }
+
+    console.log('✅ Non-SAP selected - Forms displayed automatically');
+  } else {
+    // For SAP, keep forms hidden until GET is clicked
+    this.ShowHeaderForm = false;
+    this.showTable = false;
+    this.showForm = false;
+  }
+}
 
   resetConditionalFields(): void {
+  // Don't reset these flags if switching to Non-SAP
+  if (this.sapType !== 'Non-SAP') {
     this.showTable = false;
     this.ShowHeaderForm = false;
     this.showForm = false;
-    this.searchOptionsList = [];
-    this.selectedItems = [];
-    this.HeaderForm.reset();
-    this.referenceItems.clear();
-    this.referenceItems.push(this.createReferenceRow());
-    while (this.items.length !== 0) {
-      this.items.removeAt(0);
-    }
   }
+  
+  this.searchOptionsList = [];
+  this.selectedItems = [];
+  this.HeaderForm.reset();
+  this.referenceItems.clear();
+  this.referenceItems.push(this.createReferenceRow());
+  
+  while (this.items.length !== 0) {
+    this.items.removeAt(0);
+  }
+}
 
   // Reference Table: Field Blur Handler
   onFieldBlur(index: number, fieldKey: string): void {
