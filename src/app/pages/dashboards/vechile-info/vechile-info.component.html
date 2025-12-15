@@ -40,11 +40,13 @@
       <!-- INWARD -->
       <div *ngIf="orderType === 'Inward'" class="input-flex">
         <div class="form-field flex-1">
-          <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" " (input)="onInputChange('purchase')" />
+          <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" "
+            (input)="onInputChange('purchase')" />
           <label>PO Number</label>
         </div>
 
-        <button type="button" class="btn-get" (click)="getForm('purchase')" [disabled]="!ponumber || ponumber.trim() === ''">
+        <button type="button" class="btn-get" (click)="getForm('purchase')"
+          [disabled]="!ponumber || ponumber.trim() === ''">
           GET
         </button>
       </div>
@@ -76,8 +78,7 @@
 
                   <td>{{ i + 1 }}</td>
                   <td>
-                    <input type="text" formControlName="MAPID" placeholder="Enter Map ID"
-                      readonly>
+                    <input type="text" formControlName="MAPID" placeholder="Enter Map ID" readonly>
                   </td>
 
                   <td>
@@ -126,7 +127,8 @@
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType"
+                  (change)="onSearchTypeChange()">
                   <option value="" disabled selected>Select</option>
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
@@ -147,7 +149,8 @@
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType"
+                  (change)="onSearchTypeChange()">
                   <option value="" disabled selected>Select</option>
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
@@ -193,15 +196,15 @@
               <td><input type="checkbox" formControlName="selected" (change)="onRowCheckboxChange()"></td>
               <td>{{ i + 1 }}</td>
               <td>
-                  <select formControlName="ZMAPID" (change)="onchangeMAPID(i)">
-                    <option value="">Select</option>
-                    <option *ngFor="let option of selectedItems" [value]="option.MAPID">
-                      {{ option.MAPID }}
-                    </option>
-                  </select>
-                </td>
+                <select formControlName="ZMAPID" (change)="onchangeMAPID(i)">
+                  <option value="">Select</option>
+                  <option *ngFor="let option of selectedItems" [value]="option.MAPID">
+                    {{ option.MAPID }}
+                  </option>
+                </select>
+              </td>
               <td><input type="text" formControlName="ZTRX_TYPE" /></td>
-              <td><input type="text" formControlName="ZTRANSPOTER" /></td>
+              <td><input type="text" formControlName="ZTRANSPORTER" /></td>
               <td><input type="text" formControlName="ZLRNO" /></td>
               <td><input type="text" formControlName="ZTRUC_TYPE" /></td>
               <td><input type="text" formControlName="ZTRUC_WT" /></td>
@@ -224,7 +227,8 @@
     <div *ngIf="showTable" class="text-right">
       <button class="btn btn-md btn-raised btnSave" (click)="saveVehicleInfo('stay')">Save</button>
       <button class="btn btn-md btn-raised btnSave move" (click)="saveVehicleInfo('next')">Save and Next</button>
-      <button class="btn btn-md btn-raised btnSave prev" (click)="saveVehicleInfo('previous')">Save and Previous</button>
+      <button class="btn btn-md btn-raised btnSave prev" (click)="saveVehicleInfo('previous')">Save and
+        Previous</button>
     </div>
 
   </div>
@@ -257,20 +261,20 @@
         <tbody>
           <tr *ngFor="let item of searchOptionsList">
             <td>{{ item.ZREFNO }}</td>
-            <td>{{ item.VBELN  }}</td>
-            <td>{{ item.ZODN_NO  }}</td>
-            <td>{{ item.ZSONO  }}</td>
-            <td>{{ item.ZTRX_TYPE  }}</td>
+            <td>{{ item.VBELN }}</td>
+            <td>{{ item.ZODN_NO }}</td>
+            <td>{{ item.ZSONO }}</td>
+            <td>{{ item.ZTRX_TYPE }}</td>
             <td>{{ item.ZTRANSPORTER }}</td>
-            <td>{{ item.ZLRNO  }}</td>
-            <td>{{ item.ZTRUC_TYPE  }}</td>
-            <td>{{ item.ZTRUC_WT  }}</td>
-            <td>{{ item.ZTRUC_VOL  }}</td>
-            <td>{{ item.ZVEH_NUM  }}</td>
-            <td>{{ item.ZNOOFVEH  }}</td>
-            <td>{{ item.ZDNAME  }}</td>
-            <td>{{ item.ZDNUMBER  }}</td>
-            <td>{{ item.ZWORK_ORDER  }}</td>
+            <td>{{ item.ZLRNO }}</td>
+            <td>{{ item.ZTRUC_TYPE }}</td>
+            <td>{{ item.ZTRUC_WT }}</td>
+            <td>{{ item.ZTRUC_VOL }}</td>
+            <td>{{ item.ZVEH_NUM }}</td>
+            <td>{{ item.ZNOOFVEH }}</td>
+            <td>{{ item.ZDNAME }}</td>
+            <td>{{ item.ZDNUMBER }}</td>
+            <td>{{ item.ZWORK_ORDER }}</td>
 
           </tr>
         </tbody>

@@ -197,46 +197,69 @@
   </div>
 </div>
 
-<div class="card" style="margin-top: 10px;" *ngIf="searchOptionsList?.length > 0">
+<!-- HEADER DETAILS -->
+<div class="card" style="margin-top: 10px;" *ngIf="showTable && headerData">
   <div class="card-body-LE">
+    <h5 class="mb-3">Header Details</h5>
+
+    <table class="table table-bordered table-striped text-center">
+      <thead>
+        <tr>
+          <th>Ref No</th>
+          <th>Invoice No</th>
+          <th>ODN No</th>
+          <th>SO No</th>
+          <th>Sales Person</th>
+          <th>Physical Arrived</th>
+          <th>Unloading DT</th>
+          <th>POD Scan</th>
+          <th>SIT/SALE</th>
+          <th>Location</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td>{{ headerData.ZREFNO }}</td>
+          <td>{{ headerData.ZINV_NO }}</td>
+          <td>{{ headerData.ZODN_NO }}</td>
+          <td>{{ headerData.ZSONO }}</td>
+          <td>{{ headerData.ZSALE_PERSON }}</td>
+          <td>{{ headerData.ZPY_ARRIVED_DEST | date:'dd-MM-yyyy' }}</td>
+          <td>{{ headerData.ZUNLOADING_DT }}</td>
+          <td>{{ headerData.ZPOD_SCAN }}</td>
+          <td>{{ headerData.ZSIT_SALE }}</td>
+          <td>{{ headerData.ZLOCATION }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- LINE ITEMS -->
+<div class="card" style="margin-top: 10px;" *ngIf="showTable && itemsList.length > 0">
+  <div class="card-body-LE">
+    <h5 class="mb-3">Line Items</h5>
+
     <div class="table-responsive">
       <table class="table table-bordered table-striped text-center">
         <thead>
           <tr>
-            <th>Ref No</th>
-            <th>Invoice No</th>
-            <th>ODN No</th>
-            <th>SO NO</th>
-            <th>Sales Person</th>
-            <th>Physical Arrival Date</th>
-            <th>Unloading Date & Time</th>
-            <th>POD Scan Date & Time</th>
-            <th>SIT/SALE</th>
-            <th>Location</th>
-            <th>Vehicle Line</th>
             <th>Vehicle Number</th>
+            <th>Vehicle Line</th>
             <th>Work Order</th>
             <th>LR No</th>
             <th>Transporter</th>
           </tr>
         </thead>
+
         <tbody>
-          <tr *ngFor="let item of searchOptionsList">
-            <td>{{ item.ZREFNO }}</td>
-            <td>{{ item.ZINV_NO }}</td>
-            <td>{{ item.ZODN_NO }}</td>
-            <td>{{ item.ZSONO }}</td>
-            <td>{{ item.ZSALE_PERSON }}</td>
-            <td>{{ item.ZPY_ARRIVED_DEST | date: 'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZUNLOADING_DT }}</td>
-            <td>{{ item.ZPOD_SCAN }}</td>
-            <td>{{ item.ZSIT_SALE }}</td>
-            <td>{{ item.ZLOCATION }}</td>
-            <td>{{ item.ZVEH_LINE }}</td>
+          <tr *ngFor="let item of itemsList; trackBy: trackByIndex">
             <td>{{ item.ZVEH_NUM }}</td>
-            <td>{{ item.ZWORK_ORDER}}</td>
-            <td>{{ item.ZLRNO}}</td>
-            <td>{{ item.ZTRANSPORTER}}</td>
+            <td>{{ item.ZVEH_LINE }}</td>
+            <td>{{ item.ZWORK_ORDER }}</td>
+            <td>{{ item.ZLRNO }}</td>
+            <td>{{ item.ZTRANSPORTER }}</td>
           </tr>
         </tbody>
       </table>

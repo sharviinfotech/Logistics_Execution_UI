@@ -29,6 +29,9 @@ export class TransitInfoComponent implements OnInit {
 
   // Search functionality
   selectedItems: any[] = [];
+  showTable = false;
+  headerData: any = null;
+  itemsList: any[] = [];
   searchReference: string = '';
   searchOptions = [
     { key: 'ref_no', label: 'Reference No' },
@@ -74,12 +77,19 @@ export class TransitInfoComponent implements OnInit {
     return this.transitInfo.get('referenceItems') as FormArray;
   }
 
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
   createReferenceRow(): FormGroup {
     return this.fb.group({
       referenceNumber: [''],
       workOrderNumber: [''],
       lrNumber: [''],
-      transporter: ['']
+      transporter: [''],
+      vehicleNo: [''],
+      vehicleLine: ['']
     });
   }
 
@@ -186,7 +196,6 @@ export class TransitInfoComponent implements OnInit {
       }
     });
   }
-
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
 
@@ -197,22 +206,18 @@ export class TransitInfoComponent implements OnInit {
             referenceNumber: [d.REF_NO || ''],
             workOrderNumber: [d.WORK_ORDER_NO || ''],
             lrNumber: [d.LR_NO || ''],
-            transporter: [d.TRANSPORTER || '']
+            transporter: [d.TRANSPORTER || ''],
+            vehicleNo: [d.VEH_NUM || ''],
+            vehicleLine: [d.VEH_LINE || '']
           })
         );
       });
     } else {
-      Swal.fire({
-        icon: 'info',
-        title: 'No Records Found',
-        text: 'No matching reference details were found.',
-        timer: 1500,
-        showConfirmButton: false,
-        width: '300px'
-      });
+      Swal.fire({ icon: 'info', title: 'No Records Found', timer: 1500, showConfirmButton: false });
       this.referenceItems.push(this.createReferenceRow());
     }
   }
+
 
   onCheckboxChange(event: Event, index: number): void {
     const checkbox = event.target as HTMLInputElement;
@@ -256,16 +261,36 @@ export class TransitInfoComponent implements OnInit {
     );
   }
 
+  // onSearchTypeChange(): void {
+  //   // Reset data when search type changes
+  //   this.searchReference = '';
+  //   this.searchOptionsList = [];
+  //   this.showForm = false;
+  //   console.log('🔄 Search type changed. Data reset.');
+  // }
   onSearchTypeChange(): void {
-    // Reset data when search type changes
+
+    // CLEAR INPUT
     this.searchReference = '';
     this.searchOptionsList = [];
     this.showForm = false;
-    console.log('🔄 Search type changed. Data reset.');
+
+    // 🔥 CLEAR TABLE (VERY IMPORTANT)
+    this.headerData = null;
+    this.itemsList = [];
+    this.showTable = false;
+
+    console.log('🔄 Search type changed – table cleared');
   }
 
   // Search functionality
   onSearchReference() {
+
+    // 🔥 RESET OLD TABLE BEFORE SEARCH
+    this.headerData = null;
+    this.itemsList = [];
+    this.showTable = false;
+
     if (!this.searchReference?.trim()) {
       Swal.fire('Please enter a value', '', 'warning');
       return;
@@ -276,55 +301,61 @@ export class TransitInfoComponent implements OnInit {
       return;
     }
 
-
     let payload1: any = {
-
-      "global": "TRANSIT INFO",
-      "data": {
-        "ref_no": "",
-        "inv_no": "",
-        "so_no": "",
-        "transporter": "",
-        "lr_no": "",
-        "workorder_no": "",
-        "sales_person": "",
-        "location": "",
-        "odn_no": "",
-        "vehicle_no": "",
-        "freight_billno": "",
-        "nature_damage": "",
-        "claim_status": ""
-
+      global: 'TRANSIT INFO',
+      data: {
+        ref_no: '',
+        inv_no: '',
+        so_no: '',
+        transporter: '',
+        lr_no: '',
+        workorder_no: '',
+        sales_person: '',
+        location: '',
+        odn_no: '',
+        vehicle_no: '',
+        freight_billno: '',
+        nature_damage: '',
+        claim_status: ''
       }
     };
+
     payload1.data[this.selectedType] = this.searchReference.trim();
 
-    console.log('🔍 Payload1:', payload1);
-          this.spinner.show();
-          this.service.global_Fields_SearchOption(payload1).subscribe({
-            next: (res: any) => {
-              this.spinner.hide();
-              console.log('✅ Search Response:', res);
-              if (res.NUMBER == "100" && res.STATUS == "FALSE") {
-                this.searchOptionsList = [];
-               
-               
-                Swal.fire('', res.MESSAGE, 'warning');
-              } else {
-                Swal.fire('No records found', '', 'info');
-                 this.searchOptionsList = res.HEADER;
-                this.showForm = false;
-               
-                Swal.fire('Data fetched successfully!', '', 'success');
-              }
-            },
-            error: (err) => {
-              this.spinner.hide();
-              console.error('❌ Error:', err);
-              Swal.fire('Error fetching data', '', 'error');
-            }
-          });
+    console.log('🔍 Payload:', payload1);
+    this.spinner.show();
+
+    this.service.global_Fields_SearchOption(payload1).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+
+        if (res?.NUMBER === '100' && res?.STATUS === 'FALSE') {
+          Swal.fire('', res.MESSAGE, 'warning');
+          return;
+        }
+
+        // 🔥 NEW OBJECT & ARRAY REFERENCES
+        this.headerData = res.HEADER?.[0] ? { ...res.HEADER[0] } : null;
+        this.itemsList = res.ITEMS ? [...res.ITEMS] : [];
+
+        if (!this.headerData) {
+          Swal.fire('No data found', '', 'info');
+          return;
+        }
+
+        this.showTable = true;
+        this.showForm = false;
+
+        Swal.fire('Data fetched successfully!', '', 'success');
+      },
+      error: () => {
+        this.spinner.hide();
+        Swal.fire('Error fetching data', '', 'error');
+      }
+    });
   }
+
+
 
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;

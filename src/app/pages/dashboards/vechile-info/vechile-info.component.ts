@@ -17,7 +17,7 @@ export class VechileInfoComponent implements OnInit {
 
   VehicleForm!: FormGroup;
   orderType: string = '';
-  showForm = false; 
+  showForm = false;
   sapType: string = '';
   invoicenumber: string = '';
   ponumber: string = '';
@@ -37,23 +37,23 @@ export class VechileInfoComponent implements OnInit {
     { key: 'transporter', label: 'Transporter' },
     { key: 'lr_no', label: 'LR NO' },
     { key: 'workorder_no', label: 'Workorder No' },
-    {key :"sales_person",label: 'Sales Person'},
-    {key :"location",label: 'Location'},
-    {key :"vehicle_no",label: 'Vehicle No'},
+    { key: "sales_person", label: 'Sales Person' },
+    { key: "location", label: 'Location' },
+    { key: "vehicle_no", label: 'Vehicle No' },
 
- 
+
   ]
   selectedType: any = '';
   searchOptionsList: any[] = [];
   dropdownOpen = false;
-  
+
 
   constructor(
     private fb: FormBuilder,
     private service: GeneralserviceService,
     private spinner: NgxSpinnerService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.VehicleForm = this.fb.group({
@@ -72,15 +72,15 @@ export class VechileInfoComponent implements OnInit {
   }
 
   createVehicleRow(data?: any): FormGroup {
-    console.log("createVehicleRow data",data)
+    console.log("createVehicleRow data", data)
     return this.fb.group({
       selected: [false],
-      VBELN:[data?.VBELN],
-      MANDT:[data?.MANDT],
-      POSNR:[data?.POSNR],
+      VBELN: [data?.VBELN],
+      MANDT: [data?.MANDT],
+      POSNR: [data?.POSNR],
       ZMAPID: [data?.ZMAPID || ''],
       ZTRX_TYPE: [data?.ZTRX_TYPE || '', Validators.required],
-      ZTRANSPOTER: [data?.ZTRANSPOTER || '', Validators.required],
+      ZTRANSPORTER: [data?.ZTRANSPORTER || '', Validators.required],
       ZLRNO: [data?.ZLRNO || '', Validators.required],
       ZTRUC_TYPE: [data?.ZTRUC_TYPE || '', Validators.required],
       ZTRUC_WT: [data?.ZTRUC_WT || '', Validators.required],
@@ -90,23 +90,25 @@ export class VechileInfoComponent implements OnInit {
       ZDNAME: [data?.ZDNAME || '', Validators.required],
       ZDNUMBER: [data?.ZDNUMBER || '', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
       ZREFNO: [data?.ZREFNO || ''],
-     ZWORK_ORDER: [data?.ZWORK_ORDER || ''],
-    
-    // ZTRANSPORTER: [data?.ZTRANSPORTER || ''],
-    ZSO_NO: [data?.ZSONO || ''],
-    ZODN_NO: [data?.ZODN_NO || '']
+      ZLOCATION: [data?.ZLOCATION || ''],
+      ZSALE_PERSON: [data?.ZSALE_PERSON || ''],
+      ZWORK_ORDER: [data?.ZWORK_ORDER || ''],
+
+      // ZTRANSPORTER: [data?.ZTRANSPORTER || ''],
+      ZSO_NO: [data?.ZSONO || ''],
+      ZODN_NO: [data?.ZODN_NO || '']
     });
   }
 
   createReferenceRow(): FormGroup {
     return this.fb.group({
-       MAPID: [''],
+      MAPID: [''],
       referenceNumber: [''],
       workOrderNumber: [''],
       lrNumber: [''],
       transporter: [''],
-      soNumber: [''],        
-      odnNumber: [''],   
+      soNumber: [''],
+      odnNumber: [''],
     });
   }
 
@@ -146,7 +148,7 @@ export class VechileInfoComponent implements OnInit {
 
   allSelected(): boolean {
     return this.vehicles.controls.length > 0 &&
-           this.vehicles.controls.every(ctrl => ctrl.get('selected')?.value === true);
+      this.vehicles.controls.every(ctrl => ctrl.get('selected')?.value === true);
   }
 
   toggleAllSelection(event: any): void {
@@ -157,7 +159,7 @@ export class VechileInfoComponent implements OnInit {
 
   onRowCheckboxChange(): void {
     this.isAllSelected = this.allSelected();
-     console.log('All Selected:', this.vehicles.value);
+    console.log('All Selected:', this.vehicles.value);
   }
 
   getSelectedRows() {
@@ -196,24 +198,62 @@ export class VechileInfoComponent implements OnInit {
   }
 
   onchangeMAPID(index: number) {
-  const rowForm = this.vehicles.at(index) as FormGroup;
-  const selectedMapId = rowForm.get('ZMAPID')?.value;
-  console.log("Selected MAPID:", selectedMapId);
+    const rowForm = this.vehicles.at(index) as FormGroup;
+    const selectedMapId = rowForm.get('ZMAPID')?.value;
+    console.log("Selected MAPID:", selectedMapId);
 
-  const selectedObj = this.selectedItems.find(item => item.MAPID == selectedMapId);
-  console.log("Selected MAPID object:", selectedObj);
+    // Get selected reference object
+    const selectedObj = this.selectedItems.find(item => item.MAPID == selectedMapId);
 
-  if (selectedObj) {
-    rowForm.patchValue({
-      ZREFNO: selectedObj.referenceNumber || "",
-      ZWORK_ORDER: selectedObj.workOrderNumber || "",
-      ZLRNO: selectedObj.lrNumber || "",
-      ZTRANSPOTER: selectedObj.transporter || "",
-      ZMAPID: selectedObj.MAPID || ""
+    if (selectedObj) {
+      rowForm.patchValue({
+        ZREFNO: selectedObj.referenceNumber || "",
+        ZWORK_ORDER: selectedObj.workOrderNumber || "",
+        ZLRNO: selectedObj.lrNumber || "",
+        ZTRANSPORTER: selectedObj.transporter || "",
+        ZMAPID: selectedObj.MAPID || ""
+      });
+    }
+
+    console.log("Step-1 Updated form:", this.vehicles.value);
+
+    // 🚀 Step-2: API Call to fetch TRUCK details based on MAPID
+    const vbeln = this.orderType === 'Inward' ? this.ponumber.trim() : this.invoicenumber.trim();
+
+    if (!vbeln) {
+      console.warn("VBELN missing, cannot hit MAPID API");
+      return;
+    }
+
+    const reqBody = {
+      VBELN: vbeln,
+      MAPID: selectedMapId
+    };
+
+    console.log("🚀 Hitting VehicleInfoMapid API:", reqBody);
+
+    this.spinner.show();
+    this.service.VehicleInfoMapid(reqBody).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        console.log("🚛 MAPID Vehicle Info Response:", res);
+
+        if (res) {
+          rowForm.patchValue({
+            ZTRUC_TYPE: res.ZTRUC_TYPE || "",
+            ZTRUC_WT: res.ZTRUC_WT || "",
+            ZTRUC_VOL: res.ZTRUC_VOL || ""
+          });
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error("❌ MAPID Fetch Error:", err);
+      }
     });
   }
-  console.log("Updated invoices form:", this.vehicles.value);
-}
+
+
 
   // Reference Table: Field Blur Handler
   onFieldBlur(index: number, fieldKey: string): void {
@@ -234,7 +274,7 @@ export class VechileInfoComponent implements OnInit {
     }
 
     const obj = {
-      global_scr: 'VEHICLE INFO',  
+      global_scr: 'VEHICLE INFO',
       REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
@@ -264,13 +304,13 @@ export class VechileInfoComponent implements OnInit {
       data.forEach(d => {
         this.referenceItems.push(
           this.fb.group({
-           MAPID: [d.MAPID || ''], 
-          referenceNumber: [d.REF_NO || d.referenceNumber || ''],
-          workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
-          lrNumber: [d.LR_NO || d.lrNumber || ''],
-          transporter: [d.TRANSPORTER || d.transporter || ''],
-          soNumber: [d.SO_NO || d.soNumber || ''],
-          odnNumber: [d.ODN_NO || d.odnNumber || ''],
+            MAPID: [d.MAPID || ''],
+            referenceNumber: [d.REF_NO || d.referenceNumber || ''],
+            workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
+            lrNumber: [d.LR_NO || d.lrNumber || ''],
+            transporter: [d.TRANSPORTER || d.transporter || ''],
+            soNumber: [d.SO_NO || d.soNumber || ''],
+            odnNumber: [d.ODN_NO || d.odnNumber || ''],
           })
         );
       });
@@ -294,7 +334,7 @@ export class VechileInfoComponent implements OnInit {
     if (checkbox.checked) {
       const exists = this.selectedItems.some(
         (item) =>
-          item.MAPID === rowValue.MAPID && 
+          item.MAPID === rowValue.MAPID &&
           item.referenceNumber === rowValue.referenceNumber &&
           item.workOrderNumber === rowValue.workOrderNumber &&
           item.lrNumber === rowValue.lrNumber &&
@@ -309,12 +349,12 @@ export class VechileInfoComponent implements OnInit {
       this.selectedItems = this.selectedItems.filter(
         (item) =>
           !(
-            item.MAPID === rowValue.MAPID && 
+            item.MAPID === rowValue.MAPID &&
             item.referenceNumber === rowValue.referenceNumber &&
             item.workOrderNumber === rowValue.workOrderNumber &&
             item.lrNumber === rowValue.lrNumber &&
             item.transporter === rowValue.transporter &&
-             item.soNumber === rowValue.soNumber &&
+            item.soNumber === rowValue.soNumber &&
             item.odnNumber === rowValue.odnNumber
           )
       );
@@ -328,7 +368,7 @@ export class VechileInfoComponent implements OnInit {
 
     return this.selectedItems.some(
       (item) =>
-        item.MAPID === rowValue.MAPID && 
+        item.MAPID === rowValue.MAPID &&
         item.referenceNumber === rowValue.referenceNumber &&
         item.workOrderNumber === rowValue.workOrderNumber &&
         item.lrNumber === rowValue.lrNumber &&
@@ -338,7 +378,7 @@ export class VechileInfoComponent implements OnInit {
     );
   }
 
-   onSearchTypeChange(): void {
+  onSearchTypeChange(): void {
     // Reset data when search type changes
     this.searchReference = '';
     this.searchOptionsList = [];
@@ -360,9 +400,9 @@ export class VechileInfoComponent implements OnInit {
 
 
     let payload1: any = {
-     
-    "global": "VEHICLE INFO",
-    "data": {
+
+      "global": "VEHICLE INFO",
+      "data": {
         "ref_no": "",
         "inv_no": "",
         "so_no": "",
@@ -376,8 +416,8 @@ export class VechileInfoComponent implements OnInit {
         "freight_billno": "",
         "nature_damage": "",
         "claim_status": ""
-   
-    }
+
+      }
     };
     payload1.data[this.selectedType] = this.searchReference.trim();
 
@@ -387,7 +427,7 @@ export class VechileInfoComponent implements OnInit {
     this.service.global_Fields_SearchOption(payload1).subscribe({
       next: (res: any) => {
         this.spinner.hide();
-        console.log("HEADER", res.HEADER )
+        console.log("HEADER", res.HEADER)
         if (res?.HEADER?.length > 0) {
 
           this.searchOptionsList = res.HEADER;
@@ -426,6 +466,8 @@ export class VechileInfoComponent implements OnInit {
     this.fetchVehicleDetails();
   }
 
+
+
   fetchVehicleDetails(): void {
     if (this.sapType !== 'SAP') {
       Swal.fire('Info', 'Please select "With SAP" first.', 'info');
@@ -439,7 +481,17 @@ export class VechileInfoComponent implements OnInit {
       return;
     }
 
-    const reqBody = { INV_GET: referenceNumber.trim() };
+    // 🔥 GET SELECTED MAPID (if user selected from reference popup)
+    const selectedMapId = this.selectedItems?.[0]?.MAPID || "";
+
+    // 🔥 FINAL PAYLOAD (supports invoice-only or invoice + mapid)
+    const reqBody: any = { INV_GET: referenceNumber.trim() };
+
+    if (selectedMapId) {
+      reqBody.MAPID = selectedMapId;
+    }
+
+    console.log("🚀 Final Vehicle Fetch Payload:", reqBody);
 
     this.spinner.show();
     this.service.VehicleInfofetch(reqBody).subscribe({
@@ -455,7 +507,7 @@ export class VechileInfoComponent implements OnInit {
           Swal.fire('Success', 'Vehicle details loaded successfully.', 'success');
         } else {
           this.showTable = false;
-          Swal.fire('Info', 'No data found for this reference number.', 'info');
+          Swal.fire('Info', 'No data found.', 'info');
         }
       },
       error: (err) => {
@@ -466,21 +518,22 @@ export class VechileInfoComponent implements OnInit {
     });
   }
 
-  saveVehicleInfo(action: 'stay' | 'next' | 'previous' = 'stay'): void {
-     const filtered = this.vehicles.value
-    .filter((row: any) => row.selected === true)
-    .map(({ selected, ...rest }) => rest);
 
-  if (filtered.length === 0) {
-    Swal.fire({
-      title: 'Warning',
-      text: 'Please select at least one row to save.',
-      icon: 'warning',
-      timer: 3000,
-      confirmButtonText: 'Ok',
-    });
-    return;
-  }
+  saveVehicleInfo(action: 'stay' | 'next' | 'previous' = 'stay'): void {
+    const filtered = this.vehicles.value
+      .filter((row: any) => row.selected === true)
+      .map(({ selected, ...rest }) => rest);
+
+    if (filtered.length === 0) {
+      Swal.fire({
+        title: 'Warning',
+        text: 'Please select at least one row to save.',
+        icon: 'warning',
+        timer: 3000,
+        confirmButtonText: 'Ok',
+      });
+      return;
+    }
 
 
     if (filtered.length === 0) {

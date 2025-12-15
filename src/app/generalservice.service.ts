@@ -204,6 +204,9 @@ export class GeneralserviceService {
   VehicleInfoNonSap(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/Vehicleinfo/NonSap/Save', obj);
   }
+  VehicleInfoMapid(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/Vehicleinfo/Outward/Save', obj);
+  }
   Invoiceloaddetailsfetch(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/InvoiceloadDetails/Outward/fetchInvoiceList', obj);
   }
