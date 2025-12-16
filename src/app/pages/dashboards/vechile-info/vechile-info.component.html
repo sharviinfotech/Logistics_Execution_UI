@@ -241,8 +241,10 @@
       <table class="table table-bordered table-striped text-center">
         <thead>
           <tr>
+            <th>Map ID</th>
             <th>Ref No</th>
             <th>Invoice No</th>
+            <th>Vehicle Line</th>
             <th>ODN No</th>
             <th>SO NO</th>
             <th>Type of Shipment</th>
@@ -253,15 +255,20 @@
             <th>Volume of Truck</th>
             <th>Vehicle Number</th>
             <th>No of Vehicles</th>
+            <th>Sales Person</th>
             <th>Driver Name</th>
             <th>Driver Mobile</th>
             <th>Work Order</th>
+            <th>Location</th>
+            
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let item of searchOptionsList">
+            <td>{{ item.ZMAPID }}</td>
             <td>{{ item.ZREFNO }}</td>
             <td>{{ item.VBELN }}</td>
+            <td>{{ item.ZVEH_LINE }}</td>
             <td>{{ item.ZODN_NO }}</td>
             <td>{{ item.ZSONO }}</td>
             <td>{{ item.ZTRX_TYPE }}</td>
@@ -272,10 +279,11 @@
             <td>{{ item.ZTRUC_VOL }}</td>
             <td>{{ item.ZVEH_NUM }}</td>
             <td>{{ item.ZNOOFVEH }}</td>
+            <td>{{ item.ZSALE_PERSON }}</td>
             <td>{{ item.ZDNAME }}</td>
             <td>{{ item.ZDNUMBER }}</td>
             <td>{{ item.ZWORK_ORDER }}</td>
-
+            <td>{{ item.ZLOCATION }}</td>
           </tr>
         </tbody>
       </table>
