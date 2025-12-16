@@ -146,28 +146,28 @@ export class TransitDamageInfoComponent implements OnInit {
   }
 
   resetForms() {
-  this.HeaderForm.reset();
-  this.referenceItems.clear();
-  this.referenceItems.push(this.createReferenceRow());
+    this.HeaderForm.reset();
+    this.referenceItems.clear();
+    this.referenceItems.push(this.createReferenceRow());
 
-  while (this.items.length !== 0) {
-    this.items.removeAt(0);
+    while (this.items.length !== 0) {
+      this.items.removeAt(0);
+    }
+
+    this.invoicenumber = "";
+    this.ponumber = "";
+    this.searchOptionsList = [];
+    this.selectedItems = [];
+    this.searchReference = '';
+    this.selectedType = '';
+
+    // ✅ Don't hide forms if Non-SAP is selected
+    if (this.sapType !== 'Non-SAP') {
+      this.ShowHeaderForm = false;
+      this.showTable = false;
+      this.showForm = false;
+    }
   }
-
-  this.invoicenumber = "";
-  this.ponumber = "";
-  this.searchOptionsList = [];
-  this.selectedItems = [];
-  this.searchReference = '';
-  this.selectedType = '';
-
-  // ✅ Don't hide forms if Non-SAP is selected
-  if (this.sapType !== 'Non-SAP') {
-    this.ShowHeaderForm = false;
-    this.showTable = false;
-    this.showForm = false;
-  }
-}
 
   onOrderTypeSelection() {
     if (this.previousOrderType !== null && this.previousOrderType !== this.orderType) {
@@ -179,50 +179,50 @@ export class TransitDamageInfoComponent implements OnInit {
   }
 
   onSapTypeSelection() {
-  if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
-    this.resetConditionalFields();
-  }
-  this.previousSapType = this.sapType;
-  this.resetForms();
-
-  // ✅ Auto-show forms for Non-SAP
-  if (this.sapType === 'Non-SAP') {
-    this.ShowHeaderForm = true;
-    this.showTable = true;
-    this.showForm = true;
-
-    // Add one empty row to items table
-    if (this.items.length === 0) {
-      this.addItemRow();
+    if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
+      this.resetConditionalFields();
     }
+    this.previousSapType = this.sapType;
+    this.resetForms();
 
-    console.log('✅ Non-SAP selected - Forms displayed automatically');
-  } else {
-    // For SAP, keep forms hidden until GET is clicked
-    this.ShowHeaderForm = false;
-    this.showTable = false;
-    this.showForm = false;
+    // ✅ Auto-show forms for Non-SAP
+    if (this.sapType === 'Non-SAP') {
+      this.ShowHeaderForm = true;
+      this.showTable = true;
+      this.showForm = true;
+
+      // Add one empty row to items table
+      if (this.items.length === 0) {
+        this.addItemRow();
+      }
+
+      console.log('✅ Non-SAP selected - Forms displayed automatically');
+    } else {
+      // For SAP, keep forms hidden until GET is clicked
+      this.ShowHeaderForm = false;
+      this.showTable = false;
+      this.showForm = false;
+    }
   }
-}
 
   resetConditionalFields(): void {
-  // Don't reset these flags if switching to Non-SAP
-  if (this.sapType !== 'Non-SAP') {
-    this.showTable = false;
-    this.ShowHeaderForm = false;
-    this.showForm = false;
+    // Don't reset these flags if switching to Non-SAP
+    if (this.sapType !== 'Non-SAP') {
+      this.showTable = false;
+      this.ShowHeaderForm = false;
+      this.showForm = false;
+    }
+
+    this.searchOptionsList = [];
+    this.selectedItems = [];
+    this.HeaderForm.reset();
+    this.referenceItems.clear();
+    this.referenceItems.push(this.createReferenceRow());
+
+    while (this.items.length !== 0) {
+      this.items.removeAt(0);
+    }
   }
-  
-  this.searchOptionsList = [];
-  this.selectedItems = [];
-  this.HeaderForm.reset();
-  this.referenceItems.clear();
-  this.referenceItems.push(this.createReferenceRow());
-  
-  while (this.items.length !== 0) {
-    this.items.removeAt(0);
-  }
-}
 
   // Reference Table: Field Blur Handler
   onFieldBlur(index: number, fieldKey: string): void {
@@ -413,14 +413,14 @@ export class TransitDamageInfoComponent implements OnInit {
 
           Swal.fire('', res.MESSAGE, 'warning');
         } else {
-         
+
           this.searchOptionsList = res.ITEMS;
           this.showForm = false;
           this.SavedDataShow = true;
           this.ShowHeaderForm = true;
           this.showTable = false;
           const header = res.HEADER?.[0];
-          console.log("HEADER PATCH",header)
+          console.log("HEADER PATCH", header)
           this.HeaderForm.patchValue({
             INV_NO: header.ZINV_NO,
             INV_DATE: header.ZINV_DATE,
@@ -572,51 +572,61 @@ export class TransitDamageInfoComponent implements OnInit {
   }
 
   onSaveActionSap(action: 'stay' | 'next' | 'previous' = 'stay') {
-    const filtered = this.items.value
+
+
+    const selectedItems = this.items.value
       .filter((row: any) => row.selected === true)
       .map(({ selected, ...rest }) => rest);
 
-    if (filtered.length === 0) {
-      Swal.fire({
-        title: 'Warning',
-        text: 'Please select at least one product row to save.',
-        icon: 'warning',
-        timer: 3000,
-        confirmButtonText: 'Ok',
-      });
+    if (selectedItems.length === 0) {
+      Swal.fire('Warning', 'Please select at least one row', 'warning');
       return;
     }
 
-    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
 
-    // Get header form value and remove referenceItems array
-    const headerValue = { ...this.HeaderForm.value };
+    const invoiceNo =
+      this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+
+    if (!invoiceNo) {
+      Swal.fire('Warning', 'Invoice / PO missing', 'warning');
+      return;
+    }
+
+    /* 3️⃣ HEADER preparation */
+    const headerValue: any = { ...this.HeaderForm.value };
     delete headerValue.referenceItems;
 
-    headerValue.INV_NO = referenceNumber;
+    headerValue.INV_NO = invoiceNo;
 
-    filtered.forEach(row => row.INV_NO = referenceNumber);
+    headerValue.REFNO = selectedItems[0]?.REFNO || null;
+    headerValue.INC_DATE = headerValue.INC_DATE || null;
+    headerValue.CLOSING_DT = headerValue.CLOSING_DT || null;
+    headerValue.ROUTE = headerValue.ROUTE ||
+      selectedItems.forEach((row: any) => {
+        row.INV_NO = invoiceNo;
+        row.REFNO = headerValue.REFNO;
+      });
+
 
     const payload = {
       HEADER: headerValue,
-      ITEM: filtered
+      ITEM: selectedItems
     };
 
-    console.log("📤 Final Payload:", payload);
+    console.log('✅ FINAL SAVE PAYLOAD', payload);
 
+    /* 6️⃣ API Call */
     this.spinner.show();
     this.service.TransitDamageInfoSave(payload).subscribe({
       next: (res: any) => {
         this.spinner.hide();
 
-        if (res?.STATUS === "TRUE") {
+        if (res?.STATUS === 'TRUE') {
           Swal.fire({
-            text: "✅ Data Saved Successfully!",
-            icon: "success",
+            icon: 'success',
+            text: 'Data Saved Successfully',
+            timer: 1200,
             showConfirmButton: false,
-            timer: 900,
-            title: 'Warning',
-            confirmButtonText: 'Ok',
             willClose: () => {
               if (action === 'next') {
                 this.router.navigate(['/insurance-claim-tracking']);
@@ -628,18 +638,12 @@ export class TransitDamageInfoComponent implements OnInit {
             }
           });
         } else {
-          Swal.fire({
-            text: "⚠️ Save Failed: " + (res.MESSAGE || ''),
-            icon: "warning"
-          });
+          Swal.fire('Save Failed', res?.MESSAGE || '', 'warning');
         }
       },
       error: () => {
         this.spinner.hide();
-        Swal.fire({
-          text: "❌ Error while saving",
-          icon: "error"
-        });
+        Swal.fire('Error', 'Save failed', 'error');
       }
     });
   }

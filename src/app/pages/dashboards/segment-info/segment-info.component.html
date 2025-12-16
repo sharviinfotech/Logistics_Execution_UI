@@ -36,11 +36,13 @@
       <!-- INWARD -->
       <div *ngIf="orderType === 'Inward'" class="input-flex">
         <div class="form-field flex-1">
-          <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" " (input)="onInputChange('purchase')" />
+          <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" "
+            (input)="onInputChange('purchase')" />
           <label>PO Number</label>
         </div>
 
-        <button type="button" class="btn-get" (click)="getForm('purchase')" [disabled]="!ponumber || ponumber.trim() === ''">
+        <button type="button" class="btn-get" (click)="getForm('purchase')"
+          [disabled]="!ponumber || ponumber.trim() === ''">
           GET
         </button>
       </div>
@@ -117,7 +119,8 @@
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType"
+                  (change)="onSearchTypeChange()">
                   <option value="" disabled selected>Select</option>
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
@@ -138,7 +141,8 @@
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType"
+                  (change)="onSearchTypeChange()">
                   <option value="" disabled selected>Select</option>
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
@@ -314,22 +318,22 @@
         </thead>
         <tbody>
           <tr *ngFor="let item of searchOptionsList">
-            <td>{{ item.ZREFNO  }}</td>
-            <td>{{ item.ZINV_NUM  }}</td>
+            <td>{{ item.ZREFNO }}</td>
+            <td>{{ item.ZINV_NUM }}</td>
+            <td>{{ item.ZODN_NO }}</td>
             <td>{{ item.ZSO_NO }}</td>
-            <td>{{ item.ZODN_NO  }}</td>
-            <td>{{ item.ZSALE_PERSON  }}</td>
-            <td>{{ item.ZSEGMENT  }}</td>
-            <td>{{ item.ZAPPTYP  }}</td>
-            <td>{{ item.ZCUST_PROFILE  }}</td>
+            <td>{{ item.ZSALE_PERSON }}</td>
+            <td>{{ item.ZSEGMENT }}</td>
+            <td>{{ item.ZAPPTYP }}</td>
+            <td>{{ item.ZCUST_PROFILE }}</td>
             <td>{{ item.ZBRANCH }}</td>
-            <td>{{ item.ZBRANCH_ZONE  }}</td>
-            <td>{{ item.ZTAT_TYPE  }}</td>
+            <td>{{ item.ZBRANCH_ZONE }}</td>
+            <td>{{ item.ZTAT_TYPE }}</td>
             <td>{{ item.ZTAT }}</td>
-            <td>{{ item.ZETA  }}</td>
+            <td>{{ item.ZETA }}</td>
             <td>{{ item.ZWORK_ORDER }}</td>
-            <td>{{ item.ZLRNO  }}</td>
-            <td>{{ item.ZTRANSPORTER  }}</td>
+            <td>{{ item.ZLRNO }}</td>
+            <td>{{ item.ZTRANSPORTER }}</td>
           </tr>
         </tbody>
       </table>

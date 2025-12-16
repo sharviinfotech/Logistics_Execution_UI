@@ -217,7 +217,7 @@
       <!-- Fiscal Year -->
       <div class="form-field" *ngIf="showFiscalFields"
         [ngClass]="{'grayReadOnly': OrderInfo.value.PhysicalDispatchDateTime}">
-        <input type="text" formControlName="FiscalYear" placeholder=" " disabled />
+        <input type="text" formControlName="FiscalYear" placeholder=" " readonly />
         <label>Fiscal Year</label>
       </div>
 

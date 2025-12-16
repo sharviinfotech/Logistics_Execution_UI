@@ -398,20 +398,28 @@ export class ShipmentDetailsComponent implements OnInit {
 
     console.log('🔍 Payload1:', payload1);
     this.spinner.show();
-    this.service.global_Fields_SearchOption(payload1).subscribe({
+    let apiCall;
+
+    if (this.sapType === 'SAP') {
+      apiCall = this.service.global_Fields_SearchOption(payload1); // POST
+    } else {
+      apiCall = this.service.global_Fields_SearchOption_WithoutSap(payload1); // PUT
+    }
+
+    apiCall.subscribe({
       next: (res: any) => {
         this.spinner.hide();
         console.log('✅ Search Response:', res);
-        if (res.NUMBER == "100" && res.STATUS == "FALSE") {
+
+        if (res.NUMBER === '100' && res.STATUS === 'FALSE') {
           this.searchOptionsList = [];
-
-
           Swal.fire('', res.MESSAGE, 'warning');
-        } else {
+        } else if (!res.HEADER || res.HEADER.length === 0) {
+          this.searchOptionsList = [];
           Swal.fire('No records found', '', 'info');
+        } else {
           this.searchOptionsList = res.HEADER;
           this.showForm = false;
-
           Swal.fire('Data fetched successfully!', '', 'success');
         }
       },
@@ -585,26 +593,26 @@ export class ShipmentDetailsComponent implements OnInit {
       INV_VBELN: this.ProductInfo.get('INV_VBELN')?.value || ''
     };
 
-    
+
     const finalPayload = selectedRows.map((row: any, idx: number) => {
-      
+
       const itemZins = (row.ZINS_SCPOE && String(row.ZINS_SCPOE).trim() !== '')
         ? row.ZINS_SCPOE
         : commonFields.ZINS_SCPOE;
 
-     
+
       const itemZkm = (row.ZKM !== null && row.ZKM !== undefined && row.ZKM !== '')
         ? row.ZKM
         : commonFields.ZKM;
 
 
 
-      
+
       const itemZinco = (row.ZINCO && String(row.ZINCO).trim() !== '')
         ? row.ZINCO
         : commonFields.ZINCO;
 
-        const itemINV_VBELN = (row.INV_VBELN && String(row.INV_VBELN).trim() !== '')
+      const itemINV_VBELN = (row.INV_VBELN && String(row.INV_VBELN).trim() !== '')
         ? row.INV_VBELN
         : commonFields.INV_VBELN;
 
@@ -614,11 +622,11 @@ export class ShipmentDetailsComponent implements OnInit {
         ZKM: itemZkm,
         ZINCO: itemZinco,
         INV_VBELN: itemINV_VBELN,
-       
+
         ZSETS: row.ZSETS ?? 0,
         ZAH: row.ZAH ?? 0,
         ZSHIP_WT: row.ZSHIP_WT ?? 0,
-      
+
       };
     });
 

@@ -280,6 +280,9 @@ export class GeneralserviceService {
   global_Fields_SearchOption(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/orderinfo/global_Fields_SearchOption', obj);
   }
+  global_Fields_SearchOption_WithoutSap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/orderinfo/global_Fields_SearchOption_WithoutSap', obj);
+  }
 
 
 }

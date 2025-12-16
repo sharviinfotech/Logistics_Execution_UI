@@ -69,7 +69,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     private service: GeneralserviceService,
     private router: Router,
     private spinner: NgxSpinnerService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.buildHeaderForm();
@@ -81,6 +81,9 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     this.HeaderForm = this.fb.group({
       ZMAPID: [''],
       INV_NO: [''],
+      REFNO: [''],
+      SALE_PERSON: [''],
+      ODN_NO: [''],
       FI: [''],
       REP_DATE: [''],
       CLAIM_REF: [''],
@@ -145,8 +148,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       AH: [''],
       NO_SETS: [''],
       TRANSPORTER: [''],
-      ZWORK_ORDER: [''],
-      ZBILLNO: [''],
+      WORK_ORDER: [''],   // ✅ FIX
+      BILLNO: [''],
       ZMAPID: ['']
     });
 
@@ -173,18 +176,28 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     this.selectedItems = [];
     this.searchReference = '';
     this.selectedType = '';
+
+    if (this.sapType !== 'Non-SAP') {
+      this.ShowHeaderForm = false;
+      this.showTable = false;
+      this.showForm = false;
+    }
   }
 
   resetConditionalFields(): void {
-    this.showTable = false;
-    this.ShowHeaderForm = false;
-    this.showForm = false;
+    // Don't reset these flags if switching to Non-SAP
+    if (this.sapType !== 'Non-SAP') {
+      this.showTable = false;
+      this.ShowHeaderForm = false;
+      this.showForm = false;
+    }
+
     this.searchOptionsList = [];
     this.selectedItems = [];
     this.HeaderForm.reset();
     this.referenceItems.clear();
     this.referenceItems.push(this.createReferenceRow());
-    
+
     while (this.items.length !== 0) {
       this.items.removeAt(0);
     }
@@ -237,13 +250,13 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     console.log('🔹 Sending Object:', obj);
 
     this.spinner.show();
-     let apiCall;
+    let apiCall;
     if (this.sapType === 'SAP') {
       apiCall = this.service.GlobalReferenceNoFetch(obj); // POST
     } else {
       apiCall = this.service.GlobalReferenceNoFetchwithoutsap(obj); // PUT
     }
- 
+
     apiCall.subscribe({
       next: (res: any) => {
         console.log('✅ Response:', res);
@@ -387,10 +400,10 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       Swal.fire('Please enter a value', '', 'warning');
       return;
     }
-    
+
     this.SavedDataShow = false;
     this.ShowHeaderForm = false;
-    
+
     if (!this.selectedType) {
       Swal.fire('Please select a search type', '', 'info');
       return;
@@ -416,7 +429,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         CLAIM_STATUS: ''
       }
     };
-    
+
     payload1.data[this.selectedType] = this.searchReference.trim();
 
     console.log('🔍 Payload1:', payload1);
@@ -425,7 +438,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       next: (res: any) => {
         this.spinner.hide();
         console.log('✅ Search Response:', res);
-        
+
         if (res.NUMBER == '100' && res.STATUS == 'FALSE') {
           this.searchOptionsList = [];
           Swal.fire('', res.MESSAGE, 'warning');
@@ -435,10 +448,10 @@ export class InsuranceClaimTrackingComponent implements OnInit {
           this.SavedDataShow = true;
           this.ShowHeaderForm = true;
           this.showTable = false;
-          
+
           const header = res.HEADER?.[0];
           console.log('HEADER PATCH', header);
-          
+
           this.HeaderForm.patchValue({
             INV_NO: header.ZINV_NO,
             FI: header.ZFI,
@@ -451,6 +464,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
             SOL_VAL: header.ZSOL_VAL,
             CUSTOMER: header.ZCUSTOMER,
             SO_NO: header.ZSO_NO,
+
             LOCATION: header.ZLOCATION,
             DAMAGE_RMK: header.ZDAMAGE_RMK,
             CLM_INF: header.ZCLM_INF,
@@ -534,7 +548,9 @@ export class InsuranceClaimTrackingComponent implements OnInit {
           CLM_RF: header.CLM_RF,
           SOL_VAL: header.SOL_VAL,
           CUSTOMER: header.CUSTOMER,
+          ODN_NO: header.ODN_NO,
           SO_NO: header.SO_NO,
+          SALE_PERSON: header.SALE_PERSON,
           LOCATION: header.LOCATION,
           DAMAGE_RMK: header.DAMAGE_RMK,
           CLM_INF: header.CLM_INF,
@@ -583,9 +599,15 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
   // Save SAP
   onSaveActionSap(action: 'stay' | 'next' | 'previous' = 'stay'): void {
+
+    // 1️⃣ Get selected rows
     const filtered = this.items.value
       .filter((row: any) => row.selected === true)
-      .map(({ selected, ...rest }) => rest);
+      .map(({ selected, ...row }) => ({
+        ...row,
+        WORK_ORDER: row.ZWORK_ORDER, // ✅ map correctly
+        BILLNO: row.BILLNO,          // ✅ map correctly
+      }));
 
     if (filtered.length === 0) {
       Swal.fire({
@@ -598,15 +620,35 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       return;
     }
 
-    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+    // 2️⃣ Reference / Invoice number
+    const referenceNumber =
+      this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
 
+    // 3️⃣ HEADER value
     const headerValue = { ...this.HeaderForm.value };
     delete headerValue.referenceItems;
 
     headerValue.INV_NO = referenceNumber;
 
-    filtered.forEach(row => (row.INV_NO = referenceNumber));
+    // 🔥 IMPORTANT: Set REFNO explicitly
+    headerValue.REFNO =
+      this.referenceItems.at(0)?.value?.referenceNumber || 0;
 
+    // 4️⃣ Ensure header fields exist
+    headerValue.SO_NO = headerValue.SO_NO;
+    headerValue.ODN_NO = headerValue.ODN_NO || '';
+    headerValue.SALE_PERSON = headerValue.SALE_PERSON || '';
+
+    // 5️⃣ Apply common values to ITEM
+    filtered.forEach(row => {
+      row.INV_NO = referenceNumber;
+      row.REFNO = headerValue.REFNO; // ✅ same REFNO
+      // Ensure backend receives z-prefixed bill/workorder keys as well
+      row.ZBILLNO = row.BILLNO || row.ZBILLNO || '';
+      row.ZWORK_ORDER = row.WORK_ORDER || row.ZWORK_ORDER || '';
+    });
+
+    // 6️⃣ Final payload
     const payload = {
       HEADER: headerValue,
       ITEM: filtered
@@ -614,6 +656,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
     console.log('📤 Final Payload:', payload);
 
+    // 7️⃣ Save API call
     this.spinner.show();
     this.service.InsuranceClaimTrackingSave(payload).subscribe({
       next: (res: any) => {

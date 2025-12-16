@@ -40,11 +40,13 @@
       <!-- INWARD -->
       <div *ngIf="orderType === 'Inward'" class="input-flex">
         <div class="form-field flex-1">
-          <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" " (input)="onInputChange('purchase')" />
+          <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" "
+            (input)="onInputChange('purchase')" />
           <label>PO Number</label>
         </div>
 
-        <button type="button" class="btn-get" (click)="getForm('purchase')" [disabled]="!ponumber || ponumber.trim() === ''">
+        <button type="button" class="btn-get" (click)="getForm('purchase')"
+          [disabled]="!ponumber || ponumber.trim() === ''">
           GET
         </button>
       </div>
@@ -75,9 +77,8 @@
                   </td>
 
                   <td>{{ i + 1 }}</td>
-                   <td>
-                    <input type="text" formControlName="MAPID" placeholder="Enter Map ID"
-                      readonly>
+                  <td>
+                    <input type="text" formControlName="MAPID" placeholder="Enter Map ID" readonly>
                   </td>
 
                   <td>
@@ -126,7 +127,8 @@
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType"
+                  (change)="onSearchTypeChange()">
                   <option value="" disabled selected>Select</option>
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
@@ -147,7 +149,8 @@
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType"
+                  (change)="onSearchTypeChange()">
                   <option value="" disabled selected>Select</option>
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
@@ -202,14 +205,39 @@
       </div>
 
       <div class="form-field">
-        <input type="text" formControlName="DAMAGE_RMK" placeholder=" " />
+        <select formControlName="DAMAGE_RMK">
+          <option value="" disabled selected>Select Damage Remarks</option>
+          <option value="Packing material damage">Packing material damage</option>
+          <option value="Pallet damage">Pallet damage</option>
+          <option value="Cells damage">Cells damage</option>
+          <option value="Cell Bank damage">Cell Bank damage</option>
+          <option value="Can damage">Can damage</option>
+          <option value="Accident">Accident</option>
+          <option value="Prohibited material loading and seized by Police">
+            Prohibited material loading and seized by Police
+          </option>
+          <option value="Damage during unloading">Damage during unloading</option>
+          <option value="Material in wet condition">Material in wet condition</option>
+          <option value="Damage due to other materials loaded">
+            Damage due to other materials loaded
+          </option>
+        </select>
         <label>Damage Remarks</label>
       </div>
 
+
       <div class="form-field">
-        <input type="text" formControlName="SETTLEMENT" placeholder=" " />
+        <select formControlName="SETTLEMENT">
+          <option value="" disabled selected>Select Settlement</option>
+          <option value="Claim Settlement">Claim Settlement</option>
+          <option value="Direct Deduction">Direct Deduction</option>
+          <option value="Insurance claim">Insurance claim</option>
+          <option value="Repair Locally with cost">Repair Locally with cost</option>
+          <option value="Repair Locally without cost">Repair Locally without cost</option>
+        </select>
         <label>Settlement</label>
       </div>
+
 
       <div class="form-field">
         <input type="date" formControlName="CLOSING_DT" placeholder=" " />
@@ -247,14 +275,14 @@
             <tr *ngFor="let item of items.controls; let i = index" [formGroupName]="i">
               <td><input type="checkbox" formControlName="selected" (change)="onRowCheckboxChange()" /></td>
               <td>{{ i + 1 }}</td>
-               <td>
-                  <select formControlName="ZMAPID" (change)="onchangeMAPID(i)">
-                    <option value="">Select</option>
-                    <option *ngFor="let option of selectedItems" [value]="option.MAPID">
-                      {{ option.MAPID }}
-                    </option>
-                  </select>
-                </td>
+              <td>
+                <select formControlName="ZMAPID" (change)="onchangeMAPID(i)">
+                  <option value="">Select</option>
+                  <option *ngFor="let option of selectedItems" [value]="option.MAPID">
+                    {{ option.MAPID }}
+                  </option>
+                </select>
+              </td>
               <td><input formControlName="VEH_LINE"></td>
               <td><input formControlName="TRUCK_NO"></td>
               <td><input formControlName="LR_NO"></td>
@@ -319,7 +347,7 @@
         <thead>
           <tr>
             <th>Map ID</th>
-             <th>Ref No</th>
+            <th>Ref No</th>
             <th>Invoice No</th>
             <th>Vehile Line</th>
             <th>Vehicle Number</th>
@@ -334,9 +362,9 @@
         <tbody>
           <tr *ngFor="let item of searchOptionsList">
             <td>{{ item.ZMAPID }}</td>
-            <td>{{ item.ZREFNO  }}</td>
-            <td>{{ item.ZINV_NO  }}</td>
-            <td>{{ item.ZVEH_LINE  }}</td>
+            <td>{{ item.ZREFNO }}</td>
+            <td>{{ item.ZINV_NO }}</td>
+            <td>{{ item.ZVEH_LINE }}</td>
             <td>{{ item.ZTRUCK_NO }}</td>
             <td>{{ item.ZBILLNO }}</td>
             <td>{{ item.ZPRODUCT }}</td>
@@ -345,7 +373,7 @@
             <td>{{ item.ZTRANSPORTER}}</td>
 
 
-            
+
           </tr>
         </tbody>
       </table>
