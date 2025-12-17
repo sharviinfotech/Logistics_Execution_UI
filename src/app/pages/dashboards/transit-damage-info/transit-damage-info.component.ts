@@ -403,44 +403,28 @@ export class TransitDamageInfoComponent implements OnInit {
 
     console.log('🔍 Payload1:', payload1);
     this.spinner.show();
-    this.service.global_Fields_SearchOption(payload1).subscribe({
+    let apiCall;
+
+    if (this.sapType === 'SAP') {
+      apiCall = this.service.global_Fields_SearchOption(payload1); // POST
+    } else {
+      apiCall = this.service.global_Fields_SearchOption_WithoutSap(payload1); // PUT
+    }
+
+    apiCall.subscribe({
       next: (res: any) => {
         this.spinner.hide();
         console.log('✅ Search Response:', res);
-        if (res.NUMBER == "100" && res.STATUS == "FALSE") {
+
+        if (res.NUMBER === '100' && res.STATUS === 'FALSE') {
           this.searchOptionsList = [];
-
-
           Swal.fire('', res.MESSAGE, 'warning');
+        } else if (!res.HEADER || res.HEADER.length === 0) {
+          this.searchOptionsList = [];
+          Swal.fire('No records found', '', 'info');
         } else {
-
-          this.searchOptionsList = res.ITEMS;
+          this.searchOptionsList = res.HEADER;
           this.showForm = false;
-          this.SavedDataShow = true;
-          this.ShowHeaderForm = true;
-          this.showTable = false;
-          const header = res.HEADER?.[0];
-          console.log("HEADER PATCH", header)
-          this.HeaderForm.patchValue({
-            INV_NO: header.ZINV_NO,
-            INV_DATE: header.ZINV_DATE,
-            FSR_RPT_DT: header.ZFSR_RPT_DT,
-            BASIC_VALUE: header.ZBASIC_VALUE,
-            INC_DATE: header.ZINC_DATE,
-            CUSTOMER: header.ZCUSTOMER,
-            CONSIGN_NAME: header.ZCONSIGN_NAME,
-            DAMAGE_RMK: header.ZDAMAGE_RMK,
-            SETTLEMENT: header.ZSETTLEMENT,
-            CLOSING_DT: header.ZCLOSING_DT,
-            IMAGES: header.ZIMAGES,
-            ODN_NO: header.ODN_NO,
-            SONO: header.SONO,
-            SALE_PERSON: header.ZSALE_PERSON,
-            LOCATION: header.ZLOCATION,
-            ROUTE: header.ZROUTE,
-            REFNO: header.ZREFNO,
-          });
-
           Swal.fire('Data fetched successfully!', '', 'success');
         }
       },

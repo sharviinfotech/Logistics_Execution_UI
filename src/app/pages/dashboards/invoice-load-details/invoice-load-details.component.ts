@@ -686,21 +686,29 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
     console.log('🔍 Payload1:', payload1);
     this.spinner.show();
-    this.service.global_Fields_SearchOption(payload1).subscribe({
+    let apiCall;
+
+    if (this.sapType === 'SAP') {
+      apiCall = this.service.global_Fields_SearchOption(payload1); // POST
+    } else {
+      apiCall = this.service.global_Fields_SearchOption_WithoutSap(payload1); // PUT
+    }
+
+    apiCall.subscribe({
       next: (res: any) => {
         this.spinner.hide();
         console.log('✅ Search Response:', res);
-        if (res.NUMBER == "100" && res.STATUS == "FALSE") {
+
+        if (res.NUMBER === '100' && res.STATUS === 'FALSE') {
           this.searchOptionsList = [];
           Swal.fire('', res.MESSAGE, 'warning');
-        } else if (res.HEADER && res.HEADER.length > 0) {
-          this.searchOptionsList = res.HEADER;
-          this.showForm = true;
-          this.showTable = false;
-          Swal.fire('Data fetched successfully!', '', 'success');
-        } else {
+        } else if (!res.HEADER || res.HEADER.length === 0) {
           this.searchOptionsList = [];
           Swal.fire('No records found', '', 'info');
+        } else {
+          this.searchOptionsList = res.HEADER;
+          this.showForm = false;
+          Swal.fire('Data fetched successfully!', '', 'success');
         }
       },
       error: (err) => {

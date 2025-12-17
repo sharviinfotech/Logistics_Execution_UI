@@ -37,11 +37,13 @@
       <!-- INWARD -->
       <div *ngIf="orderType === 'Inward'" class="input-flex">
         <div class="form-field flex-1">
-          <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" " (input)="onInputChange('purchase')" />
+          <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" "
+            (input)="onInputChange('purchase')" />
           <label>PO Number</label>
         </div>
 
-        <button type="button" class="btn-get" (click)="getForm('purchase')" [disabled]="!ponumber || ponumber.trim()==''">
+        <button type="button" class="btn-get" (click)="getForm('purchase')"
+          [disabled]="!ponumber || ponumber.trim()==''">
           GET
         </button>
       </div>
@@ -73,8 +75,7 @@
                   <td>{{ i + 1 }}</td>
 
                   <td>
-                    <input type="text" formControlName="MAPID" placeholder="Enter Map ID"
-                      readonly>
+                    <input type="text" formControlName="MAPID" placeholder="Enter Map ID" readonly>
                   </td>
 
                   <td>
@@ -123,7 +124,8 @@
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType"
+                  (change)="onSearchTypeChange()">
                   <option value="" disabled selected>Select</option>
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
@@ -144,7 +146,8 @@
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType"
+                  (change)="onSearchTypeChange()">
                   <option value="" disabled selected>Select</option>
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
@@ -165,7 +168,7 @@
 
 
     <!-- COMMON FIELDS + PRODUCT TABLE -->
-    <div *ngIf="showForm" >
+    <div *ngIf="showForm">
 
       <!-- COMMON FIELDS -->
       <div class="form-grid" [formGroup]="ProductInfo">
@@ -204,7 +207,7 @@
           <label>Kilometres</label>
         </div>
 
-         <div class="form-field" *ngIf="sapType === 'Non-SAP'">
+        <div class="form-field" *ngIf="sapType === 'Non-SAP'">
           <input type="number" formControlName="INV_VBELN" min="0" placeholder=" " />
           <label>DC Reference Number</label>
         </div>
@@ -257,37 +260,36 @@
                 </td>
 
                 <td>
-                    <select formControlName="MTBEZ">
-                      <option value="">Select Type</option>
+                  <select formControlName="MTBEZ">
+                    <option value="">Select Type</option>
 
-                      <option value="Batteries">Batteries</option>
-                      <option value="Acid">Acid</option>
-                      <option value="Electronic Goods">Electronic Goods</option>
-                      <option value="Scrap">Scrap</option>
-                      <option value="Rack">Rack</option>
-                      <option value="Stack Box">Stack Box</option>
-                      <option value="Packing material">Packing material</option>
-                      <option value="T-CAS">T-CAS</option>
-                      <option value="PC Wire">PC Wire</option>
-                      <option value="Raw material">Raw material</option>
-                      <option value="Contrate Product">Contrate Product</option>
+                    <option value="Batteries">Batteries</option>
+                    <option value="Acid">Acid</option>
+                    <option value="Electronic Goods">Electronic Goods</option>
+                    <option value="Scrap">Scrap</option>
+                    <option value="Rack">Rack</option>
+                    <option value="Stack Box">Stack Box</option>
+                    <option value="Packing material">Packing material</option>
+                    <option value="T-CAS">T-CAS</option>
+                    <option value="PC Wire">PC Wire</option>
+                    <option value="Raw material">Raw material</option>
+                    <option value="Contrate Product">Contrate Product</option>
 
-                    </select>
-                  </td>
+                  </select>
+                </td>
 
-                <td><input type="text" formControlName="MAKTX"  /></td>
+                <td><input type="text" formControlName="MAKTX" /></td>
                 <td><input type="number" formControlName="ZSETS" min="0" /></td>
 
                 <td>
                   <input type="number" formControlName="ZAH" min="0"
-                         *ngIf="item.get('ZPRODUCT')?.value === 'Batteries'" />
+                    *ngIf="item.get('ZPRODUCT')?.value === 'Batteries'" />
                 </td>
 
                 <td><input type="number" formControlName="ZSHIP_WT" /></td>
 
                 <td>
-                  <select formControlName="ZBATCOND"
-                          *ngIf="item.get('ZPRODUCT')?.value === 'Batteries'">
+                  <select formControlName="ZBATCOND" *ngIf="item.get('ZPRODUCT')?.value === 'Batteries'">
                     <option value="">Select Condition</option>
                     <option *ngFor="let opt of batteryConditionOptions" [value]="opt">
                       {{ opt }}
@@ -297,8 +299,7 @@
 
                 <td class="d-flex">
                   <button type="button" class="form-field" (click)="addRow()">+</button>
-                  <button type="button" class="btn-remove" (click)="removeRow(i)"
-                          [disabled]="items.length === 1">
+                  <button type="button" class="btn-remove" (click)="removeRow(i)" [disabled]="items.length === 1">
                     ✖
                   </button>
                 </td>
@@ -315,7 +316,8 @@
       <div class="text-right">
         <button class="btn btn-md btn-raised btnSave" (click)="saveShipmentOutward('stay')">Save</button>
         <button class="btn btn-md btn-raised btnSave move" (click)="saveShipmentOutward('next')">Save and Next</button>
-        <button class="btn btn-md btn-raised btnSave prev" (click)="saveShipmentOutward('previous')">Save and Previous</button>
+        <button class="btn btn-md btn-raised btnSave prev" (click)="saveShipmentOutward('previous')">Save and
+          Previous</button>
       </div>
 
     </div>
@@ -323,7 +325,7 @@
 </div>
 
 <!-- Search Results Table -->
-    <!-- Search Results Table -->
+<!-- Search Results Table -->
 <div *ngIf="searchOptionsList?.length > 0" class="table-responsive mt-3">
   <table class="table table-bordered table-striped text-center">
     <thead>
@@ -374,4 +376,3 @@
     </tbody>
   </table>
 </div>
-  

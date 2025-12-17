@@ -190,7 +190,7 @@ export class TransitInfoComponent implements OnInit {
     } else {
       apiCall = this.service.GlobalReferenceNoFetchwithoutsap(obj); // PUT
     }
- 
+
     apiCall.subscribe({
       next: (res: any) => {
         console.log('✅ Response:', res);
@@ -332,31 +332,34 @@ export class TransitInfoComponent implements OnInit {
     console.log('🔍 Payload:', payload1);
     this.spinner.show();
 
-    this.service.global_Fields_SearchOption(payload1).subscribe({
+    let apiCall;
+
+    if (this.sapType === 'SAP') {
+      apiCall = this.service.global_Fields_SearchOption(payload1); // POST
+    } else {
+      apiCall = this.service.global_Fields_SearchOption_WithoutSap(payload1); // PUT
+    }
+
+    apiCall.subscribe({
       next: (res: any) => {
         this.spinner.hide();
+        console.log('✅ Search Response:', res);
 
-        if (res?.NUMBER === '100' && res?.STATUS === 'FALSE') {
+        if (res.NUMBER === '100' && res.STATUS === 'FALSE') {
+          this.searchOptionsList = [];
           Swal.fire('', res.MESSAGE, 'warning');
-          return;
+        } else if (!res.HEADER || res.HEADER.length === 0) {
+          this.searchOptionsList = [];
+          Swal.fire('No records found', '', 'info');
+        } else {
+          this.searchOptionsList = res.HEADER;
+          this.showForm = false;
+          Swal.fire('Data fetched successfully!', '', 'success');
         }
-
-        // 🔥 NEW OBJECT & ARRAY REFERENCES
-        this.headerData = res.HEADER?.[0] ? { ...res.HEADER[0] } : null;
-        this.itemsList = res.ITEMS ? [...res.ITEMS] : [];
-
-        if (!this.headerData) {
-          Swal.fire('No data found', '', 'info');
-          return;
-        }
-
-        this.showTable = true;
-        this.showForm = false;
-
-        Swal.fire('Data fetched successfully!', '', 'success');
       },
-      error: () => {
+      error: (err) => {
         this.spinner.hide();
+        console.error('❌ Error:', err);
         Swal.fire('Error fetching data', '', 'error');
       }
     });

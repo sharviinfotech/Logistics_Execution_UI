@@ -251,13 +251,13 @@ export class FreightBillingComponent implements OnInit {
     console.log('🔹 Sending Object:', obj);
 
     this.spinner.show();
-     let apiCall;
+    let apiCall;
     if (this.sapType === 'SAP') {
       apiCall = this.service.GlobalReferenceNoFetch(obj); // POST
     } else {
       apiCall = this.service.GlobalReferenceNoFetchwithoutsap(obj); // PUT
     }
- 
+
     apiCall.subscribe({
       next: (res: any) => {
         console.log('✅ Response:', res);
@@ -386,15 +386,29 @@ export class FreightBillingComponent implements OnInit {
     console.log('🔍 Payload:', payload1);
 
     this.spinner.show();
-    this.service.global_Fields_SearchOption(payload1).subscribe({
+    let apiCall;
+
+    if (this.sapType === 'SAP') {
+      apiCall = this.service.global_Fields_SearchOption(payload1); // POST
+    } else {
+      apiCall = this.service.global_Fields_SearchOption_WithoutSap(payload1); // PUT
+    }
+
+    apiCall.subscribe({
       next: (res: any) => {
         this.spinner.hide();
-        if (res.HEADER.length > 0) {
+        console.log('✅ Search Response:', res);
+
+        if (res.NUMBER === '100' && res.STATUS === 'FALSE') {
+          this.searchOptionsList = [];
+          Swal.fire('', res.MESSAGE, 'warning');
+        } else if (!res.HEADER || res.HEADER.length === 0) {
+          this.searchOptionsList = [];
+          Swal.fire('No records found', '', 'info');
+        } else {
           this.searchOptionsList = res.HEADER;
           this.showForm = false;
           Swal.fire('Data fetched successfully!', '', 'success');
-        } else {
-          Swal.fire('No records found', '', 'info');
         }
       },
       error: (err) => {

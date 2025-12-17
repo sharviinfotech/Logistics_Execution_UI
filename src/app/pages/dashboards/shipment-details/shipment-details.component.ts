@@ -285,23 +285,30 @@ export class ShipmentDetailsComponent implements OnInit {
   onchangeMAPID(index: number) {
     const rowForm = this.items.at(index) as FormGroup;
     const selectedMapId = rowForm.get('ZMAPID')?.value;
-    console.log("Selected MAPID:", selectedMapId);
 
-    // Find object based on selected MAPID
-    const selectedObj = this.selectedItems.find(item => item.MAPID == selectedMapId);
+    const selectedObj = this.selectedItems.find(
+      item => item.MAPID == selectedMapId
+    );
 
-    console.log("Selected MAPID object:", selectedObj);
+    if (!selectedObj) return;
 
-    if (selectedObj) {
-      rowForm.patchValue({
-        ZREFNO: selectedObj.referenceNumber || "",
-        ZWORK_ORDER: selectedObj.workOrderNumber || "",
-        ZLRNO: selectedObj.lrNumber || "",
-        ZTRANSPORTER: selectedObj.transporter || "",
-        ZMAPID: selectedObj.MAPID || ""
-      });
-    }
-    console.log("Updated items form:", this.items.value);
+    rowForm.patchValue({
+      // Reference linkage
+      ZMAPID: selectedObj.MAPID ?? null,
+      ZREFNO: selectedObj.referenceNumber ?? null,
+      ZWORK_ORDER: selectedObj.workOrderNumber ?? null,
+      ZLRNO: selectedObj.lrNumber ?? null,
+      ZTRANSPORTER: selectedObj.transporter ?? null,
+
+      // ✅ REQUIRED FOR NON-SAP SAVE
+      VBELN: selectedObj.invNumber ?? this.ProductInfo.get('INV_VBELN')?.value ?? null,
+      POSNR: selectedObj.POSNR ?? null,
+      MTART: selectedObj.materialType ?? null,
+      ZSO_NO: selectedObj.soNumber ?? null,
+      ZODN_NO: selectedObj.odnNumber ?? null,
+      ZPIN_PLT: selectedObj.plantCode ?? null,
+      ZPIN_STP: selectedObj.shippingPoint ?? null
+    });
   }
 
 
@@ -557,9 +564,10 @@ export class ShipmentDetailsComponent implements OnInit {
     this.fetchInvoiceDetails();
   }
 
+
+
   // Save functionality
   saveShipmentOutward(action: 'stay' | 'next' | 'previous' = 'stay'): void {
-    // get selected rows (remove selected flag)
     const selectedRows = this.items.value
       .filter((row: any) => row.selected === true)
       .map(({ selected, ...rest }) => rest);
@@ -590,92 +598,127 @@ export class ShipmentDetailsComponent implements OnInit {
       ZINCO: this.ProductInfo.get('ZINCO')?.value || '',
       ZINS_SCPOE: this.ProductInfo.get('ZINS_SCPOE')?.value || '',
       ZKM: this.ProductInfo.get('ZKM')?.value ?? 0,
-      INV_VBELN: this.ProductInfo.get('INV_VBELN')?.value || ''
+      VBELN: this.ProductInfo.get('VBELN')?.value || ''
     };
 
-
-    const finalPayload = selectedRows.map((row: any, idx: number) => {
-
+    const finalPayload = selectedRows.map((row: any) => {
       const itemZins = (row.ZINS_SCPOE && String(row.ZINS_SCPOE).trim() !== '')
         ? row.ZINS_SCPOE
         : commonFields.ZINS_SCPOE;
-
 
       const itemZkm = (row.ZKM !== null && row.ZKM !== undefined && row.ZKM !== '')
         ? row.ZKM
         : commonFields.ZKM;
 
-
-
-
       const itemZinco = (row.ZINCO && String(row.ZINCO).trim() !== '')
         ? row.ZINCO
         : commonFields.ZINCO;
 
-      const itemINV_VBELN = (row.INV_VBELN && String(row.INV_VBELN).trim() !== '')
-        ? row.INV_VBELN
-        : commonFields.INV_VBELN;
+      const itemVBELN = (row.VBELN && String(row.VBELN).trim() !== '')
+        ? row.VBELN
+        : commonFields.VBELN;
 
       return {
         ...row,
         ZINS_SCPOE: itemZins,
         ZKM: itemZkm,
         ZINCO: itemZinco,
-        INV_VBELN: itemINV_VBELN,
-
+        VBELN: itemVBELN,
         ZSETS: row.ZSETS ?? 0,
         ZAH: row.ZAH ?? 0,
         ZSHIP_WT: row.ZSHIP_WT ?? 0,
-
       };
     });
 
     console.log('📤 finalPayload (to send):', finalPayload);
 
-    this.spinner.show();
-    this.service.ShipmentOutwardSave(finalPayload).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        console.log('✅ SAP Save Response:', res);
+    // ✅ SEND PAYLOAD DIRECTLY AS ARRAY (not wrapped in object)
+    if (this.sapType === "SAP") {
+      this.spinner.show();
+      this.service.ShipmentOutwardSave(finalPayload).subscribe(  // ← Changed here
+        (res: any) => {
+          console.log("✅ SAP Save Response:", res);
 
-        if (res && res.NUMBER === '200') {
-          Swal.fire({
-            title: 'Success',
-            text: res.MSG || 'Saved successfully',
-            icon: 'success',
-            confirmButtonText: 'Ok',
-          }).then(() => {
-            if (action === 'next') {
-              this.router.navigate(['/invoice-load-details']);
-            } else if (action === 'previous') {
-              this.router.navigate(['/order-info']);
-            } else {
-              this.resetForm();
-            }
-          });
-        } else {
+          if (res.STATUS === 'true' || res.NUMBER === '200') {
+            Swal.fire({
+              title: 'Success',
+              text: res.MESSAGE || res.MSG || 'Data saved successfully',
+              icon: 'success',
+              confirmButtonText: 'Ok',
+            }).then(() => {
+              if (action === 'next') {
+                this.router.navigate(['/invoice-load-details']);
+              } else if (action === 'previous') {
+                this.router.navigate(['/order-info']);
+              } else {
+                this.resetForm();
+              }
+            });
+            this.spinner.hide();
+          } else {
+            Swal.fire({
+              title: 'Error',
+              text: res.MESSAGE || res.MSG || 'Failed to save data',
+              icon: 'error',
+              confirmButtonText: 'Ok',
+            });
+            this.spinner.hide();
+          }
+        },
+        error => {
+          console.error('❌ SAP Save Error:', error);
+          this.spinner.hide();
           Swal.fire({
             title: 'Error',
-            text: (res && res.MSG) || 'Failed to save data',
+            text: 'Internal Server Error. Please try again later.',
             icon: 'error',
-            confirmButtonText: 'Ok'
           });
         }
-      },
-      error: (err) => {
-        this.spinner.hide();
-        console.error('❌ Error saving shipment details:', err);
-        Swal.fire({
-          title: 'Error',
-          text: 'Failed to save shipment details.',
-          icon: 'error',
-          confirmButtonText: 'Ok'
-        });
-      }
-    });
+      );
+    } else {
+      this.spinner.show();
+      this.service.shipmentdetailsNonSapSave(finalPayload).subscribe(  // ← Changed here
+        (res: any) => {
+          console.log("✅ Non-SAP Save Response:", res);
+          this.spinner.hide();
+
+          if (res.STATUS === 'true' || res.NUMBER === '200') {
+            Swal.fire({
+              title: 'Success',
+              text: res.MESSAGE || res.MSG || 'Data saved successfully',
+              icon: 'success',
+              confirmButtonText: 'Ok',
+            }).then(() => {
+              if (action === 'next') {
+                this.router.navigate(['/invoice-load-details']);
+              } else if (action === 'previous') {
+                this.router.navigate(['/order-info']);
+              } else {
+                this.resetForm();
+              }
+            });
+          } else {
+            Swal.fire({
+              title: 'Error',
+              text: res.MESSAGE || res.MSG || 'Failed to save data',
+              icon: 'error',
+              confirmButtonText: 'Ok',
+            });
+            this.spinner.hide();
+          }
+        },
+        error => {
+          console.error('❌ Non-SAP Save Error:', error);
+          this.spinner.hide();
+          Swal.fire({
+            title: 'Error',
+            text: 'Internal Server Error. Please try again later.',
+            icon: 'error',
+          });
+        }
+      );
+    }
   }
-
-
 
 
 
