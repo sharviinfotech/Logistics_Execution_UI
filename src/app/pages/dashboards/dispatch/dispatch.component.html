@@ -1,7 +1,7 @@
 <div class="card-LE">
   <div class="card-header-LE">Dispatch</div>
 
-    <div class="card-body-LE">
+  <div class="card-body-LE">
 
     <!-- 🔹 Order Type (Inward / Outward) -->
     <div class="form-radio optional">
@@ -18,7 +18,7 @@
     <br />
 
     <!-- 🔹 SAP Type (With / Without SAP) -->
-      <!-- 🔹 SAP Type (With / Without SAP) & Search Bar -->
+    <!-- 🔹 SAP Type (With / Without SAP) & Search Bar -->
     <div *ngIf="orderType" class="sap-search-container">
       <div class="form-radio optional sap-radio">
         <label>
@@ -33,152 +33,149 @@
 
       <!-- 🔍 Search Bar -->
       <div class="search-bar-wrapper" *ngIf="sapType">
-        <input
-          type="text"
-          class="search-input"
-          placeholder="Search by Reference Number"
-          [(ngModel)]="searchReference"
-          name="searchReference"
-          (keyup.enter)="onSearchReference()"
-        />
-        <button type="button" class="search-btn" (click)="onSearchReference()">
-           <i class="fas fa-search"></i>
-        </button>
+        <div class="search-container">
+
+          <!-- 🔽 Select Search Type -->
+          <select class="search-type-select" [(ngModel)]="selectedType" (change)="onSearchTypeChange()">
+            <option value="" disabled>Select</option>
+            <option *ngFor="let opt of searchOptions" [value]="opt.key">
+              {{ opt.label }}
+            </option>
+          </select>
+
+          <!-- 🔍 Single Search Input -->
+          <input type="text" class="search-input" [placeholder]="searchPlaceholder" [(ngModel)]="searchValue"
+            [disabled]="!selectedType" (keyup.enter)="onSearchReference()" />
+
+          <!-- 🔎 Button -->
+          <button type="button" class="search-btn" [disabled]="!selectedType || !searchValue"
+            (click)="onSearchReference()">
+            <i class="fas fa-search"></i>
+          </button>
+
+        </div>
       </div>
+
     </div>
 
-<br />
+    <br />
 
 
     <div class="table-responsive">
       <form [formGroup]="dispatchForm" *ngIf="showForm">
-      <table class="table table-bordered table-striped text-center">
-        <thead>
-          <tr>
-            <th>SI.No</th>
-            <th>Vehicle Type</th>
-            <th>Workorder</th>
-            <th>No Of Trucks</th>
-            <th>Vendor Code</th>
-            <th>Transporter</th>
-            <th>No.of LRs</th>
-            <th>LR Number</th>
-            <th>Loading Points</th>
-            <th>UnLoading Points</th>
-            <th *ngIf="showActionColumn">Action</th>
-          </tr>
-        </thead>
+        <table class="table table-bordered table-striped text-center">
+          <thead>
+            <tr>
+              <th>SI.No</th>
+              <th>Vehicle Type</th>
+              <th>Workorder</th>
+              <th>No Of Trucks</th>
+              <th>Vendor Code</th>
+              <th>Transporter</th>
+              <th>No.of LRs</th>
+              <th>LR Number</th>
+              <th>Loading Points</th>
+              <th>UnLoading Points</th>
+              <th *ngIf="showActionColumn">Action</th>
+            </tr>
+          </thead>
 
-        <tbody formArrayName="rows">
-          <tr *ngFor="let row of rows.controls; let i = index" [formGroupName]="i">
+          <tbody formArrayName="rows">
+            <tr *ngFor="let row of rows.controls; let i = index" [formGroupName]="i">
 
-            <td>{{ i + 1 }}</td>
-            <!-- <td><input type="text" formControlName="VehicleType"></td> -->
-            <td>
-              <select formControlName="VehicleType">
-                <option value="" disabled>Select Vehicle Type</option>
-                <option value="Cargo">Cargo</option>
-                <option value="Rate Contract">Rate Contract</option>
-                <option value="Local Transportation">Local Transportation</option>
-                <option value="Customer Transporter">Customer Transporter</option>
-                <option value="Company Vehicle">Company Vehicle</option>
-                <option value="Courier">Courier</option>
-                <option value="By Hand">By Hand</option>
-                <option value="Full Truck Load">Full Truck Load</option>
+              <td>{{ i + 1 }}</td>
+              <!-- <td><input type="text" formControlName="VehicleType"></td> -->
+              <td>
+                <select formControlName="VehicleType">
+                  <option value="" disabled>Select Vehicle Type</option>
+                  <option value="Cargo">Cargo</option>
+                  <option value="Rate Contract">Rate Contract</option>
+                  <option value="Local Transportation">Local Transportation</option>
+                  <option value="Customer Transporter">Customer Transporter</option>
+                  <option value="Company Vehicle">Company Vehicle</option>
+                  <option value="Courier">Courier</option>
+                  <option value="By Hand">By Hand</option>
+                  <option value="Full Truck Load">Full Truck Load</option>
 
-              </select>
-            </td>
+                </select>
+              </td>
 
-            <!-- <td><input type="text" formControlName="workorder"></td> -->
-            <!-- <td *ngIf="row.get('VehicleType')?.value === 'Full Truck Load'">
+              <!-- <td><input type="text" formControlName="workorder"></td> -->
+              <!-- <td *ngIf="row.get('VehicleType')?.value === 'Full Truck Load'">
               <input type="text" formControlName="workorder" />
             </td> -->
-            <!-- <td *ngIf="row.get('VehicleType')?.value !== 'Full Truck Load'">
+              <!-- <td *ngIf="row.get('VehicleType')?.value !== 'Full Truck Load'">
    </td> -->
-            <td>
-              <input *ngIf="row.get('VehicleType')?.value === 'Full Truck Load'" type="text"
-                formControlName="workorder" />
+              <td>
+                <input *ngIf="row.get('VehicleType')?.value === 'Full Truck Load'" type="text"
+                  formControlName="workorder" />
 
-              <span *ngIf="row.get('VehicleType')?.value !== 'Full Truck Load'">
-              </span>
-            </td>
+                <span *ngIf="row.get('VehicleType')?.value !== 'Full Truck Load'">
+                </span>
+              </td>
 
 
-            <td ><input type="text" formControlName="NoOfTrucks"></td>
-          <td >
-              <div class="d-flex align-items-center">
-                <!-- Vendor Dropdown -->
-                <select 
-                      formControlName="VendorCode"
-                      (change)="onchangeVendorCode(i)">
-                      <option value="">Select Vendor</option>
-                      <option *ngFor="let vendor of VendorCodeList"
-                              [value]="vendor.VENDOR_CODE">
-                        {{ vendor.VENDOR_CODE }} 
-                      </option>
-              </select>
-              </div>
-            </td>
+              <td><input type="text" formControlName="NoOfTrucks"></td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <!-- Vendor Dropdown -->
+                  <select formControlName="VendorCode" (change)="onchangeVendorCode(i)">
+                    <option value="">Select Vendor</option>
+                    <option *ngFor="let vendor of VendorCodeList" [value]="vendor.VENDOR_CODE">
+                      {{ vendor.VENDOR_CODE }}
+                    </option>
+                  </select>
+                </div>
+              </td>
 
-            <td >
-              <div class="d-flex align-items-center">
-                <!-- Transporter Dropdown -->
-                 <select 
-                      formControlName="Transporter"
-                      (change)="onchangeTransporter(i)">
-                      <option value="">Select Transporter</option>
-                      <option *ngFor="let transporter of VendorCodeList"
-                        [value]="transporter.TRANSPORTER">
-                  {{ transporter.TRANSPORTER }}
-                      </option>
-                    </select>
-              </div>
+              <td>
+                <div class="d-flex align-items-center">
+                  <!-- Transporter Dropdown -->
+                  <select formControlName="Transporter" (change)="onchangeTransporter(i)">
+                    <option value="">Select Transporter</option>
+                    <option *ngFor="let transporter of VendorCodeList" [value]="transporter.TRANSPORTER">
+                      {{ transporter.TRANSPORTER }}
+                    </option>
+                  </select>
+                </div>
 
-            </td>
-            <td><input type="text" formControlName="NoOfLRs"></td>
-            <td><input type="text" formControlName="LRNumber"></td>
-            <td><input type="text" formControlName="LoadingPoints"></td>
-            <td><input type="text" formControlName="UnLoadingPoints"></td>
+              </td>
+              <td><input type="text" formControlName="NoOfLRs"></td>
+              <td><input type="text" formControlName="LRNumber"></td>
+              <td><input type="text" formControlName="LoadingPoints"></td>
+              <td><input type="text" formControlName="UnLoadingPoints"></td>
 
-            
-           <td class="action-btns" *ngIf="showActionColumn">
-            <!-- Show '+' on all rows -->
-            <button
-              type="button"
-              class="btn-add"
-              (click)="addRow()">
-              +
-            </button>
 
-            <!-- Show '✖' on all rows except first -->
-            <button
-              type="button"
-              class="btn-remove"
-              *ngIf="i !== 0"
-              (click)="removeRow(i)">
-              ✖
-            </button>
-          </td>
-       </tr>
-        </tbody>
-      </table>
-    </form>
+              <td class="action-btns" *ngIf="showActionColumn">
+                <!-- Show '+' on all rows -->
+                <button type="button" class="btn-add" (click)="addRow()">
+                  +
+                </button>
+
+                <!-- Show '✖' on all rows except first -->
+                <button type="button" class="btn-remove" *ngIf="i !== 0" (click)="removeRow(i)">
+                  ✖
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
     </div>
-    
-   <div class="text-right" *ngIf="showForm">
 
-  <!-- Save / Update -->
-  <button class="btn btn-md btn-raised btnSave"
-          (click)="isUpdateMode ? onUpdateDispatch() : save()">
-    {{ isUpdateMode ? 'Update' : 'Save' }}
-  </button>
+    <div class="text-right" *ngIf="showForm">
 
-  <!-- Save and Next / Update and Next -->
-  <button class="btn btn-md btn-raised btnSave move"
-          (click)="isUpdateMode ? onUpdateDispatch('next') : save('next')">
-    {{ isUpdateMode ? 'Update and Next' : 'Save and Next' }}
-  </button>
+      <!-- Save / Update -->
+      <button class="btn btn-md btn-raised btnSave" (click)="isUpdateMode ? onUpdateDispatch() : save()">
+        {{ isUpdateMode ? 'Update' : 'Save' }}
+      </button>
 
-</div>
+      <!-- Save and Next / Update and Next -->
+      <button class="btn btn-md btn-raised btnSave move"
+        (click)="isUpdateMode ? onUpdateDispatch('next') : save('next')">
+        {{ isUpdateMode ? 'Update and Next' : 'Save and Next' }}
+      </button>
+
+    </div>
 
   </div>

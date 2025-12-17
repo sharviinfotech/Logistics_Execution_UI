@@ -30,7 +30,21 @@ export class DispatchComponent implements OnInit {
   fetchedLineNumbers: number[] = [];
 
   VendorCodeList: any[] = [];
-  searchReference: string = ''; 
+  searchReference: string = '';
+  selectedType: string = '';
+  searchValue: string = '';
+  searchPlaceholder: string = 'Select search type';
+
+  searchOptions = [
+    { key: 'RNO', label: 'Reference Number' },
+    { key: 'LR_NO', label: 'LR Number' },
+    { key: 'TRANSPORTER', label: 'Transporter' },
+    { key: 'WORK_ORDER', label: 'Work Order' }
+  ];
+
+  lrNumber: string = '';
+  transporter: string = '';
+  workOrder: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -66,13 +80,14 @@ export class DispatchComponent implements OnInit {
     this.rows.controls.forEach((row, index) => {
       this.watchRowFields(row as FormGroup, index);
     });
-    const firstRow = this.rows.at(0);
+    const firstRow = this.rows.at(0) as FormGroup;
 
-    ['NoOfTrucks', 'NoOfLRs', 'LoadingPoints', 'UnLoadingPoints'].forEach(field => {
-      firstRow.get(field)?.valueChanges.subscribe(() => {
-        this.updateMaxRowsAllowed();
+    ['VehicleType', 'NoOfTrucks', 'NoOfLRs', 'LoadingPoints', 'UnLoadingPoints']
+      .forEach(field => {
+        firstRow.get(field)?.valueChanges.subscribe(() => {
+          this.applyFirstRowValuesToAll();
+        });
       });
-    });
 
     this.fetchVendorCodeList();
   }
@@ -125,13 +140,16 @@ export class DispatchComponent implements OnInit {
 
   handleVehicleTypeChange(val: string) {
     this.showActionColumn = (val === 'Full Truck Load');
+
     if (val !== 'Full Truck Load') {
       this.resetRowsForNonFTL(val);
-    } else {
-      this.applyVehicleTypeToAll(val);
     }
+
+    // 👇 ONLY this
+    this.applyFirstRowValuesToAll();
     this.cd.detectChanges();
   }
+
 
   checkActionColumnVisibility() {
     const firstType = this.rows.at(0).get('VehicleType')?.value;
@@ -164,14 +182,45 @@ export class DispatchComponent implements OnInit {
     return trucks > 1 || lrs > 1 || loadPts > 1 || unloadPts > 1;
   }
 
-  applyVehicleTypeToAll(type: string) {
+  applyFirstRowValuesToAll() {
+    const firstRow = this.rows.at(0) as FormGroup;
+
+    // ✅ Always use getRawValue (even if disabled later)
+    const fixedValues = {
+      VehicleType: firstRow.get('VehicleType')?.value,
+      NoOfTrucks: firstRow.get('NoOfTrucks')?.value,
+      NoOfLRs: firstRow.get('NoOfLRs')?.value,
+      LoadingPoints: firstRow.get('LoadingPoints')?.value,
+      UnLoadingPoints: firstRow.get('UnLoadingPoints')?.value
+    };
+
     this.rows.controls.forEach((row, index) => {
       if (index === 0) return;
-      row.get('VehicleType')?.setValue(type, { emitEvent: false });
-      row.get('VehicleType')?.disable();
+
+      // ✅ Step 1: ENABLE (important)
+      row.get('VehicleType')?.enable({ emitEvent: false });
+      row.get('NoOfTrucks')?.enable({ emitEvent: false });
+      row.get('NoOfLRs')?.enable({ emitEvent: false });
+      row.get('LoadingPoints')?.enable({ emitEvent: false });
+      row.get('UnLoadingPoints')?.enable({ emitEvent: false });
+
+      // ✅ Step 2: PATCH values
+      row.patchValue(fixedValues, { emitEvent: false });
+
+      // ✅ Step 3: DISABLE after patch
+      row.get('VehicleType')?.disable({ emitEvent: false });
+      row.get('NoOfTrucks')?.disable({ emitEvent: false });
+      row.get('NoOfLRs')?.disable({ emitEvent: false });
+      row.get('LoadingPoints')?.disable({ emitEvent: false });
+      row.get('UnLoadingPoints')?.disable({ emitEvent: false });
     });
+
+    // ✅ IMPORTANT
+    this.updateMaxRowsAllowed();
     this.cd.detectChanges();
   }
+
+
 
   resetRowsForNonFTL(type: string) {
     const firstRow = this.rows.at(0);
@@ -193,7 +242,6 @@ export class DispatchComponent implements OnInit {
     this.showActionColumn = false;
     this.cd.detectChanges();
   }
-
   addRow() {
     if (this.maxLimitReached) {
       Swal.fire({
@@ -205,20 +253,19 @@ export class DispatchComponent implements OnInit {
     }
 
     this.isAddingRow = true;
+
     const newRow = this.createRow(false);
     this.rows.push(newRow);
     this.watchRowFields(newRow, this.rows.length - 1);
 
-    const firstType = this.rows.at(0).get('VehicleType')?.value;
-    this.showActionColumn = (firstType === 'Full Truck Load');
-    if (firstType) {
-      this.applyVehicleTypeToAll(firstType);
-    }
-
     this.isAddingRow = false;
-    this.updateMaxRowsAllowed();
-    this.cd.detectChanges();
+
+    // ✅ MUST be after push
+    this.applyFirstRowValuesToAll();
   }
+
+
+
 
   updateMaxRowsAllowed() {
     const firstRow = this.rows.at(0);
@@ -246,56 +293,100 @@ export class DispatchComponent implements OnInit {
   }
 
   // ✅ FETCH REFERENCE NUMBER DATA
- onSearchReference() {
-    if (!this.searchReference?.trim()) {
-      Swal.fire('Please enter a Reference Number', '', 'warning');
+  onSearchTypeChange(): void {
+
+    // 🔁 Reset search input
+    this.searchValue = '';
+
+    // 🔁 Hide table & update mode
+    this.showForm = false;
+    this.isUpdateMode = false;
+
+    // 🔁 CLEAR FORM ARRAY (THIS IS KEY)
+    const rowsArray = this.dispatchForm.get('rows') as FormArray;
+    rowsArray.clear();
+    rowsArray.push(this.createRow(true));
+
+    // 🔁 Reset other states
+    this.showActionColumn = false;
+    this.maxLimitReached = false;
+    this.maxRowsAllowed = 0;
+
+    const selected = this.searchOptions.find(
+      opt => opt.key === this.selectedType
+    );
+
+    this.searchPlaceholder = selected
+      ? `Search by ${selected.label}`
+      : 'Select search type';
+
+    // 🔁 Force UI refresh
+    this.cd.detectChanges();
+
+    console.log('🔄 Search type changed, table reset');
+  }
+
+  onSearchReference() {
+
+    if (!this.selectedType || !this.searchValue) {
+      Swal.fire('Warning', 'Please select search type and enter value', 'warning');
       return;
     }
 
-    const payload = { RNO: this.searchReference };
+    // ✅ Backend requires all 4 keys
+    const payload: any = {
+      RNO: '',
+      LR_NO: '',
+      TRANSPORTER: '',
+      WORK_ORDER: ''
+    };
+
+    // ✅ Put value only in selected key
+    payload[this.selectedType] = this.searchValue;
+
+    console.log('🔍 Search Payload:', payload);
 
     this.spinner.show();
     let request$;
-    
+
     if (this.sapType === 'SAP') {
       request$ = this.service.fetchReferencenumber(payload);
     } else if (this.sapType === 'Non-SAP') {
       request$ = this.service.fetchReferencenumberWithoutSap(payload);
-    }
-    
-    
-    if (request$) { 
-        request$.subscribe({ // <-- This is the correction
-            next: (res: any) => {
-                this.spinner.hide();
-                console.log("✅ Reference Data:", res);
-
-                // Added safe access to res?.data for robustness
-                const records = Array.isArray(res) ? res : res?.data || []; 
-                if (records.length > 0) {
-                    this.populateDispatchForm(records);
-                    this.isUpdateMode = true;
-                    this.showForm = true;
-                    Swal.fire('Data fetched successfully!', '', 'success');
-                } else {
-                    Swal.fire('No record found for this Reference Number', '', 'info');
-                }
-            },
-            error: (err) => {
-                this.spinner.hide();
-                console.error('❌ Fetch error:', err);
-                Swal.fire('Error fetching Reference Number data', '', 'error');
-            }
-        });
     } else {
-        // Optional: Handle case where sapType is neither 'SAP' nor 'Non-SAP'
-        this.spinner.hide();
-        console.warn('⚠️ Invalid sapType:', this.sapType);
-        Swal.fire('Invalid SAP Type configuration', '', 'error');
+      this.spinner.hide();
+      Swal.fire('Invalid SAP Type configuration', '', 'error');
+      return;
     }
-}
 
-  
+    request$.subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        console.log('✅ Reference Data:', res);
+        this.showForm = false;
+
+        const records = Array.isArray(res) ? res : res?.data || [];
+
+        if (records.length > 0) {
+          this.populateDispatchForm(records);
+          this.isUpdateMode = true;
+          this.showForm = true;
+          Swal.fire('Data fetched successfully!', '', 'success');
+        } else {
+          Swal.fire('No record found for the search criteria', '', 'info');
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('❌ Fetch error:', err);
+        Swal.fire('Error fetching reference data', '', 'error');
+      }
+    });
+  }
+
+
+
+
 
   // ✅ POPULATE FORM WITH FETCHED DATA
   populateDispatchForm(records: any[]) {
@@ -366,26 +457,26 @@ export class DispatchComponent implements OnInit {
         this.spinner.hide();
         console.log("✅ Update response:", res);
 
-       if (res.STATUS === 'TRUE' || res.NUMBER === '200') {
-  Swal.fire({
-    title: 'Success',
-    text: res.MSG || 'Dispatch data updated successfully',
-    icon: 'success'
-  }).then(() => {
-    if (action === 'next') {
-      this.router.navigate(['/order-info']);
-    } else if (action === 'previous') {
-      this.router.navigate(['/dashboard']);
-    } else {
-      this.resetAll();
-      this.searchReference = '';
-      this.isUpdateMode = false;
-      this.showForm = false;
-    }
-  });
-} else {
-  Swal.fire('Failed', res.MSG || 'Something went wrong', 'error');
-}
+        if (res.STATUS === 'TRUE' || res.NUMBER === '200') {
+          Swal.fire({
+            title: 'Success',
+            text: res.MSG || 'Dispatch data updated successfully',
+            icon: 'success'
+          }).then(() => {
+            if (action === 'next') {
+              this.router.navigate(['/order-info']);
+            } else if (action === 'previous') {
+              this.router.navigate(['/dashboard']);
+            } else {
+              this.resetAll();
+              this.searchReference = '';
+              this.isUpdateMode = false;
+              this.showForm = false;
+            }
+          });
+        } else {
+          Swal.fire('Failed', res.MSG || 'Something went wrong', 'error');
+        }
 
       },
       error: (err) => {
