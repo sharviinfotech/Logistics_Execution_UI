@@ -64,6 +64,7 @@
                   <th>Work Order Number</th>
                   <th>LR Number</th>
                   <th>Transporter</th>
+                  <th>Action</th>
                 </tr>
               </thead>
 
@@ -101,6 +102,12 @@
                     <input type="text" formControlName="transporter" placeholder="Enter Transporter"
                       (blur)="onFieldBlur(i, 'TRANSPORTER')" (keydown.enter)="onFieldBlur(i, 'TRANSPORTER')"
                       (keydown.tab)="onFieldBlur(i, 'TRANSPORTER')" [readonly]="i !== 0" />
+                  </td>
+
+                  <td>
+                    <button type="button" class="btn-remove-LR" (click)="removeReferenceRow(i)" *ngIf="referenceItems.length > 1">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -175,7 +182,7 @@
               <th>SI.No</th>
               <th>Map ID</th>
               <th>Truck Type</th>
-              <th>Passing Weight</th>
+              <th>Passing Weight (Tons)</th>
               <th>Actual Load (Tons)</th>
               <th>Loading factor% (w.r.t weight)</th>
               <th>Actual Volume Occupied</th>
@@ -254,7 +261,7 @@
             <th>ODN No</th>
             <th>SO No</th>
             <th>Truck Type</th>
-            <th>Passing Weight</th>
+            <th>Passing Weight (Tons)</th>
             <th>Actual Load (Tons)</th>
             <th>Actual Volume</th>
             <th>Loading Factor (Volume)</th>

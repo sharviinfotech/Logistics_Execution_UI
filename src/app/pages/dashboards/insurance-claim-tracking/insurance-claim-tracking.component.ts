@@ -836,4 +836,20 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   isSap(): boolean {
     return this.sapType === 'SAP';
   }
+
+  removeReferenceRow(index: number): void {
+  const rowValue = (this.referenceItems.at(index) as FormGroup).value;
+
+  this.referenceItems.removeAt(index);
+
+  this.selectedItems = this.selectedItems.filter(
+    item =>
+      !(
+        item.referenceNumber === rowValue.referenceNumber &&
+        item.workOrderNumber === rowValue.workOrderNumber &&
+        item.lrNumber === rowValue.lrNumber &&
+        item.transporter === rowValue.transporter
+      )
+  );
+}
 }

@@ -77,6 +77,7 @@
                   <th>Work Order Number</th>
                   <th>LR Number</th>
                   <th>Transporter</th>
+                  <th>Action</th>
                 </tr>
               </thead>
 
@@ -111,6 +112,13 @@
                       (blur)="onFieldBlur(i, 'TRANSPORTER')" (keydown.enter)="onFieldBlur(i, 'TRANSPORTER')"
                       (keydown.tab)="onFieldBlur(i, 'TRANSPORTER')" [readonly]="i !== 0" />
                   </td>
+
+                  <td>
+                    <button type="button" class="btn-remove-LR" (click)="removeRow(i)" *ngIf="items.length > 1">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </td>
+
                 </tr>
               </tbody>
             </table>
@@ -260,7 +268,7 @@
 
       <!-- Transaction Type -->
       <div class="form-field">
-        <select formControlName="TransactionType">
+        <select formControlName="TransactionType" [searchable]="true" [clearable]="false">
           <option value="">Select Mode of Transport</option>
           <option value="FULLTRUCKLOAD">FULL TRUCK LOAD</option>
           <option value="CARGO">CARGO</option>
@@ -273,6 +281,25 @@
         </select>
         <label>Transaction Type</label>
       </div>
+
+      <!-- <div class="form-field">
+        
+        <ng-select formControlName="TransactionType" placeholder="Select Transaction Type" [searchable]="true"
+          [clearable]="false">
+
+          <ng-option value="FULLTRUCKLOAD">FULL TRUCK LOAD</ng-option>
+          <ng-option value="CARGO">CARGO</ng-option>
+          <ng-option value="RATECONTRACT">RATE CONTRACT</ng-option>
+          <ng-option value="LOCALTRANSPORTATION">LOCAL TRANSPORTATION</ng-option>
+          <ng-option value="CUSTOMERTRANSPORTER">CUSTOMER TRANSPORTER</ng-option>
+          <ng-option value="COMPANYVEHICLE">COMPANY VEHICLE</ng-option>
+          <ng-option value="COURIER">COURIER</ng-option>
+          <ng-option value="BYHAND">BY HAND</ng-option>
+
+        </ng-select>
+
+        <label>Transaction Type</label>
+      </div> -->
 
       <!-- Billing Transaction Type -->
       <div class="form-field">

@@ -334,6 +334,22 @@ export class VechileInfoComponent implements OnInit {
     }
   }
 
+   removeReferenceRow(index: number): void {
+  const rowValue = (this.referenceItems.at(index) as FormGroup).value;
+
+  this.referenceItems.removeAt(index);
+
+  this.selectedItems = this.selectedItems.filter(
+    item =>
+      !(
+        item.referenceNumber === rowValue.referenceNumber &&
+        item.workOrderNumber === rowValue.workOrderNumber &&
+        item.lrNumber === rowValue.lrNumber &&
+        item.transporter === rowValue.transporter
+      )
+  );
+}
+
   onCheckboxChange(event: Event, index: number): void {
     const checkbox = event.target as HTMLInputElement;
     const rowValue = (this.referenceItems.at(index) as FormGroup).value;

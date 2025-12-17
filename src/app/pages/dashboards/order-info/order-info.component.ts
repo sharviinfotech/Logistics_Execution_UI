@@ -895,6 +895,21 @@ export class OrderInfoComponent implements OnInit {
     );
   }
 
+  removeRow(index: number): void {
+    const rowValue = (this.items.at(index) as FormGroup).value;
+    this.items.removeAt(index);
+
+    this.selectedItems = this.selectedItems.filter( 
+      (item) =>
+        !(
+          item.referenceNumber === rowValue.referenceNumber &&
+          item.workOrderNumber === rowValue.workOrderNumber &&
+          item.lrNumber === rowValue.lrNumber &&
+          item.transporter === rowValue.transporter
+        )
+    );
+  }
+
   openSearchTypePopup() {
     this.ponumber = '';
     this.invoicenumber = '';

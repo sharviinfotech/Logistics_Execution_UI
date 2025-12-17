@@ -1507,6 +1507,20 @@ input[type="radio"] {
   background: #218838;
 }
 
+.btn-remove-LR {
+  background: transparent;
+  border: none;
+  color: #e53935;
+  cursor: pointer;
+}
+
+.btn-remove-LR:hover {
+  color: #b71c1c;
+}
+.btn-remove-LR i {
+  font-size: 18px;
+}
+
 
 
 

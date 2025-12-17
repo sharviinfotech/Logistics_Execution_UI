@@ -64,6 +64,7 @@
                   <th>Work Order Number</th>
                   <th>LR Number</th>
                   <th>Transporter</th>
+                  <th>Action</th>
                 </tr>
               </thead>
 
@@ -100,6 +101,12 @@
                     <input type="text" formControlName="transporter" placeholder="Enter Transporter"
                       (blur)="onFieldBlur(i, 'TRANSPORTER')" (keydown.enter)="onFieldBlur(i, 'TRANSPORTER')"
                       (keydown.tab)="onFieldBlur(i, 'TRANSPORTER')" [readonly]="i !== 0" />
+                  </td>
+
+                  <td>
+                    <button type="button" class="btn-remove-LR" (click)="removeReferenceRow(i)" *ngIf="referenceItems.length > 1">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
                   </td>
                 </tr>
               </tbody>
