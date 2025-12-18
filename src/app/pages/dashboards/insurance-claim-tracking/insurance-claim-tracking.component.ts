@@ -403,6 +403,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
     this.SavedDataShow = false;
     this.ShowHeaderForm = false;
+    
 
     if (!this.selectedType) {
       Swal.fire('Please select a search type', '', 'info');
@@ -447,15 +448,45 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         this.spinner.hide();
         console.log('✅ Search Response:', res);
 
-        if (res.NUMBER === '100' && res.STATUS === 'FALSE') {
+        if (res.NUMBER == '100' && res.STATUS == 'FALSE') {
           this.searchOptionsList = [];
           Swal.fire('', res.MESSAGE, 'warning');
-        } else if (!res.HEADER || res.HEADER.length === 0) {
-          this.searchOptionsList = [];
-          Swal.fire('No records found', '', 'info');
         } else {
-          this.searchOptionsList = res.HEADER;
+          this.searchOptionsList = res.ITEMS;
           this.showForm = false;
+          this.SavedDataShow = true;
+          this.ShowHeaderForm = true;
+          this.showTable = false;
+          
+          const header = res.HEADER?.[0];
+          console.log('HEADER PATCH', header);
+          
+          this.HeaderForm.patchValue({
+            INV_NO: header.ZINV_NO,
+            FI: header.ZFI,
+            REP_DATE: header.ZREP_DATE,
+            CLAIM_REF: header.ZCLAIM_REF,
+            INV_DATE: header.ZINV_DATE,
+            INV_BV: header.ZINV_BV,
+            LOSS_DCL: header.ZLOSS_DCL,
+            CLM_RF: header.ZCLM_RF,
+            SOL_VAL: header.ZSOL_VAL,
+            CUSTOMER: header.ZCUSTOMER,
+            SO_NO: header.ZSO_NO,
+            LOCATION: header.ZLOCATION,
+            DAMAGE_RMK: header.ZDAMAGE_RMK,
+            CLM_INF: header.ZCLM_INF,
+            CLM_ST: header.ZCLM_ST,
+            CLM_DOC_ST: header.ZCLM_DOC_ST,
+            COURIER_DET: header.ZCOURIER_DET,
+            PAY_ST: header.ZPAY_ST,
+            PAY_INFO: header.ZPAY_INFO,
+            UTR: header.ZUTR,
+            CLM_SET_DT: header.ZCLM_SET_DT,
+            SALE_PERSON: header.ZSALE_PERSON,
+            REFNO: header.ZREFNO
+          });
+
           Swal.fire('Data fetched successfully!', '', 'success');
         }
       },
