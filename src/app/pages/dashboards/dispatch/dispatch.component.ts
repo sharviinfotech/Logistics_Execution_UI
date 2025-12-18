@@ -30,6 +30,7 @@ export class DispatchComponent implements OnInit {
   fetchedLineNumbers: number[] = [];
 
   VendorCodeList: any[] = [];
+ PlantCodeList: any[] = [];
   searchReference: string = '';
   selectedType: string = '';
   searchValue: string = '';
@@ -90,6 +91,7 @@ export class DispatchComponent implements OnInit {
       });
 
     this.fetchVendorCodeList();
+     this.fetchPlantCodeList(); 
   }
 
   createRow(isFirstRow: boolean = false): FormGroup {
@@ -100,6 +102,8 @@ export class DispatchComponent implements OnInit {
       NoOfTrucks: ['', Validators.required],
       VendorCode: [''],
       Transporter: ['', Validators.required],
+      Plant: ['', Validators.required],
+      Division: ['', Validators.required],
       NoOfLRs: ['', Validators.required],
       LRNumber: ['', Validators.required],
       LoadingPoints: ['', Validators.required],
@@ -113,6 +117,8 @@ export class DispatchComponent implements OnInit {
           NoOfTrucks: '',
           VendorCode: '',
           Transporter: '',
+          Plant: '',
+          Division: '',
           NoOfLRs: '',
           LoadingPoints: '',
           LRNumber: '',
@@ -229,6 +235,8 @@ export class DispatchComponent implements OnInit {
       NoOfTrucks: '',
       VendorCode: '',
       Transporter: '',
+      Plant: '',
+      Division: '',
       NoOfLRs: '',
       LRNumber: '',
       LoadingPoints: '',
@@ -401,6 +409,8 @@ export class DispatchComponent implements OnInit {
         NoOfTrucks: [item.NO_TRUCKS || '', Validators.required],
         VendorCode: [item.VENDOR_CD || ''],
         Transporter: [item.TRANSPORTER || '', Validators.required],
+        Plant: [item.WERKS || ''],
+        Division: [item.DIVISION || '', Validators.required],
         NoOfLRs: [item.NO_LRS || '', Validators.required],
         LRNumber: [item.LR_NO || '', Validators.required],
         LoadingPoints: [item.LOAD_PT || '', Validators.required],
@@ -442,6 +452,8 @@ export class DispatchComponent implements OnInit {
       NO_TRUCKS: Number(row.NoOfTrucks),
       WORK_ORDER: row.workorder || '',
       VENDOR_CD: Number(row.VendorCode) || 0,
+      WERKS:  Number(row.Plant) || 0,
+      DIVISION: row.Division || '',
       TRANSPORTER: row.Transporter || '',
       NO_LRS: Number(row.NoOfLRs) || 0,
       LR_NO: row.LRNumber || '',
@@ -568,6 +580,52 @@ export class DispatchComponent implements OnInit {
     }
   }
 
+ fetchPlantCodeList(): void {
+  this.spinner.show();
+  this.service.fetchVendorCode().subscribe(
+    (res: any) => {
+      if (res && res[0]?.PLANT) {
+        console.log("✅ Plant Data:", res[0].PLANT);
+        this.PlantCodeList = res[0].PLANT;
+        this.spinner.hide();
+      } else {
+        Swal.fire("No Plant Found", "", "warning");
+      }
+    },
+    error => {
+      this.spinner.hide();
+    }
+  );
+}
+
+
+ onchangePlantCode(index: number) {
+  const rowsArray = this.dispatchForm.get('rows') as FormArray;
+  const currentRow = rowsArray.at(index);
+
+  // ✅ FIXED HERE
+  const selectedPlant = currentRow.get('Plant')?.value;
+
+  const plantObj = this.PlantCodeList.find(
+    item => item.PLANT === selectedPlant
+  );
+
+  if (plantObj) {
+    console.log("Selected Plant Object:", plantObj);
+    currentRow.patchValue({
+      Division: plantObj.DIVISION
+    });
+  } else {
+    currentRow.patchValue({
+      Division: ''
+    });
+  }
+}
+
+
+
+
+
   // ✅ SAVE NEW DISPATCH DATA
   save(action: 'stay' | 'next' | 'previous' = 'stay') {
     if (!this.sapType) {
@@ -596,6 +654,8 @@ export class DispatchComponent implements OnInit {
         work_order: row.get('workorder')?.value,
         VENDOR_CD: row.get('VendorCode')?.value,
         transporter: row.get('Transporter')?.value,
+        WERKS: row.get('Plant')?.value,
+        DIVISION: row.get('Division')?.value,
         NO_LRS: row.get('NoOfLRs')?.value,
         lr_no: row.get('LRNumber')?.value,
         load_pt: row.get('LoadingPoints')?.value,

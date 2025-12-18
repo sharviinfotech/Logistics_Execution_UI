@@ -334,21 +334,21 @@ export class VechileInfoComponent implements OnInit {
     }
   }
 
-   removeReferenceRow(index: number): void {
-  const rowValue = (this.referenceItems.at(index) as FormGroup).value;
+  removeReferenceRow(index: number): void {
+    const rowValue = (this.referenceItems.at(index) as FormGroup).value;
 
-  this.referenceItems.removeAt(index);
+    this.referenceItems.removeAt(index);
 
-  this.selectedItems = this.selectedItems.filter(
-    item =>
-      !(
-        item.referenceNumber === rowValue.referenceNumber &&
-        item.workOrderNumber === rowValue.workOrderNumber &&
-        item.lrNumber === rowValue.lrNumber &&
-        item.transporter === rowValue.transporter
-      )
-  );
-}
+    this.selectedItems = this.selectedItems.filter(
+      item =>
+        !(
+          item.referenceNumber === rowValue.referenceNumber &&
+          item.workOrderNumber === rowValue.workOrderNumber &&
+          item.lrNumber === rowValue.lrNumber &&
+          item.transporter === rowValue.transporter
+        )
+    );
+  }
 
   onCheckboxChange(event: Event, index: number): void {
     const checkbox = event.target as HTMLInputElement;
@@ -515,11 +515,14 @@ export class VechileInfoComponent implements OnInit {
       return;
     }
 
-    // 🔥 GET SELECTED MAPID (if user selected from reference popup)
+    
     const selectedMapId = this.selectedItems?.[0]?.MAPID || "";
+    const selectedRefNo = this.selectedItems?.[0]?.referenceNumber || '';
 
-    // 🔥 FINAL PAYLOAD (supports invoice-only or invoice + mapid)
-    const reqBody: any = { INV_GET: referenceNumber.trim() };
+    const reqBody: any = {
+      INV_GET: referenceNumber.trim(),
+        refno: selectedRefNo               
+    };
 
     if (selectedMapId) {
       reqBody.MAPID = selectedMapId;

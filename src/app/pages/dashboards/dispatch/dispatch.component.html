@@ -34,25 +34,27 @@
       <!-- 🔍 Search Bar -->
       <div class="search-bar-wrapper" *ngIf="sapType">
         <div class="search-container">
+          <div class="search-box">
 
-          <!-- 🔽 Select Search Type -->
-          <select class="search-type-select" [(ngModel)]="selectedType" (change)="onSearchTypeChange()">
-            <option value="" disabled>Select</option>
-            <option *ngFor="let opt of searchOptions" [value]="opt.key">
-              {{ opt.label }}
-            </option>
-          </select>
+            <!-- 🔽 Select Search Type -->
+            <select class="search-type-select" [(ngModel)]="selectedType" (change)="onSearchTypeChange()">
+              <option value="" disabled>Select</option>
+              <option *ngFor="let opt of searchOptions" [value]="opt.key">
+                {{ opt.label }}
+              </option>
+            </select>
 
-          <!-- 🔍 Single Search Input -->
-          <input type="text" class="search-input" [placeholder]="searchPlaceholder" [(ngModel)]="searchValue"
-            [disabled]="!selectedType" (keyup.enter)="onSearchReference()" />
+            <!-- 🔍 Single Search Input -->
+            <input type="text" class="search-input" [placeholder]="searchPlaceholder" [(ngModel)]="searchValue"
+              [disabled]="!selectedType" (keyup.enter)="onSearchReference()" />
 
-          <!-- 🔎 Button -->
-          <button type="button" class="search-btn" [disabled]="!selectedType || !searchValue"
-            (click)="onSearchReference()">
-            <i class="fas fa-search"></i>
-          </button>
+            <!-- 🔎 Button -->
+            <button type="button" class="search-btn" [disabled]="!selectedType || !searchValue"
+              (click)="onSearchReference()">
+              <i class="fas fa-search"></i>
+            </button>
 
+          </div>
         </div>
       </div>
 
@@ -72,6 +74,8 @@
               <th>No Of Trucks</th>
               <th>Vendor Code</th>
               <th>Transporter</th>
+              <th>Plant</th>
+              <th>Divison</th>
               <th>No.of LRs</th>
               <th>LR Number</th>
               <th>Loading Points</th>
@@ -105,7 +109,7 @@
               <input type="text" formControlName="workorder" />
             </td> -->
               <!-- <td *ngIf="row.get('VehicleType')?.value !== 'Full Truck Load'">
-   </td> -->
+    </td> -->
               <td>
                 <input *ngIf="row.get('VehicleType')?.value === 'Full Truck Load'" type="text"
                   formControlName="workorder" />
@@ -140,6 +144,17 @@
                 </div>
 
               </td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <select formControlName="Plant" (change)="onchangePlantCode(i)">
+                    <option value="">Select Plant</option>
+                    <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT">
+                      {{ plant.PLANT }}
+                    </option>
+                  </select>
+                </div>
+              </td>
+              <td><input type="text" formControlName="Division"></td>
               <td><input type="text" formControlName="NoOfLRs"></td>
               <td><input type="text" formControlName="LRNumber"></td>
               <td><input type="text" formControlName="LoadingPoints"></td>
