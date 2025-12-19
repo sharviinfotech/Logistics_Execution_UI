@@ -1,6 +1,4 @@
 
-
-
 .action-btns {
   display: flex;
   align-items: center;
@@ -48,6 +46,143 @@ select:disabled {
 .sap-radio {
   flex-shrink: 0;
 }
+
+.filter-section {
+  margin-top: 20px;
+}
+
+.filter-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #721c24;
+  margin-bottom: 20px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-apply-filter {
+  background: #721c24;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-download-excel {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-download-pdf {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+}
+
+.empty-state i {
+  font-size: 48px;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 16px;
+  margin: 0;
+}
+
+
+/* Wrapper */
+.Creation-radio {
+  display: flex;
+  gap: 20px;
+ 
+}
+
+/* Label = Card */
+.Creation-radio label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Radio visible */
+.Creation-radio input[type="radio"] {
+  accent-color: #a61c3c; /* radio color */
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Text */
+.Creation-radio label span {
+  font-size: 15px;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Hover */
+.Creation-radio label:hover {
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+/* Selected Card */
+.Creation-radio label:has(input[type="radio"]:checked) {
+  border: 2px solid #a61c3c;
+  background: #fff5f7;
+}
+
+/* Selected Text */
+.Creation-radio input[type="radio"]:checked + span {
+  color: #a61c3c;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .Creation-radio {
+    flex-direction: column;
+  }
+}
+
+
 
 
 
