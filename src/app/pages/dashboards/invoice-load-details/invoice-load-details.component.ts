@@ -59,6 +59,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.InvoiceForm = this.fb.group({
+      INV_VBELN: [''],
       invoices: this.fb.array([]),
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
@@ -87,7 +88,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       ZACT_VOL: [data?.ZACT_VOL || '', Validators.required],
       ZLF_VOL: [data?.ZLF_VOL || '', Validators.required],
       ZLF_WT: [data?.ZLF_WT || '', Validators.required],
-      ZWEEK_SF: [data?.ZWEEK_SF || '', Validators.required],
+      ZWEEK_SF: [data?.ZWEEK_SF || ''],
       ZEWAYBILL_NO: [data?.ZEWAYBILL_NO || '', Validators.required],
       ZEWAYBILL_DT: [data?.ZEWAYBILL_DT || '', Validators.required],
       // ✅ Add these reference fields like shipment-details
@@ -395,21 +396,21 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     this.fetchInvoiceDetails();
   }
 
-   removeReferenceRow(index: number): void {
-  const rowValue = (this.referenceItems.at(index) as FormGroup).value;
+  removeReferenceRow(index: number): void {
+    const rowValue = (this.referenceItems.at(index) as FormGroup).value;
 
-  this.referenceItems.removeAt(index);
+    this.referenceItems.removeAt(index);
 
-  this.selectedItems = this.selectedItems.filter(
-    item =>
-      !(
-        item.referenceNumber === rowValue.referenceNumber &&
-        item.workOrderNumber === rowValue.workOrderNumber &&
-        item.lrNumber === rowValue.lrNumber &&
-        item.transporter === rowValue.transporter
-      )
-  );
-}
+    this.selectedItems = this.selectedItems.filter(
+      item =>
+        !(
+          item.referenceNumber === rowValue.referenceNumber &&
+          item.workOrderNumber === rowValue.workOrderNumber &&
+          item.lrNumber === rowValue.lrNumber &&
+          item.transporter === rowValue.transporter
+        )
+    );
+  }
 
   // ✅ SAVE FOR SAP
   saveInvoiceDetails(action: 'stay' | 'next' | 'previous' = 'stay'): void {
@@ -499,6 +500,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
   // 8. ✅ Update saveInvoiceNonsapDetails similarly
   saveInvoiceNonsapDetails(action: 'stay' | 'next' | 'previous' = 'stay'): void {
+
     const filtered = this.invoices.value
       .filter((row: any) => row.selected === true)
       .map(({ selected, ...rest }) => rest);
@@ -513,10 +515,19 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       });
       return;
     }
+
+    const dcRefNo = this.InvoiceForm.get('INV_VBELN')?.value;
+    if (!dcRefNo || dcRefNo.trim() === '') {
+      Swal.fire('Warning', 'Please enter DC Reference Number', 'warning');
+      return;
+    }
+
     if (this.InvoiceForm.invalid) {
       Swal.fire('Error', 'Please fill all required fields', 'error');
       return;
     }
+
+
 
     if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
       Swal.fire({
@@ -527,14 +538,14 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     }
 
     const payload = {
-      NSAP_LOAD: filtered.map((inv: any) => ({
+      NSAP_LOAD: filtered.map((inv: any, index: number) => ({
         MANDT: '',
-        REF_NO: inv.ZREFNO || "",
-        WORK_ORDER_NO: inv.ZWORK_ORDER || "",
-        LR_NO: inv.ZLRNO || "",
-        TRANSPORTER: inv.ZTRANSPORTER || "",
-        VBELN: this.invoicenumber || '0000000000',
-        POSNR: 10,
+        ZREFNO: inv.ZREFNO || "",
+        ZWORK_ORDER: inv.ZWORK_ORDER || "",
+        ZLRNO: inv.ZLRNO || "",
+        ZTRANSPORTER: inv.ZTRANSPORTER || "",
+        VBELN: dcRefNo,
+        POSNR: index + 10,
         ZTRUC_TYPE: inv.ZTRUC_TYPE,
         ZTRUC_WT: inv.ZTRUC_WT,
         ZACT_LOAD: inv.ZACT_LOAD,
@@ -544,7 +555,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
         ZWEEK_SF: inv.ZWEEK_SF,
         ZEWAYBILL_NO: inv.ZEWAYBILL_NO,
         ZEWAYBILL_DT: inv.ZEWAYBILL_DT,
-        MAPID: inv.ZMAPID || "",
+        ZMAPID: inv.ZMAPID || "",
       })),
     };
 
@@ -606,7 +617,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   }
 
   onTruckTypeChange(i: number): void {
-    if (this.sapType === 'Non-SAP') return;
+
 
     const row = this.invoices.at(i);
     const selectedTruck = row.get('ZTRUC_TYPE')?.value;

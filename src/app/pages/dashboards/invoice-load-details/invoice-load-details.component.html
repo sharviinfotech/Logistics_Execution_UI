@@ -30,7 +30,7 @@
           <span>Without SAP</span>
         </label>
       </div>
-      <br/>
+      <br />
     </div>
 
     <!-- Input Section -->
@@ -39,14 +39,18 @@
       <!-- INWARD -->
       <div *ngIf="orderType === 'Inward'" class="input-flex">
         <div class="form-field flex-1">
-          <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" " (input)="onInputChange('purchase')" />
+          <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" "
+            (input)="onInputChange('purchase')" />
           <label>PO Number</label>
         </div>
 
-        <button type="button" class="btn-get" (click)="getForm('purchase')" [disabled]="!ponumber || ponumber.trim()==''">
+        <button type="button" class="btn-get" (click)="getForm('purchase')"
+          [disabled]="!ponumber || ponumber.trim()==''">
           GET
         </button>
       </div>
+
+
 
       <!-- OUTWARD -->
       <div *ngIf="orderType === 'Outward'">
@@ -76,8 +80,7 @@
 
                   <td>{{ i + 1 }}</td>
                   <td>
-                    <input type="text" formControlName="MAPID" placeholder="Enter Map ID"
-                      readonly>
+                    <input type="text" formControlName="MAPID" placeholder="Enter Map ID" readonly>
                   </td>
 
                   <td>
@@ -105,7 +108,8 @@
                   </td>
 
                   <td>
-                    <button type="button" class="btn-remove-LR" (click)="removeReferenceRow(i)" *ngIf="referenceItems.length > 1">
+                    <button type="button" class="btn-remove-LR" (click)="removeReferenceRow(i)"
+                      *ngIf="referenceItems.length > 1">
                       <i class="fas fa-trash-alt"></i>
                     </button>
                   </td>
@@ -132,7 +136,8 @@
           <div class="search-bar-wrapper-global">
             <div class="search-container">
               <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType" (change)="onSearchTypeChange()">
+                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType"
+                  (change)="onSearchTypeChange()">
                   <option value="" disabled selected>Select</option>
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
@@ -172,6 +177,18 @@
       </div>
     </div>
 
+    <form [formGroup]="InvoiceForm">
+      <div class="form-grid">
+
+        <div class="form-field" *ngIf="sapType === 'Non-SAP'">
+          <input type="text" formControlName="INV_VBELN" placeholder=" " />
+          <label>DC Reference Number</label>
+        </div>
+
+      </div>
+    </form>
+
+
     <!-- Invoice Load Table -->
     <div *ngIf="showTable" class="table-responsive mt-3">
       <form [formGroup]="InvoiceForm">
@@ -200,17 +217,17 @@
               <td>{{ i + 1 }}</td>
 
               <td>
-                  <select formControlName="ZMAPID" (change)="onchangeMAPID(i)">
-                    <option value="">Select</option>
-                    <option *ngFor="let option of selectedItems" [value]="option.MAPID">
-                      {{ option.MAPID }}
-                    </option>
-                  </select>
-                </td>
+                <select formControlName="ZMAPID" (change)="onchangeMAPID(i)">
+                  <option value="">Select</option>
+                  <option *ngFor="let option of selectedItems" [value]="option.MAPID">
+                    {{ option.MAPID }}
+                  </option>
+                </select>
+              </td>
 
 
               <td>
-                <select formControlName="ZTRUC_TYPE" >
+                <select formControlName="ZTRUC_TYPE">
                   <option value="">-- Select Vehicle Type --</option>
                   <option *ngFor="let v of vehicleTypes" [value]="v.ZTRUC_TYPE">
                     {{ v.ZTRUC_TYPE }}
@@ -220,8 +237,8 @@
 
               <td><input type="text" formControlName="ZTRUC_WT" /></td>
               <td><input type="number" formControlName="ZACT_LOAD" /></td>
-              <td><input type="text" formControlName= "ZLF_WT"/></td>
-              <td><input type="text" formControlName="ZACT_VOL" (change)="onTruckTypeChange(i)"/></td>
+              <td><input type="text" formControlName="ZLF_WT" /></td>
+              <td><input type="text" formControlName="ZACT_VOL" (change)="onTruckTypeChange(i)" /></td>
               <td><input type="text" formControlName="ZLF_VOL" /></td>
               <td><input type="text" formControlName="ZWEEK_SF" /></td>
               <td><input type="text" formControlName="ZEWAYBILL_NO" /></td>
@@ -276,23 +293,23 @@
         </thead>
         <tbody>
           <tr *ngFor="let item of searchOptionsList">
-           <td>{{ item.ZMAPID }}</td>
-            <td>{{ item.ZREFNO  }}</td>
-            <td>{{ item.VBELN  }}</td>
+            <td>{{ item.ZMAPID }}</td>
+            <td>{{ item.ZREFNO }}</td>
+            <td>{{ item.VBELN }}</td>
             <td>{{ item.ZODN_NO }}</td>
             <td>{{ item.ZSO_NO }}</td>
-            <td>{{ item.ZTRUC_TYPE  }}</td>
+            <td>{{ item.ZTRUC_TYPE }}</td>
             <td>{{ item.ZTRUC_WT }}</td>
-            <td>{{ item.ZACT_LOAD  }}</td>
+            <td>{{ item.ZACT_LOAD }}</td>
             <td>{{ item.ZACT_VOL }}</td>
-            <td>{{ item.ZLF_VOL  }}</td>
-            <td>{{ item.ZLF_WT  }}</td>
+            <td>{{ item.ZLF_VOL }}</td>
+            <td>{{ item.ZLF_WT }}</td>
             <td>{{ item.ZWEEK_SF }}</td>
-            <td>{{ item.ZEWAYBILL_NO  }}</td>
-            <td>{{ item.ZEWAYBILL_DT  | date: 'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZWORK_ORDER  }}</td>
+            <td>{{ item.ZEWAYBILL_NO }}</td>
+            <td>{{ item.ZEWAYBILL_DT | date: 'dd-MM-yyyy' }}</td>
+            <td>{{ item.ZWORK_ORDER }}</td>
             <td>{{ item.ZLRNO }}</td>
-            <td>{{ item.ZTRANSPORTER  }}</td>
+            <td>{{ item.ZTRANSPORTER }}</td>
           </tr>
         </tbody>
       </table>

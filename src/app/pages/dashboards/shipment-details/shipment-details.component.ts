@@ -439,23 +439,23 @@ export class ShipmentDetailsComponent implements OnInit {
   }
 
   removeReferenceRow(index: number): void {
-  const rowValue = (this.referenceItems.at(index) as FormGroup).value;
+    const rowValue = (this.referenceItems.at(index) as FormGroup).value;
 
-  this.referenceItems.removeAt(index);
+    this.referenceItems.removeAt(index);
 
-  this.selectedItems = this.selectedItems.filter(
-    item =>
-      !(
-        item.referenceNumber === rowValue.referenceNumber &&
-        item.workOrderNumber === rowValue.workOrderNumber &&
-        item.lrNumber === rowValue.lrNumber &&
-        item.transporter === rowValue.transporter
-      )
-  );
-}
+    this.selectedItems = this.selectedItems.filter(
+      item =>
+        !(
+          item.referenceNumber === rowValue.referenceNumber &&
+          item.workOrderNumber === rowValue.workOrderNumber &&
+          item.lrNumber === rowValue.lrNumber &&
+          item.transporter === rowValue.transporter
+        )
+    );
+  }
 
 
-  
+
 
   // Product checkbox methods
   allSelected(): boolean {

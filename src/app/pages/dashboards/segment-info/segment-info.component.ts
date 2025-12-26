@@ -221,7 +221,9 @@ export class SegmentInfoComponent implements OnInit {
       INV_VBELN: data.INV_NUM || '',
       SALE_PERSON: data.SALE_PERSON || '',
       SEGMENT: data.SEGMENT || '',
-      APPTYP: data.APPTYP || '',
+      APPTYP: this.appTypeList.find(
+        a => a.APPTYP === data.APPTYP
+      ) || '',
       CUST_PROF: data.CUST_PROFILE || '',
       BRANCH: data.BRANCH || '',
       BRANCH_ZONE: data.BRANCH_ZONE || '',
@@ -506,6 +508,7 @@ export class SegmentInfoComponent implements OnInit {
 
     const formValue = this.segmentInfo.value;
 
+
     // BUILD MULTIPLE RECORDS
     let saveArray: any[] = [];
 
@@ -523,6 +526,7 @@ export class SegmentInfoComponent implements OnInit {
           SALE_PERSON: formValue.SALE_PERSON || '',
           SEGMENT: formValue.SEGMENT || '',
           APPTYP: formValue.APPTYP || '',
+
           CUST_PROFILE: formValue.CUST_PROF || '',
           BRANCH: formValue.BRANCH || '',
           BRANCH_ZONE: formValue.BRANCH_ZONE || '',
@@ -655,7 +659,10 @@ export class SegmentInfoComponent implements OnInit {
     }
   }
 
-  saveSegmentInfoWithoutSAP(action: 'stay' | 'next' | 'previous' = 'stay'): void {
+  saveSegmentInfoWithoutSAP(
+    action: 'stay' | 'next' | 'previous' = 'stay'
+  ): void {
+
     this.segmentInfo.markAllAsTouched();
 
     if (this.segmentInfo.invalid) {
@@ -677,28 +684,35 @@ export class SegmentInfoComponent implements OnInit {
     }
 
     const formValue = this.segmentInfo.value;
+
     const payload = {
-      CREATE: [
-        {
-          SALE_PERSON: formValue.SALE_PERSON,
-          SEGMENT: formValue.SEGMENT,
-          APPTYP: formValue.APPTYP,
-          CUST_PROF: formValue.CUST_PROF,
-          BRANCH: formValue.BRANCH,
-          BRANCH_ZONE: formValue.BRANCH_ZONE,
-          TAT_TYPE: formValue.TAT_Type,
-          TAT_DAYS: formValue.TAT_DAYS,
-          ETA_DATE: formValue.ETA_DATE,
-          ...(this.orderType === 'Outward' && this.selectedItems.length > 0 ? this.selectedItems[0] : {})
-        },
-      ],
+      CREATE: this.selectedItems.map((item: any, index: number) => ({
+        REFNO: item.referenceNumber || 0,
+        LINE_NO: index + 1,
+        WORK_ORDER: item.workOrderNumber || '',
+        LRNO: item.lrNumber || '',
+        TRANSPORTER: item.transporter || '',
+        SONO: item.SONO || '',
+        ODN_NO: item.ODN_NO || '',
+        INV_NUM: formValue.INV_VBELN || this.invoicenumber || '',
+        SALES_EMP: formValue.SALE_PERSON || '',
+        SEGMENT: formValue.SEGMENT || '',
+        APPTYP: formValue.APPTYP || '',
+        CUST_PROF: formValue.CUST_PROF || '',
+        BRANCH: formValue.BRANCH || '',
+        BRANCH_ZONE: formValue.BRANCH_ZONE || '',
+        TAT_TYPE: formValue.TAT_Type || '',
+        TAT: formValue.TAT_DAYS || '',
+        ETA: formValue.ETA_DATE || ''
+      }))
     };
 
     this.spinner.show();
     this.service.SegmentInfoNonSap(payload).subscribe({
       next: (res: any) => {
         this.spinner.hide();
-        if (res.STATUS == 'true' || res.NUMBER == '200') {
+
+        if (res.STATUS === 'true' || res.NUMBER === '200') {
           Swal.fire({
             title: 'Success',
             text: res.MESSAGE,
@@ -716,9 +730,8 @@ export class SegmentInfoComponent implements OnInit {
           });
         } else {
           Swal.fire({
-            title: '',
-            text: res.MESSAGE,
             icon: 'warning',
+            text: res.MESSAGE,
             confirmButtonText: 'Ok',
           });
         }
@@ -726,9 +739,10 @@ export class SegmentInfoComponent implements OnInit {
       error: () => {
         this.spinner.hide();
         Swal.fire('Error saving Non-SAP data', '', 'error');
-      },
+      }
     });
   }
+
 
   fetchzonechange() {
     console.log('SAP Type:', this.sapType);
@@ -776,19 +790,19 @@ export class SegmentInfoComponent implements OnInit {
     return this.sapType === 'SAP';
   }
 
-   removeReferenceRow(index: number): void {
-  const rowValue = (this.referenceItems.at(index) as FormGroup).value;
+  removeReferenceRow(index: number): void {
+    const rowValue = (this.referenceItems.at(index) as FormGroup).value;
 
-  this.referenceItems.removeAt(index);
+    this.referenceItems.removeAt(index);
 
-  this.selectedItems = this.selectedItems.filter(
-    item =>
-      !(
-        item.referenceNumber === rowValue.referenceNumber &&
-        item.workOrderNumber === rowValue.workOrderNumber &&
-        item.lrNumber === rowValue.lrNumber &&
-        item.transporter === rowValue.transporter
-      )
-  );
-}
+    this.selectedItems = this.selectedItems.filter(
+      item =>
+        !(
+          item.referenceNumber === rowValue.referenceNumber &&
+          item.workOrderNumber === rowValue.workOrderNumber &&
+          item.lrNumber === rowValue.lrNumber &&
+          item.transporter === rowValue.transporter
+        )
+    );
+  }
 }

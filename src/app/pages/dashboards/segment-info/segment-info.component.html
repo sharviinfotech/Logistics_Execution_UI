@@ -99,7 +99,8 @@
                   </td>
 
                   <td>
-                    <button type="button" class="btn-remove-LR" (click)="removeReferenceRow(i)" *ngIf="referenceItems.length > 1">
+                    <button type="button" class="btn-remove-LR" (click)="removeReferenceRow(i)"
+                      *ngIf="referenceItems.length > 1">
                       <i class="fas fa-trash-alt"></i>
                     </button>
                   </td>
@@ -172,6 +173,14 @@
   <!-- Form Section -->
   <form class="form-grid" [formGroup]="segmentInfo" *ngIf="showForm">
 
+    <div class="form-field" [class.filled]="segmentInfo.get('INV_VBELN')?.value">
+      <input type="text" formControlName="INV_VBELN" placeholder=" " />
+      <label>Invoice No</label>
+    </div>
+
+
+
+
     <!-- Sales Person -->
     <div class="form-field" [class.filled]="segmentInfo.get('SALE_PERSON')?.value">
       <ng-container *ngIf="sapType === 'Non-SAP' || showF4.SALE_PERSON; else sapSales">
@@ -212,7 +221,7 @@
       <ng-container *ngIf="sapType === 'Non-SAP' || showF4.APPTYP; else sapAppType">
         <select formControlName="APPTYP">
           <option value="">Select Application Type</option>
-          <option *ngFor="let app of appTypeList" [value]="app.APPTYP">
+          <option *ngFor="let app of appTypeList" [ngValue]="app">
             {{ app.APPTYP }} - {{ app.DESC }}
           </option>
         </select>

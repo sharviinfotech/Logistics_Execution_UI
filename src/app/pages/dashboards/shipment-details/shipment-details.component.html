@@ -104,7 +104,8 @@
                   </td>
 
                   <td>
-                    <button type="button" class="btn-remove-LR" (click)="removeReferenceRow(i)" *ngIf="referenceItems.length > 1">
+                    <button type="button" class="btn-remove-LR" (click)="removeReferenceRow(i)"
+                      *ngIf="referenceItems.length > 1">
                       <i class="fas fa-trash-alt"></i>
                     </button>
                   </td>
@@ -215,7 +216,7 @@
         </div>
 
         <div class="form-field" *ngIf="sapType === 'Non-SAP'">
-          <input type="number" formControlName="INV_VBELN" min="0" placeholder=" " />
+          <input type="text" formControlName="INV_VBELN" min="0" placeholder=" " />
           <label>DC Reference Number</label>
         </div>
 
@@ -267,7 +268,7 @@
                 </td>
 
                 <td>
-                  <select formControlName="MTBEZ">
+                  <select formControlName="MTART">
                     <option value="">Select Type</option>
 
                     <option value="Batteries">Batteries</option>
@@ -344,7 +345,7 @@
         <th>SO No</th>
         <th>Product</th>
         <th>Material Type</th>
-        <th>Type of Material</th>
+        <!-- <th>Type of Material</th> -->
         <th>Material Description</th>
         <th>No of Sets</th>
         <th>Ah Loaded</th>
@@ -367,7 +368,7 @@
         <td>{{ item.ZSO_NO || '-' }}</td>
         <td>{{ item.ZPRODUCT || '-' }}</td>
         <td>{{ item.MTART || '-' }}</td>
-        <td>{{ item.MTBEZ || '-' }}</td>
+        <!-- <td>{{ item.MTART || '-' }}</td> -->
         <td>{{ item.MAKTX || '-' }}</td>
         <td>{{ item.ZSETS || '-' }}</td>
         <td>{{ item.ZAH || '-' }}</td>

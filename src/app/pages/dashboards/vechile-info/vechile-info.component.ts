@@ -46,6 +46,8 @@ export class VechileInfoComponent implements OnInit {
   selectedType: any = '';
   searchOptionsList: any[] = [];
   dropdownOpen = false;
+  Vehicle_Form!: FormGroup;
+
 
 
   constructor(
@@ -57,6 +59,7 @@ export class VechileInfoComponent implements OnInit {
 
   ngOnInit(): void {
     this.VehicleForm = this.fb.group({
+      INV_VBELN: [''],
       vehicles: this.fb.array([]),
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
@@ -515,13 +518,13 @@ export class VechileInfoComponent implements OnInit {
       return;
     }
 
-    
+
     const selectedMapId = this.selectedItems?.[0]?.MAPID || "";
     const selectedRefNo = this.selectedItems?.[0]?.referenceNumber || '';
 
     const reqBody: any = {
       INV_GET: referenceNumber.trim(),
-        refno: selectedRefNo               
+      refno: selectedRefNo
     };
 
     if (selectedMapId) {
@@ -560,6 +563,7 @@ export class VechileInfoComponent implements OnInit {
     const filtered = this.vehicles.value
       .filter((row: any) => row.selected === true)
       .map(({ selected, ...rest }) => rest);
+
 
     if (filtered.length === 0) {
       Swal.fire({
