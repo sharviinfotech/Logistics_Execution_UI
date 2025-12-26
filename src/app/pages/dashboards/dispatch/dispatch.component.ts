@@ -361,9 +361,9 @@ export class DispatchComponent implements OnInit {
         const records = Array.isArray(res) ? res : res?.data || [];
 
         if (records.length > 0) {
-          // this.searchReference = records[0].ZREFNO || records[0].REFNO || records[0].RNO || records[0].REF_NO || '';
+          this.searchReference = records[0].ZREFNO || records[0].REFNO || records[0].RNO || records[0].REF_NO || '';
           
-          // console.log('✅ Captured Reference Number:', this.searchReference);
+          console.log('✅ Captured Reference Number:', this.searchReference);
           this.populateDispatchForm(records);
           this.isUpdateMode = true;
           this.showForm = true;
@@ -434,6 +434,8 @@ export class DispatchComponent implements OnInit {
       WORK_ORDER: row.workorder || '',
       VENDOR_CD: Number(row.VendorCode) || 0,
       TRANSPORTER: row.Transporter || '',
+      WERKS: row.Plant || '',
+      DIVISION: row.Division || '',
       NO_LRS: Number(row.NoOfLRs) || 0,
       LR_NO: row.LRNumber || '',
       LOAD_PT: row.LoadingPoints || '',
@@ -694,9 +696,7 @@ export class DispatchComponent implements OnInit {
     this.cd.detectChanges();
   }
 
-  // ============================================
-  // FILTER AND DOWNLOAD MODE METHODS
-  // ============================================
+  
 
   applyFilter() {
     if (!this.filterFromDate || !this.filterToDate) {

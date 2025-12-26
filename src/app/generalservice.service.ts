@@ -286,7 +286,10 @@ export class GeneralserviceService {
   fetchDispatchFiltered(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/orderinfo/Filter_Creation', obj);
   }
-  
+
+   fetchOrderInfoFiltered(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/orderinfo/Outward/Filter_Creation', obj);
+  }
 
 
 }

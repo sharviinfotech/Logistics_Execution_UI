@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { GeneralserviceService } from 'src/app/generalservice.service';
@@ -8,6 +8,7 @@ import { SpinnerService } from 'src/app/spinner.service';
 import { SharedModule } from '../saas/shared/shared.module';
 import { Router } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-order-info',
@@ -24,6 +25,7 @@ export class OrderInfoComponent implements OnInit {
   orderType: string = '';
   sapType: string = '';
   isProcessing: boolean = false;
+  mainMode: string = 'creation';
   ponumber: string = '';
   invoicenumber: string = '';
   previousOrderType: string | null = null;
@@ -49,13 +51,27 @@ export class OrderInfoComponent implements OnInit {
   selectedType: any = '';
   searchOptionsList: any[] = [];
   dropdownOpen = false;
+  // Filter mode properties
+  filterFromDate: string = '';
+  filterToDate: string = '';
+  filterPlant: string = '';
+  filterDivision: string = '';
+  filterTransporter: string = '';
+  filterVehicleType: string = '';
+  filterStatus: string = '';
+  filteredData: any[] = [];
+  filterApplied: boolean = false;
+  isUpdateMode: boolean;
+  searchValue: string;
+  VendorCodeList: any[] = [];
 
   constructor(
     private fb: FormBuilder,
     private service: GeneralserviceService,
     private spinner: NgxSpinnerService,
     public spinnerService: SpinnerService,
-    private router: Router
+    private router: Router,
+    private cd: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -89,7 +105,40 @@ export class OrderInfoComponent implements OnInit {
     this.initialFormValues = this.OrderInfo.value;
     this.setupPhysicalDispatch();
     this.fetchCustomers();
+    this.fetchTransporter();
   }
+
+  // Main mode change handler
+  onMainModeChange(): void {
+    // Reset everything when switching modes
+    this.orderType = '';
+    this.sapType = '';
+    this.showForm = false;
+    this.isUpdateMode = false;
+
+    // Reset filter values
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterVehicleType = '';
+    this.filterStatus = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+
+    // Reset search values
+    this.selectedType = '';
+    this.searchValue = '';
+
+
+    if (this.mainMode === 'filter') {
+      this.fetchpdb();
+    }
+
+    this.cd.detectChanges();
+  }
+
 
   createItemRow(): FormGroup {
     return this.fb.group({
@@ -899,7 +948,7 @@ export class OrderInfoComponent implements OnInit {
     const rowValue = (this.items.at(index) as FormGroup).value;
     this.items.removeAt(index);
 
-    this.selectedItems = this.selectedItems.filter( 
+    this.selectedItems = this.selectedItems.filter(
       (item) =>
         !(
           item.referenceNumber === rowValue.referenceNumber &&
@@ -1057,5 +1106,174 @@ export class OrderInfoComponent implements OnInit {
   selectSearchType(option: any) {
     this.selectedType = option;
     this.dropdownOpen = false;
+  }
+
+  onFilterPlantChange(): void {
+    if (!this.filterPlant) {
+      this.filterDivision = '';
+      return;
+    }
+
+    const plantObj = this.plantList?.find(
+      (p: any) => p.PLANT_DESC === this.filterPlant
+    );
+
+    if (plantObj?.PLANT) {
+      const payload = { WERKS: plantObj.PLANT };
+
+      this.spinner.show();
+      this.service.PlantBasedDivison(payload).subscribe(
+        (res: any) => {
+          this.spinner.hide();
+          if (res?.DIVISION) {
+            const divisionObj = this.divisionList?.find(
+              (d: any) => d.DIVISION === res.DIVISION
+            );
+            this.filterDivision = divisionObj
+              ? divisionObj.DIVISION_DESC
+              : res.DIVISION;
+
+            console.log("✅ Filter Division set to:", this.filterDivision);
+          }
+        },
+        (error) => {
+          console.error("❌ Error fetching division for filter:", error);
+          this.spinner.hide();
+        }
+      );
+    }
+  }
+
+  fetchTransporter(): void {
+    this.spinner.show();
+    this.service.fetchVendorCode().subscribe(
+      (res: any) => {
+        if (res && res.length > 0 && res[0].VEND_CODE) {
+          console.log("✅ Transporter Data Fetched:", res[0].VEND_CODE);
+
+          // ONLY transporter list
+          this.VendorCodeList = res[0].VEND_CODE;
+
+          this.spinner.hide();
+        } else {
+          Swal.fire("No Transporter Found", "", "warning");
+          this.spinner.hide();
+        }
+      },
+      error => {
+        console.error("❌ Transporter Fetch Error:", error);
+        this.spinner.hide();
+      }
+    );
+  }
+
+  onFilterDivisionChange(): void {
+    const code = this.filterDivision;
+    console.log("Filter Division selected:", code);
+  }
+
+  applyFilter() {
+    if (!this.filterFromDate || !this.filterToDate) {
+      Swal.fire('Warning', 'Please select From Date and To Date', 'warning');
+      return;
+    }
+
+    const payload: any = {
+      DATE_FROM: this.filterFromDate,
+      DATE_TO: this.filterToDate,
+      PLANT: this.filterPlant || '',
+      DIVISION: this.filterDivision || '',
+      TRANSPORTER: this.filterTransporter || '',
+      VEHICLE_TYPE: this.filterVehicleType || '',
+      STATUS: this.filterStatus || ''
+    };
+
+    this.spinner.show();
+
+    this.service.fetchOrderInfoFiltered(payload).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        const records = Array.isArray(res) ? res : res?.data || [];
+
+        if (records.length > 0) {
+          this.filteredData = records;
+          this.filterApplied = true;
+          Swal.fire('Success', `Found ${records.length} records`, 'success');
+        } else {
+          this.filteredData = [];
+          this.filterApplied = true;
+          Swal.fire('No Records', 'No records found matching the filters', 'info');
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        Swal.fire('Error', 'Failed to fetch filtered data', 'error');
+      }
+    });
+  }
+
+  clearFilter() {
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterVehicleType = '';
+    this.filterStatus = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+
+  }
+
+  downloadExcel() {
+    if (!this.filteredData || this.filteredData.length === 0) {
+      Swal.fire('Warning', 'No data to download. Please apply filters first.', 'warning');
+      return;
+    }
+
+    const exportData = this.filteredData.map((record) => ({
+      'Reference No': record.ZREFNO || '',
+      'Invoice No': record.ZINV_NO || '',
+      'Line No': record.ZLINE_NO || '',
+      'ODN No': record.ZODN_NO || '',
+      'Invoice Date': record.ZINV_DATE ? new Date(record.ZINV_DATE).toLocaleDateString('en-GB') : '',
+      'Basic Value': record.ZBASIC_VALUE || '',
+      'Invoice Value (GST)': record.ZINV_VALUE_GST || '',
+      'Physical Dispatch': record.ZPHY_DISPATCH || '',
+      'Fiscal Year': record.ZFYEAR || '',
+      'System Date': record.ZSYS_DATE ? new Date(record.ZSYS_DATE).toLocaleDateString('en-GB') : '',
+      'Fiscal Quarter': record.ZFIS_QUARTER || '',
+      'Fiscal Month': record.ZFIS_MONTH || '',
+      'Plant': record.ZPLANT || '',
+      'Transaction Type': record.ZTRX_TYPE || '',
+      'Bill Text': record.ZBILL_TRX_TEXT || '',
+      'Division': record.ZDIVISION || '',
+      'Sub Division': record.ZSUB_DIVISION || '',
+      'SO Ref No': record.ZSO_NO || '',
+      'Customer Name': record.ZCUST_NAME || '',
+      'Customer Group': record.ZCUST_GRP || '',
+      'Consignee Name': record.ZCONSIGN_NAME || '',
+      'Destination Location': record.ZDES_LOC || '',
+      'State': record.ZSTATE || '',
+      'Zone': record.ZZONE || '',
+      'Work Order': record.ZWORK_ORDER || '',
+      'LR No': record.ZLRNO || '',
+      'Transporter': record.ZTRANSPORTER || '',
+      'Created Date': record.ZCREATED_DT || '',
+      'Vehicle Type': record.ZVEH_TYPE || ''
+
+    }));
+
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Order Info Records');
+
+    // Auto column width
+    const colWidths = Object.keys(exportData[0]).map(key => ({
+      wch: Math.max(key.length + 5, 15)
+    }));
+    ws['!cols'] = colWidths;
+
+    XLSX.writeFile(wb, 'Order_Info_Records.xlsx');
   }
 }
