@@ -8,6 +8,11 @@ import { SpinnerService } from 'src/app/spinner.service';
 import { GeneralserviceService } from 'src/app/generalservice.service';
 import { Router } from '@angular/router';
 import * as XLSX from 'xlsx';
+import * as jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
+
+
 
 @Component({
   selector: 'app-dispatch',
@@ -22,7 +27,7 @@ export class DispatchComponent implements OnInit {
   showActionColumn: boolean = false;
 
   // Main mode selection
-  mainMode: string = 'creation'; // Default to creation mode
+  mainMode: string = 'creation';
 
   orderType: string = '';
   sapType: string = '';
@@ -34,9 +39,15 @@ export class DispatchComponent implements OnInit {
   isUpdateMode: boolean = false;
   fetchedLineNumbers: number[] = [];
 
+  
+  originalTotalTrucks: number = 0;
+  originalTotalInvoices: number = 0;
+  originalTotalLRs: number = 0;
+  originalTotalLoadingPoints: number = 0;
+  originalTotalUnLoadingPoints: number = 0;
+
   VendorCodeList: any[] = [];
   PlantCodeList: any[] = [];
-
 
   searchReference: string = '';
   selectedType: string = '';
@@ -50,7 +61,6 @@ export class DispatchComponent implements OnInit {
     { key: 'WORK_ORDER', label: 'Work Order' }
   ];
 
-  // Filter mode properties
   filterFromDate: string = '';
   filterToDate: string = '';
   filterPlant: string = '';
@@ -83,7 +93,38 @@ export class DispatchComponent implements OnInit {
     });
 
     const firstRow = this.rows.at(0) as FormGroup;
-    ['VehicleType', 'NoOfTrucks', 'NoOfLRs', 'LoadingPoints', 'UnLoadingPoints']
+
+    // Watch for NoOfTrucks changes in first row to update original value
+    firstRow.get('NoOfTrucks', )?.valueChanges.subscribe(val => {
+      this.originalTotalTrucks = +val || 0;
+      this.redistributeNoOfTrucks();
+    });
+
+    // Watch for NoOfInvoices changes in first row to update original value
+    firstRow.get('NoOfInvoices')?.valueChanges.subscribe(val => {
+      this.originalTotalInvoices = +val || 0;
+      this.redistributeInvoices();
+    });
+
+    // Watch for NoOfLRs changes in first row to update original value
+    firstRow.get('NoOfLRs')?.valueChanges.subscribe(val => {
+      this.originalTotalLRs = +val || 0;
+      this.redistributeLRs();
+    });
+
+    // Watch for LoadingPoints changes in first row to update original value
+    firstRow.get('LoadingPoints')?.valueChanges.subscribe(val => {
+      this.originalTotalLoadingPoints = +val || 0;
+      this.redistributeLoadingPoints();
+    });
+
+    // Watch for UnLoadingPoints changes in first row to update original value
+    firstRow.get('UnLoadingPoints')?.valueChanges.subscribe(val => {
+      this.originalTotalUnLoadingPoints = +val || 0;
+      this.redistributeUnLoadingPoints();
+    });
+
+    ['VehicleType', 'NoOfInvoices', 'NoOfLRs', 'LoadingPoints', 'UnLoadingPoints']
       .forEach(field => {
         firstRow.get(field)?.valueChanges.subscribe(() => {
           this.applyFirstRowValuesToAll();
@@ -94,15 +135,11 @@ export class DispatchComponent implements OnInit {
     this.fetchPlantCodeList();
   }
 
-  // Main mode change handler
   onMainModeChange(): void {
-    // Reset everything when switching modes
     this.orderType = '';
     this.sapType = '';
     this.showForm = false;
     this.isUpdateMode = false;
-
-    // Reset filter values
     this.filterFromDate = '';
     this.filterToDate = '';
     this.filterPlant = '';
@@ -111,11 +148,8 @@ export class DispatchComponent implements OnInit {
     this.filterVehicleType = '';
     this.filteredData = [];
     this.filterApplied = false;
-
-    // Reset search values
     this.selectedType = '';
     this.searchValue = '';
-
     this.cd.detectChanges();
   }
 
@@ -124,12 +158,15 @@ export class DispatchComponent implements OnInit {
     this.showForm = false;
     this.dispatchForm.reset();
     this.isUpdateMode = false;
+    this.originalTotalTrucks = 0;
   }
 
   onSapTypeChange(): void {
     this.dispatchForm.reset();
     this.showForm = !!(this.orderType && this.sapType);
     this.isUpdateMode = false;
+    this.originalTotalTrucks = 0;
+    
   }
 
   createRow(isFirstRow: boolean = false): FormGroup {
@@ -138,6 +175,7 @@ export class DispatchComponent implements OnInit {
       workorder: [''],
       VehicleType: ['', Validators.required],
       NoOfTrucks: ['', Validators.required],
+      NoOfInvoices: ['', Validators.required],
       VendorCode: [''],
       Transporter: ['', Validators.required],
       Plant: ['', Validators.required],
@@ -153,6 +191,7 @@ export class DispatchComponent implements OnInit {
         row.patchValue({
           workorder: '',
           NoOfTrucks: '',
+          NoOfInvoices: '',
           VendorCode: '',
           Transporter: '',
           Plant: '',
@@ -162,6 +201,7 @@ export class DispatchComponent implements OnInit {
           LRNumber: '',
           UnLoadingPoints: ''
         }, { emitEvent: false });
+        this.originalTotalTrucks = 0;
       }
       this.checkActionColumnVisibility();
       this.cd.detectChanges();
@@ -213,37 +253,118 @@ export class DispatchComponent implements OnInit {
     this.cd.detectChanges();
   }
 
+  redistributeNoOfTrucks() {
+    if (this.originalTotalTrucks === 0 || this.rows.length === 0) return;
+
+    const totalRows = this.rows.length;
+    const trucksPerRow = Math.floor(this.originalTotalTrucks / totalRows);
+    const remainder = this.originalTotalTrucks % totalRows;
+
+    this.rows.controls.forEach((row, index) => {
+      const splitValue = trucksPerRow + (index < remainder ? 1 : 0);
+      row.get('NoOfTrucks',)?.setValue(splitValue, { emitEvent: false });
+    });
+
+    this.updateMaxRowsAllowed();
+    this.cd.detectChanges();
+  }
+
+  redistributeInvoices() {
+    if (this.originalTotalInvoices === 0 || this.rows.length === 0) return;
+
+    const totalRows = this.rows.length;
+    const invoicesPerRow = Math.floor(this.originalTotalInvoices / totalRows);
+    const remainder = this.originalTotalInvoices % totalRows;
+
+    this.rows.controls.forEach((row, index) => {
+      const splitValue = invoicesPerRow + (index < remainder ? 1 : 0);
+      row.get('NoOfInvoices')?.setValue(splitValue, { emitEvent: false });
+    });
+
+    this.cd.detectChanges();
+  }
+
+  redistributeLRs() {
+    if (this.originalTotalLRs === 0 || this.rows.length === 0) return;
+
+    const totalRows = this.rows.length;
+    const lrsPerRow = Math.floor(this.originalTotalLRs / totalRows);
+    const remainder = this.originalTotalLRs % totalRows;
+
+    this.rows.controls.forEach((row, index) => {
+      const splitValue = lrsPerRow + (index < remainder ? 1 : 0);
+      row.get('NoOfLRs')?.setValue(splitValue, { emitEvent: false });
+    });
+
+    this.cd.detectChanges();
+  }
+
+  redistributeLoadingPoints() {
+    if (this.originalTotalLoadingPoints === 0 || this.rows.length === 0) return;
+
+    const totalRows = this.rows.length;
+    const loadingPointsPerRow = Math.floor(this.originalTotalLoadingPoints / totalRows);
+    const remainder = this.originalTotalLoadingPoints % totalRows;
+
+    this.rows.controls.forEach((row, index) => {
+      const splitValue = loadingPointsPerRow + (index < remainder ? 1 : 0);
+      row.get('LoadingPoints')?.setValue(splitValue, { emitEvent: false });
+    });
+
+    this.cd.detectChanges();
+  }
+
+  redistributeUnLoadingPoints() {
+    if (this.originalTotalUnLoadingPoints === 0 || this.rows.length === 0) return;
+
+    const totalRows = this.rows.length;
+    const unloadingPointsPerRow = Math.floor(this.originalTotalUnLoadingPoints / totalRows);
+    const remainder = this.originalTotalUnLoadingPoints % totalRows;
+
+    this.rows.controls.forEach((row, index) => {
+      const splitValue = unloadingPointsPerRow + (index < remainder ? 1 : 0);
+      row.get('UnLoadingPoints')?.setValue(splitValue, { emitEvent: false });
+    });
+
+    this.cd.detectChanges();
+  }
+
   applyFirstRowValuesToAll() {
     const firstRow = this.rows.at(0) as FormGroup;
 
     const fixedValues = {
       VehicleType: firstRow.get('VehicleType')?.value,
-      NoOfTrucks: firstRow.get('NoOfTrucks')?.value,
-      NoOfLRs: firstRow.get('NoOfLRs')?.value,
-      LoadingPoints: firstRow.get('LoadingPoints')?.value,
-      UnLoadingPoints: firstRow.get('UnLoadingPoints')?.value
+      workorder: firstRow.get('workorder')?.value,
+      VendorCode: firstRow.get('VendorCode')?.value,
+      Transporter: firstRow.get('Transporter')?.value,
+      // NoOfLRs: firstRow.get('NoOfLRs')?.value,
+      // LoadingPoints: firstRow.get('LoadingPoints')?.value,
+      // UnLoadingPoints: firstRow.get('UnLoadingPoints')?.value
     };
 
     this.rows.controls.forEach((row, index) => {
       if (index === 0) return;
 
       row.get('VehicleType')?.enable({ emitEvent: false });
-      row.get('NoOfTrucks')?.enable({ emitEvent: false });
-      row.get('NoOfLRs')?.enable({ emitEvent: false });
-      row.get('LoadingPoints')?.enable({ emitEvent: false });
-      row.get('UnLoadingPoints')?.enable({ emitEvent: false });
+      row.get('workorder')?.enable({ emitEvent: false });
+      row.get('VendorCode')?.enable({ emitEvent: false });
+      row.get('Transporter')?.enable({ emitEvent: false });
+      // row.get('NoOfLRs')?.enable({ emitEvent: false });
+      // row.get('LoadingPoints')?.enable({ emitEvent: false });
+      // row.get('UnLoadingPoints')?.enable({ emitEvent: false });
 
       row.patchValue(fixedValues, { emitEvent: false });
 
       row.get('VehicleType')?.disable({ emitEvent: false });
-      row.get('NoOfTrucks')?.disable({ emitEvent: false });
-      row.get('NoOfLRs')?.disable({ emitEvent: false });
-      row.get('LoadingPoints')?.disable({ emitEvent: false });
-      row.get('UnLoadingPoints')?.disable({ emitEvent: false });
+      row.get('workorder')?.disable({ emitEvent: false });
+      row.get('VendorCode')?.disable({ emitEvent: false });
+      row.get('Transporter')?.disable({ emitEvent: false });
+      // row.get('NoOfLRs')?.disable({ emitEvent: false });
+      // row.get('LoadingPoints')?.disable({ emitEvent: false });
+      // row.get('UnLoadingPoints')?.disable({ emitEvent: false });
     });
 
-    this.updateMaxRowsAllowed();
-    this.cd.detectChanges();
+    this.redistributeNoOfTrucks();
   }
 
   resetRowsForNonFTL(type: string) {
@@ -251,6 +372,7 @@ export class DispatchComponent implements OnInit {
     firstRow.patchValue({
       workorder: '',
       NoOfTrucks: '',
+      NoOfInvoices: '',
       VendorCode: '',
       Transporter: '',
       Plant: '',
@@ -265,6 +387,7 @@ export class DispatchComponent implements OnInit {
       this.rows.removeAt(1);
     }
 
+    this.originalTotalTrucks = 0;
     this.showActionColumn = false;
     this.cd.detectChanges();
   }
@@ -284,12 +407,19 @@ export class DispatchComponent implements OnInit {
     this.rows.push(newRow);
     this.watchRowFields(newRow, this.rows.length - 1);
     this.isAddingRow = false;
+
+    // Redistribute values after adding row
+    this.redistributeNoOfTrucks();
+    this.redistributeInvoices();
+    this.redistributeLRs();
+    this.redistributeLoadingPoints();
+    this.redistributeUnLoadingPoints();
     this.applyFirstRowValuesToAll();
   }
 
   updateMaxRowsAllowed() {
     const firstRow = this.rows.at(0);
-    const trucks = +firstRow.get('NoOfTrucks')?.value || 0;
+    const trucks = this.originalTotalTrucks || (+firstRow.get('NoOfTrucks')?.value || 0);
     const lrs = +firstRow.get('NoOfLRs')?.value || 0;
     const loadPts = +firstRow.get('LoadingPoints')?.value || 0;
     const unloadPts = +firstRow.get('UnLoadingPoints')?.value || 0;
@@ -301,6 +431,13 @@ export class DispatchComponent implements OnInit {
   removeRow(index: number) {
     if (this.rows.length > 1) {
       this.rows.removeAt(index);
+
+      // Redistribute values after removing row
+      this.redistributeNoOfTrucks();
+      this.redistributeInvoices();
+      this.redistributeLRs();
+      this.redistributeLoadingPoints();
+      this.redistributeUnLoadingPoints();
       this.checkActionColumnVisibility();
       this.cd.detectChanges();
     }
@@ -318,6 +455,7 @@ export class DispatchComponent implements OnInit {
     this.showActionColumn = false;
     this.maxLimitReached = false;
     this.maxRowsAllowed = 0;
+    this.originalTotalTrucks = 0;
 
     const selected = this.searchOptions.find(opt => opt.key === this.selectedType);
     this.searchPlaceholder = selected ? `Search by ${selected.label}` : 'Select search type';
@@ -362,7 +500,7 @@ export class DispatchComponent implements OnInit {
 
         if (records.length > 0) {
           this.searchReference = records[0].ZREFNO || records[0].REFNO || records[0].RNO || records[0].REF_NO || '';
-          
+
           console.log('✅ Captured Reference Number:', this.searchReference);
           this.populateDispatchForm(records);
           this.isUpdateMode = true;
@@ -383,12 +521,20 @@ export class DispatchComponent implements OnInit {
     const rowsArray = this.dispatchForm.get('rows') as FormArray;
     rowsArray.clear();
 
+    // Calculate total trucks from all records
+    let totalTrucks = 0;
+    records.forEach(item => {
+      totalTrucks += (+item.NO_TRUCKS || 0);
+    });
+    this.originalTotalTrucks = totalTrucks;
+
     records.forEach((item, index) => {
       const row = this.fb.group({
         LINE_NO: [item.LINE_NO || ''],
         workorder: [item.WORK_ORDER || ''],
         VehicleType: [item.VEH_TYPE || '', Validators.required],
         NoOfTrucks: [item.NO_TRUCKS || '', Validators.required],
+        NoOfInvoices: [item.NO_INVOICES || '', Validators.required],
         VendorCode: [item.VENDOR_CD || ''],
         Transporter: [item.TRANSPORTER || '', Validators.required],
         Plant: [item.WERKS || ''],
@@ -415,7 +561,6 @@ export class DispatchComponent implements OnInit {
       return;
     }
 
-    // ✅ Validate form before update
     if (!this.dispatchForm.valid) {
       this.dispatchForm.markAllAsTouched();
       Swal.fire('Please fill all required fields', '', 'warning');
@@ -423,14 +568,14 @@ export class DispatchComponent implements OnInit {
     }
 
     const rowsArray = this.dispatchForm.get('rows') as FormArray;
-    const rawRows = rowsArray.getRawValue(); // ✅ Include disabled fields
+    const rawRows = rowsArray.getRawValue();
 
-    // ✅ Create payload matching API structure
     const payload = rawRows.map((row: any) => ({
       REFNO: Number(this.searchReference),
       LINE_NO: Number(row.LINE_NO),
       VEH_TYPE: row.VehicleType,
       NO_TRUCKS: Number(row.NoOfTrucks),
+      NO_INVOICES: Number(row.NoOfInvoices),
       WORK_ORDER: row.workorder || '',
       VENDOR_CD: Number(row.VendorCode) || 0,
       TRANSPORTER: row.Transporter || '',
@@ -456,13 +601,11 @@ export class DispatchComponent implements OnInit {
             text: res.MSG || 'Dispatch data updated successfully',
             icon: 'success'
           }).then(() => {
-            // ✅ Handle navigation after update
             if (action === 'next') {
               this.router.navigate(['/order-info']);
             } else if (action === 'previous') {
               this.router.navigate(['/dashboard']);
             } else {
-              // Reset form after successful update
               this.resetAll();
               this.searchReference = '';
               this.isUpdateMode = false;
@@ -554,7 +697,6 @@ export class DispatchComponent implements OnInit {
     }
   }
 
-  // Add this new method for Division change
   onchangeDivisionCode(index: number) {
     const rowsArray = this.dispatchForm.get('rows') as FormArray;
     const currentRow = rowsArray.at(index);
@@ -568,10 +710,6 @@ export class DispatchComponent implements OnInit {
     }
   }
 
-
-
-
-  // 🔹 NEW: Handle Plant Change in Filter Mode
   onFilterPlantChange(): void {
     const plantObj = this.PlantCodeList.find(item => item.PLANT === this.filterPlant);
 
@@ -594,9 +732,7 @@ export class DispatchComponent implements OnInit {
     this.cd.detectChanges();
   }
 
-  // 🔹 NEW: Handle Transporter Change in Filter Mode
   onFilterTransporterChange(): void {
-
     this.cd.detectChanges();
   }
 
@@ -623,6 +759,7 @@ export class DispatchComponent implements OnInit {
     const payload = {
       DISPATCH: this.rows.controls.map((row: any) => ({
         NO_TRUCKS: row.get('NoOfTrucks')?.value,
+        NO_INVOICES: row.get('NoOfInvoices')?.value,
         veh_type: row.get('VehicleType')?.value,
         work_order: row.get('workorder')?.value,
         VENDOR_CD: row.get('VendorCode')?.value,
@@ -690,13 +827,15 @@ export class DispatchComponent implements OnInit {
     }
     this.rows.push(this.createRow(true));
     this.showActionColumn = false;
+    this.originalTotalTrucks = 0;
     this.dispatchForm.markAsPristine();
     this.dispatchForm.markAsUntouched();
     this.dispatchForm.updateValueAndValidity();
     this.cd.detectChanges();
   }
 
-  
+
+
 
   applyFilter() {
     if (!this.filterFromDate || !this.filterToDate) {
@@ -768,7 +907,8 @@ export class DispatchComponent implements OnInit {
       "No. of LRs": record.ZNO_LRS || '',
       "LR Number": record.ZLR_NO || '',
       "Loading Points": record.ZLOAD_PT || '',
-      "Unloading Points": record.ZUNLOAD_PT || ''
+      "Unloading Points": record.ZUNLOAD_PT || '',
+      "No. of Invoices": record.ZNO_INVOICES || ''
     }));
 
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
@@ -784,13 +924,78 @@ export class DispatchComponent implements OnInit {
     XLSX.writeFile(wb, 'Dispatch_Records.xlsx');
   }
 
-  // downloadPDF() {
-  //   if (!this.filteredData || this.filteredData.length === 0) {
-  //     Swal.fire('Warning', 'No data to download. Please apply filters first.', 'warning');
-  //     return;
-  //   }
+  downloadPDF() {
+  if (!this.filteredData || this.filteredData.length === 0) {
+    Swal.fire('Warning', 'No data to download. Please apply filters first.', 'warning');
+    return;
+  }
 
-  //   Swal.fire('Info', 'PDF download functionality to be implemented', 'info');
+  const doc = new (jsPDF as any).default('l', 'mm', 'a4'); // landscape
 
-  // }
+  /* ===== PDF HEADING ===== */
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Dispatch Records Report', doc.internal.pageSize.getWidth() / 2, 12, {
+    align: 'center'
+  });
+
+  /* Optional subtitle */
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Generated on: ${new Date().toLocaleDateString()}`,
+    doc.internal.pageSize.getWidth() / 2,
+    18,
+    { align: 'center' }
+  );
+
+  const headers = [[
+    'Reference No',
+    'Date',
+    'Vehicle Type',
+    'Work Order',
+    'Vendor Code',
+    'Transporter',
+    'Plant',
+    'Division',
+    'No. of Trucks',
+    'No. of LRs',
+    'LR Number',
+    'Loading Points',
+    'Unloading Points',
+    'No. of Invoices'
+  ]];
+
+  const data = this.filteredData.map(record => ([
+    record.ZREFNO || '',
+    record.ZCREATED_DT || '',
+    record.ZVEH_TYPE || '',
+    record.ZWORK_ORDER || '',
+    record.ZVENDOR_CD || '',
+    record.ZTRANSPORTER || '',
+    record.ZWERKS || '',
+    record.ZDIVISION || '',
+    record.ZNO_TRUCKS || '',
+    record.ZNO_LRS || '',
+    record.ZLR_NO || '',
+    record.ZLOAD_PT || '',
+    record.ZUNLOAD_PT || '',
+    record.ZNO_INVOICES || ''
+  ]));
+
+  autoTable(doc, {
+    head: headers,
+    body: data,
+    startY: 25, // ⬅️ important: start after heading
+    styles: {
+      fontSize: 8,
+      cellPadding: 3
+    },
+    headStyles: {
+      fillColor: [52, 152, 219]
+    }
+  });
+
+  doc.save('Dispatch_Records.pdf');
+}
+
 }

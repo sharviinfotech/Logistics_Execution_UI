@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import { finalize } from 'rxjs/operators';
 import { SpinnerService } from 'src/app/spinner.service';
 import { Router } from '@angular/router';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-shipment-details',
@@ -32,7 +33,10 @@ export class ShipmentDetailsComponent implements OnInit {
   invoicenumber: string = '';
   TypeofmaterialList: any = [];
   IncotermsList: any[] = [];
+  isUpdateMode: boolean = false;
   isAllSelected: boolean = false;
+  // Main mode selection
+  mainMode: string = 'creation'; // Default to creation mode
 
   selectedItems: any[] = [];
   searchReference: string = '';
@@ -49,6 +53,16 @@ export class ShipmentDetailsComponent implements OnInit {
 
   previousOrderType: string | null = null;
   previousSapType: string | null = null;
+
+  // Filter mode properties
+  filterFromDate: string = '';
+  filterToDate: string = '';
+  filterPlant: string = '';
+  filterDivision: string = '';
+  filterTransporter: string = '';
+  filterVehicleType: string = '';
+  filteredData: any[] = [];
+  filterApplied: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -184,6 +198,31 @@ export class ShipmentDetailsComponent implements OnInit {
       this.resetConditionalFields();
     }
     this.previousOrderType = this.orderType;
+  }
+
+  // Main mode change handler
+  onMainModeChange(): void {
+    // Reset everything when switching modes
+    this.orderType = '';
+    this.sapType = '';
+    this.showForm = false;
+    this.isUpdateMode = false;
+
+    // Reset filter values
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterVehicleType = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+
+    // Reset search values
+    this.selectedType = '';
+    this.searchReference = '';
+
+    this.searchOptionsList = [];
   }
 
   resetConditionalFields(): void {

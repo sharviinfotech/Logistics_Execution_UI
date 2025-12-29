@@ -95,6 +95,7 @@
                 <th>Vehicle Type</th>
                 <th>Workorder</th>
                 <th>No Of Trucks</th>
+                <th>No Of Invoices</th>
                 <th>Vendor Code</th>
                 <th>Transporter</th>
                 <th>Plant</th>
@@ -133,6 +134,7 @@
                 </td>
 
                 <td><input type="text" formControlName="NoOfTrucks"></td>
+                <td><input type="text" formControlName="NoOfInvoices"></td>
                 <td>
                   <div class="d-flex align-items-center">
                     <select formControlName="VendorCode" (change)="onchangeVendorCode(i)">
@@ -143,6 +145,8 @@
                     </select>
                   </div>
                 </td>
+
+
 
                 <td>
                   <div class="d-flex align-items-center">
@@ -160,7 +164,7 @@
                     <select formControlName="Plant" (change)="onchangePlantCode(i)">
                       <option value="">Select Plant</option>
                       <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT">
-                        {{ plant.PLANT }}
+                        {{ plant.PLANT }}_{{ plant.PLANT_DESC }}
                       </option>
                     </select>
                   </div>
@@ -236,7 +240,7 @@
             <select [(ngModel)]="filterPlant" (change)="onFilterPlantChange()">
               <option value="">Select Plant</option>
               <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT">
-                {{ plant.PLANT }}
+                {{ plant.PLANT }}_{{ plant.PLANT_DESC }}
               </option>
             </select>
             <label>Plant</label>
@@ -294,9 +298,9 @@
             [disabled]="!filteredData || filteredData.length === 0">
             <i class="fas fa-file-excel"></i> Download Excel
           </button>
-          <!-- <button class="btn btn-download-pdf" (click)="downloadPDF()" [disabled]="!filteredData || filteredData.length === 0">
+          <button class="btn btn-download-pdf" (click)="downloadPDF()" [disabled]="!filteredData || filteredData.length === 0">
             <i class="fas fa-file-pdf"></i> Download PDF
-          </button> -->
+          </button>
         </div>
       </div>
 
@@ -330,6 +334,7 @@
             <th>LR Number</th>
             <th>Loading Point</th>
             <th>Unloading Point</th>
+            <th>No of Invoices</th>
           </tr>
         </thead>
         <tbody>
@@ -349,6 +354,7 @@
             <td>{{ record.ZLR_NO }}</td>
             <td>{{ record.ZLOAD_PT }}</td>
             <td>{{ record.ZUNLOAD_PT }}</td>
+            <td>{{ record.ZNO_INVOICES }}</td>
           </tr>
         </tbody>
       </table>
