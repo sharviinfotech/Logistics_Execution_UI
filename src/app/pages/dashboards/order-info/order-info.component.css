@@ -26,10 +26,10 @@ input[type="radio"] {
 
 
 .input-row {
-  
+
   align-items: center;
   gap: 12px;
- 
+
 }
 
 .input-row .form-field {
@@ -42,8 +42,9 @@ input[type="radio"] {
   display: flex;
   align-items: center;
   gap: 10px;
-  width: fit-content; /* shrink to content size */
- 
+  width: fit-content;
+  /* shrink to content size */
+
 }
 
 .form-field.flex-1 {
@@ -54,7 +55,7 @@ input[type="radio"] {
 
 .form-field {
   position: relative;
-  
+
   flex-direction: column;
 
 }
@@ -328,6 +329,7 @@ input[type="radio"] {
   border: 1px solid #ced4da !important;
   box-shadow: none !important;
 }
+
 .search-container {
   display: flex;
   justify-content: center;
@@ -465,7 +467,7 @@ input[type="radio"] {
 .Creation-radio {
   display: flex;
   gap: 20px;
- 
+
 }
 
 /* Label = Card */
@@ -484,7 +486,8 @@ input[type="radio"] {
 
 /* Radio visible */
 .Creation-radio input[type="radio"] {
-  accent-color: #a61c3c; /* radio color */
+  accent-color: #a61c3c;
+  /* radio color */
   width: 16px;
   height: 16px;
   cursor: pointer;
@@ -509,7 +512,7 @@ input[type="radio"] {
 }
 
 /* Selected Text */
-.Creation-radio input[type="radio"]:checked + span {
+.Creation-radio input[type="radio"]:checked+span {
   color: #a61c3c;
 }
 
@@ -519,5 +522,3 @@ input[type="radio"] {
     flex-direction: column;
   }
 }
-
-

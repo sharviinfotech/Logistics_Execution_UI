@@ -64,6 +64,11 @@ export class OrderInfoComponent implements OnInit {
   isUpdateMode: boolean;
   searchValue: string;
   VendorCodeList: any[] = [];
+  orderInfoData: any[] = [];
+  dispatchData: any[] = [];
+  filterSapType: string = '';
+  showOrderInfoTable = false;
+  showDispatchTable = false;
 
   constructor(
     private fb: FormBuilder,
@@ -381,6 +386,27 @@ export class OrderInfoComponent implements OnInit {
       this.showForm = true;
     }
   }
+  onFilterSapTypeChange() {
+    console.log('Selected SAP type in filter mode:', this.filterSapType);
+
+    // Update the current sapType based on filter selection
+    this.sapType = this.filterSapType;
+
+    // Reset previous filtered data
+    this.orderInfoData = [];
+    this.dispatchData = [];
+
+    // Automatically fetch filtered data if dates are provided
+    if (this.filterFromDate && this.filterToDate) {
+      this.applyFilter();
+    } else {
+      console.log('ℹ️ From and To dates are not selected yet.');
+    }
+  }
+
+
+
+
 
   resetConditionalFields(): void {
     this.showForm = false;
@@ -1171,14 +1197,14 @@ export class OrderInfoComponent implements OnInit {
     const code = this.filterDivision;
     console.log("Filter Division selected:", code);
   }
-
   applyFilter() {
     if (!this.filterFromDate || !this.filterToDate) {
       Swal.fire('Warning', 'Please select From Date and To Date', 'warning');
       return;
     }
 
-    const payload: any = {
+    const payload = {
+      GLOBAL: 'ORDER INFO',
       DATE_FROM: this.filterFromDate,
       DATE_TO: this.filterToDate,
       PLANT: this.filterPlant || '',
@@ -1190,27 +1216,47 @@ export class OrderInfoComponent implements OnInit {
 
     this.spinner.show();
 
-    this.service.fetchOrderInfoFiltered(payload).subscribe({
+    let apiCall;
+
+    if (this.sapType === 'SAP') {
+      apiCall = this.service.fetchOrderInfoFiltered(payload); // SAP API
+    } else {
+      // Use the same Non-SAP service with a READ payload
+      apiCall = this.service.OrderInfoNonSap({ READ: payload });
+    }
+
+    apiCall.subscribe({
       next: (res: any) => {
         this.spinner.hide();
-        const records = Array.isArray(res) ? res : res?.data || [];
 
-        if (records.length > 0) {
-          this.filteredData = records;
-          this.filterApplied = true;
-          Swal.fire('Success', `Found ${records.length} records`, 'success');
+        let records: any[] = [];
+        if (Array.isArray(res)) records = res;
+        else if (res?.HEADER) records = res.HEADER;
+        else if (res?.DATA) records = res.DATA;
+
+        if (this.filterStatus === 'Completed') {
+          this.orderInfoData = records;
+          this.dispatchData = [];
+          Swal.fire('Success', `Order Info records: ${records.length}`, 'success');
+        } else if (this.filterStatus === 'Pending') {
+          this.dispatchData = records;
+          this.orderInfoData = [];
+          Swal.fire('Success', `Dispatch records: ${records.length}`, 'success');
         } else {
-          this.filteredData = [];
-          this.filterApplied = true;
-          Swal.fire('No Records', 'No records found matching the filters', 'info');
+          this.orderInfoData = [];
+          this.dispatchData = [];
+          Swal.fire('Info', 'Please select valid status', 'info');
         }
       },
       error: (err) => {
         this.spinner.hide();
         Swal.fire('Error', 'Failed to fetch filtered data', 'error');
+        console.error(err);
       }
     });
   }
+
+
 
   clearFilter() {
     this.filterFromDate = '';
@@ -1226,54 +1272,94 @@ export class OrderInfoComponent implements OnInit {
   }
 
   downloadExcel() {
-    if (!this.filteredData || this.filteredData.length === 0) {
-      Swal.fire('Warning', 'No data to download. Please apply filters first.', 'warning');
+    // 1️⃣ Determine data source based on status
+    let exportSource: any[] = [];
+    let fileName = '';
+
+    if (this.filterStatus === 'Completed') {
+      exportSource = this.orderInfoData; // SAP or Non-SAP completed records
+      fileName = this.sapType === 'SAP' ? 'Order_Info_Completed_SAP.xlsx' : 'Order_Info_Completed_NonSAP.xlsx';
+    } else if (this.filterStatus === 'Pending') {
+      exportSource = this.dispatchData; // SAP or Non-SAP pending records
+      fileName = this.sapType === 'SAP' ? 'Dispatch_Pending_SAP.xlsx' : 'Dispatch_Pending_NonSAP.xlsx';
+    } else {
+      Swal.fire('Warning', 'Please select valid status before download', 'warning');
       return;
     }
 
-    const exportData = this.filteredData.map((record) => ({
-      'Reference No': record.ZREFNO || '',
-      'Invoice No': record.ZINV_NO || '',
-      'Line No': record.ZLINE_NO || '',
-      'ODN No': record.ZODN_NO || '',
-      'Invoice Date': record.ZINV_DATE ? new Date(record.ZINV_DATE).toLocaleDateString('en-GB') : '',
-      'Basic Value': record.ZBASIC_VALUE || '',
-      'Invoice Value (GST)': record.ZINV_VALUE_GST || '',
-      'Physical Dispatch': record.ZPHY_DISPATCH || '',
-      'Fiscal Year': record.ZFYEAR || '',
-      'System Date': record.ZSYS_DATE ? new Date(record.ZSYS_DATE).toLocaleDateString('en-GB') : '',
-      'Fiscal Quarter': record.ZFIS_QUARTER || '',
-      'Fiscal Month': record.ZFIS_MONTH || '',
-      'Plant': record.ZPLANT || '',
-      'Transaction Type': record.ZTRX_TYPE || '',
-      'Bill Text': record.ZBILL_TRX_TEXT || '',
-      'Division': record.ZDIVISION || '',
-      'Sub Division': record.ZSUB_DIVISION || '',
-      'SO Ref No': record.ZSO_NO || '',
-      'Customer Name': record.ZCUST_NAME || '',
-      'Customer Group': record.ZCUST_GRP || '',
-      'Consignee Name': record.ZCONSIGN_NAME || '',
-      'Destination Location': record.ZDES_LOC || '',
-      'State': record.ZSTATE || '',
-      'Zone': record.ZZONE || '',
-      'Work Order': record.ZWORK_ORDER || '',
-      'LR No': record.ZLRNO || '',
-      'Transporter': record.ZTRANSPORTER || '',
-      'Created Date': record.ZCREATED_DT || '',
-      'Vehicle Type': record.ZVEH_TYPE || ''
+    // 2️⃣ Check if data is available
+    if (!exportSource || exportSource.length === 0) {
+      Swal.fire('Warning', 'No data available to download', 'warning');
+      return;
+    }
 
-    }));
+    // 3️⃣ Map data for Excel
+    let exportData: any[] = [];
 
+    if (this.filterStatus === 'Completed') {
+      exportData = exportSource.map(record => ({
+        'Reference No': record.ZREFNO || '',
+        'Invoice No': record.ZINV_NO || '',
+        'Line No': record.ZLINE_NO || '',
+        'ODN No': record.ZODN_NO || '',
+        'Invoice Date': record.ZINV_DATE ? new Date(record.ZINV_DATE).toLocaleDateString('en-GB') : '',
+        'Basic Value': record.ZBASIC_VALUE || '',
+        'Invoice Value (GST)': record.ZINV_VALUE_GST || '',
+        'Physical Dispatch': record.ZPHY_DISPATCH || '',
+        'Fiscal Year': record.ZFYEAR || '',
+        'Fiscal Quarter': record.ZFIS_QUARTER || '',
+        'Fiscal Month': record.ZFIS_MONTH || '',
+        'Plant': record.ZPLANT || '',
+        'Transaction Type': record.ZTRX_TYPE || '',
+        'Billing Text': record.ZBILL_TRX_TEXT || '',
+        'Division': record.ZDIVISION || '',
+        'Sub Division': record.ZSUB_DIVISION || '',
+        'SO Ref No': record.ZSO_NO || '',
+        'Customer Name': record.ZCUST_NAME || '',
+        'Customer Group': record.ZCUST_GRP || '',
+        'Consignee Name': record.ZCONSIGN_NAME || '',
+        'Destination Location': record.ZDES_LOC || '',
+        'State': record.ZSTATE || '',
+        'Zone': record.ZZONE || '',
+        'Work Order': record.ZWORK_ORDER || '',
+        'LR No': record.ZLRNO || '',
+        'Transporter': record.ZTRANSPORTER || '',
+        'Vehicle Type': record.ZVEH_TYPE || '',
+        'Created Date': record.ZCREATED_DT || ''
+      }));
+    } else if (this.filterStatus === 'Pending') {
+      exportData = exportSource.map(record => ({
+        'Reference No': record.ZREFNO || '',
+        'Line No': record.ZLINE_NO || '',
+        'Date': record.ZCREATED_DT ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB') : '',
+        'Plant': record.ZWERKS || '',
+        'Division': record.ZDIVISION || '',
+        'Vehicle Type': record.ZVEH_TYPE || '',
+        'No. of Trucks': record.ZNO_TRUCKS || '',
+        'Work Order': record.ZWORK_ORDER || '',
+        'Vendor Code': record.ZVENDOR_CD || '',
+        'Transporter': record.ZTRANSPORTER || '',
+        'No. of LRs': record.ZNO_LRS || '',
+        'LR Number': record.ZLR_NO || '',
+        'Loading Point': record.ZLOAD_PT || '',
+        'Unloading Point': record.ZUNLOAD_PT || ''
+      }));
+    }
+
+    // 4️⃣ Create Excel sheet and workbook
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Order Info Records');
+    XLSX.utils.book_append_sheet(wb, ws, 'Records');
 
-    // Auto column width
-    const colWidths = Object.keys(exportData[0]).map(key => ({
-      wch: Math.max(key.length + 5, 15)
-    }));
+    // 5️⃣ Set auto column width
+    const colWidths = Object.keys(exportData[0]).map(key => ({ wch: Math.max(key.length + 5, 18) }));
     ws['!cols'] = colWidths;
 
-    XLSX.writeFile(wb, 'Order_Info_Records.xlsx');
+    // 6️⃣ Write file
+    XLSX.writeFile(wb, fileName);
+
+    Swal.fire('Success', `Excel file downloaded: ${fileName}`, 'success');
   }
+
+
 }
