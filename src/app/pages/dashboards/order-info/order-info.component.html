@@ -228,13 +228,13 @@
 
 
       <!-- Filter Options Header -->
-      <div class="filter-header">
+      <div class="filter-header" *ngIf="filterSapType">
         <i class="fas fa-filter"></i>
         <span>Filter Options</span>
       </div>
 
       <!-- Filter Form -->
-      <div class="card-body-LE">
+      <div class="card-body-LE" *ngIf="filterSapType">
         <div class="form-grid">
 
           <!-- From Date -->
@@ -337,6 +337,13 @@
     (filterStatus === 'Pending' && (!dispatchData || dispatchData.length === 0)) ">
             <i class="fas fa-file-excel"></i> Download Excel
           </button>
+          <button class="btn btn-download-pdf" (click)="downloadPDF()" [disabled]="
+    (filterStatus === 'Completed' && (!orderInfoData || orderInfoData.length === 0)) ||
+    (filterStatus === 'Pending' && (!dispatchData || dispatchData.length === 0))
+  ">
+            <i class="fas fa-file-pdf"></i> Download PDF
+          </button>
+
         </div>
       </div>
 

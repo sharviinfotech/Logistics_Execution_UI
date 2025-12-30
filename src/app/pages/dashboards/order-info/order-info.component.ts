@@ -9,6 +9,8 @@ import { SharedModule } from '../saas/shared/shared.module';
 import { Router } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
 import * as XLSX from 'xlsx';
+import * as jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-order-info',
@@ -1149,9 +1151,11 @@ export class OrderInfoComponent implements OnInit {
 
       this.spinner.show();
       this.service.PlantBasedDivison(payload).subscribe(
+
         (res: any) => {
           this.spinner.hide();
           if (res?.DIVISION) {
+            console.log("✅ Filter Division Response:", res);
             const divisionObj = this.divisionList?.find(
               (d: any) => d.DIVISION === res.DIVISION
             );
@@ -1277,10 +1281,10 @@ export class OrderInfoComponent implements OnInit {
     let fileName = '';
 
     if (this.filterStatus === 'Completed') {
-      exportSource = this.orderInfoData; // SAP or Non-SAP completed records
+      exportSource = this.orderInfoData; 
       fileName = this.sapType === 'SAP' ? 'Order_Info_Completed_SAP.xlsx' : 'Order_Info_Completed_NonSAP.xlsx';
     } else if (this.filterStatus === 'Pending') {
-      exportSource = this.dispatchData; // SAP or Non-SAP pending records
+      exportSource = this.dispatchData; 
       fileName = this.sapType === 'SAP' ? 'Dispatch_Pending_SAP.xlsx' : 'Dispatch_Pending_NonSAP.xlsx';
     } else {
       Swal.fire('Warning', 'Please select valid status before download', 'warning');
@@ -1302,6 +1306,7 @@ export class OrderInfoComponent implements OnInit {
         'Invoice No': record.ZINV_NO || '',
         'Line No': record.ZLINE_NO || '',
         'ODN No': record.ZODN_NO || '',
+        
         'Invoice Date': record.ZINV_DATE ? new Date(record.ZINV_DATE).toLocaleDateString('en-GB') : '',
         'Basic Value': record.ZBASIC_VALUE || '',
         'Invoice Value (GST)': record.ZINV_VALUE_GST || '',
@@ -1360,6 +1365,189 @@ export class OrderInfoComponent implements OnInit {
 
     Swal.fire('Success', `Excel file downloaded: ${fileName}`, 'success');
   }
+
+  downloadPDF() {
+    // 1️⃣ Determine data source based on status
+    let exportSource: any[] = [];
+    let fileName = '';
+    let reportTitle = '';
+
+    if (this.filterStatus === 'Completed') {
+      exportSource = this.orderInfoData;
+      fileName = this.sapType === 'SAP' ? 'Order_Info_Completed_SAP.pdf' : 'Order_Info_Completed_NonSAP.pdf';
+      reportTitle = 'Order Info Records (Completed)';
+    } else if (this.filterStatus === 'Pending') {
+      exportSource = this.dispatchData;
+      fileName = this.sapType === 'SAP' ? 'Dispatch_Pending_SAP.pdf' : 'Dispatch_Pending_NonSAP.pdf';
+      reportTitle = 'Dispatch Records (Pending)';
+    } else {
+      Swal.fire('Warning', 'Please select valid status before download', 'warning');
+      return;
+    }
+
+    // 2️⃣ Check if data is available
+    if (!exportSource || exportSource.length === 0) {
+      Swal.fire('Warning', 'No data available to download', 'warning');
+      return;
+    }
+
+    const doc = new (jsPDF as any).default('l', 'mm', 'a4'); // landscape
+
+    /* ===== PDF HEADING ===== */
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text(reportTitle, doc.internal.pageSize.getWidth() / 2, 12, {
+      align: 'center'
+    });
+
+    /* Optional subtitle */
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`,
+      doc.internal.pageSize.getWidth() / 2,
+      18,
+      { align: 'center' }
+    );
+
+    let headers: any[] = [];
+    let data: any[] = [];
+
+    // 3️⃣ Generate headers and data based on status
+    if (this.filterStatus === 'Completed') {
+      headers = [[
+        'SI.No',
+        'REFNO',
+        'Invoice No',
+        'Line No',
+        'ODN No',
+        'Invoice Date',
+        'Basic Value',
+        'Invoice Value (GST)',
+        'Physical Dispatch',
+        'Fiscal Year',
+        'System Date',
+        'Fiscal Quarter',
+        'Fiscal Month',
+        'Plant',
+        'Transaction Type',
+        'Bill Text',
+        'Division',
+        'Sub Division',
+        'SO Ref No',
+        'Customer Name',
+        'Customer Group',
+        'Consignee Name',
+        'Destination Location',
+        'State',
+        'Zone',
+        'Work Order',
+        'LR No',
+        'Transporter',
+        'Created date',
+        'Vehicle Type'
+      ]];
+
+      data = exportSource.map((record, index) => ([
+        index + 1,
+        record.ZREFNO || '',
+        record.ZINV_NO || '',
+        record.ZLINE_NO || '',
+        record.ZODN_NO || '',
+        record.ZINV_DATE ? new Date(record.ZINV_DATE).toLocaleDateString('en-GB') : '',
+        record.ZBASIC_VALUE || '',
+        record.ZINV_VALUE_GST || '',
+        record.ZPHY_DISPATCH || '',
+        record.ZFYEAR || '',
+        record.ZSYS_DATE ? new Date(record.ZSYS_DATE).toLocaleDateString('en-GB') : '',
+        record.ZFIS_QUARTER || '',
+        record.ZFIS_MONTH || '',
+        record.ZPLANT || '',
+        record.ZTRX_TYPE || '',
+        record.ZBILL_TRX_TEXT || '',
+        record.ZDIVISION || '',
+        record.ZSUB_DIVISION || '',
+        record.ZSO_NO || '',
+        record.ZCUST_NAME || '',
+        record.ZCUST_GRP || '',
+        record.ZCONSIGN_NAME || '',
+        record.ZDES_LOC || '',
+        record.ZSTATE || '',
+        record.ZZONE || '',
+        record.ZWORK_ORDER || '',
+        record.ZLRNO || '',
+        record.ZTRANSPORTER || '',
+        record.ZCREATED_DT ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB') : '',
+        record.ZVEH_TYPE || ''
+      ]));
+    } else if (this.filterStatus === 'Pending') {
+      headers = [[
+        'SI.No',
+        'Reference No',
+        'Line No',
+        'Date',
+        'Plant',
+        'Division',
+        'Vehicle Type',
+        'No. of Trucks',
+        'Work Order',
+        'Vendor Code',
+        'Transporter',
+        'No. of LRs',
+        'LR Number',
+        'Loading Point',
+        'Unloading Point'
+      ]];
+
+      data = exportSource.map((record, index) => ([
+        index + 1,
+        record.ZREFNO || '',
+        record.ZLINE_NO || '',
+        record.ZCREATED_DT ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB') : '',
+        record.ZWERKS || '',
+        record.ZDIVISION || '',
+        record.ZVEH_TYPE || '',
+        record.ZNO_TRUCKS || '',
+        record.ZWORK_ORDER || '',
+        record.ZVENDOR_CD || '',
+        record.ZTRANSPORTER || '',
+        record.ZNO_LRS || '',
+        record.ZLR_NO || '',
+        record.ZLOAD_PT || '',
+        record.ZUNLOAD_PT || ''
+      ]));
+    }
+
+    autoTable(doc, {
+      head: headers,
+      body: data,
+      startY: 25,
+      styles: {
+        fontSize: 6,
+        cellPadding: 1.5
+      },
+      headStyles: {
+        fillColor: [52, 152, 219],
+        fontStyle: 'bold',
+        fontSize: 6
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245]
+      },
+      // columnStyles: {
+      //   0: { cellWidth: 8 },  
+      //   1: { cellWidth: 12 }, 
+      //   2: { cellWidth: 12 }, 
+      //   3: { cellWidth: 10 }, 
+      //   4: { cellWidth: 12 }, 
+      // },
+      theme: 'grid'
+    });
+
+    doc.save(fileName);
+    Swal.fire('Success', `PDF file downloaded: ${fileName}`, 'success');
+  }
+
+
 
 
 }

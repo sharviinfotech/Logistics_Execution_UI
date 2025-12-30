@@ -186,227 +186,236 @@
                   <button type="button" class="search-btn-global" (click)="onSearchReference()">
                     <i class="fas fa-search"></i>
                   </button>
+                </div>
               </div>
+
+
+
+
             </div>
-      
-      
-      
-      
+
           </div>
-      
         </div>
-      </div>
 
 
-      <!-- COMMON FIELDS + PRODUCT TABLE -->
-      <div *ngIf="showForm">
+        <!-- COMMON FIELDS + PRODUCT TABLE -->
+        <div *ngIf="showForm">
 
-        <!-- COMMON FIELDS -->
-        <div class="form-grid" [formGroup]="ProductInfo">
-          <!-- Incoterms -->
-          <div class="form-field">
-            <ng-container *ngIf="!isSap(); else incSap">
-              <select formControlName="ZINCO">
-                <option value="">Select Incoterm</option>
-                <option *ngFor="let i of IncotermsList" [value]="i.INCO1">
-                  {{ i.INCO1 }} - {{ i.BEZEI }}
+          <!-- COMMON FIELDS -->
+          <div class="form-grid" style="margin-bottom: 5px;margin-top: 20px;" [formGroup]="ProductInfo">
+            <!-- Incoterms -->
+            <div class="form-field">
+              <ng-container *ngIf="!isSap(); else incSap">
+                <select formControlName="ZINCO">
+                  <option value="">Select Incoterm</option>
+                  <option *ngFor="let i of IncotermsList" [value]="i.INCO1">
+                    {{ i.INCO1 }} - {{ i.BEZEI }}
+                  </option>
+                </select>
+              </ng-container>
+
+              <ng-template #incSap>
+                <input type="text" formControlName="ZINCO" readonly />
+              </ng-template>
+
+              <label>Incoterms</label>
+            </div>
+
+            <!-- Insurance Scope -->
+            <div class="form-field">
+              <select formControlName="ZINS_SCPOE">
+                <option value="">Select Insurance Scope</option>
+                <option *ngFor="let option of insuranceScopeOptions" [value]="option">
+                  {{ option }}
                 </option>
               </select>
-            </ng-container>
+              <label>Insurance Scope</label>
+            </div>
 
-            <ng-template #incSap>
-              <input type="text" formControlName="ZINCO" readonly />
-            </ng-template>
+            <!-- Kilometres -->
+            <div class="form-field">
+              <input type="number" formControlName="ZKM" min="0" placeholder=" " />
+              <label>Kilometres</label>
+            </div>
 
-            <label>Incoterms</label>
+            <div class="form-field" *ngIf="sapType === 'Non-SAP'">
+              <input type="text" formControlName="VBELN" min="0" placeholder=" " />
+              <label>DC Reference Number</label>
+            </div>
+
           </div>
 
-          <!-- Insurance Scope -->
-          <div class="form-field">
-            <select formControlName="ZINS_SCPOE">
-              <option value="">Select Insurance Scope</option>
-              <option *ngFor="let option of insuranceScopeOptions" [value]="option">
-                {{ option }}
-              </option>
-            </select>
-            <label>Insurance Scope</label>
+          <!-- PRODUCT TABLE -->
+          <div class="table-responsive">
+
+            <form [formGroup]="ProductInfo">
+              <table class="table table-bordered">
+
+                <thead>
+                  <tr>
+                    <th><input type="checkbox" (change)="toggleAllSelection($event)" [checked]="isAllSelected" /></th>
+                    <th>SI.No.</th>
+                    <th>Map ID</th>
+                    <th>Product</th>
+                    <th>Type of Material</th>
+                    <th>Material Description</th>
+                    <th>No of Sets/No (Qty)</th>
+                    <th>Ah Loaded</th>
+                    <th>Shipment Weight(kg)</th>
+                    <th>Battery Condition</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+
+                <tbody formArrayName="items">
+                  <tr *ngFor="let item of items.controls; index as i" [formGroupName]="i">
+
+                    <td><input type="checkbox" formControlName="selected" (change)="onRowCheckboxChange()" /></td>
+
+                    <td>{{ i + 1 }}</td>
+
+                    <td>
+                      <select formControlName="ZMAPID" (change)="onchangeMAPID(i)">
+                        <option value="">Select</option>
+                        <option *ngFor="let option of selectedItems" [value]="option.MAPID">
+                          {{ option.MAPID }}
+                        </option>
+                      </select>
+                    </td>
+
+                    <td>
+                      <select formControlName="ZPRODUCT">
+                        <option value="">Select Product</option>
+                        <option *ngFor="let option of productOptions" [value]="option">{{ option }}</option>
+                      </select>
+                    </td>
+
+                    <td>
+                      <select formControlName="MTART">
+                        <option value="">Select Type</option>
+
+                        <option value="Batteries">Batteries</option>
+                        <option value="Acid">Acid</option>
+                        <option value="Electronic Goods">Electronic Goods</option>
+                        <option value="Scrap">Scrap</option>
+                        <option value="Rack">Rack</option>
+                        <option value="Stack Box">Stack Box</option>
+                        <option value="Packing material">Packing material</option>
+                        <option value="T-CAS">T-CAS</option>
+                        <option value="PC Wire">PC Wire</option>
+                        <option value="Raw material">Raw material</option>
+                        <option value="Contrate Product">Contrate Product</option>
+
+                      </select>
+                    </td>
+
+                    <td><input type="text" formControlName="MAKTX" /></td>
+                    <td><input type="number" formControlName="ZSETS" min="0" /></td>
+
+                    <td>
+                      <input type="number" formControlName="ZAH" min="0"
+                        *ngIf="item.get('ZPRODUCT')?.value === 'Batteries'" />
+                    </td>
+
+                    <td><input type="number" formControlName="ZSHIP_WT" /></td>
+
+                    <td>
+                      <select formControlName="ZBATCOND" *ngIf="item.get('ZPRODUCT')?.value === 'Batteries'">
+                        <option value="">Select Condition</option>
+                        <option *ngFor="let opt of batteryConditionOptions" [value]="opt">
+                          {{ opt }}
+                        </option>
+                      </select>
+                    </td>
+
+                    <td class="d-flex">
+                      <button type="button" class="form-field" (click)="addRow()">+</button>
+                      <button type="button" class="btn-remove" (click)="removeRow(i)" [disabled]="items.length === 1">
+                        ✖
+                      </button>
+                    </td>
+
+                  </tr>
+                </tbody>
+
+              </table>
+            </form>
+
           </div>
 
-          <!-- Kilometres -->
-          <div class="form-field">
-            <input type="number" formControlName="ZKM" min="0" placeholder=" " />
-            <label>Kilometres</label>
-          </div>
-
-          <div class="form-field" *ngIf="sapType === 'Non-SAP'">
-            <input type="text" formControlName="INV_VBELN" min="0" placeholder=" " />
-            <label>DC Reference Number</label>
+          <!-- SAVE BUTTONS -->
+          <div class="text-right">
+            <button class="btn btn-md btn-raised btnSave" (click)="saveShipmentOutward('stay')">Save</button>
+            <button class="btn btn-md btn-raised btnSave move" (click)="saveShipmentOutward('next')">Save and
+              Next</button>
+            <button class="btn btn-md btn-raised btnSave prev" (click)="saveShipmentOutward('previous')">Save and
+              Previous</button>
           </div>
 
         </div>
-
-        <!-- PRODUCT TABLE -->
-        <div class="table-responsive">
-
-          <form [formGroup]="ProductInfo">
-            <table class="table table-bordered">
-
-              <thead>
-                <tr>
-                  <th><input type="checkbox" (change)="toggleAllSelection($event)" [checked]="isAllSelected" /></th>
-                  <th>SI.No.</th>
-                  <th>Map ID</th>
-                  <th>Product</th>
-                  <th>Type of Material</th>
-                  <th>Material Description</th>
-                  <th>No of Sets/No (Qty)</th>
-                  <th>Ah Loaded</th>
-                  <th>Shipment Weight(kg)</th>
-                  <th>Battery Condition</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-
-              <tbody formArrayName="items">
-                <tr *ngFor="let item of items.controls; index as i" [formGroupName]="i">
-
-                  <td><input type="checkbox" formControlName="selected" (change)="onRowCheckboxChange()" /></td>
-
-                  <td>{{ i + 1 }}</td>
-
-                  <td>
-                    <select formControlName="ZMAPID" (change)="onchangeMAPID(i)">
-                      <option value="">Select</option>
-                      <option *ngFor="let option of selectedItems" [value]="option.MAPID">
-                        {{ option.MAPID }}
-                      </option>
-                    </select>
-                  </td>
-
-                  <td>
-                    <select formControlName="ZPRODUCT">
-                      <option value="">Select Product</option>
-                      <option *ngFor="let option of productOptions" [value]="option">{{ option }}</option>
-                    </select>
-                  </td>
-
-                  <td>
-                    <select formControlName="MTART">
-                      <option value="">Select Type</option>
-
-                      <option value="Batteries">Batteries</option>
-                      <option value="Acid">Acid</option>
-                      <option value="Electronic Goods">Electronic Goods</option>
-                      <option value="Scrap">Scrap</option>
-                      <option value="Rack">Rack</option>
-                      <option value="Stack Box">Stack Box</option>
-                      <option value="Packing material">Packing material</option>
-                      <option value="T-CAS">T-CAS</option>
-                      <option value="PC Wire">PC Wire</option>
-                      <option value="Raw material">Raw material</option>
-                      <option value="Contrate Product">Contrate Product</option>
-
-                    </select>
-                  </td>
-
-                  <td><input type="text" formControlName="MAKTX" /></td>
-                  <td><input type="number" formControlName="ZSETS" min="0" /></td>
-
-                  <td>
-                    <input type="number" formControlName="ZAH" min="0"
-                      *ngIf="item.get('ZPRODUCT')?.value === 'Batteries'" />
-                  </td>
-
-                  <td><input type="number" formControlName="ZSHIP_WT" /></td>
-
-                  <td>
-                    <select formControlName="ZBATCOND" *ngIf="item.get('ZPRODUCT')?.value === 'Batteries'">
-                      <option value="">Select Condition</option>
-                      <option *ngFor="let opt of batteryConditionOptions" [value]="opt">
-                        {{ opt }}
-                      </option>
-                    </select>
-                  </td>
-
-                  <td class="d-flex">
-                    <button type="button" class="form-field" (click)="addRow()">+</button>
-                    <button type="button" class="btn-remove" (click)="removeRow(i)" [disabled]="items.length === 1">
-                      ✖
-                    </button>
-                  </td>
-
-                </tr>
-              </tbody>
-
-            </table>
-          </form>
-
-        </div>
-
-        <!-- SAVE BUTTONS -->
-        <div class="text-right">
-          <button class="btn btn-md btn-raised btnSave" (click)="saveShipmentOutward('stay')">Save</button>
-          <button class="btn btn-md btn-raised btnSave move" (click)="saveShipmentOutward('next')">Save and
-            Next</button>
-          <button class="btn btn-md btn-raised btnSave prev" (click)="saveShipmentOutward('previous')">Save and
-            Previous</button>
-        </div>
-
       </div>
     </div>
   </div>
-</div>
 
-<div *ngIf="mainMode === 'filter'" class="filter-section">
+  <div *ngIf="mainMode === 'filter'" class="filter-section">
 
-      <!-- Filter Options Header -->
-      <div class="filter-header">
-        <i class="fas fa-filter"></i>
-        <span>Filter Options</span>
+    <!-- SAP Type Selection (Filter Mode) -->
+    <div class="filter-sap-row" style="display: flex; margin-bottom: 10px;">
+      <div class="form-radio optional sap-radio">
+        <label>
+          <input type="radio" [(ngModel)]="filterSapType" value="SAP" (change)="onFilterSapTypeChange()" />
+          <span>With SAP</span>
+        </label>
+        <label>
+          <input type="radio" [(ngModel)]="filterSapType" value="Non-SAP" (change)="onFilterSapTypeChange()" />
+          <span>Without SAP</span>
+        </label>
       </div>
+    </div>
 
-      <!-- Filter Form -->
-      <div class="card-body-LE">
-        <div class="form-grid">
+    <!-- Filter Options Header -->
+    <div class="filter-header" *ngIf="filterSapType">
+      <i class="fas fa-filter"></i>
+      <span>Filter Options</span>
+    </div>
 
-          <!-- From Date -->
-          <div class="form-field">
-            <input type="date" [(ngModel)]="filterFromDate" />
-            <label>From Date</label>
-          </div>
+    <!-- Filter Form -->
+    <div class="card-body-LE" *ngIf="filterSapType">
+      <div class="form-grid">
 
-          <!-- To Date -->
-          <div class="form-field">
-            <input type="date" [(ngModel)]="filterToDate" />
-            <label>To Date</label>
-          </div>
+        <!-- From Date -->
+        <div class="form-field">
+          <input type="date" [(ngModel)]="filterFromDate" />
+          <label>From Date</label>
+        </div>
 
-          <!-- Plant -->
-          <div class="form-field">
+        <!-- To Date -->
+        <div class="form-field">
+          <input type="date" [(ngModel)]="filterToDate" />
+          <label>To Date</label>
+        </div>
+
+         <div class="form-field">
             <select [(ngModel)]="filterPlant" (change)="onFilterPlantChange()">
               <option value="">Select Plant</option>
-              <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT">
-                {{ plant.PLANT }}
-              </option>
+              <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT">{{ plant.PLANT }} - {{ plant.PLANT_DESC }}</option>
             </select>
             <label>Plant</label>
           </div>
 
-          <!-- Division (Auto-filled from Plant) -->
-          <!-- Division (Auto-filled from Plant OR select to fill Plant) -->
+          <!-- Division -->
           <div class="form-field">
             <select [(ngModel)]="filterDivision" (change)="onFilterDivisionChange()">
               <option value="">Select Division</option>
-              <option *ngFor="let plant of PlantCodeList" [value]="plant.DIVISION">
-                {{ plant.DIVISION }}
+              <option *ngFor="let plant of PlantCodeList" [value]="plant.DIVISION">{{ plant.DIVISION }} 
               </option>
             </select>
             <label>Division</label>
           </div>
 
-          <!-- Transporter -->
+          <!-- Customer -->
           <div class="form-field">
-            <select [(ngModel)]="filterTransporter" (change)="onFilterTransporterChange()">
+            <select [(ngModel)]="filterTransporter">
               <option value="">Select Transporter</option>
               <option *ngFor="let transporter of VendorCodeList" [value]="transporter.TRANSPORTER">
                 {{ transporter.TRANSPORTER }}
@@ -415,97 +424,66 @@
             <label>Transporter</label>
           </div>
 
-          <!-- Vehicle Type -->
-          <div class="form-field">
-            <select [(ngModel)]="filterVehicleType">
-              <option value="">Select Vehicle Type</option>
-              <option value="Cargo">Cargo</option>
-              <option value="Rate Contract">Rate Contract</option>
-              <option value="Local Transportation">Local Transportation</option>
-              <option value="Customer Transporter">Customer Transporter</option>
-              <option value="Company Vehicle">Company Vehicle</option>
-              <option value="Courier">Courier</option>
-              <option value="By Hand">By Hand</option>
-              <option value="Full Truck Load">Full Truck Load</option>
-            </select>
-            <label>Vehicle Type</label>
-          </div>
+
+        <!-- Vehicle Type -->
+        <div class="form-field">
+          <select [(ngModel)]="filterVehicleType">
+            <option value="">Select Vehicle Type</option>
+            <option value="Cargo">Cargo</option>
+            <option value="Rate Contract">Rate Contract</option>
+            <option value="Local Transportation">Local Transportation</option>
+            <option value="Customer Transporter">Customer Transporter</option>
+            <option value="Company Vehicle">Company Vehicle</option>
+            <option value="Courier">Courier</option>
+            <option value="By Hand">By Hand</option>
+            <option value="Full Truck Load">Full Truck Load</option>
+          </select>
+          <label>Vehicle Type</label>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="filter-actions">
-          <button class="btn btn-apply-filter" (click)="applyFilter()">
-            <i class="fas fa-filter"></i> Apply Filter
-          </button>
-          <!-- <button class="btn btn-clear-filter" (click)="clearFilters()">
-            <i class="fas fa-times"></i> Clear Filters
-          </button> -->
-          <button class="btn btn-download-excel" (click)="downloadExcel()"
-            [disabled]="!filteredData || filteredData.length === 0">
-            <i class="fas fa-file-excel"></i> Download Excel
-          </button>
-          <!-- <button class="btn btn-download-pdf" (click)="downloadPDF()" [disabled]="!filteredData || filteredData.length === 0">
-            <i class="fas fa-file-pdf"></i> Download PDF
-          </button> -->
-        </div>
+        <div class="form-field">
+        <select [(ngModel)]="filterStatus">
+          <option value="">Select Status Type</option>
+          <option value="Pending">Pending</option>
+          <option value="Completed">Completed</option>
+        </select>
+        <label>Status</label>
+      </div>
       </div>
 
+      
 
-
-
+      <!-- Action Buttons -->
+      <div class="filter-actions">
+        <button class="btn btn-apply-filter" (click)="applyFilter()">
+          <i class="fas fa-filter"></i> Apply Filter
+        </button>
+        <!-- <button class="btn btn-clear-filter" (click)="clearFilters()">
+            <i class="fas fa-times"></i> Clear Filters
+          </button> -->
+        <button class="btn btn-download-excel" (click)="downloadExcel()" [disabled]="
+       (filterStatus === 'Completed' && (!ShipmentData || ShipmentData.length === 0)) ||
+    (filterStatus === 'Pending' && (!dispatchData || dispatchData.length === 0)) ">
+          <i class="fas fa-file-excel"></i> Download Excel
+        </button>
+        <button class="btn btn-download-pdf" (click)="downloadPDF()" [disabled]="
+    (filterStatus === 'Completed' && (!ShipmentData || ShipmentData.length === 0)) ||
+    (filterStatus === 'Pending' && (!dispatchData || dispatchData.length === 0))
+  ">
+          <i class="fas fa-file-pdf"></i> Download PDF
+        </button>
+      </div>
     </div>
 
-  </div>
 
 
-<div class="card" style="margin-top: 10px;" *ngIf="filteredData && filteredData.length > 0">
-  <div class="card-body-LE">
-    <!-- Results Table -->
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped text-center">
-        <thead>
-          <tr>
-            <th>SI.No</th>
-            <th>Reference No</th>
-            <th>Line No</th>
-            <th>Date</th>
-            <th>Plant</th>
-            <th>Division</th>
-            <th>Vehicle Type</th>
-            <th>No. of Trucks</th>
-            <th>Work Order</th>
-            <th>Vendor Code</th>
-            <th>Transporter</th>
-            <th>No. of LRs</th>
-            <th>LR Number</th>
-            <th>Loading Point</th>
-            <th>Unloading Point</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let record of filteredData; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>{{ record.ZREFNO }}</td>
-            <td>{{ record.ZLINE_NO }}</td>
-            <td>{{ record.ZCREATED_DT | date: 'dd-MM-yyyy' }}</td>
-            <td>{{ record.ZWERKS }}</td>
-            <td>{{ record.ZDIVISION }}</td>
-            <td>{{ record.ZVEH_TYPE }}</td>
-            <td>{{ record.ZNO_TRUCKS }}</td>
-            <td>{{ record.ZWORK_ORDER }}</td>
-            <td>{{ record.ZVENDOR_CD }}</td>
-            <td>{{ record.ZTRANSPORTER }}</td>
-            <td>{{ record.ZNO_LRS }}</td>
-            <td>{{ record.ZLR_NO }}</td>
-            <td>{{ record.ZLOAD_PT }}</td>
-            <td>{{ record.ZUNLOAD_PT }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+
   </div>
 
 </div>
+
+
+
 <!-- Search Results Table -->
 <div *ngIf="searchOptionsList?.length > 0" class="table-responsive mt-3">
   <table class="table table-bordered table-striped text-center">
@@ -554,6 +532,119 @@
         <td>{{ item.ZLRNO || '-' }}</td>
         <td>{{ item.ZTRANSPORTER || '-' }}</td>
       </tr>
+    </tbody>
+  </table>
+</div>
+
+<div *ngIf="filterStatus === 'Completed' && ShipmentData?.length > 0 && mainMode === 'filter'"
+  class="table-responsive mt-3">
+
+  <table class="table table-bordered table-striped text-center">
+    <thead>
+      <tr>
+        <th>SI.No</th>
+        <th>Map ID</th>
+        <th>REFNO</th>
+        <th>Invoice No</th>
+        <th>Line No</th>
+        <th>Odn Number</th>
+        <th>SO Number</th>
+        <th>Incoterms</th>
+        <th>Insurance Scope</th>
+        <th>Kilometres</th>
+        <th>Product</th>
+        <th>Type of Material</th>
+        <th>Material Description</th>
+        <th>No of Sets/No (Qty)</th>
+        <th>Ah Loaded</th>
+        <th>Shipment Weight(kg)</th>
+        <th>Battery Condition</th>
+        <th>Plant</th>
+        <th>Division</th>
+        <th>Work Order</th>
+        <th>LR No</th>
+        <th>Transporter</th>
+        <th>Created date</th>
+        <th>Vehicle Type</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let item of ShipmentData; let i = index">
+        <td>{{ i + 1 }}</td>
+        <td>{{ item.ZMAPID }}</td>
+        <td>{{ item.ZREFNO }}</td>
+        <td>{{ item.VBELN }}</td>
+        <td>{{ item.ZLINE_NO }}</td>
+        <td>{{ item.ZODN_NO }}</td>
+        <td>{{ item.ZSO_NO }}</td>
+        <td>{{ item.ZINCO }}</td>
+        <td>{{ item.ZINS_SCPOE }}</td>
+        <td>{{ item.ZKM }}</td>
+        <td>{{ item.ZPRODUCT }}</td>
+        <td>{{ item.MTART}}</td>
+        <td>{{ item.MAKTX }}</td>
+        <td>{{ item.ZSETS }}</td>
+        <td>{{ item.ZAH }}</td>
+        <td>{{ item.ZSHIP_WT }}</td>
+        <td>{{ item.ZBATCOND }}</td>
+        <td>{{ item.ZPLANT }}</td>
+
+        <td>{{ item.ZDIVISION }}</td>
+        <td>{{ item.ZWORK_ORDER }}</td>
+        <td>{{ item.ZLRNO }}</td>
+        <td>{{ item.ZTRANSPORTER }}</td>
+        <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
+        <td>{{ item.ZVEH_TYPE }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div *ngIf="filterStatus === 'Pending' && dispatchData?.length > 0 && mainMode === 'filter'"
+  class="table-responsive mt-3">
+
+  <table class="table table-bordered table-striped text-center">
+    <thead>
+      <tr>
+        <th>SI.No</th>
+        <th>Reference No</th>
+        <th>Line No</th>
+        <th>Date</th>
+        <th>Plant</th>
+        <th>Division</th>
+        <th>Vehicle Type</th>
+        <th>No. of Trucks</th>
+        <th>Work Order</th>
+        <th>Vendor Code</th>
+        <th>Transporter</th>
+        <th>No. of LRs</th>
+        <th>LR Number</th>
+        <th>Loading Point</th>
+        <th>Unloading Point</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let item of dispatchData; let i = index">
+
+        <td>{{ i + 1 }}</td>
+        <td>{{ item.ZREFNO }}</td>
+        <td>{{ item.ZLINE_NO }}</td>
+        <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
+        <td>{{ item.ZWERKS }}</td>
+        <td>{{ item.ZDIVISION }}</td>
+        <td>{{ item.ZVEH_TYPE }}</td>
+        <td>{{ item.ZNO_TRUCKS }}</td>
+        <td>{{ item.ZWORK_ORDER }}</td>
+        <td>{{ item.ZVENDOR_CD }}</td>
+        <td>{{ item.ZTRANSPORTER }}</td>
+        <td>{{ item.ZNO_LRS }}</td>
+        <td>{{ item.ZLR_NO }}</td>
+        <td>{{ item.ZLOAD_PT }}</td>
+        <td>{{ item.ZUNLOAD_PT }}</td>
+      </tr>
+
+
     </tbody>
   </table>
 </div>

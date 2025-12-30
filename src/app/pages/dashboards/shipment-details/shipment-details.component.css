@@ -1,15 +1,5 @@
 /* Radio button styling */
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 13px;
-    margin-top: 10px;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 10px !important;
-    margin-top: 20px;
-    margin-bottom: 5px;
-}
+
 
 
 
@@ -97,7 +87,7 @@ input[type="radio"] {
 
 .input-row .form-field {
   flex: 1;
-  min-width: 280px;
+  
   position: relative;
 }
 /* .form-field input,

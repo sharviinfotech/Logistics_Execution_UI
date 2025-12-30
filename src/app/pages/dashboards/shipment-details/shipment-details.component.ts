@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, FormArray, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { GeneralserviceService } from 'src/app/generalservice.service';
@@ -30,6 +30,9 @@ export class ShipmentDetailsComponent implements OnInit {
   orderType: string = '';
   sapType: string = '';
   ponumber: string = '';
+  PlantCodeList: any[] = [];
+
+
   invoicenumber: string = '';
   TypeofmaterialList: any = [];
   IncotermsList: any[] = [];
@@ -61,11 +64,21 @@ export class ShipmentDetailsComponent implements OnInit {
   filterDivision: string = '';
   filterTransporter: string = '';
   filterVehicleType: string = '';
+  filterStatus: string = '';
   filteredData: any[] = [];
   filterApplied: boolean = false;
 
+  searchValue: string;
+  VendorCodeList: any[] = [];
+  ShipmentData: any[] = [];
+  dispatchData: any[] = [];
+  filterSapType: string = '';
+  showOrderInfoTable = false;
+  showDispatchTable = false;
+
   constructor(
     private fb: FormBuilder,
+    private cd: ChangeDetectorRef,
     private service: GeneralserviceService,
     private spinner: NgxSpinnerService,
     public spinnerService: SpinnerService,
@@ -77,12 +90,15 @@ export class ShipmentDetailsComponent implements OnInit {
       ZINCO: ['', Validators.required],
       ZINS_SCPOE: ['', Validators.required],
       ZKM: [null, [Validators.required, Validators.min(0)]],
-      INV_VBELN: [''],
+      VBELN: [''],
       items: this.fb.array([this.createItemRow()]),
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
 
     this.fetchIncoterms();
+    this.fetchTransporter();
+    this.fetchPlantCodeList();
+
   }
 
   // Getter for Product Items FormArray
@@ -120,7 +136,7 @@ export class ShipmentDetailsComponent implements OnInit {
       ZPIN_PLT: [''],
       ZPIN_STP: [''],
       ZKM: [''],
-      INV_VBELN: [''],
+      
       ZWORK_ORDER: [''],
       ZLRNO: [''],
       ZTRANSPORTER: [''],
@@ -191,6 +207,24 @@ export class ShipmentDetailsComponent implements OnInit {
     }
   }
 
+  onFilterSapTypeChange() {
+    console.log('Selected SAP type in filter mode:', this.filterSapType);
+
+    // Update the current sapType based on filter selection
+    this.sapType = this.filterSapType;
+
+    // Reset previous filtered data
+    this.ShipmentData = [];
+    this.dispatchData = [];
+
+    // Automatically fetch filtered data if dates are provided
+    if (this.filterFromDate && this.filterToDate) {
+      this.applyFilter();
+    } else {
+      console.log('ℹ️ From and To dates are not selected yet.');
+    }
+  }
+
   onOrderTypeChange(): void {
     if (this.previousOrderType !== null && this.previousOrderType !== this.orderType) {
       this.sapType = '';
@@ -215,6 +249,7 @@ export class ShipmentDetailsComponent implements OnInit {
     this.filterDivision = '';
     this.filterTransporter = '';
     this.filterVehicleType = '';
+    this.filterStatus = '';
     this.filteredData = [];
     this.filterApplied = false;
 
@@ -340,7 +375,7 @@ export class ShipmentDetailsComponent implements OnInit {
       ZTRANSPORTER: selectedObj.transporter ?? null,
 
       // ✅ REQUIRED FOR NON-SAP SAVE
-      VBELN: selectedObj.invNumber ?? this.ProductInfo.get('INV_VBELN')?.value ?? null,
+      VBELN: selectedObj.invNumber ?? this.ProductInfo.get('VBELN')?.value ?? null,
       POSNR: selectedObj.POSNR ?? null,
       MTART: selectedObj.materialType ?? null,
       ZSO_NO: selectedObj.soNumber ?? null,
@@ -561,7 +596,7 @@ export class ShipmentDetailsComponent implements OnInit {
           ZINCO: firstItem.ZINCO || '',
           ZINS_SCPOE: firstItem.ZINS_SCPOE || '',
           ZKM: firstItem.ZKM ?? null,
-          INV_VBELN: firstItem.INV_VBELN || ''
+          VBELN: firstItem.VBELN || ''
         });
 
         // Fill FormArray rows
@@ -589,7 +624,7 @@ export class ShipmentDetailsComponent implements OnInit {
               ZPIN_PLT: [item.ZPIN_PLT || ''],
               ZPIN_STP: [item.ZPIN_STP || ''],
               ZKM: [item.ZKM || ''],
-              INV_VBELN: [item.INV_VBELN || ''],
+             
               ZWORK_ORDER: [item.ZWORK_ORDER || ''],
               ZLRNO: [item.ZLRNO || ''],
               ZTRANSPORTER: [item.ZTRANSPORTER || ''],
@@ -816,7 +851,7 @@ export class ShipmentDetailsComponent implements OnInit {
             ZINCO: firstItem.ZINCO || '',
             ZINS_SCPOE: firstItem.ZINS_SCPOE || '',
             ZKM: firstItem.ZKM || 0,
-            INV_VBELN: firstItem.INV_VBELN || ''
+            VBELN: firstItem.VBELN || ''
           });
           res.forEach((item: any) => {
             this.items.push(this.fb.group({
@@ -863,4 +898,252 @@ export class ShipmentDetailsComponent implements OnInit {
     this.selectedType = option;
     this.dropdownOpen = false;
   }
+
+  fetchPlantCodeList(): void {
+    this.spinner.show();
+    this.service.fetchVendorCode().subscribe(
+      (res: any) => {
+        if (res && res[0]?.PLANT) {
+          this.PlantCodeList = res[0].PLANT;
+          this.spinner.hide();
+        } else {
+          Swal.fire("No Plant Found", "", "warning");
+        }
+      },
+      error => {
+        this.spinner.hide();
+      }
+    );
+  }
+
+
+
+  fetchTransporter(): void {
+    this.spinner.show();
+    this.service.fetchVendorCode().subscribe(
+      (res: any) => {
+        if (res && res.length > 0 && res[0].VEND_CODE) {
+          console.log("✅ Transporter Data Fetched:", res[0].VEND_CODE);
+
+          // ONLY transporter list
+          this.VendorCodeList = res[0].VEND_CODE;
+
+          this.spinner.hide();
+        } else {
+          Swal.fire("No Transporter Found", "", "warning");
+          this.spinner.hide();
+        }
+      },
+      error => {
+        console.error("❌ Transporter Fetch Error:", error);
+        this.spinner.hide();
+      }
+    );
+  }
+
+  onFilterDivisionChange(): void {
+    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
+
+    if (plantObj) {
+      this.filterPlant = plantObj.PLANT;
+    } else {
+      this.filterPlant = '';
+    }
+    this.cd.detectChanges();
+  }
+
+  onFilterPlantChange(): void {
+    const plantObj = this.PlantCodeList.find(item => item.PLANT === this.filterPlant);
+
+    if (plantObj) {
+      this.filterDivision = plantObj.DIVISION;
+    } else {
+      this.filterDivision = '';
+    }
+    this.cd.detectChanges();
+  }
+
+
+
+
+
+  applyFilter() {
+  if (!this.filterFromDate || !this.filterToDate) {
+    Swal.fire('Warning', 'Please select From Date and To Date', 'warning');
+    return;
+  }
+
+  const payload = {
+    GLOBAL: 'SHIPMENT DETAILS',
+    DATE_FROM: this.filterFromDate,
+    DATE_TO: this.filterToDate,
+    PLANT: this.filterPlant || '',
+    DIVISION: this.filterDivision || '',
+    TRANSPORTER: this.filterTransporter || '',
+    VEHICLE_TYPE: this.filterVehicleType || '',
+    STATUS: this.filterStatus || ''
+  };
+
+  this.spinner.show();
+
+  let apiCall;
+  if (this.sapType === 'SAP') {
+    apiCall = this.service.fetchOrderInfoFiltered(payload);
+  } else {
+    apiCall = this.service.OrderInfoNonSap({ READ: payload });
+  }
+
+  apiCall.subscribe({
+    next: (res: any) => {
+      this.spinner.hide();
+
+      /** 🔴 NO DATA FOUND HANDLING */
+      if (res?.STATUS === 'FALSE') {
+        this.ShipmentData = [];
+        this.dispatchData = [];
+
+        Swal.fire({
+          icon: 'info',
+          title: 'No Data Found',
+          text: res.MSG || 'No records available for selected filters'
+        });
+        return;
+      }
+
+      /** 🟢 DATA FOUND */
+      let records: any[] = [];
+      if (Array.isArray(res)) records = res;
+      else if (res?.HEADER) records = res.HEADER;
+      else if (res?.DATA) records = res.DATA;
+
+      if (this.filterStatus === 'Completed') {
+        this.ShipmentData = records;
+        this.dispatchData = [];
+        Swal.fire('Success', `Shipment records: ${records.length}`, 'success');
+      } 
+      else if (this.filterStatus === 'Pending') {
+        this.dispatchData = records;
+        this.ShipmentData = [];
+        Swal.fire('Success', `Dispatch records: ${records.length}`, 'success');
+      } 
+      else {
+        this.ShipmentData = [];
+        this.dispatchData = [];
+        Swal.fire('Info', 'Please select valid status', 'info');
+      }
+    },
+    error: (err) => {
+      this.spinner.hide();
+      Swal.fire('Error', 'Failed to fetch filtered data', 'error');
+      console.error(err);
+    }
+  });
+}
+
+
+
+
+  clearFilter() {
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterVehicleType = '';
+    this.filterStatus = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+
+  }
+
+  downloadExcel() {
+    // 1️⃣ Determine data source based on status
+    let exportSource: any[] = [];
+    let fileName = '';
+
+    if (this.filterStatus === 'Completed') {
+      exportSource = this.ShipmentData;
+      fileName = this.sapType === 'SAP' ? 'ShipmentData_Completed_SAP.xlsx' : 'ShipmentData_Completed_NonSAP.xlsx';
+    } else if (this.filterStatus === 'Pending') {
+      exportSource = this.dispatchData;
+      fileName = this.sapType === 'SAP' ? 'Dispatch_Pending_SAP.xlsx' : 'Dispatch_Pending_NonSAP.xlsx';
+    } else {
+      Swal.fire('Warning', 'Please select valid status before download', 'warning');
+      return;
+    }
+
+    // 2️⃣ Check if data is available
+    if (!exportSource || exportSource.length === 0) {
+      Swal.fire('Warning', 'No data available to download', 'warning');
+      return;
+    }
+
+    // 3️⃣ Map data for Excel
+    let exportData: any[] = [];
+
+    if (this.filterStatus === 'Completed') {
+      exportData = exportSource.map(record => ({
+        'Reference No': record.ZREFNO || '',
+        'Invoice No': record.ZINV_NO || '',
+        'Line No': record.ZLINE_NO || '',
+        'Map ID': record.ZMAPID || '',
+        'ODN No': record.ZODN_NO || '',
+        'SO No': record.ZSO_NO || '',
+        'Incoterms': record.ZINCO || '',
+        'Insurance Scope': record.ZINS_SCPOE || '',
+        'KM': record.ZKM || '',
+        'Product Code': record.ZPRODUCT || '',
+        'Type of Material': record.MTART || '',
+        'Material Description': record.MAKTX || '',
+        'No. of Sets': record.ZSETS || '',
+        'AH Truck Load': record.ZAH || '',
+        'Weight (in Kg)': record.ZSHIP_WT || '',
+        'Battery Condition': record.ZBATCOND || '',
+        'Plant': record.ZWERKS || '',
+        'Division': record.ZDIVISION || '',
+        'Work Order': record.ZWORK_ORDER || '',
+        'LR No': record.ZLRNO || '',
+        'Transporter': record.ZTRANSPORTER || '',
+        'Vehicle Type': record.ZVEH_TYPE || '',
+        'Created Date': record.ZCREATED_DT || ''
+      }));
+    } else if (this.filterStatus === 'Pending') {
+      exportData = exportSource.map(record => ({
+        'Reference No': record.ZREFNO || '',
+        'Line No': record.ZLINE_NO || '',
+        'Date': record.ZCREATED_DT ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB') : '',
+        'Plant': record.ZWERKS || '',
+        'Division': record.ZDIVISION || '',
+        'Vehicle Type': record.ZVEH_TYPE || '',
+        'No. of Trucks': record.ZNO_TRUCKS || '',
+        'Work Order': record.ZWORK_ORDER || '',
+        'Vendor Code': record.ZVENDOR_CD || '',
+        'Transporter': record.ZTRANSPORTER || '',
+        'No. of LRs': record.ZNO_LRS || '',
+        'LR Number': record.ZLR_NO || '',
+        'Loading Point': record.ZLOAD_PT || '',
+        'Unloading Point': record.ZUNLOAD_PT || ''
+      }));
+    }
+
+    // 4️⃣ Create Excel sheet and workbook
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Records');
+
+    // 5️⃣ Set auto column width
+    const colWidths = Object.keys(exportData[0]).map(key => ({ wch: Math.max(key.length + 5, 18) }));
+    ws['!cols'] = colWidths;
+
+    // 6️⃣ Write file
+    XLSX.writeFile(wb, fileName);
+
+    Swal.fire('Success', `Excel file downloaded: ${fileName}`, 'success');
+  }
+
+
+
+
+
+
 }

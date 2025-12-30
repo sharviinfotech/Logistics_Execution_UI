@@ -922,6 +922,7 @@ export class DispatchComponent implements OnInit {
     ws['!cols'] = colWidths;
 
     XLSX.writeFile(wb, 'Dispatch_Records.xlsx');
+     Swal.fire('Success', `Excel file downloaded: Dispatch_Records.xlsx`, 'success');
   }
 
   downloadPDF() {
@@ -996,6 +997,7 @@ export class DispatchComponent implements OnInit {
   });
 
   doc.save('Dispatch_Records.pdf');
+   Swal.fire('Success', `PDF file downloaded: Dispatch_Records.pdf  `, 'success');
 }
 
 }
