@@ -5,6 +5,28 @@
 
   <div class="card-body-LE">
 
+    <div class="Creation-radio">
+      <label>
+        <input type="radio" name="mainMode" [(ngModel)]="mainMode" value="creation" (change)="onMainModeChange()" />
+        <div class="icon">
+          <i class="fa fa-plus"></i>
+        </div>
+        <span>Creation</span>
+      </label>
+      <label>
+        <input type="radio" name="mainMode" [(ngModel)]="mainMode" value="filter" (change)="onMainModeChange()" />
+        <div class="icon red">
+          <i class="fa fa-file"></i>
+        </div>
+        <span>Filter and Download</span>
+
+      </label>
+    </div>
+
+    <br />
+
+    <div *ngIf="mainMode === 'creation'">
+     
     <!-- ORDER TYPE -->
     <div class="form-radio optional">
       <label>
@@ -196,6 +218,132 @@
       </button>
 
     </div>
+    </div>
+    <div *ngIf="mainMode === 'filter'" class="filter-section">
+
+      <!-- SAP Type Selection (Filter Mode) -->
+      <div class="filter-sap-row" style="display: flex; margin-bottom: 10px;">
+        <div class="form-radio optional sap-radio">
+          <label>
+            <input type="radio" [(ngModel)]="filterSapType" value="SAP" (change)="onFilterSapTypeChange()" />
+            <span>With SAP</span>
+          </label>
+          <label>
+            <input type="radio" [(ngModel)]="filterSapType" value="Non-SAP" (change)="onFilterSapTypeChange()" />
+            <span>Without SAP</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Filter Options Header -->
+      <div class="filter-header" *ngIf="filterSapType">
+        <i class="fas fa-filter"></i>
+        <span>Filter Options</span>
+      </div>
+
+      <!-- Filter Form -->
+      <div class="card-body-LE" *ngIf="filterSapType">
+        <div class="form-grid">
+
+          <!-- From Date -->
+          <div class="form-field">
+            <input type="date" [(ngModel)]="filterFromDate" />
+            <label>From Date</label>
+          </div>
+
+          <!-- To Date -->
+          <div class="form-field">
+            <input type="date" [(ngModel)]="filterToDate" />
+            <label>To Date</label>
+          </div>
+
+          <div class="form-field">
+            <select [(ngModel)]="filterPlant" (change)="onFilterPlantChange()">
+              <option value="">Select Plant</option>
+              <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT">{{ plant.PLANT }} - {{ plant.PLANT_DESC
+                }}
+              </option>
+            </select>
+            <label>Plant</label>
+          </div>
+
+          <!-- Division -->
+          <div class="form-field">
+            <select [(ngModel)]="filterDivision" (change)="onFilterDivisionChange()">
+              <option value="">Select Division</option>
+              <option *ngFor="let plant of PlantCodeList" [value]="plant.DIVISION">{{ plant.DIVISION }}
+              </option>
+            </select>
+            <label>Division</label>
+          </div>
+
+          <!-- Customer -->
+          <div class="form-field">
+            <select [(ngModel)]="filterTransporter">
+              <option value="">Select Transporter</option>
+              <option *ngFor="let transporter of VendorCodeList" [value]="transporter.TRANSPORTER">
+                {{ transporter.TRANSPORTER }}
+              </option>
+            </select>
+            <label>Transporter</label>
+          </div>
+
+
+          <!-- Vehicle Type -->
+          <div class="form-field">
+            <select [(ngModel)]="filterVehicleType">
+              <option value="">Select Vehicle Type</option>
+              <option value="Cargo">Cargo</option>
+              <option value="Rate Contract">Rate Contract</option>
+              <option value="Local Transportation">Local Transportation</option>
+              <option value="Customer Transporter">Customer Transporter</option>
+              <option value="Company Vehicle">Company Vehicle</option>
+              <option value="Courier">Courier</option>
+              <option value="By Hand">By Hand</option>
+              <option value="Full Truck Load">Full Truck Load</option>
+            </select>
+            <label>Vehicle Type</label>
+          </div>
+
+          <div class="form-field">
+            <select [(ngModel)]="filterStatus">
+              <option value="">Select Status Type</option>
+              <option value="Pending">Pending</option>
+              <option value="Completed">Completed</option>
+            </select>
+            <label>Status</label>
+          </div>
+        </div>
+
+
+
+        <!-- Action Buttons -->
+        <div class="filter-actions">
+          <button class="btn btn-apply-filter" (click)="applyFilter()">
+            <i class="fas fa-filter"></i> Apply Filter
+          </button>
+          <!-- <button class="btn btn-clear-filter" (click)="clearFilters()">
+            <i class="fas fa-times"></i> Clear Filters
+          </button> -->
+          <button class="btn btn-download-excel" (click)="downloadExcel()" [disabled]="
+            !filterApplied ||
+            (filterStatus === 'Completed' && FreightBillingData.length === 0) ||
+            (filterStatus === 'Pending' && dispatchData.length === 0)
+            ">
+            <i class="fas fa-file-excel"></i> Download Excel
+          </button>
+
+          <button class="btn btn-download-pdf" (click)="downloadPDF()" [disabled]="
+            !filterApplied ||
+            (filterStatus === 'Completed' && FreightBillingData.length === 0) ||
+            (filterStatus === 'Pending' && dispatchData.length === 0)
+            ">
+            <i class="fas fa-file-pdf"></i> Download PDF
+          </button>
+
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -246,6 +394,128 @@
             <td>{{ item.ZVEH_NUM }}</td>
             <td>{{ item.ZVEH_LINE }}</td>
           </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card" style="margin-top: 10px;"
+  *ngIf=" filterApplied && filterStatus === 'Completed' && FreightBillingData?.length > 0 && mainMode === 'filter'">
+  <div class="card-body-LE">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped text-center">
+        <thead>
+          <tr>
+            <th>SI.No</th>
+          
+            <th>REFNO</th>
+            <th>Invoice No</th>
+            <!-- <th>Line No</th> -->
+            <th>Odn Number</th>
+            <th>SO Number</th>
+            <th>Sale Person</th>
+            <th>Freight Bill No</th>
+            <th>Freight Bill Date</th>
+            <th>Physical Submission Date</th>
+            <th>Freight Charges</th>
+             <th>Work order type</th>
+            <th>Bill Submission</th>
+            
+            <th>Location</th>
+             <th>Vehicle Line</th>
+            <th>Vehicle Number</th>
+            
+            <th>Plant</th>
+            <th>Division</th>
+            <th>Work Order</th>
+            <th>LR No</th>
+            <th>Transporter</th>
+            <th>Created date</th>
+            <th>Vehicle Type</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let item of FreightBillingData; let i = index">
+            <td>{{ i + 1 }}</td>
+            
+            <td>{{ item.ZREFNO }}</td>
+            <td>{{ item.ZINV_NO}}</td>
+            <td>{{ item.ZODN_NO }}</td>
+            <td>{{ item.ZSONO}}</td>
+            <td>{{ item.ZSALE_PERSON }}</td>
+            <td>{{ item.ZBILLNO}}</td>
+            <td>{{ item.ZBILLDATE }}</td>
+            <td>{{ item.ZPHY_DATE}}</td>
+            <td>{{ item.ZFRT_CHARGES }}</td>
+            <td>{{ item.ZWORKORDER }}</td>
+            <td>{{ item.ZBILL_SUBMISSION }}</td>
+            <td>{{ item.ZLOCATION}}</td>
+            <td>{{ item.ZVEH_LINE }}</td>
+            <td>{{ item.ZVEH_NUM }}</td>
+            <td>{{ item.ZPLANT}}</td>
+            <td>{{ item.ZDIVISION }}</td>
+            <td>{{ item.ZWORK_ORDER }}</td>
+            <td>{{ item.ZLRNO}}</td>
+            <td>{{ item.ZTRANSPORTER}}</td>
+            
+            <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
+            <td>{{ item.ZVEH_TYPE }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="card" style="margin-top: 10px;"
+  *ngIf="filterApplied && filterStatus === 'Pending' && dispatchData?.length > 0 && mainMode === 'filter'">
+  <div class="card-body-LE">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped text-center">
+        <thead>
+          <tr>
+            <th>SI.No</th>
+            <th>Reference No</th>
+            <th>Line No</th>
+            <th>Date</th>
+            <th>Plant</th>
+            <th>Division</th>
+            <th>Vehicle Type</th>
+            <th>No. of Trucks</th>
+            <th>Work Order</th>
+            <th>Vendor Code</th>
+            <th>Transporter</th>
+            <th>No. of LRs</th>
+            <th>LR Number</th>
+            <th>Loading Point</th>
+            <th>Unloading Point</th>
+            <th>No Of Invoices</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let item of dispatchData; let i = index">
+
+            <td>{{ i + 1 }}</td>
+            <td>{{ item.ZREFNO }}</td>
+            <td>{{ item.ZLINE_NO }}</td>
+            <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
+            <td>{{ item.ZWERKS }}</td>
+            <td>{{ item.ZDIVISION }}</td>
+            <td>{{ item.ZVEH_TYPE }}</td>
+            <td>{{ item.ZNO_TRUCKS }}</td>
+            <td>{{ item.ZWORK_ORDER }}</td>
+            <td>{{ item.ZVENDOR_CD }}</td>
+            <td>{{ item.ZTRANSPORTER }}</td>
+            <td>{{ item.ZNO_LRS }}</td>
+            <td>{{ item.ZLR_NO }}</td>
+            <td>{{ item.ZLOAD_PT }}</td>
+            <td>{{ item.ZUNLOAD_PT }}</td>
+            <td>{{ item.ZNO_INVOICES }}</td>
+          </tr>
+
+
         </tbody>
       </table>
     </div>

@@ -213,14 +213,28 @@
 
     <div *ngIf="mainMode === 'filter'" class="filter-section">
 
+      <div class="filter-sap-row" style="display: flex; margin-bottom: 10px;">
+        <div class="form-radio optional sap-radio">
+          <label>
+            <input type="radio" [(ngModel)]="filterSapType" value="SAP" (change)="onFilterSapTypeChange()" />
+            <span>With SAP</span>
+          </label>
+          <label>
+            <input type="radio" [(ngModel)]="filterSapType" value="Non-SAP" (change)="onFilterSapTypeChange()" />
+            <span>Without SAP</span>
+          </label>
+        </div>
+      </div>
+
+
       <!-- Filter Options Header -->
-      <div class="filter-header">
+      <div class="filter-header" *ngIf="filterSapType">
         <i class="fas fa-filter"></i>
         <span>Filter Options</span>
       </div>
 
       <!-- Filter Form -->
-      <div class="card-body-LE">
+      <div class="card-body-LE" *ngIf="filterSapType">
         <div class="form-grid">
 
           <!-- From Date -->

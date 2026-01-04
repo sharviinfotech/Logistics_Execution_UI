@@ -68,6 +68,7 @@ export class OrderInfoComponent implements OnInit {
   VendorCodeList: any[] = [];
   orderInfoData: any[] = [];
   dispatchData: any[] = [];
+
   filterSapType: string = '';
   showOrderInfoTable = false;
   showDispatchTable = false;
@@ -131,6 +132,7 @@ export class OrderInfoComponent implements OnInit {
     this.filterTransporter = '';
     this.filterVehicleType = '';
     this.filterStatus = '';
+     this.filterSapType = '';
     this.filteredData = [];
     this.filterApplied = false;
 
@@ -388,23 +390,7 @@ export class OrderInfoComponent implements OnInit {
       this.showForm = true;
     }
   }
-  onFilterSapTypeChange() {
-    console.log('Selected SAP type in filter mode:', this.filterSapType);
-
-    // Update the current sapType based on filter selection
-    this.sapType = this.filterSapType;
-
-    // Reset previous filtered data
-    this.orderInfoData = [];
-    this.dispatchData = [];
-
-    // Automatically fetch filtered data if dates are provided
-    if (this.filterFromDate && this.filterToDate) {
-      this.applyFilter();
-    } else {
-      console.log('ℹ️ From and To dates are not selected yet.');
-    }
-  }
+  
 
 
 
@@ -760,7 +746,7 @@ export class OrderInfoComponent implements OnInit {
     return '';
   }
 
-  // ✅ Helper method to convert "2015-12-14" to "2015-12-14T00:00"
+  
   private convertToDateFormat(date: string): string {
     if (!date) return '';
 
@@ -774,7 +760,7 @@ export class OrderInfoComponent implements OnInit {
       return `${year}-${month}-${day}`;
     }
 
-    // Already in correct format "2015-12-14"
+   
     return date;
   }
 
@@ -1201,11 +1187,35 @@ export class OrderInfoComponent implements OnInit {
     const code = this.filterDivision;
     console.log("Filter Division selected:", code);
   }
+
+  onFilterSapTypeChange(): void {
+
+  // Reset filters
+  this.filterFromDate = '';
+  this.filterToDate = '';
+  this.filterPlant = '';
+  this.filterDivision = '';
+  this.filterTransporter = '';
+  this.filterVehicleType = '';
+  this.filterStatus = '';
+
+  
+  this.orderInfoData = [];
+  this.dispatchData = [];
+
+  
+  this.filterApplied = false;
+
+  this.cd.detectChanges();
+}
+
   applyFilter() {
     if (!this.filterFromDate || !this.filterToDate) {
       Swal.fire('Warning', 'Please select From Date and To Date', 'warning');
       return;
     }
+
+    this.filterApplied = false;
 
     const payload = {
       GLOBAL: 'ORDER INFO',
@@ -1222,12 +1232,22 @@ export class OrderInfoComponent implements OnInit {
 
     let apiCall;
 
-    if (this.sapType === 'SAP') {
-      apiCall = this.service.fetchOrderInfoFiltered(payload); // SAP API
-    } else {
-      // Use the same Non-SAP service with a READ payload
-      apiCall = this.service.OrderInfoNonSap({ READ: payload });
-    }
+    // if (this.filterSapType === 'SAP') {
+    //   apiCall = this.service.fetchOrderInfoFiltered(payload); 
+    // } else {
+     
+    //   apiCall = this.service.fetchGlobalFilteredNonSap(payload);
+    // }
+
+    if (this.filterSapType === 'SAP') {
+        apiCall = this.service.fetchOrderInfoFiltered(payload);
+      } else if (this.filterSapType === 'Non-SAP') {
+        apiCall = this.service.fetchGlobalFilteredNonSap(payload);
+      } else {
+        this.spinner.hide();
+        Swal.fire('Error', 'Invalid SAP Type selected', 'error');
+        return;
+      }
 
     apiCall.subscribe({
       next: (res: any) => {
@@ -1237,6 +1257,8 @@ export class OrderInfoComponent implements OnInit {
         if (Array.isArray(res)) records = res;
         else if (res?.HEADER) records = res.HEADER;
         else if (res?.DATA) records = res.DATA;
+
+        this.filterApplied = true;
 
         if (this.filterStatus === 'Completed') {
           this.orderInfoData = records;
@@ -1347,7 +1369,8 @@ export class OrderInfoComponent implements OnInit {
         'No. of LRs': record.ZNO_LRS || '',
         'LR Number': record.ZLR_NO || '',
         'Loading Point': record.ZLOAD_PT || '',
-        'Unloading Point': record.ZUNLOAD_PT || ''
+        'Unloading Point': record.ZUNLOAD_PT || '',
+        'No Of Invoices': record.ZNO_INVOICES || ''
       }));
     }
 
@@ -1391,7 +1414,12 @@ export class OrderInfoComponent implements OnInit {
       return;
     }
 
-    const doc = new (jsPDF as any).default('l', 'mm', 'a4'); // landscape
+    const doc = new (jsPDF as any).default({
+    orientation: 'landscape',
+    unit: 'mm',
+    format: [420, 297] // ✅ A2 Landscape (WIDE)
+  });
+
 
     /* ===== PDF HEADING ===== */
     doc.setFontSize(16);
@@ -1495,7 +1523,8 @@ export class OrderInfoComponent implements OnInit {
         'No. of LRs',
         'LR Number',
         'Loading Point',
-        'Unloading Point'
+        'Unloading Point',
+        'No Of Invoices'
       ]];
 
       data = exportSource.map((record, index) => ([
@@ -1513,7 +1542,8 @@ export class OrderInfoComponent implements OnInit {
         record.ZNO_LRS || '',
         record.ZLR_NO || '',
         record.ZLOAD_PT || '',
-        record.ZUNLOAD_PT || ''
+        record.ZUNLOAD_PT || '',
+        record.ZNO_INVOICES || ''
       ]));
     }
 

@@ -8,6 +8,8 @@ import { finalize } from 'rxjs/operators';
 import { SpinnerService } from 'src/app/spinner.service';
 import { Router } from '@angular/router';
 import * as XLSX from 'xlsx';
+import * as jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-shipment-details',
@@ -136,7 +138,7 @@ export class ShipmentDetailsComponent implements OnInit {
       ZPIN_PLT: [''],
       ZPIN_STP: [''],
       ZKM: [''],
-      
+
       ZWORK_ORDER: [''],
       ZLRNO: [''],
       ZTRANSPORTER: [''],
@@ -207,23 +209,7 @@ export class ShipmentDetailsComponent implements OnInit {
     }
   }
 
-  onFilterSapTypeChange() {
-    console.log('Selected SAP type in filter mode:', this.filterSapType);
 
-    // Update the current sapType based on filter selection
-    this.sapType = this.filterSapType;
-
-    // Reset previous filtered data
-    this.ShipmentData = [];
-    this.dispatchData = [];
-
-    // Automatically fetch filtered data if dates are provided
-    if (this.filterFromDate && this.filterToDate) {
-      this.applyFilter();
-    } else {
-      console.log('ℹ️ From and To dates are not selected yet.');
-    }
-  }
 
   onOrderTypeChange(): void {
     if (this.previousOrderType !== null && this.previousOrderType !== this.orderType) {
@@ -252,6 +238,7 @@ export class ShipmentDetailsComponent implements OnInit {
     this.filterStatus = '';
     this.filteredData = [];
     this.filterApplied = false;
+    this.filterSapType = '';
 
     // Reset search values
     this.selectedType = '';
@@ -624,7 +611,7 @@ export class ShipmentDetailsComponent implements OnInit {
               ZPIN_PLT: [item.ZPIN_PLT || ''],
               ZPIN_STP: [item.ZPIN_STP || ''],
               ZKM: [item.ZKM || ''],
-             
+
               ZWORK_ORDER: [item.ZWORK_ORDER || ''],
               ZLRNO: [item.ZLRNO || ''],
               ZTRANSPORTER: [item.ZTRANSPORTER || ''],
@@ -963,82 +950,111 @@ export class ShipmentDetailsComponent implements OnInit {
     this.cd.detectChanges();
   }
 
+  onFilterSapTypeChange(): void {
+    // Reset all filter fields
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterVehicleType = '';
+    this.filterStatus = '';
 
+    // Clear filtered data and results
+    this.filteredData = [];
+    this.filterApplied = false;
+
+    this.cd.detectChanges();
+  }
 
 
 
   applyFilter() {
-  if (!this.filterFromDate || !this.filterToDate) {
-    Swal.fire('Warning', 'Please select From Date and To Date', 'warning');
-    return;
-  }
-
-  const payload = {
-    GLOBAL: 'SHIPMENT DETAILS',
-    DATE_FROM: this.filterFromDate,
-    DATE_TO: this.filterToDate,
-    PLANT: this.filterPlant || '',
-    DIVISION: this.filterDivision || '',
-    TRANSPORTER: this.filterTransporter || '',
-    VEHICLE_TYPE: this.filterVehicleType || '',
-    STATUS: this.filterStatus || ''
-  };
-
-  this.spinner.show();
-
-  let apiCall;
-  if (this.sapType === 'SAP') {
-    apiCall = this.service.fetchOrderInfoFiltered(payload);
-  } else {
-    apiCall = this.service.OrderInfoNonSap({ READ: payload });
-  }
-
-  apiCall.subscribe({
-    next: (res: any) => {
-      this.spinner.hide();
-
-      /** 🔴 NO DATA FOUND HANDLING */
-      if (res?.STATUS === 'FALSE') {
-        this.ShipmentData = [];
-        this.dispatchData = [];
-
-        Swal.fire({
-          icon: 'info',
-          title: 'No Data Found',
-          text: res.MSG || 'No records available for selected filters'
-        });
-        return;
-      }
-
-      /** 🟢 DATA FOUND */
-      let records: any[] = [];
-      if (Array.isArray(res)) records = res;
-      else if (res?.HEADER) records = res.HEADER;
-      else if (res?.DATA) records = res.DATA;
-
-      if (this.filterStatus === 'Completed') {
-        this.ShipmentData = records;
-        this.dispatchData = [];
-        Swal.fire('Success', `Shipment records: ${records.length}`, 'success');
-      } 
-      else if (this.filterStatus === 'Pending') {
-        this.dispatchData = records;
-        this.ShipmentData = [];
-        Swal.fire('Success', `Dispatch records: ${records.length}`, 'success');
-      } 
-      else {
-        this.ShipmentData = [];
-        this.dispatchData = [];
-        Swal.fire('Info', 'Please select valid status', 'info');
-      }
-    },
-    error: (err) => {
-      this.spinner.hide();
-      Swal.fire('Error', 'Failed to fetch filtered data', 'error');
-      console.error(err);
+    if (!this.filterFromDate || !this.filterToDate) {
+      Swal.fire('Warning', 'Please select From Date and To Date', 'warning');
+      return;
     }
-  });
-}
+
+    this.filterApplied = false;
+
+    const payload = {
+      GLOBAL: 'SHIPMENT DETAILS',
+      DATE_FROM: this.filterFromDate,
+      DATE_TO: this.filterToDate,
+      PLANT: this.filterPlant || '',
+      DIVISION: this.filterDivision || '',
+      TRANSPORTER: this.filterTransporter || '',
+      VEHICLE_TYPE: this.filterVehicleType || '',
+      STATUS: this.filterStatus || ''
+    };
+
+    this.spinner.show();
+
+    let apiCall;
+    // if (this.sapType === 'SAP') {
+    //   apiCall = this.service.fetchOrderInfoFiltered(payload);
+    // } else {
+    //   apiCall = this.service.fetchGlobalFilteredNonSap( payload );
+    // }
+
+    if (this.filterSapType === 'SAP') {
+      apiCall = this.service.fetchOrderInfoFiltered(payload);
+    } else if (this.filterSapType === 'Non-SAP') {
+      apiCall = this.service.fetchGlobalFilteredNonSap(payload);
+    } else {
+      this.spinner.hide();
+      Swal.fire('Error', 'Invalid SAP Type selected', 'error');
+      return;
+    }
+
+    apiCall.subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+
+        /** 🔴 NO DATA FOUND HANDLING */
+        if (res?.STATUS === 'FALSE') {
+          this.ShipmentData = [];
+          this.dispatchData = [];
+
+          Swal.fire({
+            icon: 'info',
+            title: 'No Data Found',
+            text: res.MSG || 'No records available for selected filters'
+          });
+          return;
+        }
+
+        /** 🟢 DATA FOUND */
+        let records: any[] = [];
+        if (Array.isArray(res)) records = res;
+        else if (res?.HEADER) records = res.HEADER;
+        else if (res?.DATA) records = res.DATA;
+
+        this.filterApplied = true;
+
+        if (this.filterStatus === 'Completed') {
+          this.ShipmentData = records;
+          this.dispatchData = [];
+          Swal.fire('Success', `Shipment records: ${records.length}`, 'success');
+        }
+        else if (this.filterStatus === 'Pending') {
+          this.dispatchData = records;
+          this.ShipmentData = [];
+          Swal.fire('Success', `Dispatch records: ${records.length}`, 'success');
+        }
+        else {
+          this.ShipmentData = [];
+          this.dispatchData = [];
+          Swal.fire('Info', 'Please select valid status', 'info');
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        Swal.fire('Error', 'Failed to fetch filtered data', 'error');
+        console.error(err);
+      }
+    });
+  }
 
 
 
@@ -1084,8 +1100,8 @@ export class ShipmentDetailsComponent implements OnInit {
     if (this.filterStatus === 'Completed') {
       exportData = exportSource.map(record => ({
         'Reference No': record.ZREFNO || '',
-        'Invoice No': record.ZINV_NO || '',
-        'Line No': record.ZLINE_NO || '',
+        'Invoice No': record.VBELN || '',
+        // 'Line No': record.ZLINE_NO || '',
         'Map ID': record.ZMAPID || '',
         'ODN No': record.ZODN_NO || '',
         'SO No': record.ZSO_NO || '',
@@ -1141,7 +1157,182 @@ export class ShipmentDetailsComponent implements OnInit {
     Swal.fire('Success', `Excel file downloaded: ${fileName}`, 'success');
   }
 
+  downloadPDF() {
+    // 1️⃣ Determine data source based on status
+    let exportSource: any[] = [];
+    let fileName = '';
+    let reportTitle = '';
 
+    if (this.filterStatus === 'Completed') {
+      exportSource = this.ShipmentData;
+      fileName = this.sapType === 'SAP' ? 'Shipmentdata_Completed_SAP.pdf' : 'Shipmentdata_Completed_NonSAP.pdf';
+      reportTitle = 'Shipment Data Records (Completed)';
+    } else if (this.filterStatus === 'Pending') {
+      exportSource = this.dispatchData;
+      fileName = this.sapType === 'SAP' ? 'Dispatch_Pending_SAP.pdf' : 'Dispatch_Pending_NonSAP.pdf';
+      reportTitle = 'Dispatch Records (Pending)';
+    } else {
+      Swal.fire('Warning', 'Please select valid status before download', 'warning');
+      return;
+    }
+
+    // 2️⃣ Check if data is available
+    if (!exportSource || exportSource.length === 0) {
+      Swal.fire('Warning', 'No data available to download', 'warning');
+      return;
+    }
+
+    const doc = new (jsPDF as any).default({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: [420, 297] // ✅ A2 Landscape (WIDE)
+    });
+
+
+    /* ===== PDF HEADING ===== */
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text(reportTitle, doc.internal.pageSize.getWidth() / 2, 12, {
+      align: 'center'
+    });
+
+    /* Optional subtitle */
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`,
+      doc.internal.pageSize.getWidth() / 2,
+      18,
+      { align: 'center' }
+    );
+
+    let headers: any[] = [];
+    let data: any[] = [];
+
+    // 3️⃣ Generate headers and data based on status
+    if (this.filterStatus === 'Completed') {
+      headers = [[
+        'SI.No',
+        'REFNO',
+        'Invoice No',
+        // 'Line No',
+        'Map ID',
+        'ODN No',
+        'SO No',
+        'Incoterms',
+
+        'Insurance Scope',
+        'KM',
+        'Product',
+        'Type of Material',
+        'Material Description',
+        'No. of Sets',
+        'AH Truck Load',
+        'Weight (in Kg)',
+        'Battery Condition',
+        'Plant',
+        'Division',
+
+        'Work Order',
+        'LR No',
+        'Transporter',
+        'Created date',
+        'Vehicle Type'
+      ]];
+
+      data = exportSource.map((record, index) => ([
+        index + 1,
+        record.ZREFNO || '',
+        record.VBELN || '',
+        // record.ZLINE_NO || '',
+        record.ZMAPID || '',
+        record.ZODN_NO || '',
+        record.ZSO_NO || '',
+        record.ZINCO || '',
+        record.ZINS_SCPOE || '',
+        record.ZKM || '',
+        record.ZPRODUCT || '',
+        record.MTART || '',
+        record.MAKTX || '',
+        record.ZSETS || '',
+        record.ZAH || '',
+        record.ZSHIP_WT || '',
+        record.ZBATCOND || '',
+        record.ZWERKS || '',
+        record.ZDIVISION || '',
+
+        record.ZWORK_ORDER || '',
+        record.ZLRNO || '',
+        record.ZTRANSPORTER || '',
+        record.ZCREATED_DT ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB') : '',
+        record.ZVEH_TYPE || ''
+      ]));
+    } else if (this.filterStatus === 'Pending') {
+      headers = [[
+        'SI.No',
+        'Reference No',
+        'Line No',
+        'Date',
+        'Plant',
+        'Division',
+        'Vehicle Type',
+        'No. of Trucks',
+        'Work Order',
+        'Vendor Code',
+        'Transporter',
+        'No. of LRs',
+        'LR Number',
+        'Loading Point',
+        'Unloading Point'
+      ]];
+
+      data = exportSource.map((record, index) => ([
+        index + 1,
+        record.ZREFNO || '',
+        record.ZLINE_NO || '',
+        record.ZCREATED_DT ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB') : '',
+        record.ZWERKS || '',
+        record.ZDIVISION || '',
+        record.ZVEH_TYPE || '',
+        record.ZNO_TRUCKS || '',
+        record.ZWORK_ORDER || '',
+        record.ZVENDOR_CD || '',
+        record.ZTRANSPORTER || '',
+        record.ZNO_LRS || '',
+        record.ZLR_NO || '',
+        record.ZLOAD_PT || '',
+        record.ZUNLOAD_PT || ''
+      ]));
+    }
+
+    autoTable(doc, {
+      head: headers,
+      body: data,
+      startY: 25,
+      styles: {
+        fontSize: 6,
+        cellPadding: 1.5
+      },
+      headStyles: {
+        fillColor: [52, 152, 219],
+        fontStyle: 'bold',
+        fontSize: 6
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245]
+      },
+      // columnStyles: {
+      //   0: { cellWidth: 8 },  
+      //   1: { cellWidth: 12 }, 
+      //   2: { cellWidth: 12 }, 
+      //   3: { cellWidth: 10 }, 
+      //   4: { cellWidth: 12 }, 
+      // },
+      theme: 'grid'
+    });
+
+    doc.save(fileName);
+    Swal.fire('Success', `PDF file downloaded: ${fileName}`, 'success');
+  }
 
 
 

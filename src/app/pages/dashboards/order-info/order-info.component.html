@@ -333,16 +333,21 @@
             <i class="fas fa-filter"></i> Apply Filter
           </button>
           <button class="btn btn-download-excel" (click)="downloadExcel()" [disabled]="
-    (filterStatus === 'Completed' && (!orderInfoData || orderInfoData.length === 0)) ||
-    (filterStatus === 'Pending' && (!dispatchData || dispatchData.length === 0)) ">
+            !filterApplied ||
+            (filterStatus === 'Completed' && orderInfoData.length === 0) ||
+            (filterStatus === 'Pending' && dispatchData.length === 0)
+            ">
             <i class="fas fa-file-excel"></i> Download Excel
           </button>
+
           <button class="btn btn-download-pdf" (click)="downloadPDF()" [disabled]="
-    (filterStatus === 'Completed' && (!orderInfoData || orderInfoData.length === 0)) ||
-    (filterStatus === 'Pending' && (!dispatchData || dispatchData.length === 0))
-  ">
+            !filterApplied ||
+            (filterStatus === 'Completed' && orderInfoData.length === 0) ||
+            (filterStatus === 'Pending' && dispatchData.length === 0)
+            ">
             <i class="fas fa-file-pdf"></i> Download PDF
           </button>
+
 
         </div>
       </div>
@@ -713,128 +718,132 @@
         </tbody>
       </table>
     </div> -->
-    <div *ngIf="filterStatus === 'Completed' && orderInfoData?.length > 0 && mainMode === 'filter'"
-      class="table-responsive mt-3">
+    <div *ngIf="filterApplied && filterStatus === 'Completed' && orderInfoData?.length > 0 && mainMode === 'filter'">
+      <div class="table-responsive">
 
-      <table class="table table-bordered table-striped text-center">
-        <thead>
-          <tr>
-            <th>SI.No</th>
-            <th>REFNO</th>
-            <th>Invoice No</th>
-            <th>Line No</th>
-            <th>ODN No</th>
-            <th>Invoice Date</th>
-            <th>Basic Value</th>
-            <th>Invoice Value (GST)</th>
-            <th>Physical Dispatch</th>
-            <th>Fiscal Year</th>
-            <th>System Date</th>
-            <th>Fiscal Quarter</th>
-            <th>Fiscal Month</th>
-            <th>Plant</th>
-            <th>Transaction Type</th>
-            <th>Bill Text</th>
-            <th>Division</th>
-            <th>Sub Division</th>
-            <th>SO Ref No</th>
-            <th>Customer Name</th>
-            <th>Customer Group</th>
-            <th>Consignee Name</th>
-            <th>Destination Location</th>
-            <th>State</th>
-            <th>Zone</th>
-            <th>Work Order</th>
-            <th>LR No</th>
-            <th>Transporter</th>
-            <th>Created date</th>
-            <th>Vehicle Type</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr *ngFor="let item of orderInfoData; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>{{ item.ZREFNO }}</td>
-            <td>{{ item.ZINV_NO }}</td>
-            <td>{{ item.ZLINE_NO }}</td>
-            <td>{{ item.ZODN_NO }}</td>
-            <td>{{ item.ZINV_DATE | date:'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZBASIC_VALUE | number:'1.2-2' }}</td>
-            <td>{{ item.ZINV_VALUE_GST | number:'1.2-2' }}</td>
-            <td>{{ item.ZPHY_DISPATCH }}</td>
-            <td>{{ item.ZFYEAR }}</td>
-            <td>{{ item.ZSYS_DATE | date:'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZFIS_QUARTER }}</td>
-            <td>{{ item.ZFIS_MONTH }}</td>
-            <td>{{ item.ZPLANT }}</td>
-            <td>{{ item.ZTRX_TYPE }}</td>
-            <td>{{ item.ZBILL_TRX_TEXT }}</td>
-            <td>{{ item.ZDIVISION }}</td>
-            <td>{{ item.ZSUB_DIVISION }}</td>
-            <td>{{ item.ZSO_NO }}</td>
-            <td>{{ item.ZCUST_NAME }}</td>
-            <td>{{ item.ZCUST_GRP }}</td>
-            <td>{{ item.ZCONSIGN_NAME }}</td>
-            <td>{{ item.ZDES_LOC }}</td>
-            <td>{{ item.ZSTATE }}</td>
-            <td>{{ item.ZZONE }}</td>
-            <td>{{ item.ZWORK_ORDER }}</td>
-            <td>{{ item.ZLRNO }}</td>
-            <td>{{ item.ZTRANSPORTER }}</td>
-            <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZVEH_TYPE }}</td>
-          </tr>
-        </tbody>
-      </table>
+        <table class="table table-bordered table-striped text-center">
+          <thead>
+            <tr>
+              <th>SI.No</th>
+              <th>REFNO</th>
+              <th>Invoice No</th>
+              <th>Line No</th>
+              <th>ODN No</th>
+              <th>Invoice Date</th>
+              <th>Basic Value</th>
+              <th>Invoice Value (GST)</th>
+              <th>Physical Dispatch</th>
+              <th>Fiscal Year</th>
+              <th>System Date</th>
+              <th>Fiscal Quarter</th>
+              <th>Fiscal Month</th>
+              <th>Plant</th>
+              <th>Transaction Type</th>
+              <th>Bill Text</th>
+              <th>Division</th>
+              <th>Sub Division</th>
+              <th>SO Ref No</th>
+              <th>Customer Name</th>
+              <th>Customer Group</th>
+              <th>Consignee Name</th>
+              <th>Destination Location</th>
+              <th>State</th>
+              <th>Zone</th>
+              <th>Work Order</th>
+              <th>LR No</th>
+              <th>Transporter</th>
+              <th>Created date</th>
+              <th>Vehicle Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of orderInfoData; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>{{ item.ZREFNO }}</td>
+              <td>{{ item.ZINV_NO }}</td>
+              <td>{{ item.ZLINE_NO }}</td>
+              <td>{{ item.ZODN_NO }}</td>
+              <td>{{ item.ZINV_DATE | date:'dd-MM-yyyy' }}</td>
+              <td>{{ item.ZBASIC_VALUE | number:'1.2-2' }}</td>
+              <td>{{ item.ZINV_VALUE_GST | number:'1.2-2' }}</td>
+              <td>{{ item.ZPHY_DISPATCH }}</td>
+              <td>{{ item.ZFYEAR }}</td>
+              <td>{{ item.ZSYS_DATE | date:'dd-MM-yyyy' }}</td>
+              <td>{{ item.ZFIS_QUARTER }}</td>
+              <td>{{ item.ZFIS_MONTH }}</td>
+              <td>{{ item.ZPLANT }}</td>
+              <td>{{ item.ZTRX_TYPE }}</td>
+              <td>{{ item.ZBILL_TRX_TEXT }}</td>
+              <td>{{ item.ZDIVISION }}</td>
+              <td>{{ item.ZSUB_DIVISION }}</td>
+              <td>{{ item.ZSO_NO }}</td>
+              <td>{{ item.ZCUST_NAME }}</td>
+              <td>{{ item.ZCUST_GRP }}</td>
+              <td>{{ item.ZCONSIGN_NAME }}</td>
+              <td>{{ item.ZDES_LOC }}</td>
+              <td>{{ item.ZSTATE }}</td>
+              <td>{{ item.ZZONE }}</td>
+              <td>{{ item.ZWORK_ORDER }}</td>
+              <td>{{ item.ZLRNO }}</td>
+              <td>{{ item.ZTRANSPORTER }}</td>
+              <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
+              <td>{{ item.ZVEH_TYPE }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-    <div *ngIf="filterStatus === 'Pending' && dispatchData?.length > 0 && mainMode === 'filter'"
-      class="table-responsive mt-3">
+    <div *ngIf="filterApplied && filterStatus === 'Pending' && dispatchData?.length > 0 && mainMode === 'filter'">
 
-      <table class="table table-bordered table-striped text-center">
-        <thead>
-          <tr>
-            <th>SI.No</th>
-            <th>Reference No</th>
-            <th>Line No</th>
-            <th>Date</th>
-            <th>Plant</th>
-            <th>Division</th>
-            <th>Vehicle Type</th>
-            <th>No. of Trucks</th>
-            <th>Work Order</th>
-            <th>Vendor Code</th>
-            <th>Transporter</th>
-            <th>No. of LRs</th>
-            <th>LR Number</th>
-            <th>Loading Point</th>
-            <th>Unloading Point</th>
-          </tr>
-        </thead>
+      <div class="table-responsive">
 
-        <tbody>
-          <tr *ngFor="let item of dispatchData; let i = index">
+        <table class="table table-bordered table-striped text-center">
+          <thead>
+            <tr>
+              <th>SI.No</th>
+              <th>Reference No</th>
+              <th>Line No</th>
+              <th>Date</th>
+              <th>Plant</th>
+              <th>Division</th>
+              <th>Vehicle Type</th>
+              <th>No. of Trucks</th>
+              <th>Work Order</th>
+              <th>Vendor Code</th>
+              <th>Transporter</th>
+              <th>No. of LRs</th>
+              <th>LR Number</th>
+              <th>Loading Point</th>
+              <th>Unloading Point</th>
+              <th>No Of Invoices</th>
+            </tr>
+          </thead>
 
-            <td>{{ i + 1 }}</td>
-            <td>{{ item.ZREFNO }}</td>
-            <td>{{ item.ZLINE_NO }}</td>
-            <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZWERKS }}</td>
-            <td>{{ item.ZDIVISION }}</td>
-            <td>{{ item.ZVEH_TYPE }}</td>
-            <td>{{ item.ZNO_TRUCKS }}</td>
-            <td>{{ item.ZWORK_ORDER }}</td>
-            <td>{{ item.ZVENDOR_CD }}</td>
-            <td>{{ item.ZTRANSPORTER }}</td>
-            <td>{{ item.ZNO_LRS }}</td>
-            <td>{{ item.ZLR_NO }}</td>
-            <td>{{ item.ZLOAD_PT }}</td>
-            <td>{{ item.ZUNLOAD_PT }}</td>
-          </tr>
+          <tbody>
+            <tr *ngFor="let item of dispatchData; let i = index">
+
+              <td>{{ i + 1 }}</td>
+              <td>{{ item.ZREFNO }}</td>
+              <td>{{ item.ZLINE_NO }}</td>
+              <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
+              <td>{{ item.ZWERKS }}</td>
+              <td>{{ item.ZDIVISION }}</td>
+              <td>{{ item.ZVEH_TYPE }}</td>
+              <td>{{ item.ZNO_TRUCKS }}</td>
+              <td>{{ item.ZWORK_ORDER }}</td>
+              <td>{{ item.ZVENDOR_CD }}</td>
+              <td>{{ item.ZTRANSPORTER }}</td>
+              <td>{{ item.ZNO_LRS }}</td>
+              <td>{{ item.ZLR_NO }}</td>
+              <td>{{ item.ZLOAD_PT }}</td>
+              <td>{{ item.ZUNLOAD_PT }}</td>
+              <td>{{ item.ZNO_INVOICES }}</td>
+            </tr>
 
 
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </div>
 
 

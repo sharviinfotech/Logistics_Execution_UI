@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { GeneralserviceService } from 'src/app/generalservice.service';
@@ -6,6 +6,9 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import Swal from 'sweetalert2';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Router } from '@angular/router';
+import * as XLSX from 'xlsx';
+import * as jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-segment-info',
@@ -24,6 +27,7 @@ export class SegmentInfoComponent implements OnInit {
   orderType: string = '';
   sapType: string = '';
   ponumber: string = '';
+  PlantCodeList: any[] = [];
 
   invoicenumber: string = '';
   previousOrderType: string | null = null;
@@ -36,6 +40,8 @@ export class SegmentInfoComponent implements OnInit {
   custGrpList: any[] = [];
   branchList: any[] = [];
   appTypeList: any[] = [];
+  SegmentData: any[] = [];
+  dispatchData: any[] = [];
 
   // showF4 flags
   showF4 = {
@@ -45,6 +51,9 @@ export class SegmentInfoComponent implements OnInit {
     BRANCH: false,
     APPTYP: false,
   };
+
+  mainMode: string = 'creation'; // Default to creation mode
+  isUpdateMode: boolean = false;
 
   // Search functionality
   selectedItems: any[] = [];
@@ -57,11 +66,24 @@ export class SegmentInfoComponent implements OnInit {
     { key: 'lr_no', label: 'LR NO' }
   ];
   selectedType: any = '';
+  VendorCodeList: any[] = [];
   searchOptionsList: any[] = [];
+  // Filter mode properties
+  filterFromDate: string = '';
+  filterToDate: string = '';
+  filterPlant: string = '';
+  filterDivision: string = '';
+  filterTransporter: string = '';
+  filterVehicleType: string = '';
+  filterStatus: string = '';
+  filteredData: any[] = [];
+  filterApplied: boolean = false;
   dropdownOpen = false;
+  filterSapType: string = '';
 
   constructor(
     private fb: FormBuilder,
+    private cd: ChangeDetectorRef,
     private service: GeneralserviceService,
     private spinner: NgxSpinnerService,
     private router: Router
@@ -83,6 +105,8 @@ export class SegmentInfoComponent implements OnInit {
     });
 
     this.fetchDropdownData();
+    this.fetchTransporter();
+    this.fetchPlantCodeList();
 
     // ✅ Subscribe to TAT_Type changes
     this.segmentInfo.get('TAT_Type')?.valueChanges.subscribe(() => {
@@ -109,6 +133,32 @@ export class SegmentInfoComponent implements OnInit {
       SONO: [''],       // ✔ match backend
       ODN_NO: ['']
     });
+  }
+
+  onMainModeChange(): void {
+    // Reset everything when switching modes
+    this.orderType = '';
+    this.sapType = '';
+    this.showForm = false;
+    this.isUpdateMode = false;
+
+    // Reset filter values
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterVehicleType = '';
+    this.filterStatus = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+    this.filterSapType = '';
+
+    // Reset search values
+    this.selectedType = '';
+    this.searchReference = '';
+
+    this.searchOptionsList = [];
   }
 
   resetF4Flags() {
@@ -805,4 +855,423 @@ export class SegmentInfoComponent implements OnInit {
         )
     );
   }
+  fetchPlantCodeList(): void {
+    this.spinner.show();
+    this.service.fetchVendorCode().subscribe(
+      (res: any) => {
+        if (res && res[0]?.PLANT) {
+          this.PlantCodeList = res[0].PLANT;
+          this.spinner.hide();
+        } else {
+          Swal.fire("No Plant Found", "", "warning");
+        }
+      },
+      error => {
+        this.spinner.hide();
+      }
+    );
+  }
+
+
+
+  fetchTransporter(): void {
+    this.spinner.show();
+    this.service.fetchVendorCode().subscribe(
+      (res: any) => {
+        if (res && res.length > 0 && res[0].VEND_CODE) {
+          console.log("✅ Transporter Data Fetched:", res[0].VEND_CODE);
+
+          // ONLY transporter list
+          this.VendorCodeList = res[0].VEND_CODE;
+
+          this.spinner.hide();
+        } else {
+          Swal.fire("No Transporter Found", "", "warning");
+          this.spinner.hide();
+        }
+      },
+      error => {
+        console.error("❌ Transporter Fetch Error:", error);
+        this.spinner.hide();
+      }
+    );
+  }
+
+  onFilterDivisionChange(): void {
+    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
+
+    if (plantObj) {
+      this.filterPlant = plantObj.PLANT;
+    } else {
+      this.filterPlant = '';
+    }
+    this.cd.detectChanges();
+  }
+
+  onFilterPlantChange(): void {
+    const plantObj = this.PlantCodeList.find(item => item.PLANT === this.filterPlant);
+
+    if (plantObj) {
+      this.filterDivision = plantObj.DIVISION;
+    } else {
+      this.filterDivision = '';
+    }
+    this.cd.detectChanges();
+  }
+  onFilterSapTypeChange(): void {
+    // Reset all filter fields
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterVehicleType = '';
+    this.filterStatus = '';
+
+    // Clear filtered data and results
+    this.filteredData = [];
+    this.filterApplied = false;
+
+    this.cd.detectChanges();
+  }
+
+  applyFilter() {
+    if (!this.filterFromDate || !this.filterToDate) {
+      Swal.fire('Warning', 'Please select From Date and To Date', 'warning');
+      return;
+    }
+
+    this.filterApplied = false;
+
+    const payload = {
+      GLOBAL: 'SEGMENT INFO',
+      DATE_FROM: this.filterFromDate,
+      DATE_TO: this.filterToDate,
+      PLANT: this.filterPlant || '',
+      DIVISION: this.filterDivision || '',
+      TRANSPORTER: this.filterTransporter || '',
+      VEHICLE_TYPE: this.filterVehicleType || '',
+      STATUS: this.filterStatus || ''
+    };
+
+    this.spinner.show();
+
+    let apiCall;
+    // if (this.filterSapType === 'SAP') {
+    //   apiCall = this.service.fetchOrderInfoFiltered(payload);
+    // } else {
+    //   apiCall = this.service.fetchGlobalFilteredNonSap( payload );
+    // }
+
+    if (this.filterSapType === 'SAP') {
+      apiCall = this.service.fetchOrderInfoFiltered(payload);
+    } else if (this.filterSapType === 'Non-SAP') {
+      apiCall = this.service.fetchGlobalFilteredNonSap(payload);
+    } else {
+      this.spinner.hide();
+      Swal.fire('Error', 'Invalid SAP Type selected', 'error');
+      return;
+    }
+
+    apiCall.subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+
+        /** 🔴 NO DATA FOUND HANDLING */
+        if (res?.STATUS === 'FALSE') {
+          this.SegmentData = [];
+          this.dispatchData = [];
+
+          Swal.fire({
+            icon: 'info',
+            title: 'No Data Found',
+            text: res.MSG || 'No records available for selected filters'
+          });
+          return;
+        }
+
+        /** 🟢 DATA FOUND */
+        let records: any[] = [];
+        if (Array.isArray(res)) records = res;
+        else if (res?.HEADER) records = res.HEADER;
+        else if (res?.DATA) records = res.DATA;
+
+        this.filterApplied = true;
+
+        if (this.filterStatus === 'Completed') {
+          this.SegmentData = records;
+          this.dispatchData = [];
+          Swal.fire('Success', `SegmentInfo records: ${records.length}`, 'success');
+        }
+        else if (this.filterStatus === 'Pending') {
+          this.dispatchData = records;
+          this.SegmentData = [];
+          Swal.fire('Success', `Dispatch records: ${records.length}`, 'success');
+        }
+        else {
+          this.SegmentData = [];
+          this.dispatchData = [];
+          Swal.fire('Info', 'Please select valid status', 'info');
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        Swal.fire('Error', 'Failed to fetch filtered data', 'error');
+        console.error(err);
+      }
+    });
+  }
+  downloadExcel() {
+    // 1️⃣ Determine data source based on status
+    let exportSource: any[] = [];
+    let fileName = '';
+
+    if (this.filterStatus === 'Completed') {
+      exportSource = this.SegmentData;
+      fileName = this.sapType === 'SAP' ? 'SegmentData_Completed_SAP.xlsx' : 'SegmentData_Completed_NonSAP.xlsx';
+    } else if (this.filterStatus === 'Pending') {
+      exportSource = this.dispatchData;
+      fileName = this.sapType === 'SAP' ? 'Dispatch_Pending_SAP.xlsx' : 'Dispatch_Pending_NonSAP.xlsx';
+    } else {
+      Swal.fire('Warning', 'Please select valid status before download', 'warning');
+      return;
+    }
+
+    // 2️⃣ Check if data is available
+    if (!exportSource || exportSource.length === 0) {
+      Swal.fire('Warning', 'No data available to download', 'warning');
+      return;
+    }
+
+    // 3️⃣ Map data for Excel
+    let exportData: any[] = [];
+
+    if (this.filterStatus === 'Completed') {
+      exportData = exportSource.map((item, index) => ({
+        'SI.No': index + 1,
+        'Line No': item.ZLINE_NO || '',
+        'REFNO': item.ZREFNO || '',
+        'Invoice No': item.ZINV_NUM || '',
+        'ODN Number': item.ZODN_NO || '',
+        'SO Number': item.ZSO_NO || '',
+        'Sales Person': item.ZSALE_PERSON || '',
+        'Segment': item.ZSEGMENT || '',
+        'Application Type': item.ZAPPTYP || '',
+        'Customer Profile': item.ZCUST_PROFILE || '',
+        'Branch': item.ZBRANCH || '',
+        'Branch Zone': item.ZBRANCH_ZONE || '',
+        'TAT Type': item.ZTAT_TYPE || '',
+        'TAT Days': item.ZTAT || '',
+        'ETA': item.ZETA || '',
+        'Plant': item.ZPLANT || '',
+        'Division': item.ZDIVISION || '',
+        'Work Order': item.ZWORK_ORDER || '',
+        'LR No': item.ZLRNO || '',
+        'Transporter': item.ZTRANSPORTER || '',
+        'Created Date': item.ZCREATED_DT || '',
+        'Vehicle Type': item.ZVEH_TYPE || ''
+      }));
+    } else if (this.filterStatus === 'Pending') {
+      exportData = exportSource.map(record => ({
+        'Reference No': record.ZREFNO || '',
+        'Line No': record.ZLINE_NO || '',
+        'Date': record.ZCREATED_DT ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB') : '',
+        'Plant': record.ZWERKS || '',
+        'Division': record.ZDIVISION || '',
+        'Vehicle Type': record.ZVEH_TYPE || '',
+        'No. of Trucks': record.ZNO_TRUCKS || '',
+        'Work Order': record.ZWORK_ORDER || '',
+        'Vendor Code': record.ZVENDOR_CD || '',
+        'Transporter': record.ZTRANSPORTER || '',
+        'No. of LRs': record.ZNO_LRS || '',
+        'LR Number': record.ZLR_NO || '',
+        'Loading Point': record.ZLOAD_PT || '',
+        'Unloading Point': record.ZUNLOAD_PT || ''
+      }));
+    }
+
+    // 4️⃣ Create Excel sheet and workbook
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Records');
+
+    // 5️⃣ Set auto column width
+    const colWidths = Object.keys(exportData[0]).map(key => ({ wch: Math.max(key.length + 5, 18) }));
+    ws['!cols'] = colWidths;
+
+    // 6️⃣ Write file
+    XLSX.writeFile(wb, fileName);
+
+    Swal.fire('Success', `Excel file downloaded: ${fileName}`, 'success');
+  }
+
+  downloadPDF() {
+    let exportSource: any[] = [];
+    let fileName = '';
+    let reportTitle = '';
+
+    if (this.filterStatus === 'Completed') {
+      exportSource = this.SegmentData; // ✅ same as table
+      fileName = this.sapType === 'SAP'
+        ? 'SegmentData_Completed_SAP.pdf'
+        : 'SegmentData_Completed_NonSAP.pdf';
+      reportTitle = 'Segment Data Records (Completed)';
+    } else if (this.filterStatus === 'Pending') {
+      exportSource = this.dispatchData;
+      fileName = this.sapType === 'SAP'
+        ? 'Dispatch_Pending_SAP.pdf'
+        : 'Dispatch_Pending_NonSAP.pdf';
+      reportTitle = 'Dispatch Records (Pending)';
+    } else {
+      Swal.fire('Warning', 'Please select valid status before download', 'warning');
+      return;
+    }
+
+    if (!exportSource || exportSource.length === 0) {
+      Swal.fire('Warning', 'No data available to download', 'warning');
+      return;
+    }
+
+    const doc = new (jsPDF as any).default({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: [420, 297] // A2 landscape
+    });
+
+    /* ===== HEADER ===== */
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text(reportTitle, doc.internal.pageSize.getWidth() / 2, 12, { align: 'center' });
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(
+      `Generated on: ${new Date().toLocaleDateString('en-GB')}`,
+      doc.internal.pageSize.getWidth() / 2,
+      18,
+      { align: 'center' }
+    );
+
+    let headers: any[] = [];
+    let data: any[] = [];
+
+    /* ================= COMPLETED ================= */
+    if (this.filterStatus === 'Completed') {
+      headers = [[
+        'SI.No',
+        'Line No',
+        'REFNO',
+        'Invoice No',
+        'ODN Number',
+        'SO Number',
+        'Sales Person',
+        'Segment',
+        'Application Type',
+        'Customer Profile',
+        'Branch',
+        'Branch Zone',
+        'TAT Type',
+        'TAT Days',
+        'ETA',
+        'Plant',
+        'Division',
+        'Work Order',
+        'LR No',
+        'Transporter',
+        'Created Date',
+        'Vehicle Type'
+      ]];
+
+      data = exportSource.map((item, index) => ([
+        index + 1,
+        item.ZLINE_NO || '',
+        item.ZREFNO || '',
+        item.ZINV_NUM || '',
+        item.ZODN_NO || '',
+        item.ZSO_NO || '',
+        item.ZSALE_PERSON || '',
+        item.ZSEGMENT || '',
+        item.ZAPPTYP || '',
+        item.ZCUST_PROFILE || '',
+        item.ZBRANCH || '',
+        item.ZBRANCH_ZONE || '',
+        item.ZTAT_TYPE || '',
+        item.ZTAT || '',
+        item.ZETA || '',
+        item.ZPLANT || '',
+        item.ZDIVISION || '',
+        item.ZWORK_ORDER || '',
+        item.ZLRNO || '',
+        item.ZTRANSPORTER || '',
+        item.ZCREATED_DT
+          ? new Date(item.ZCREATED_DT).toLocaleDateString('en-GB')
+          : '',
+        item.ZVEH_TYPE || ''
+      ]));
+    }
+
+    /* ================= PENDING ================= */
+    if (this.filterStatus === 'Pending') {
+      headers = [[
+        'SI.No',
+        'Reference No',
+        'Line No',
+        'Date',
+        'Plant',
+        'Division',
+        'Vehicle Type',
+        'No. of Trucks',
+        'Work Order',
+        'Vendor Code',
+        'Transporter',
+        'No. of LRs',
+        'LR Number',
+        'Loading Point',
+        'Unloading Point'
+      ]];
+
+      data = exportSource.map((item, index) => ([
+        index + 1,
+        item.ZREFNO || '',
+        item.ZLINE_NO || '',
+        item.ZCREATED_DT
+          ? new Date(item.ZCREATED_DT).toLocaleDateString('en-GB')
+          : '',
+        item.ZWERKS || '',
+        item.ZDIVISION || '',
+        item.ZVEH_TYPE || '',
+        item.ZNO_TRUCKS || '',
+        item.ZWORK_ORDER || '',
+        item.ZVENDOR_CD || '',
+        item.ZTRANSPORTER || '',
+        item.ZNO_LRS || '',
+        item.ZLR_NO || '',
+        item.ZLOAD_PT || '',
+        item.ZUNLOAD_PT || ''
+      ]));
+    }
+
+    autoTable(doc, {
+      head: headers,
+      body: data,
+      startY: 25,
+      theme: 'grid',
+      styles: {
+        fontSize: 6,
+        cellPadding: 1.5
+      },
+      headStyles: {
+        fillColor: [52, 152, 219],
+        fontStyle: 'bold',
+        fontSize: 6
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245]
+      }
+    });
+
+    doc.save(fileName);
+    Swal.fire('Success', `PDF downloaded: ${fileName}`, 'success');
+  }
+
 }

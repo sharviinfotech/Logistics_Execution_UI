@@ -1,339 +1,555 @@
 <div class="card-LE">
   <div class="card-header-LE">Segment & Application Info</div>
   <div class="card-body-LE">
-    <!-- Order Type -->
-    <div class="form-radio optional">
+
+
+    <div class="Creation-radio">
       <label>
-        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
-        <span>Inward</span>
+        <input type="radio" name="mainMode" [(ngModel)]="mainMode" value="creation" (change)="onMainModeChange()" />
+        <div class="icon">
+          <i class="fa fa-plus"></i>
+        </div>
+        <span>Creation</span>
       </label>
       <label>
-        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
-        <span>Outward</span>
+        <input type="radio" name="mainMode" [(ngModel)]="mainMode" value="filter" (change)="onMainModeChange()" />
+        <div class="icon red">
+          <i class="fa fa-file"></i>
+        </div>
+        <span>Filter and Download</span>
+
       </label>
     </div>
 
     <br />
-
-    <!-- SAP Type -->
-    <div *ngIf="orderType" class="sap-row" style="display: flex !important; margin-bottom: 10px;">
-      <div class="form-radio optional sap-radio">
+    <div *ngIf="mainMode === 'creation'">
+      <!-- Order Type -->
+      <div class="form-radio optional">
         <label>
-          <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
-          <span>With SAP</span>
+          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
+          <span>Inward</span>
         </label>
         <label>
-          <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
-          <span>Without SAP</span>
+          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
+          <span>Outward</span>
         </label>
       </div>
+
       <br />
-    </div>
 
-    <!-- Input Section -->
-    <div class="input-row" *ngIf="sapType">
-
-      <!-- INWARD -->
-      <div *ngIf="orderType === 'Inward'" class="input-flex">
-        <div class="form-field flex-1">
-          <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" "
-            (input)="onInputChange('purchase')" />
-          <label>PO Number</label>
+      <!-- SAP Type -->
+      <div *ngIf="orderType" class="sap-row" style="display: flex !important; margin-bottom: 10px;">
+        <div class="form-radio optional sap-radio">
+          <label>
+            <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
+            <span>With SAP</span>
+          </label>
+          <label>
+            <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
+            <span>Without SAP</span>
+          </label>
         </div>
-
-        <button type="button" class="btn-get" (click)="getForm('purchase')"
-          [disabled]="!ponumber || ponumber.trim() === ''">
-          GET
-        </button>
+        <br />
       </div>
 
-      <!-- OUTWARD -->
-      <div *ngIf="orderType === 'Outward'">
+      <!-- Input Section -->
+      <div class="input-row" *ngIf="sapType">
 
-        <!-- Reference Table (with FormArray) -->
-        <form [formGroup]="segmentInfo">
-          <div id="refTable" class="table-responsive">
-            <table class="table table-bordered text-center">
-              <thead>
-                <tr>
-                  <th>Select</th>
-                  <th>Sl.No</th>
-                  <th>Reference Number</th>
-                  <th>Work Order Number</th>
-                  <th>LR Number</th>
-                  <th>Transporter</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-
-              <tbody formArrayName="referenceItems">
-                <tr *ngFor="let item of referenceItems.controls; let i = index" [formGroupName]="i">
-                  <td>
-                    <input type="checkbox" (change)="onCheckboxChange($event, i)" [checked]="isItemSelected(i)" />
-                  </td>
-
-                  <td>{{ i + 1 }}</td>
-
-                  <td>
-                    <input type="text" formControlName="referenceNumber" placeholder="Enter Ref. No."
-                      (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
-                      (keydown.tab)="onFieldBlur(i, 'REF_NO')" [readonly]="i !== 0" />
-                  </td>
-
-                  <td>
-                    <input type="text" formControlName="workOrderNumber" placeholder="Enter Work Order No."
-                      (blur)="onFieldBlur(i, 'WORK_ORDER_NO')" (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
-                      (keydown.tab)="onFieldBlur(i, 'WORK_ORDER_NO')" [readonly]="i !== 0" />
-                  </td>
-
-                  <td>
-                    <input type="text" formControlName="lrNumber" placeholder="Enter LR No."
-                      (blur)="onFieldBlur(i, 'LR_NO')" (keydown.enter)="onFieldBlur(i, 'LR_NO')"
-                      (keydown.tab)="onFieldBlur(i, 'LR_NO')" [readonly]="i !== 0" />
-                  </td>
-
-                  <td>
-                    <input type="text" formControlName="transporter" placeholder="Enter Transporter"
-                      (blur)="onFieldBlur(i, 'TRANSPORTER')" (keydown.enter)="onFieldBlur(i, 'TRANSPORTER')"
-                      (keydown.tab)="onFieldBlur(i, 'TRANSPORTER')" [readonly]="i !== 0" />
-                  </td>
-
-                  <td>
-                    <button type="button" class="btn-remove-LR" (click)="removeReferenceRow(i)"
-                      *ngIf="referenceItems.length > 1">
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </form>
-
-        <!-- SAP → Invoice + Search -->
-        <div class="input-row input-flex" *ngIf="sapType === 'SAP'">
+        <!-- INWARD -->
+        <div *ngIf="orderType === 'Inward'" class="input-flex">
           <div class="form-field flex-1">
-            <input type="text" name="invoicenumber" [(ngModel)]="invoicenumber" placeholder=" "
-              (input)="onInputChange('invoice')" />
-            <label>Invoice Number</label>
+            <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" "
+              (input)="onInputChange('purchase')" />
+            <label>PO Number</label>
           </div>
 
-          <button type="button" class="btn-get" (click)="getForm('invoice')"
-            [disabled]="!invoicenumber || invoicenumber.trim() === ''">
+          <button type="button" class="btn-get" (click)="getForm('purchase')"
+            [disabled]="!ponumber || ponumber.trim() === ''">
             GET
           </button>
+        </div>
 
-          <!-- Global Search Bar for SAP -->
-          <div class="search-bar-wrapper-global">
-            <div class="search-container">
-              <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType"
-                  (change)="onSearchTypeChange()">
-                  <option value="" disabled selected>Select</option>
-                  <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
-                </select>
+        <!-- OUTWARD -->
+        <div *ngIf="orderType === 'Outward'">
 
-                <input type="text" class="search-input" placeholder="Enter Reference / Invoice / ODN / SO Number"
-                  [(ngModel)]="searchReference" name="searchReference" (keyup.enter)="onSearchReference()" />
+          <!-- Reference Table (with FormArray) -->
+          <form [formGroup]="segmentInfo">
+            <div id="refTable" class="table-responsive">
+              <table class="table table-bordered text-center">
+                <thead>
+                  <tr>
+                    <th>Select</th>
+                    <th>Sl.No</th>
+                    <th>Reference Number</th>
+                    <th>Work Order Number</th>
+                    <th>LR Number</th>
+                    <th>Transporter</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
 
-                <button type="button" class="search-btn-global" (click)="onSearchReference()">
-                  <i class="fas fa-search"></i>
-                </button>
+                <tbody formArrayName="referenceItems">
+                  <tr *ngFor="let item of referenceItems.controls; let i = index" [formGroupName]="i">
+                    <td>
+                      <input type="checkbox" (change)="onCheckboxChange($event, i)" [checked]="isItemSelected(i)" />
+                    </td>
+
+                    <td>{{ i + 1 }}</td>
+
+                    <td>
+                      <input type="text" formControlName="referenceNumber" placeholder="Enter Ref. No."
+                        (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
+                        (keydown.tab)="onFieldBlur(i, 'REF_NO')" [readonly]="i !== 0" />
+                    </td>
+
+                    <td>
+                      <input type="text" formControlName="workOrderNumber" placeholder="Enter Work Order No."
+                        (blur)="onFieldBlur(i, 'WORK_ORDER_NO')" (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
+                        (keydown.tab)="onFieldBlur(i, 'WORK_ORDER_NO')" [readonly]="i !== 0" />
+                    </td>
+
+                    <td>
+                      <input type="text" formControlName="lrNumber" placeholder="Enter LR No."
+                        (blur)="onFieldBlur(i, 'LR_NO')" (keydown.enter)="onFieldBlur(i, 'LR_NO')"
+                        (keydown.tab)="onFieldBlur(i, 'LR_NO')" [readonly]="i !== 0" />
+                    </td>
+
+                    <td>
+                      <input type="text" formControlName="transporter" placeholder="Enter Transporter"
+                        (blur)="onFieldBlur(i, 'TRANSPORTER')" (keydown.enter)="onFieldBlur(i, 'TRANSPORTER')"
+                        (keydown.tab)="onFieldBlur(i, 'TRANSPORTER')" [readonly]="i !== 0" />
+                    </td>
+
+                    <td>
+                      <button type="button" class="btn-remove-LR" (click)="removeReferenceRow(i)"
+                        *ngIf="referenceItems.length > 1">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </form>
+
+          <!-- SAP → Invoice + Search -->
+          <div class="input-row input-flex" *ngIf="sapType === 'SAP'">
+            <div class="form-field flex-1">
+              <input type="text" name="invoicenumber" [(ngModel)]="invoicenumber" placeholder=" "
+                (input)="onInputChange('invoice')" />
+              <label>Invoice Number</label>
+            </div>
+
+            <button type="button" class="btn-get" (click)="getForm('invoice')"
+              [disabled]="!invoicenumber || invoicenumber.trim() === ''">
+              GET
+            </button>
+
+            <!-- Global Search Bar for SAP -->
+            <div class="search-bar-wrapper-global">
+              <div class="search-container">
+                <div class="search-box">
+                  <select class="search-type-select" [(ngModel)]="selectedType" name="searchType"
+                    (change)="onSearchTypeChange()">
+                    <option value="" disabled selected>Select</option>
+                    <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
+                  </select>
+
+                  <input type="text" class="search-input" placeholder="Enter Reference / Invoice / ODN / SO Number"
+                    [(ngModel)]="searchReference" name="searchReference" (keyup.enter)="onSearchReference()" />
+
+                  <button type="button" class="search-btn-global" (click)="onSearchReference()">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Non-SAP Only Search -->
-        <div class="input-row input-flex" *ngIf="sapType === 'Non-SAP'">
-          <div class="search-bar-wrapper-global">
-            <div class="search-container">
-              <div class="search-box">
-                <select class="search-type-select" [(ngModel)]="selectedType" name="searchType"
-                  (change)="onSearchTypeChange()">
-                  <option value="" disabled selected>Select</option>
-                  <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
-                </select>
+          <!-- Non-SAP Only Search -->
+          <div class="input-row input-flex" *ngIf="sapType === 'Non-SAP'">
+            <div class="search-bar-wrapper-global">
+              <div class="search-container">
+                <div class="search-box">
+                  <select class="search-type-select" [(ngModel)]="selectedType" name="searchType"
+                    (change)="onSearchTypeChange()">
+                    <option value="" disabled selected>Select</option>
+                    <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
+                  </select>
 
-                <input type="text" class="search-input" placeholder="Enter Reference / Invoice / ODN / SO Number"
-                  [(ngModel)]="searchReference" name="searchReference" (keyup.enter)="onSearchReference()" />
+                  <input type="text" class="search-input" placeholder="Enter Reference / Invoice / ODN / SO Number"
+                    [(ngModel)]="searchReference" name="searchReference" (keyup.enter)="onSearchReference()" />
 
-                <button type="button" class="search-btn-global" (click)="onSearchReference()">
-                  <i class="fas fa-search"></i>
-                </button>
+                  <button type="button" class="search-btn-global" (click)="onSearchReference()">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
+
+        </div>
+      </div>
+
+
+      <!-- Form Section -->
+      <form class="form-grid" [formGroup]="segmentInfo" *ngIf="showForm">
+
+        <div class="form-field" [class.filled]="segmentInfo.get('INV_VBELN')?.value">
+          <input type="text" formControlName="INV_VBELN" placeholder=" " />
+          <label>Invoice No</label>
         </div>
 
+
+
+
+        <!-- Sales Person -->
+        <div class="form-field" [class.filled]="segmentInfo.get('SALE_PERSON')?.value">
+          <ng-container *ngIf="sapType === 'Non-SAP' || showF4.SALE_PERSON; else sapSales">
+            <ng-select [items]="supplierList" bindLabel="SUPPLIER_NAME" bindValue="SUPPLIER_NAME"
+              formControlName="SALE_PERSON" [searchable]="true" [virtualScroll]="true" placeholder="Select Sales Person"
+              class="w-full">
+              <ng-template ng-option-tmp let-item="item">
+                {{ item.SUPPLIER }} - {{ item.SUPPLIER_NAME }}
+              </ng-template>
+            </ng-select>
+          </ng-container>
+
+          <ng-template #sapSales>
+            <input type="text" formControlName="SALE_PERSON" placeholder=" " readonly />
+          </ng-template>
+
+          <label>Sales Person</label>
+        </div>
+
+        <!-- Segment -->
+        <div class="form-field" [class.filled]="segmentInfo.get('SEGMENT')?.value">
+          <ng-container *ngIf="sapType === 'Non-SAP' || showF4.SEGMENT; else sapSegment">
+            <select formControlName="SEGMENT">
+              <option value="" disabled hidden>Select Segment</option>
+              <option *ngFor="let seg of segmentList" [value]="seg.SEGMENT_DESC">
+                {{ seg.SEGMENT }} - {{ seg.SEGMENT_DESC }}
+              </option>
+            </select>
+          </ng-container>
+          <ng-template #sapSegment>
+            <input type="text" formControlName="SEGMENT" placeholder=" " readonly />
+          </ng-template>
+          <label>Segment</label>
+        </div>
+
+        <!-- Application Type -->
+        <div class="form-field" [class.filled]="segmentInfo.get('APPTYP')?.value">
+          <ng-container *ngIf="sapType === 'Non-SAP' || showF4.APPTYP; else sapAppType">
+            <select formControlName="APPTYP">
+              <option value="">Select Application Type</option>
+              <option *ngFor="let app of appTypeList" [ngValue]="app">
+                {{ app.APPTYP }} - {{ app.DESC }}
+              </option>
+            </select>
+          </ng-container>
+          <ng-template #sapAppType>
+            <input type="text" formControlName="APPTYP" placeholder=" " readonly />
+          </ng-template>
+          <label>Application Type</label>
+        </div>
+
+        <!-- Customer Profile -->
+        <div class="form-field" [class.filled]="segmentInfo.get('CUST_PROF')?.value">
+          <ng-container *ngIf="sapType === 'Non-SAP' || showF4.CUST_PROF; else sapCustProf">
+            <select formControlName="CUST_PROF">
+              <option value="">Select Customer Profile</option>
+              <option *ngFor="let c of custGrpList" [value]="c.CUST_PROF_DESC">
+                {{ c.CUST_PROF }} - {{ c.CUST_PROF_DESC }}
+              </option>
+            </select>
+          </ng-container>
+
+          <ng-template #sapCustProf>
+            <input type="text" formControlName="CUST_PROF" placeholder=" " readonly />
+          </ng-template>
+
+          <label>Customer Profile</label>
+        </div>
+
+        <!-- Branch -->
+        <div class="form-field" [class.filled]="segmentInfo.get('BRANCH')?.value">
+          <ng-container *ngIf="sapType === 'Non-SAP' || showF4.BRANCH; else sapBranch">
+            <select formControlName="BRANCH" (change)="fetchzonechange()">
+              <option value="">Select Branch (State)</option>
+              <option *ngFor="let b of branchList" [value]="b.BRANCH_DESC">
+                {{ b.BRANCH_DESC }}
+              </option>
+            </select>
+          </ng-container>
+          <ng-template #sapBranch>
+            <input type="text" formControlName="BRANCH" placeholder=" " readonly />
+          </ng-template>
+          <label>Branch</label>
+        </div>
+
+        <!-- Branch Zone -->
+        <div class="form-field" [class.filled]="segmentInfo.get('BRANCH_ZONE')?.value">
+          <input type="text" formControlName="BRANCH_ZONE" placeholder=" " readonly />
+          <label>Branch Zone</label>
+        </div>
+
+        <!-- TAT Type -->
+        <div class="form-field" [class.filled]="segmentInfo.get('TAT_Type')?.value">
+          <select formControlName="TAT_Type" (change)="onTatTypeChange()">
+            <option value="">Select TAT Type</option>
+            <option value="Direct Truck TAT">Direct Truck TAT</option>
+            <option value="Revised TAT">Revised TAT</option>
+            <option value="Safe Express TAT">Safe Express TAT</option>
+            <option value="Delivery TAT">Delivery TAT</option>
+            <option value="GATI TAT">GATI TAT</option>
+          </select>
+          <label>TAT Type</label>
+        </div>
+
+        <!-- TAT Days -->
+        <div class="form-field" [class.filled]="segmentInfo.get('TAT_DAYS')?.value">
+          <input type="text" formControlName="TAT_DAYS" placeholder=" " />
+          <label>TAT (Days)</label>
+        </div>
+
+        <!-- ETA -->
+        <div class="form-field" [class.filled]="segmentInfo.get('ETA_DATE')?.value">
+          <input type="date" formControlName="ETA_DATE" placeholder=" " />
+          <label>ETA</label>
+        </div>
+
+      </form>
+
+      <!-- Save Button -->
+      <div class="text-right" *ngIf="showForm">
+        <button class="btn btn-md btn-raised btnSave" (click)="savePlan('stay')">Save</button>
+        <button class="btn btn-md btn-raised btnSave move" (click)="savePlan('next')">Save and Next</button>
+        <button class="btn btn-md btn-raised btnSave prev" (click)="savePlan('previous')">Save and Previous</button>
+      </div>
+    </div>
+
+    <div *ngIf="mainMode === 'filter'" class="filter-section">
+
+      <!-- SAP Type Selection (Filter Mode) -->
+      <div class="filter-sap-row" style="display: flex; margin-bottom: 10px;">
+        <div class="form-radio optional sap-radio">
+          <label>
+            <input type="radio" [(ngModel)]="filterSapType" value="SAP" (change)="onFilterSapTypeChange()" />
+            <span>With SAP</span>
+          </label>
+          <label>
+            <input type="radio" [(ngModel)]="filterSapType" value="Non-SAP" (change)="onFilterSapTypeChange()" />
+            <span>Without SAP</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Filter Options Header -->
+      <div class="filter-header" *ngIf="filterSapType">
+        <i class="fas fa-filter"></i>
+        <span>Filter Options</span>
+      </div>
+
+      <!-- Filter Form -->
+      <div class="card-body-LE" *ngIf="filterSapType">
+        <div class="form-grid">
+
+          <!-- From Date -->
+          <div class="form-field">
+            <input type="date" [(ngModel)]="filterFromDate" />
+            <label>From Date</label>
+          </div>
+
+          <!-- To Date -->
+          <div class="form-field">
+            <input type="date" [(ngModel)]="filterToDate" />
+            <label>To Date</label>
+          </div>
+
+          <div class="form-field">
+            <select [(ngModel)]="filterPlant" (change)="onFilterPlantChange()">
+              <option value="">Select Plant</option>
+              <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT">{{ plant.PLANT }} - {{ plant.PLANT_DESC
+                }}
+              </option>
+            </select>
+            <label>Plant</label>
+          </div>
+
+          <!-- Division -->
+          <div class="form-field">
+            <select [(ngModel)]="filterDivision" (change)="onFilterDivisionChange()">
+              <option value="">Select Division</option>
+              <option *ngFor="let plant of PlantCodeList" [value]="plant.DIVISION">{{ plant.DIVISION }}
+              </option>
+            </select>
+            <label>Division</label>
+          </div>
+
+          <!-- Customer -->
+          <div class="form-field">
+            <select [(ngModel)]="filterTransporter">
+              <option value="">Select Transporter</option>
+              <option *ngFor="let transporter of VendorCodeList" [value]="transporter.TRANSPORTER">
+                {{ transporter.TRANSPORTER }}
+              </option>
+            </select>
+            <label>Transporter</label>
+          </div>
+
+
+          <!-- Vehicle Type -->
+          <div class="form-field">
+            <select [(ngModel)]="filterVehicleType">
+              <option value="">Select Vehicle Type</option>
+              <option value="Cargo">Cargo</option>
+              <option value="Rate Contract">Rate Contract</option>
+              <option value="Local Transportation">Local Transportation</option>
+              <option value="Customer Transporter">Customer Transporter</option>
+              <option value="Company Vehicle">Company Vehicle</option>
+              <option value="Courier">Courier</option>
+              <option value="By Hand">By Hand</option>
+              <option value="Full Truck Load">Full Truck Load</option>
+            </select>
+            <label>Vehicle Type</label>
+          </div>
+
+          <div class="form-field">
+            <select [(ngModel)]="filterStatus">
+              <option value="">Select Status Type</option>
+              <option value="Pending">Pending</option>
+              <option value="Completed">Completed</option>
+            </select>
+            <label>Status</label>
+          </div>
+        </div>
+
+
+
+        <!-- Action Buttons -->
+        <div class="filter-actions">
+          <button class="btn btn-apply-filter" (click)="applyFilter()">
+            <i class="fas fa-filter"></i> Apply Filter
+          </button>
+          <!-- <button class="btn btn-clear-filter" (click)="clearFilters()">
+            <i class="fas fa-times"></i> Clear Filters
+          </button> -->
+          <button class="btn btn-download-excel" (click)="downloadExcel()" [disabled]="
+            !filterApplied ||
+            (filterStatus === 'Completed' && SegmentData.length === 0) ||
+            (filterStatus === 'Pending' && dispatchData.length === 0)
+            ">
+            <i class="fas fa-file-excel"></i> Download Excel
+          </button>
+
+          <button class="btn btn-download-pdf" (click)="downloadPDF()" [disabled]="
+            !filterApplied ||
+            (filterStatus === 'Completed' && SegmentData.length === 0) ||
+            (filterStatus === 'Pending' && dispatchData.length === 0)
+            ">
+            <i class="fas fa-file-pdf"></i> Download PDF
+          </button>
+        </div>
+      </div>
+
+
+
+
+    </div>
+
+
+
+  </div>
+
+  <!-- Search Results Table -->
+  <div class="card" style="margin-top: 10px;" *ngIf="searchOptionsList?.length > 0">
+    <div class="card-body-LE">
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped text-center">
+          <thead>
+            <tr>
+              <th>Ref No</th>
+              <th>Invoice No</th>
+              <th>ODN No</th>
+              <th>SO NO</th>
+              <th>Sales Person</th>
+              <th>Segment</th>
+              <th>Application Type</th>
+              <th>Customer Profile</th>
+              <th>Branch</th>
+              <th>Branch Zone</th>
+              <th>TAT Type</th>
+              <th>TAT Days</th>
+              <th>ETA</th>
+              <th>Work Order</th>
+              <th>LR No</th>
+              <th>Transporter</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of searchOptionsList">
+              <td>{{ item.ZREFNO }}</td>
+              <td>{{ item.ZINV_NUM }}</td>
+              <td>{{ item.ZODN_NO }}</td>
+              <td>{{ item.ZSO_NO }}</td>
+              <td>{{ item.ZSALE_PERSON }}</td>
+              <td>{{ item.ZSEGMENT }}</td>
+              <td>{{ item.ZAPPTYP }}</td>
+              <td>{{ item.ZCUST_PROFILE }}</td>
+              <td>{{ item.ZBRANCH }}</td>
+              <td>{{ item.ZBRANCH_ZONE }}</td>
+              <td>{{ item.ZTAT_TYPE }}</td>
+              <td>{{ item.ZTAT }}</td>
+              <td>{{ item.ZETA | date:'dd-MM-yyyy' }}</td>
+              <td>{{ item.ZWORK_ORDER }}</td>
+              <td>{{ item.ZLRNO }}</td>
+              <td>{{ item.ZTRANSPORTER }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 
-  <!-- Form Section -->
-  <form class="form-grid" [formGroup]="segmentInfo" *ngIf="showForm">
-
-    <div class="form-field" [class.filled]="segmentInfo.get('INV_VBELN')?.value">
-      <input type="text" formControlName="INV_VBELN" placeholder=" " />
-      <label>Invoice No</label>
-    </div>
-
-
-
-
-    <!-- Sales Person -->
-    <div class="form-field" [class.filled]="segmentInfo.get('SALE_PERSON')?.value">
-      <ng-container *ngIf="sapType === 'Non-SAP' || showF4.SALE_PERSON; else sapSales">
-        <ng-select [items]="supplierList" bindLabel="SUPPLIER_NAME" bindValue="SUPPLIER_NAME"
-          formControlName="SALE_PERSON" [searchable]="true" [virtualScroll]="true" placeholder="Select Sales Person"
-          class="w-full">
-          <ng-template ng-option-tmp let-item="item">
-            {{ item.SUPPLIER }} - {{ item.SUPPLIER_NAME }}
-          </ng-template>
-        </ng-select>
-      </ng-container>
-
-      <ng-template #sapSales>
-        <input type="text" formControlName="SALE_PERSON" placeholder=" " readonly />
-      </ng-template>
-
-      <label>Sales Person</label>
-    </div>
-
-    <!-- Segment -->
-    <div class="form-field" [class.filled]="segmentInfo.get('SEGMENT')?.value">
-      <ng-container *ngIf="sapType === 'Non-SAP' || showF4.SEGMENT; else sapSegment">
-        <select formControlName="SEGMENT">
-          <option value="" disabled hidden>Select Segment</option>
-          <option *ngFor="let seg of segmentList" [value]="seg.SEGMENT_DESC">
-            {{ seg.SEGMENT }} - {{ seg.SEGMENT_DESC }}
-          </option>
-        </select>
-      </ng-container>
-      <ng-template #sapSegment>
-        <input type="text" formControlName="SEGMENT" placeholder=" " readonly />
-      </ng-template>
-      <label>Segment</label>
-    </div>
-
-    <!-- Application Type -->
-    <div class="form-field" [class.filled]="segmentInfo.get('APPTYP')?.value">
-      <ng-container *ngIf="sapType === 'Non-SAP' || showF4.APPTYP; else sapAppType">
-        <select formControlName="APPTYP">
-          <option value="">Select Application Type</option>
-          <option *ngFor="let app of appTypeList" [ngValue]="app">
-            {{ app.APPTYP }} - {{ app.DESC }}
-          </option>
-        </select>
-      </ng-container>
-      <ng-template #sapAppType>
-        <input type="text" formControlName="APPTYP" placeholder=" " readonly />
-      </ng-template>
-      <label>Application Type</label>
-    </div>
-
-    <!-- Customer Profile -->
-    <div class="form-field" [class.filled]="segmentInfo.get('CUST_PROF')?.value">
-      <ng-container *ngIf="sapType === 'Non-SAP' || showF4.CUST_PROF; else sapCustProf">
-        <select formControlName="CUST_PROF">
-          <option value="">Select Customer Profile</option>
-          <option *ngFor="let c of custGrpList" [value]="c.CUST_PROF_DESC">
-            {{ c.CUST_PROF }} - {{ c.CUST_PROF_DESC }}
-          </option>
-        </select>
-      </ng-container>
-
-      <ng-template #sapCustProf>
-        <input type="text" formControlName="CUST_PROF" placeholder=" " readonly />
-      </ng-template>
-
-      <label>Customer Profile</label>
-    </div>
-
-    <!-- Branch -->
-    <div class="form-field" [class.filled]="segmentInfo.get('BRANCH')?.value">
-      <ng-container *ngIf="sapType === 'Non-SAP' || showF4.BRANCH; else sapBranch">
-        <select formControlName="BRANCH" (change)="fetchzonechange()">
-          <option value="">Select Branch (State)</option>
-          <option *ngFor="let b of branchList" [value]="b.BRANCH_DESC">
-            {{ b.BRANCH_DESC }}
-          </option>
-        </select>
-      </ng-container>
-      <ng-template #sapBranch>
-        <input type="text" formControlName="BRANCH" placeholder=" " readonly />
-      </ng-template>
-      <label>Branch</label>
-    </div>
-
-    <!-- Branch Zone -->
-    <div class="form-field" [class.filled]="segmentInfo.get('BRANCH_ZONE')?.value">
-      <input type="text" formControlName="BRANCH_ZONE" placeholder=" " readonly />
-      <label>Branch Zone</label>
-    </div>
-
-    <!-- TAT Type -->
-    <div class="form-field" [class.filled]="segmentInfo.get('TAT_Type')?.value">
-      <select formControlName="TAT_Type" (change)="onTatTypeChange()">
-        <option value="">Select TAT Type</option>
-        <option value="Direct Truck TAT">Direct Truck TAT</option>
-        <option value="Revised TAT">Revised TAT</option>
-        <option value="Safe Express TAT">Safe Express TAT</option>
-        <option value="Delivery TAT">Delivery TAT</option>
-        <option value="GATI TAT">GATI TAT</option>
-      </select>
-      <label>TAT Type</label>
-    </div>
-
-    <!-- TAT Days -->
-    <div class="form-field" [class.filled]="segmentInfo.get('TAT_DAYS')?.value">
-      <input type="text" formControlName="TAT_DAYS" placeholder=" " />
-      <label>TAT (Days)</label>
-    </div>
-
-    <!-- ETA -->
-    <div class="form-field" [class.filled]="segmentInfo.get('ETA_DATE')?.value">
-      <input type="date" formControlName="ETA_DATE" placeholder=" " />
-      <label>ETA</label>
-    </div>
-
-  </form>
-
-  <!-- Save Button -->
-  <div class="text-right" *ngIf="showForm">
-    <button class="btn btn-md btn-raised btnSave" (click)="savePlan('stay')">Save</button>
-    <button class="btn btn-md btn-raised btnSave move" (click)="savePlan('next')">Save and Next</button>
-    <button class="btn btn-md btn-raised btnSave prev" (click)="savePlan('previous')">Save and Previous</button>
-  </div>
-</div>
-
-<!-- Search Results Table -->
-<div class="card" style="margin-top: 10px;" *ngIf="searchOptionsList?.length > 0">
+  <div class="card" style="margin-top: 10px;"
+  *ngIf="filterApplied && filterStatus === 'Completed' && SegmentData?.length > 0 && mainMode === 'filter'">
   <div class="card-body-LE">
     <div class="table-responsive">
       <table class="table table-bordered table-striped text-center">
         <thead>
           <tr>
-            <th>Ref No</th>
+            <th>SI.No</th>
+           
+            <th>Line No</th>
+            <th>REFNO</th>
             <th>Invoice No</th>
-            <th>ODN No</th>
-            <th>SO NO</th>
+            <th>Odn Number</th>
+            <th>SO Number</th>
             <th>Sales Person</th>
-            <th>Segment</th>
-            <th>Application Type</th>
-            <th>Customer Profile</th>
-            <th>Branch</th>
-            <th>Branch Zone</th>
-            <th>TAT Type</th>
-            <th>TAT Days</th>
-            <th>ETA</th>
+              <th>Segment</th>
+              <th>Application Type</th>
+              <th>Customer Profile</th>
+              <th>Branch</th>
+              <th>Branch Zone</th>
+              <th>TAT Type</th>
+              <th>TAT Days</th>
+              <th>ETA</th>
+            <th>Plant</th>
+            <th>Division</th>
             <th>Work Order</th>
             <th>LR No</th>
             <th>Transporter</th>
+            <th>Created date</th>
+            <th>Vehicle Type</th>
           </tr>
         </thead>
+
         <tbody>
-          <tr *ngFor="let item of searchOptionsList">
+          <tr *ngFor="let item of SegmentData; let i = index">
+            <td>{{ i + 1 }}</td>
+            
+            <td>{{ item.ZLINE_NO }}</td>
             <td>{{ item.ZREFNO }}</td>
             <td>{{ item.ZINV_NUM }}</td>
             <td>{{ item.ZODN_NO }}</td>
@@ -343,16 +559,68 @@
             <td>{{ item.ZAPPTYP }}</td>
             <td>{{ item.ZCUST_PROFILE }}</td>
             <td>{{ item.ZBRANCH }}</td>
-            <td>{{ item.ZBRANCH_ZONE }}</td>
-            <td>{{ item.ZTAT_TYPE }}</td>
-            <td>{{ item.ZTAT }}</td>
-            <td>{{ item.ZETA }}</td>
+            <td>{{ item.ZBRANCH_ZONE}}</td>
+            <td>{{ item.ZTAT_TYPE}}</td>
+            <td>{{ item.ZTAT}}</td>
+            <td>{{ item.ZETA  }}</td>
+            <td>{{ item.ZPLANT }}</td>
+            <td>{{ item.ZDIVISION }}</td>
             <td>{{ item.ZWORK_ORDER }}</td>
             <td>{{ item.ZLRNO }}</td>
             <td>{{ item.ZTRANSPORTER }}</td>
+            <td>{{ item.ZCREATED_DT  }}</td>
+            <td>{{ item.ZVEH_TYPE }}</td>
           </tr>
         </tbody>
       </table>
     </div>
+  </div>
+</div>
+<div *ngIf="filterApplied && filterStatus === 'Pending' && dispatchData?.length > 0 && mainMode === 'filter'">
+  <div class="table-responsive">
+  <table class="table table-bordered table-striped text-center">
+    <thead>
+      <tr>
+        <th>SI.No</th>
+        <th>Reference No</th>
+        <th>Line No</th>
+        <th>Date</th>
+        <th>Plant</th>
+        <th>Division</th>
+        <th>Vehicle Type</th>
+        <th>No. of Trucks</th>
+        <th>Work Order</th>
+        <th>Vendor Code</th>
+        <th>Transporter</th>
+        <th>No. of LRs</th>
+        <th>LR Number</th>
+        <th>Loading Point</th>
+        <th>Unloading Point</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let item of dispatchData; let i = index">
+
+        <td>{{ i + 1 }}</td>
+        <td>{{ item.ZREFNO }}</td>
+        <td>{{ item.ZLINE_NO }}</td>
+        <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
+        <td>{{ item.ZWERKS }}</td>
+        <td>{{ item.ZDIVISION }}</td>
+        <td>{{ item.ZVEH_TYPE }}</td>
+        <td>{{ item.ZNO_TRUCKS }}</td>
+        <td>{{ item.ZWORK_ORDER }}</td>
+        <td>{{ item.ZVENDOR_CD }}</td>
+        <td>{{ item.ZTRANSPORTER }}</td>
+        <td>{{ item.ZNO_LRS }}</td>
+        <td>{{ item.ZLR_NO }}</td>
+        <td>{{ item.ZLOAD_PT }}</td>
+        <td>{{ item.ZUNLOAD_PT }}</td>
+      </tr>
+
+
+    </tbody>
+  </table>
   </div>
 </div>

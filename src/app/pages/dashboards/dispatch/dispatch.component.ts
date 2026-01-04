@@ -14,6 +14,7 @@ import autoTable from 'jspdf-autotable';
 
 
 
+
 @Component({
   selector: 'app-dispatch',
   standalone: true,
@@ -48,6 +49,7 @@ export class DispatchComponent implements OnInit {
 
   VendorCodeList: any[] = [];
   PlantCodeList: any[] = [];
+  filterSapType: string = '';
 
   searchReference: string = '';
   selectedType: string = '';
@@ -145,6 +147,7 @@ export class DispatchComponent implements OnInit {
     this.filterPlant = '';
     this.filterDivision = '';
     this.filterTransporter = '';
+    this.filterSapType = '';
     this.filterVehicleType = '';
     this.filteredData = [];
     this.filterApplied = false;
@@ -833,48 +836,81 @@ export class DispatchComponent implements OnInit {
     this.dispatchForm.updateValueAndValidity();
     this.cd.detectChanges();
   }
+    
 
+   onFilterSapTypeChange(): void {
+  // Reset all filter fields
+  this.filterFromDate = '';
+  this.filterToDate = '';
+  this.filterPlant = '';
+  this.filterDivision = '';
+  this.filterTransporter = '';
+  this.filterVehicleType = '';
+  
+  // Clear filtered data and results
+  this.filteredData = [];
+  this.filterApplied = false;
+  
+  this.cd.detectChanges();
+}
 
 
 
   applyFilter() {
-    if (!this.filterFromDate || !this.filterToDate) {
-      Swal.fire('Warning', 'Please select From Date and To Date', 'warning');
-      return;
-    }
-
-    const payload: any = {
-      DATE_FROM: this.filterFromDate,
-      DATE_TO: this.filterToDate,
-      PLANT: this.filterPlant || '',
-      DIVISION: this.filterDivision || '',
-      TRANSPORTER: this.filterTransporter || '',
-      VEHICLE_TYPE: this.filterVehicleType || ''
-    };
-
-    this.spinner.show();
-
-    this.service.fetchDispatchFiltered(payload).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        const records = Array.isArray(res) ? res : res?.data || [];
-
-        if (records.length > 0) {
-          this.filteredData = records;
-          this.filterApplied = true;
-          Swal.fire('Success', `Found ${records.length} records`, 'success');
-        } else {
-          this.filteredData = [];
-          this.filterApplied = true;
-          Swal.fire('No Records', 'No records found matching the filters', 'info');
-        }
-      },
-      error: (err) => {
-        this.spinner.hide();
-        Swal.fire('Error', 'Failed to fetch filtered data', 'error');
-      }
-    });
+  if (!this.filterSapType) {
+    Swal.fire('Warning', 'Please select SAP Type (With SAP / Without SAP)', 'warning');
+    return;
   }
+
+  if (!this.filterFromDate || !this.filterToDate) {
+    Swal.fire('Warning', 'Please select From Date and To Date', 'warning');
+    return;
+  }
+
+  const payload: any = {
+    DATE_FROM: this.filterFromDate,
+    DATE_TO: this.filterToDate,
+    PLANT: this.filterPlant || '',
+    DIVISION: this.filterDivision || '',
+    TRANSPORTER: this.filterTransporter || '',
+    VEHICLE_TYPE: this.filterVehicleType || ''
+  };
+
+  this.spinner.show();
+
+  // Choose service based on SAP type
+  let request$;
+  if (this.filterSapType === 'SAP') {
+    request$ = this.service.fetchDispatchFiltered(payload);
+  } else if (this.filterSapType === 'Non-SAP') {
+    request$ = this.service.fetchDispatchFilteredNonSap(payload);
+  } else {
+    this.spinner.hide();
+    Swal.fire('Error', 'Invalid SAP Type selected', 'error');
+    return;
+  }
+
+  request$.subscribe({
+    next: (res: any) => {
+      this.spinner.hide();
+      const records = Array.isArray(res) ? res : res?.data || [];
+
+      if (records.length > 0) {
+        this.filteredData = records;
+        this.filterApplied = true;
+        Swal.fire('Success', `Found ${records.length} records`, 'success');
+      } else {
+        this.filteredData = [];
+        this.filterApplied = true;
+        Swal.fire('No Records', 'No records found matching the filters', 'info');
+      }
+    },
+    error: (err) => {
+      this.spinner.hide();
+      Swal.fire('Error', 'Failed to fetch filtered data', 'error');
+    }
+  });
+}
 
   clearFilters() {
     this.filterFromDate = '';

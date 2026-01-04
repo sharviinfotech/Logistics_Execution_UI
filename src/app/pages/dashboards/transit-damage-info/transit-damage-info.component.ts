@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -12,6 +12,10 @@ import Swal from 'sweetalert2/dist/sweetalert2.js';
 import { GeneralserviceService } from 'src/app/generalservice.service';
 import { Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
+import * as XLSX from 'xlsx';
+import * as jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
 
 @Component({
   selector: 'app-transit-damage-info',
@@ -33,6 +37,8 @@ export class TransitDamageInfoComponent implements OnInit {
   showTable = false;
   ShowHeaderForm = false;
   SavedDataShow = false;
+  headerData: any = null;
+  itemsList: any[] = [];
   showForm = false;
   isEditMode = false;
   isAllSelected: boolean = false;
@@ -41,8 +47,13 @@ export class TransitDamageInfoComponent implements OnInit {
   previousOrderType: string | null = null;
   previousSapType: string | null = null;
 
+  PlantCodeList: any[] = [];
+  VendorCodeList: any[] = [];
+  mainMode: string = 'creation'; // Default to creation mode
+
   // Search functionality
   selectedItems: any[] = [];
+
   searchReference: string = '';
   searchOptions = [
     { key: 'ref_no', label: 'Reference No' },
@@ -63,8 +74,24 @@ export class TransitDamageInfoComponent implements OnInit {
   searchOptionsList: any[] = [];
   dropdownOpen = false;
 
+  filterFromDate: string = '';
+  filterToDate: string = '';
+  filterPlant: string = '';
+  filterDivision: string = '';
+  filterTransporter: string = '';
+  filterVehicleType: string = '';
+  filterStatus: string = '';
+  filteredData: any[] = [];
+  filterApplied: boolean = false;
+  isUpdateMode: boolean = false;
+
+  dispatchData: any[] = [];
+  TransitdamageInfoData: any[] = [];
+  filterSapType: string = '';
+
   constructor(
     private fb: FormBuilder,
+    private cd: ChangeDetectorRef,
     private service: GeneralserviceService,
     private router: Router,
     private spinner: NgxSpinnerService
@@ -73,6 +100,8 @@ export class TransitDamageInfoComponent implements OnInit {
   ngOnInit(): void {
     this.buildHeaderForm();
     this.buildItemForm();
+    this.fetchTransporter();
+    this.fetchPlantCodeList();
   }
 
   buildHeaderForm() {
@@ -139,6 +168,36 @@ export class TransitDamageInfoComponent implements OnInit {
     });
 
     this.items.push(row);
+  }
+
+  onMainModeChange(): void {
+    // Reset everything when switching modes
+    this.orderType = '';
+    this.sapType = '';
+    this.showForm = false;
+    this.isUpdateMode = false;
+
+    // Reset filter values
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterVehicleType = '';
+    this.filterStatus = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+    this.filterSapType = '';
+
+    // Reset search values
+    this.selectedType = '';
+    this.searchReference = '';
+
+    this.searchOptionsList = [];
+
+    this.headerData = null;
+    this.itemsList = [];
+    this.showTable = false;
   }
 
   removeItemRow(i: number) {
@@ -810,19 +869,514 @@ export class TransitDamageInfoComponent implements OnInit {
     return this.sapType === 'SAP';
   }
 
-   removeReferenceRow(index: number): void {
-  const rowValue = (this.referenceItems.at(index) as FormGroup).value;
+  removeReferenceRow(index: number): void {
+    const rowValue = (this.referenceItems.at(index) as FormGroup).value;
 
-  this.referenceItems.removeAt(index);
+    this.referenceItems.removeAt(index);
 
-  this.selectedItems = this.selectedItems.filter(
-    item =>
-      !(
-        item.referenceNumber === rowValue.referenceNumber &&
-        item.workOrderNumber === rowValue.workOrderNumber &&
-        item.lrNumber === rowValue.lrNumber &&
-        item.transporter === rowValue.transporter
-      )
-  );
-}
+    this.selectedItems = this.selectedItems.filter(
+      item =>
+        !(
+          item.referenceNumber === rowValue.referenceNumber &&
+          item.workOrderNumber === rowValue.workOrderNumber &&
+          item.lrNumber === rowValue.lrNumber &&
+          item.transporter === rowValue.transporter
+        )
+    );
+  }
+
+  fetchPlantCodeList(): void {
+    this.spinner.show();
+    this.service.fetchVendorCode().subscribe(
+      (res: any) => {
+        if (res && res[0]?.PLANT) {
+          this.PlantCodeList = res[0].PLANT;
+          this.spinner.hide();
+        } else {
+          Swal.fire("No Plant Found", "", "warning");
+        }
+      },
+      error => {
+        this.spinner.hide();
+      }
+    );
+  }
+
+
+
+  fetchTransporter(): void {
+    this.spinner.show();
+    this.service.fetchVendorCode().subscribe(
+      (res: any) => {
+        if (res && res.length > 0 && res[0].VEND_CODE) {
+          console.log("✅ Transporter Data Fetched:", res[0].VEND_CODE);
+
+          // ONLY transporter list
+          this.VendorCodeList = res[0].VEND_CODE;
+
+          this.spinner.hide();
+        } else {
+          Swal.fire("No Transporter Found", "", "warning");
+          this.spinner.hide();
+        }
+      },
+      error => {
+        console.error("❌ Transporter Fetch Error:", error);
+        this.spinner.hide();
+      }
+    );
+  }
+
+  onFilterDivisionChange(): void {
+    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
+
+    if (plantObj) {
+      this.filterPlant = plantObj.PLANT;
+    } else {
+      this.filterPlant = '';
+    }
+    this.cd.detectChanges();
+  }
+
+  onFilterPlantChange(): void {
+    const plantObj = this.PlantCodeList.find(item => item.PLANT === this.filterPlant);
+
+    if (plantObj) {
+      this.filterDivision = plantObj.DIVISION;
+    } else {
+      this.filterDivision = '';
+    }
+    this.cd.detectChanges();
+  }
+
+  onFilterSapTypeChange(): void {
+    // Reset all filter fields
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterVehicleType = '';
+    this.filterStatus = '';
+
+    // Clear filtered data and results
+    this.filteredData = [];
+    this.filterApplied = false;
+
+    this.cd.detectChanges();
+  }
+
+  applyFilter() {
+    if (!this.filterFromDate || !this.filterToDate) {
+      Swal.fire('Warning', 'Please select From Date and To Date', 'warning');
+      return;
+    }
+
+
+    this.filterApplied = false;
+
+    const payload = {
+      GLOBAL: 'TRANSIT DAMAGE INFO',
+      DATE_FROM: this.filterFromDate,
+      DATE_TO: this.filterToDate,
+      PLANT: this.filterPlant || '',
+      DIVISION: this.filterDivision || '',
+      TRANSPORTER: this.filterTransporter || '',
+      VEHICLE_TYPE: this.filterVehicleType || '',
+      STATUS: this.filterStatus || ''
+    };
+
+    this.spinner.show();
+
+    let apiCall;
+    // if (this.sapType === 'SAP') {
+    //   apiCall = this.service.fetchOrderInfoFiltered(payload);
+    // } else {
+    //   apiCall = this.service.fetchGlobalFilteredNonSap( payload );
+    // }
+
+    if (this.filterSapType === 'SAP') {
+      apiCall = this.service.fetchOrderInfoFiltered(payload);
+    } else if (this.filterSapType === 'Non-SAP') {
+      apiCall = this.service.fetchGlobalFilteredNonSap(payload);
+    } else {
+      this.spinner.hide();
+      Swal.fire('Error', 'Invalid SAP Type selected', 'error');
+      return;
+    }
+
+    apiCall.subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+
+        /** 🔴 NO DATA FOUND HANDLING */
+        if (res?.STATUS === 'FALSE') {
+          this.TransitdamageInfoData = [];
+          this.dispatchData = [];
+
+          Swal.fire({
+            icon: 'info',
+            title: 'No Data Found',
+            text: res.MSG || 'No records available for selected filters'
+          });
+          return;
+        }
+
+        // this.transitResponse = res;
+        this.filterApplied = true;
+
+
+        /** 🟢 DATA FOUND - Combine HEADER and ITEMS */
+        if (this.filterStatus === 'Completed') {
+          // Combine header data with items data
+          const flattenedData: any[] = [];
+
+          if (res?.HEADER && res?.ITEMS) {
+            res.ITEMS.forEach((item: any) => {
+              // Find matching header for this item
+              const header = res.HEADER.find((h: any) => h.ZREFNO === item.ZREFNO);
+
+              if (header) {
+                // Merge header and item data
+                flattenedData.push({
+                  ...header,
+                  ...item
+                });
+              }
+            });
+          }
+
+          this.TransitdamageInfoData = flattenedData;
+          this.dispatchData = [];
+          Swal.fire('Success', `Transit Damage Info records: ${flattenedData.length}`, 'success');
+        }
+        else if (this.filterStatus === 'Pending') {
+          let records: any[] = [];
+          if (Array.isArray(res)) records = res;
+          else if (res?.HEADER) records = res.HEADER;
+          else if (res?.DATA) records = res.DATA;
+
+          this.dispatchData = records;
+          this.TransitdamageInfoData = [];
+          Swal.fire('Success', `Dispatch records: ${records.length}`, 'success');
+        }
+        else {
+          this.TransitdamageInfoData = [];
+          this.dispatchData = [];
+          Swal.fire('Info', 'Please select valid status', 'info');
+        }
+      },
+    });
+  }
+
+  clearFilter() {
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterVehicleType = '';
+    this.filterStatus = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+
+  }
+
+
+  downloadExcel() {
+    // 1️⃣ Determine data source based on status
+    let exportSource: any[] = [];
+    let fileName = '';
+
+    if (this.filterStatus === 'Completed') {
+      exportSource = this.TransitdamageInfoData;
+      fileName = this.filterSapType === 'SAP' ? 'TransitdamageInfo_Completed_SAP.xlsx' : 'TransitdamageInfo_Completed_NonSAP.xlsx';
+    } else if (this.filterStatus === 'Pending') {
+      exportSource = this.dispatchData;
+      fileName = this.filterSapType === 'SAP' ? 'Dispatch_Pending_SAP.xlsx' : 'Dispatch_Pending_NonSAP.xlsx';
+    } else {
+      Swal.fire('Warning', 'Please select valid status before download', 'warning');
+      return;
+    }
+
+    // 2️⃣ Check if data is available
+    if (!exportSource || exportSource.length === 0) {
+      Swal.fire('Warning', 'No data available to download', 'warning');
+      return;
+    }
+
+    // 3️⃣ Map data for Excel
+    let exportData: any[] = [];
+
+    if (this.filterStatus === 'Completed') {
+      exportData = exportSource.map(record => ({
+        'Map ID': record.ZMAPID || '',
+        'REFNO': record.ZREFNO || '',
+        'Invoice No': record.ZINV_NO || '',
+        'ODN Number': record.ZODN_NO || '',
+        'SO Number': record.ZSONO || '',
+
+        // 🔹 HEADER ITEMS
+        'Invoice Date': record.ZINV_DATE || '',
+        'FSR Report Date': record.ZFSR_RPT_DT || '',
+        'Invoice Base Value': record.ZBASIC_VALUE || '',
+        'Incident Date': record.ZINC_DATE || '',
+        'Customer': record.ZCUSTOMER || '',
+        'Consign Name': record.ZCONSIGN_NAME || '',
+        'Damage Remarks': record.ZDAMAGE_RMK || '',
+        'Settlement': record.ZSETTLEMENT || '',
+        'Closing Date': record.ZCLOSING_DT || '',
+        'Images': record.ZIMAGES || '',
+        'Sale Person': record.ZSALE_PERSON || '',
+        'Location': record.ZLOCATION || '',
+        'Route': record.ZROUTE || '',
+        'Plant': record.ZPLANT || '',
+        'Division': record.ZDIVISION || '',
+        'Created Date': record.ZCREATED_DT
+          ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB')
+          : '',
+        'Vehicle Type': record.ZVEH_TYPE || '',
+
+        // 🔹 LINE ITEMS
+
+        'Vehicle Line': record.ZVEH_LINE || '',
+        'Vehicle Number': record.ZTRUCK_NO || '',
+        'LR No': record.ZLRNO || '',
+        'Work Order Number': record.ZWORK_ORDER || '',
+        'Transporter': record.ZTRANSPORTER || '',
+        'Bill No': record.ZBILLNO || '',
+        'Product': record.ZPRODUCT || ''
+      }));
+    } else if (this.filterStatus === 'Pending') {
+      exportData = exportSource.map(record => ({
+        'Reference No': record.ZREFNO || '',
+        // 'Line No': record.ZLINE_NO || '',
+        'Date': record.ZCREATED_DT ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB') : '',
+        'Plant': record.ZWERKS || '',
+        'Division': record.ZDIVISION || '',
+        'Vehicle Type': record.ZVEH_TYPE || '',
+        'No. of Trucks': record.ZNO_TRUCKS || '',
+        'Work Order': record.ZWORK_ORDER || '',
+        'Vendor Code': record.ZVENDOR_CD || '',
+        'Transporter': record.ZTRANSPORTER || '',
+        'No. of LRs': record.ZNO_LRS || '',
+        'LR Number': record.ZLR_NO || '',
+        'Loading Point': record.ZLOAD_PT || '',
+        'Unloading Point': record.ZUNLOAD_PT || ''
+      }));
+    }
+
+    // 4️⃣ Create Excel sheet and workbook
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Records');
+
+    // 5️⃣ Set auto column width
+    const colWidths = Object.keys(exportData[0]).map(key => ({ wch: Math.max(key.length + 5, 18) }));
+    ws['!cols'] = colWidths;
+
+    // 6️⃣ Write file
+    XLSX.writeFile(wb, fileName);
+
+    Swal.fire('Success', `Excel file downloaded: ${fileName}`, 'success');
+  }
+
+  downloadPDF() {
+    // 1️⃣ Determine data source based on status
+    let exportSource: any[] = [];
+    let fileName = '';
+    let reportTitle = '';
+
+    if (this.filterStatus === 'Completed') {
+      exportSource = this.TransitdamageInfoData;
+      fileName = this.sapType === 'SAP' ? 'TransitdamageInfo_Completed_SAP.pdf' : 'TransitdamageInfo_Completed_NonSAP.pdf';
+      reportTitle = 'Transit Info Records (Completed)';
+    } else if (this.filterStatus === 'Pending') {
+      exportSource = this.dispatchData;
+      fileName = this.sapType === 'SAP' ? 'Dispatch_Pending_SAP.pdf' : 'Dispatch_Pending_NonSAP.pdf';
+      reportTitle = 'Dispatch Records (Pending)';
+    } else {
+      Swal.fire('Warning', 'Please select valid status before download', 'warning');
+      return;
+    }
+
+    // 2️⃣ Check if data is available
+    if (!exportSource || exportSource.length === 0) {
+      Swal.fire('Warning', 'No data available to download', 'warning');
+      return;
+    }
+
+    const doc = new (jsPDF as any).default({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: [420, 297] // ✅ A2 Landscape (WIDE)
+    });
+
+
+    /* ===== PDF HEADING ===== */
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text(reportTitle, doc.internal.pageSize.getWidth() / 2, 12, {
+      align: 'center'
+    });
+
+    /* Optional subtitle */
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`,
+      doc.internal.pageSize.getWidth() / 2,
+      18,
+      { align: 'center' }
+    );
+
+    let headers: any[] = [];
+    let data: any[] = [];
+
+    // 3️⃣ Generate headers and data based on status
+    if (this.filterStatus === 'Completed') {
+      headers = [[
+        'SI.No',
+        'Map ID',
+        'REFNO',
+        'Invoice No',
+        'ODN Number',
+        'SO Number',
+        'Invoice Date',
+        'FSR Report Date',
+        'Invoice Base Value',
+        'Incident Date',
+        'Customer',
+        'Consign Name',
+        'Damage Remarks',
+        'Settlement',
+        'Closing Date',
+        'Images',
+        'Sale Person',
+        'Location',
+        'Route',
+        'Plant',
+        'Division',
+        'Created Date',
+        'Vehicle Type',
+
+        'Vehicle Line',
+        'Vehicle Number',
+        'LR No',
+        'Work Order',
+        'Transporter',
+        'Bill No',
+        'Product'
+      ]];
+
+
+      data = exportSource.map((record, index) => ([
+        index + 1,
+        record.ZMAPID || '',
+        record.ZREFNO || '',
+        record.ZINV_NO || '',
+        record.ZODN_NO || '',
+        record.ZSONO || '',
+
+        // 🔹 HEADER ITEMS
+        record.ZINV_DATE || '',
+        record.ZFSR_RPT_DT || '',
+        record.ZBASIC_VALUE || '',
+        record.ZINC_DATE || '',
+        record.ZCUSTOMER || '',
+        record.ZCONSIGN_NAME || '',
+        record.ZDAMAGE_RMK || '',
+        record.ZSETTLEMENT || '',
+        record.ZCLOSING_DT || '',
+        record.ZIMAGES || '',
+        record.ZSALE_PERSON || '',
+        record.ZLOCATION || '',
+        record.ZROUTE || '',
+        record.ZPLANT || '',
+        record.ZDIVISION || '',
+        record.ZCREATED_DT
+          ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB')
+          : '',
+        record.ZVEH_TYPE || '',
+
+        // 🔹 LINE ITEMS
+
+        record.ZVEH_LINE || '',
+        record.ZTRUCK_NO || '',
+        record.ZLRNO || '',
+        record.ZWORK_ORDER || '',
+        record.ZTRANSPORTER || '',
+        record.ZBILLNO || '',
+        record.ZPRODUCT || ''
+      ]));
+
+    } else if (this.filterStatus === 'Pending') {
+      headers = [[
+        'SI.No',
+        'Reference No',
+        'Line No',
+        'Date',
+        'Plant',
+        'Division',
+        'Vehicle Type',
+        'No. of Trucks',
+        'Work Order',
+        'Vendor Code',
+        'Transporter',
+        'No. of LRs',
+        'LR Number',
+        'Loading Point',
+        'Unloading Point',
+        'No Of Invoices'
+      ]];
+
+      data = exportSource.map((record, index) => ([
+        index + 1,
+        record.ZREFNO || '',
+        record.ZLINE_NO || '',
+        record.ZCREATED_DT ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB') : '',
+        record.ZWERKS || '',
+        record.ZDIVISION || '',
+        record.ZVEH_TYPE || '',
+        record.ZNO_TRUCKS || '',
+        record.ZWORK_ORDER || '',
+        record.ZVENDOR_CD || '',
+        record.ZTRANSPORTER || '',
+        record.ZNO_LRS || '',
+        record.ZLR_NO || '',
+        record.ZLOAD_PT || '',
+        record.ZUNLOAD_PT || '',
+        record.ZNO_INVOICES || ''
+      ]));
+    }
+    autoTable(doc, {
+      head: headers,
+      body: data,
+      startY: 25,
+      styles: {
+        fontSize: 6,
+        cellPadding: 1.5
+      },
+      headStyles: {
+        fillColor: [52, 152, 219],
+        fontStyle: 'bold',
+        fontSize: 6
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245]
+      },
+      // columnStyles: {
+      //   0: { cellWidth: 8 },  
+      //   1: { cellWidth: 12 }, 
+      //   2: { cellWidth: 12 }, 
+      //   3: { cellWidth: 10 }, 
+      //   4: { cellWidth: 12 }, 
+      // },
+      theme: 'grid'
+    });
+
+    doc.save(fileName);
+    Swal.fire('Success', `PDF file downloaded: ${fileName}`, 'success');
+  }
+
+
 }

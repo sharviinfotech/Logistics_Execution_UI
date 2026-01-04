@@ -287,9 +287,19 @@ export class GeneralserviceService {
     return this.http.post(environment.baseUrl + 'api/external/LE/orderinfo/Filter_Creation', obj);
   }
 
+   fetchDispatchFilteredNonSap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/Dispatch/Outward/Filter_Creation_NonSap', obj);
+  }
+
+
    fetchOrderInfoFiltered(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/orderinfo/Outward/Filter_Creation', obj);
   }
+
+  fetchGlobalFilteredNonSap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/Global/Outward/Filter_Creation_NonSap', obj);
+  }
+
 
 
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormArray,
@@ -12,6 +12,9 @@ import Swal from 'sweetalert2';
 import { GeneralserviceService } from 'src/app/generalservice.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { Router } from '@angular/router';
+import * as XLSX from 'xlsx';
+import * as jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-invoice-load-details',
@@ -30,6 +33,13 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   showTable = false;
   isAllSelected: boolean = false;
   vehicleTypes: any[] = [];
+  isUpdateMode: boolean = false;
+  PlantCodeList: any[] = [];
+  VendorCodeList: any[] = [];
+  InvoiceLoadDetailsData: any[] = [];
+  dispatchData: any[] = [];
+
+  mainMode: string = 'creation'; // Default to creation mode
 
 
   // Search functionality
@@ -45,6 +55,17 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   selectedType: any = '';
   searchOptionsList: any[] = [];
   dropdownOpen = false;
+  // Filter mode properties
+  filterFromDate: string = '';
+  filterToDate: string = '';
+  filterPlant: string = '';
+  filterDivision: string = '';
+  filterTransporter: string = '';
+  filterVehicleType: string = '';
+  filterStatus: string = '';
+  filteredData: any[] = [];
+  filterApplied: boolean = false;
+  filterSapType: string = '';
 
   previousOrderType: string | null = null;
   previousSapType: string | null = null;
@@ -52,6 +73,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
+    private cd: ChangeDetectorRef,
     private service: GeneralserviceService,
     private spinner: NgxSpinnerService,
     private router: Router
@@ -63,8 +85,11 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       invoices: this.fb.array([]),
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
+
     this.addRow();
     this.getVehicleTypes();
+    this.fetchTransporter();
+    this.fetchPlantCodeList();
   }
 
   get invoices(): FormArray {
@@ -157,6 +182,32 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     this.sapType = '';
     this.invoicenumber = '';
     this.ponumber = '';
+  }
+
+  onMainModeChange(): void {
+    // Reset everything when switching modes
+    this.orderType = '';
+    this.sapType = '';
+    this.showForm = false;
+    this.isUpdateMode = false;
+
+    // Reset filter values
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterVehicleType = '';
+    this.filterStatus = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+    this.filterSapType = '';
+
+    // Reset search values
+    this.selectedType = '';
+    this.searchReference = '';
+
+    this.searchOptionsList = [];
   }
 
   removeRow(i: number): void {
@@ -745,4 +796,464 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       }
     });
   }
+
+  fetchPlantCodeList(): void {
+    this.spinner.show();
+    this.service.fetchVendorCode().subscribe(
+      (res: any) => {
+        if (res && res[0]?.PLANT) {
+          this.PlantCodeList = res[0].PLANT;
+          this.spinner.hide();
+        } else {
+          Swal.fire("No Plant Found", "", "warning");
+        }
+      },
+      error => {
+        this.spinner.hide();
+      }
+    );
+  }
+
+
+
+  fetchTransporter(): void {
+    this.spinner.show();
+    this.service.fetchVendorCode().subscribe(
+      (res: any) => {
+        if (res && res.length > 0 && res[0].VEND_CODE) {
+          console.log("✅ Transporter Data Fetched:", res[0].VEND_CODE);
+
+          // ONLY transporter list
+          this.VendorCodeList = res[0].VEND_CODE;
+
+          this.spinner.hide();
+        } else {
+          Swal.fire("No Transporter Found", "", "warning");
+          this.spinner.hide();
+        }
+      },
+      error => {
+        console.error("❌ Transporter Fetch Error:", error);
+        this.spinner.hide();
+      }
+    );
+  }
+
+  onFilterDivisionChange(): void {
+    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
+
+    if (plantObj) {
+      this.filterPlant = plantObj.PLANT;
+    } else {
+      this.filterPlant = '';
+    }
+    this.cd.detectChanges();
+  }
+
+  onFilterPlantChange(): void {
+    const plantObj = this.PlantCodeList.find(item => item.PLANT === this.filterPlant);
+
+    if (plantObj) {
+      this.filterDivision = plantObj.DIVISION;
+    } else {
+      this.filterDivision = '';
+    }
+    this.cd.detectChanges();
+  }
+  onFilterSapTypeChange(): void {
+    // Reset all filter fields
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterVehicleType = '';
+    this.filterStatus = '';
+
+    // Clear filtered data and results
+    this.filteredData = [];
+    this.filterApplied = false;
+
+    this.cd.detectChanges();
+  }
+  applyFilter() {
+    if (!this.filterFromDate || !this.filterToDate) {
+      Swal.fire('Warning', 'Please select From Date and To Date', 'warning');
+      return;
+    }
+
+    this.filterApplied = false;
+
+    const payload = {
+      GLOBAL: 'INVOICE LOAD DETAILS',
+      DATE_FROM: this.filterFromDate,
+      DATE_TO: this.filterToDate,
+      PLANT: this.filterPlant || '',
+      DIVISION: this.filterDivision || '',
+      TRANSPORTER: this.filterTransporter || '',
+      VEHICLE_TYPE: this.filterVehicleType || '',
+      STATUS: this.filterStatus || ''
+    };
+
+    this.spinner.show();
+
+    let apiCall;
+    // if (this.filterSapType === 'SAP') {
+    //   apiCall = this.service.fetchOrderInfoFiltered(payload);
+    // } else {
+    //   apiCall = this.service.fetchGlobalFilteredNonSap( payload );
+    // }
+
+    if (this.filterSapType === 'SAP') {
+      apiCall = this.service.fetchOrderInfoFiltered(payload);
+    } else if (this.filterSapType === 'Non-SAP') {
+      apiCall = this.service.fetchGlobalFilteredNonSap(payload);
+    } else {
+      this.spinner.hide();
+      Swal.fire('Error', 'Invalid SAP Type selected', 'error');
+      return;
+    }
+
+    apiCall.subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+
+        /** 🔴 NO DATA FOUND HANDLING */
+        if (res?.STATUS === 'FALSE') {
+          this.InvoiceLoadDetailsData = [];
+          this.dispatchData = [];
+
+          Swal.fire({
+            icon: 'info',
+            title: 'No Data Found',
+            text: res.MSG || 'No records available for selected filters'
+          });
+          return;
+        }
+
+        /** 🟢 DATA FOUND */
+        let records: any[] = [];
+        if (Array.isArray(res)) records = res;
+        else if (res?.HEADER) records = res.HEADER;
+        else if (res?.DATA) records = res.DATA;
+
+        this.filterApplied = true;
+
+        if (this.filterStatus === 'Completed') {
+          this.InvoiceLoadDetailsData = records;
+          this.dispatchData = [];
+          Swal.fire('Success', `Invoice Load Details records: ${records.length}`, 'success');
+        }
+        else if (this.filterStatus === 'Pending') {
+          this.dispatchData = records;
+          this.InvoiceLoadDetailsData = [];
+          Swal.fire('Success', `Dispatch records: ${records.length}`, 'success');
+        }
+        else {
+          this.InvoiceLoadDetailsData = [];
+          this.dispatchData = [];
+          Swal.fire('Info', 'Please select valid status', 'info');
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        Swal.fire('Error', 'Failed to fetch filtered data', 'error');
+        console.error(err);
+      }
+    });
+  }
+
+   clearFilter() {
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterVehicleType = '';
+    this.filterStatus = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+
+  }
+
+  downloadExcel() {
+
+  let exportSource: any[] = [];
+  let fileName = '';
+
+  // 1️⃣ Status based data
+  if (this.filterStatus === 'Completed') {
+    exportSource = this.InvoiceLoadDetailsData;
+    fileName = this.sapType === 'SAP'
+      ? 'InvoiceLoadDetails_Completed_SAP.xlsx'
+      : 'InvoiceLoadDetails_Completed_NonSAP.xlsx';
+  } else if (this.filterStatus === 'Pending') {
+    exportSource = this.dispatchData;
+    fileName = this.sapType === 'SAP'
+      ? 'Dispatch_Pending_SAP.xlsx'
+      : 'Dispatch_Pending_NonSAP.xlsx';
+  } else {
+    Swal.fire('Warning', 'Please select valid status before download', 'warning');
+    return;
+  }
+
+  // 2️⃣ No data check
+  if (!exportSource || exportSource.length === 0) {
+    Swal.fire('Warning', 'No data available to download', 'warning');
+    return;
+  }
+
+  let exportData: any[] = [];
+
+  // 3️⃣ COMPLETED – HTML table keys mapping
+  if (this.filterStatus === 'Completed') {
+    exportData = exportSource.map((item, index) => ({
+      
+      'Map ID': item.ZMAPID || '',
+      'Line No': item.ZLINE_NO || '',
+      'REFNO': item.ZREFNO || '',
+      'Invoice No': item.VBELN || '',
+      'ODN Number': item.ZODN_NO || '',
+      'SO Number': item.ZSO_NO || '',
+      'Truck Type': item.ZTRUC_TYPE || '',
+      'Passing Weight (Tons)': item.ZTRUC_WT || '',
+      'Actual Load (Tons)': item.ZACT_LOAD || '',
+      'Loading factor % (w.r.t weight)': item.ZLF_WT || '',
+      'Actual Volume Occupied': item.ZACT_VOL || '',
+      'Loading Factor w.r.t Volume': item.ZLF_VOL || '',
+      'Week Wise Shipment Flow': item.ZWEEK_SF || '',
+      'Eway Bill Number': item.ZEWAYBILL_NO || '',
+      'Eway Bill Expiry Date': item.ZEWAYBILL_DT || '',
+      'Plant': item.ZPLANT || '',
+      'Division': item.ZDIVISION || '',
+      'Work Order': item.ZWORK_ORDER || '',
+      'LR No': item.ZLRNO || '',
+      'Transporter': item.ZTRANSPORTER || '',
+      'Created Date': item.ZCREATED_DT
+        ? new Date(item.ZCREATED_DT).toLocaleDateString('en-GB')
+        : '',
+      'Vehicle Type': item.ZVEH_TYPE || ''
+    }));
+  }
+
+  // 4️⃣ PENDING (unchanged – already correct)
+  if (this.filterStatus === 'Pending') {
+  exportData = exportSource.map((item, index) => ({
+    'SI.No': index + 1,
+    'Reference No': item.ZREFNO || '',
+    'Line No': item.ZLINE_NO || '',
+    'Date': item.ZCREATED_DT
+      ? new Date(item.ZCREATED_DT).toLocaleDateString('en-GB')
+      : '',
+    'Plant': item.ZWERKS || '',
+    'Division': item.ZDIVISION || '',
+    'Vehicle Type': item.ZVEH_TYPE || '',
+    'No. of Trucks': item.ZNO_TRUCKS || '',
+    'Work Order': item.ZWORK_ORDER || '',
+    'Vendor Code': item.ZVENDOR_CD || '',
+    'Transporter': item.ZTRANSPORTER || '',
+    'No. of LRs': item.ZNO_LRS || '',
+    'LR Number': item.ZLR_NO || '',
+    'Loading Point': item.ZLOAD_PT || '',
+    'Unloading Point': item.ZUNLOAD_PT || ''
+  }));
+}
+
+
+  // 5️⃣ Create Excel
+  const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+  const wb: XLSX.WorkBook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Records');
+
+  // 6️⃣ Auto column width
+  ws['!cols'] = Object.keys(exportData[0]).map(key => ({
+    wch: Math.max(key.length + 5, 18)
+  }));
+
+  // 7️⃣ Download
+  XLSX.writeFile(wb, fileName);
+
+  Swal.fire('Success', `Excel file downloaded: ${fileName}`, 'success');
+}
+
+downloadPDF() {
+
+  let exportSource: any[] = [];
+  let fileName = '';
+  let reportTitle = '';
+
+  // 1️⃣ Status based data
+  if (this.filterStatus === 'Completed') {
+    exportSource = this.InvoiceLoadDetailsData; // ⚠️ ShipmentData kakunda HTML data
+    fileName = this.sapType === 'SAP'
+      ? 'Shipmentdata_Completed_SAP.pdf'
+      : 'Shipmentdata_Completed_NonSAP.pdf';
+    reportTitle = 'Shipment Data Records (Completed)';
+  } else if (this.filterStatus === 'Pending') {
+    exportSource = this.dispatchData;
+    fileName = this.sapType === 'SAP'
+      ? 'Dispatch_Pending_SAP.pdf'
+      : 'Dispatch_Pending_NonSAP.pdf';
+    reportTitle = 'Dispatch Records (Pending)';
+  } else {
+    Swal.fire('Warning', 'Please select valid status before download', 'warning');
+    return;
+  }
+
+  // 2️⃣ No data check
+  if (!exportSource || exportSource.length === 0) {
+    Swal.fire('Warning', 'No data available to download', 'warning');
+    return;
+  }
+
+  // 3️⃣ PDF config (A2 Landscape – Wide)
+  const doc = new (jsPDF as any).default({
+    orientation: 'landscape',
+    unit: 'mm',
+    format: [420, 297]
+  });
+
+  /* ===== TITLE ===== */
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text(reportTitle, doc.internal.pageSize.getWidth() / 2, 12, { align: 'center' });
+
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text(
+    `Generated on: ${new Date().toLocaleDateString()}`,
+    doc.internal.pageSize.getWidth() / 2,
+    18,
+    { align: 'center' }
+  );
+
+  let headers: any[] = [];
+  let data: any[] = [];
+
+  // ================= COMPLETED =================
+  if (this.filterStatus === 'Completed') {
+
+    headers = [[
+      'SI.No',
+      'Map ID',
+      'Line No',
+      'REFNO',
+      'Invoice No',
+      'ODN Number',
+      'SO Number',
+      'Truck Type',
+      'Passing Weight (Tons)',
+      'Actual Load (Tons)',
+      'Loading factor % (Wt)',
+      'Actual Volume',
+      'Loading Factor (Vol)',
+      'Week Wise Shipment Flow',
+      'Eway Bill No',
+      'Eway Bill Expiry',
+      'Plant',
+      'Division',
+      'Work Order',
+      'LR No',
+      'Transporter',
+      'Created Date',
+      'Vehicle Type'
+    ]];
+
+    data = exportSource.map((item, index) => ([
+      index + 1,
+      item.ZMAPID || '',
+      item.ZLINE_NO || '',
+      item.ZREFNO || '',
+      item.VBELN || '',
+      item.ZODN_NO || '',
+      item.ZSO_NO || '',
+      item.ZTRUC_TYPE || '',
+      item.ZTRUC_WT || '',
+      item.ZACT_LOAD || '',
+      item.ZLF_WT || '',
+      item.ZACT_VOL || '',
+      item.ZLF_VOL || '',
+      item.ZWEEK_SF || '',
+      item.ZEWAYBILL_NO || '',
+      item.ZEWAYBILL_DT || '',
+      item.ZPLANT || '',
+      item.ZDIVISION || '',
+      item.ZWORK_ORDER || '',
+      item.ZLRNO || '',
+      item.ZTRANSPORTER || '',
+      item.ZCREATED_DT
+        ? new Date(item.ZCREATED_DT).toLocaleDateString('en-GB')
+        : '',
+      item.ZVEH_TYPE || ''
+    ]));
+  }
+
+  // ================= PENDING =================
+  if (this.filterStatus === 'Pending') {
+
+    headers = [[
+      'SI.No',
+      'Reference No',
+      'Line No',
+      'Date',
+      'Plant',
+      'Division',
+      'Vehicle Type',
+      'No. of Trucks',
+      'Work Order',
+      'Vendor Code',
+      'Transporter',
+      'No. of LRs',
+      'LR Number',
+      'Loading Point',
+      'Unloading Point'
+    ]];
+
+    data = exportSource.map((item, index) => ([
+      index + 1,
+      item.ZREFNO || '',
+      item.ZLINE_NO || '',
+      item.ZCREATED_DT
+        ? new Date(item.ZCREATED_DT).toLocaleDateString('en-GB')
+        : '',
+      item.ZWERKS || '',
+      item.ZDIVISION || '',
+      item.ZVEH_TYPE || '',
+      item.ZNO_TRUCKS || '',
+      item.ZWORK_ORDER || '',
+      item.ZVENDOR_CD || '',
+      item.ZTRANSPORTER || '',
+      item.ZNO_LRS || '',
+      item.ZLR_NO || '',
+      item.ZLOAD_PT || '',
+      item.ZUNLOAD_PT || ''
+    ]));
+  }
+
+  // 4️⃣ AutoTable
+  autoTable(doc, {
+    head: headers,
+    body: data,
+    startY: 25,
+    styles: {
+      fontSize: 6,
+      cellPadding: 1.5
+    },
+    headStyles: {
+      fillColor: [52, 152, 219],
+      fontStyle: 'bold',
+      fontSize: 6
+    },
+    alternateRowStyles: {
+      fillColor: [245, 245, 245]
+    },
+    theme: 'grid'
+  });
+
+  // 5️⃣ Save
+  doc.save(fileName);
+  Swal.fire('Success', `PDF file downloaded: ${fileName}`, 'success');
+}
+
+
 }

@@ -355,9 +355,7 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <div *ngIf="mainMode === 'filter'" class="filter-section">
+    <div *ngIf="mainMode === 'filter'" class="filter-section">
 
     <!-- SAP Type Selection (Filter Mode) -->
     <div class="filter-sap-row" style="display: flex; margin-bottom: 10px;">
@@ -395,34 +393,35 @@
           <label>To Date</label>
         </div>
 
-         <div class="form-field">
-            <select [(ngModel)]="filterPlant" (change)="onFilterPlantChange()">
-              <option value="">Select Plant</option>
-              <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT">{{ plant.PLANT }} - {{ plant.PLANT_DESC }}</option>
-            </select>
-            <label>Plant</label>
-          </div>
+        <div class="form-field">
+          <select [(ngModel)]="filterPlant" (change)="onFilterPlantChange()">
+            <option value="">Select Plant</option>
+            <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT">{{ plant.PLANT }} - {{ plant.PLANT_DESC }}
+            </option>
+          </select>
+          <label>Plant</label>
+        </div>
 
-          <!-- Division -->
-          <div class="form-field">
-            <select [(ngModel)]="filterDivision" (change)="onFilterDivisionChange()">
-              <option value="">Select Division</option>
-              <option *ngFor="let plant of PlantCodeList" [value]="plant.DIVISION">{{ plant.DIVISION }} 
-              </option>
-            </select>
-            <label>Division</label>
-          </div>
+        <!-- Division -->
+        <div class="form-field">
+          <select [(ngModel)]="filterDivision" (change)="onFilterDivisionChange()">
+            <option value="">Select Division</option>
+            <option *ngFor="let plant of PlantCodeList" [value]="plant.DIVISION">{{ plant.DIVISION }}
+            </option>
+          </select>
+          <label>Division</label>
+        </div>
 
-          <!-- Customer -->
-          <div class="form-field">
-            <select [(ngModel)]="filterTransporter">
-              <option value="">Select Transporter</option>
-              <option *ngFor="let transporter of VendorCodeList" [value]="transporter.TRANSPORTER">
-                {{ transporter.TRANSPORTER }}
-              </option>
-            </select>
-            <label>Transporter</label>
-          </div>
+        <!-- Customer -->
+        <div class="form-field">
+          <select [(ngModel)]="filterTransporter">
+            <option value="">Select Transporter</option>
+            <option *ngFor="let transporter of VendorCodeList" [value]="transporter.TRANSPORTER">
+              {{ transporter.TRANSPORTER }}
+            </option>
+          </select>
+          <label>Transporter</label>
+        </div>
 
 
         <!-- Vehicle Type -->
@@ -442,16 +441,16 @@
         </div>
 
         <div class="form-field">
-        <select [(ngModel)]="filterStatus">
-          <option value="">Select Status Type</option>
-          <option value="Pending">Pending</option>
-          <option value="Completed">Completed</option>
-        </select>
-        <label>Status</label>
-      </div>
+          <select [(ngModel)]="filterStatus">
+            <option value="">Select Status Type</option>
+            <option value="Pending">Pending</option>
+            <option value="Completed">Completed</option>
+          </select>
+          <label>Status</label>
+        </div>
       </div>
 
-      
+
 
       <!-- Action Buttons -->
       <div class="filter-actions">
@@ -462,16 +461,21 @@
             <i class="fas fa-times"></i> Clear Filters
           </button> -->
         <button class="btn btn-download-excel" (click)="downloadExcel()" [disabled]="
-       (filterStatus === 'Completed' && (!ShipmentData || ShipmentData.length === 0)) ||
-    (filterStatus === 'Pending' && (!dispatchData || dispatchData.length === 0)) ">
-          <i class="fas fa-file-excel"></i> Download Excel
-        </button>
-        <button class="btn btn-download-pdf" (click)="downloadPDF()" [disabled]="
-    (filterStatus === 'Completed' && (!ShipmentData || ShipmentData.length === 0)) ||
-    (filterStatus === 'Pending' && (!dispatchData || dispatchData.length === 0))
-  ">
-          <i class="fas fa-file-pdf"></i> Download PDF
-        </button>
+            !filterApplied ||
+            (filterStatus === 'Completed' && ShipmentData.length === 0) ||
+            (filterStatus === 'Pending' && dispatchData.length === 0)
+            ">
+            <i class="fas fa-file-excel"></i> Download Excel
+          </button>
+
+          <button class="btn btn-download-pdf" (click)="downloadPDF()" [disabled]="
+            !filterApplied ||
+            (filterStatus === 'Completed' && ShipmentData.length === 0) ||
+            (filterStatus === 'Pending' && dispatchData.length === 0)
+            ">
+            <i class="fas fa-file-pdf"></i> Download PDF
+          </button>
+          
       </div>
     </div>
 
@@ -479,6 +483,9 @@
 
 
   </div>
+  </div>
+
+  
 
 </div>
 
@@ -536,9 +543,8 @@
   </table>
 </div>
 
-<div *ngIf="filterStatus === 'Completed' && ShipmentData?.length > 0 && mainMode === 'filter'"
-  class="table-responsive mt-3">
-
+<div *ngIf=" filterApplied && filterStatus === 'Completed' && ShipmentData?.length > 0 && mainMode === 'filter'">
+  <div class="table-responsive">
   <table class="table table-bordered table-striped text-center">
     <thead>
       <tr>
@@ -546,7 +552,7 @@
         <th>Map ID</th>
         <th>REFNO</th>
         <th>Invoice No</th>
-        <th>Line No</th>
+        <!-- <th>Line No</th> -->
         <th>Odn Number</th>
         <th>SO Number</th>
         <th>Incoterms</th>
@@ -575,7 +581,7 @@
         <td>{{ item.ZMAPID }}</td>
         <td>{{ item.ZREFNO }}</td>
         <td>{{ item.VBELN }}</td>
-        <td>{{ item.ZLINE_NO }}</td>
+
         <td>{{ item.ZODN_NO }}</td>
         <td>{{ item.ZSO_NO }}</td>
         <td>{{ item.ZINCO }}</td>
@@ -589,7 +595,6 @@
         <td>{{ item.ZSHIP_WT }}</td>
         <td>{{ item.ZBATCOND }}</td>
         <td>{{ item.ZPLANT }}</td>
-
         <td>{{ item.ZDIVISION }}</td>
         <td>{{ item.ZWORK_ORDER }}</td>
         <td>{{ item.ZLRNO }}</td>
@@ -599,16 +604,16 @@
       </tr>
     </tbody>
   </table>
+  </div>
 </div>
-<div *ngIf="filterStatus === 'Pending' && dispatchData?.length > 0 && mainMode === 'filter'"
-  class="table-responsive mt-3">
-
+<div *ngIf="filterApplied && filterStatus === 'Pending' && dispatchData?.length > 0 && mainMode === 'filter'">
+  <div class="table-responsive">
   <table class="table table-bordered table-striped text-center">
     <thead>
       <tr>
         <th>SI.No</th>
         <th>Reference No</th>
-        <th>Line No</th>
+
         <th>Date</th>
         <th>Plant</th>
         <th>Division</th>
@@ -647,4 +652,5 @@
 
     </tbody>
   </table>
+  </div>
 </div>
