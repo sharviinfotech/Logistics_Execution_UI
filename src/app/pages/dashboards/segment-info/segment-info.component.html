@@ -461,6 +461,7 @@
 
 
   </div>
+</div>
 
   <!-- Search Results Table -->
   <div class="card" style="margin-top: 10px;" *ngIf="searchOptionsList?.length > 0">
@@ -485,6 +486,10 @@
               <th>Work Order</th>
               <th>LR No</th>
               <th>Transporter</th>
+              <th>Plant</th>
+              <th>Division</th>
+              <th>Created Date</th>
+              <th>Vehicle Type</th>
             </tr>
           </thead>
           <tbody>
@@ -505,6 +510,10 @@
               <td>{{ item.ZWORK_ORDER }}</td>
               <td>{{ item.ZLRNO }}</td>
               <td>{{ item.ZTRANSPORTER }}</td>
+              <td>{{ item.ZPLANT }}</td>
+              <td>{{ item.ZDIVISION }}</td>
+              <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
+              <td>{{ item.ZVEH_TYPE }}</td>
             </tr>
           </tbody>
         </table>

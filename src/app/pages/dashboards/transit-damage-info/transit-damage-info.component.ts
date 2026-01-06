@@ -192,6 +192,7 @@ export class TransitDamageInfoComponent implements OnInit {
     // Reset search values
     this.selectedType = '';
     this.searchReference = '';
+    this.SavedDataShow = false;
 
     this.searchOptionsList = [];
 
@@ -219,6 +220,7 @@ export class TransitDamageInfoComponent implements OnInit {
     this.selectedItems = [];
     this.searchReference = '';
     this.selectedType = '';
+    this.SavedDataShow = false; // ✅ Added
 
     // ✅ Don't hide forms if Non-SAP is selected
     if (this.sapType !== 'Non-SAP') {
@@ -232,8 +234,16 @@ export class TransitDamageInfoComponent implements OnInit {
     if (this.previousOrderType !== null && this.previousOrderType !== this.orderType) {
       this.sapType = null;
       this.previousSapType = null;
+      // ✅ Clear invoice/PO numbers when order type changes
+      this.invoicenumber = '';
+      this.ponumber = '';
+      this.searchReference = '';
+      this.selectedType = '';
+      this.searchOptionsList = [];
+      this.SavedDataShow = false;
+      
       this.resetConditionalFields();
-    }
+    } 
     this.previousOrderType = this.orderType;
   }
 
@@ -242,6 +252,14 @@ export class TransitDamageInfoComponent implements OnInit {
       this.resetConditionalFields();
     }
     this.previousSapType = this.sapType;
+      // ✅ Complete reset when SAP mode changes
+    this.invoicenumber = '';
+    this.ponumber = '';
+    this.searchReference = '';
+    this.selectedType = '';
+    this.searchOptionsList = [];
+    this.selectedItems = [];
+    this.SavedDataShow = false;
     this.resetForms();
 
     // ✅ Auto-show forms for Non-SAP
@@ -272,8 +290,17 @@ export class TransitDamageInfoComponent implements OnInit {
       this.showForm = false;
     }
 
+    // ✅ Clear all input fields and data
+    this.invoicenumber = '';
+    this.ponumber = '';
+    this.searchReference = '';
+    this.selectedType = '';
     this.searchOptionsList = [];
     this.selectedItems = [];
+    this.SavedDataShow = false;
+
+   
+  
     this.HeaderForm.reset();
     this.referenceItems.clear();
     this.referenceItems.push(this.createReferenceRow());
@@ -433,6 +460,12 @@ export class TransitDamageInfoComponent implements OnInit {
     }
     this.SavedDataShow = false;
     this.ShowHeaderForm = false;
+
+     // ✅ Hide invoice table and clear items when searching
+    this.showTable = false;
+    this.showForm = false;
+
+
     if (!this.selectedType) {
       Swal.fire('Please select a search type', '', 'info');
       return;
@@ -548,6 +581,7 @@ export class TransitDamageInfoComponent implements OnInit {
       this.showTable = false;
       this.ShowHeaderForm = false;
       this.showForm = false;
+      this.SavedDataShow = false;
     }
   }
 
@@ -583,6 +617,9 @@ export class TransitDamageInfoComponent implements OnInit {
 
         const header = res[0].HEADER;
         const items = res[0].ITEM;
+        // ✅ Hide search results when showing invoice data
+        this.SavedDataShow = false;
+        this.searchOptionsList = [];
 
         this.showTable = true;
         this.ShowHeaderForm = true;
@@ -740,6 +777,10 @@ export class TransitDamageInfoComponent implements OnInit {
 
         const header = res[0].HEADER;
         const items = res[0].ITEM;
+
+        // ✅ Hide search results when showing invoice data
+        this.SavedDataShow = false;
+        this.searchOptionsList = [];
 
         this.showTable = true;
         this.ShowHeaderForm = true;

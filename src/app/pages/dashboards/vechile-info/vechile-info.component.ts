@@ -473,6 +473,8 @@ export class VechileInfoComponent implements OnInit {
       return;
     }
 
+     this.showTable = false;
+
 
     let payload1: any = {
 
@@ -521,6 +523,8 @@ export class VechileInfoComponent implements OnInit {
         } else {
           this.searchOptionsList = res.HEADER;
           this.showForm = false;
+
+          
           Swal.fire('Data fetched successfully!', '', 'success');
         }
       },
@@ -545,6 +549,7 @@ export class VechileInfoComponent implements OnInit {
     const value = type === 'purchase' ? this.ponumber : this.invoicenumber;
     if (!value || value.trim() === '') {
       this.showTable = false;
+      this.searchOptionsList = [];
     }
   }
 
@@ -566,6 +571,10 @@ export class VechileInfoComponent implements OnInit {
       Swal.fire('Warning', `Please enter ${this.orderType === 'Inward' ? 'PO' : 'invoice'} number.`, 'warning');
       return;
     }
+
+    this.searchOptionsList = [];
+  this.searchReference = '';
+  this.selectedType = '';
 
 
     const selectedMapId = this.selectedItems?.[0]?.MAPID || "";
@@ -596,6 +605,7 @@ export class VechileInfoComponent implements OnInit {
           Swal.fire('Success', 'Vehicle details loaded successfully.', 'success');
         } else {
           this.showTable = false;
+         
           Swal.fire('Info', 'No data found.', 'info');
         }
       },

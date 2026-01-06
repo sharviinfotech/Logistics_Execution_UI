@@ -944,7 +944,8 @@ export class DispatchComponent implements OnInit {
       "LR Number": record.ZLR_NO || '',
       "Loading Points": record.ZLOAD_PT || '',
       "Unloading Points": record.ZUNLOAD_PT || '',
-      "No. of Invoices": record.ZNO_INVOICES || ''
+      "No. of Invoices": record.ZNO_INVOICES || '',
+      "Created date": record.ZCREATED_DT || ''
     }));
 
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
@@ -999,7 +1000,8 @@ export class DispatchComponent implements OnInit {
     'LR Number',
     'Loading Points',
     'Unloading Points',
-    'No. of Invoices'
+    'No. of Invoices',
+    'Created date'
   ]];
 
   const data = this.filteredData.map(record => ([
@@ -1016,7 +1018,8 @@ export class DispatchComponent implements OnInit {
     record.ZLR_NO || '',
     record.ZLOAD_PT || '',
     record.ZUNLOAD_PT || '',
-    record.ZNO_INVOICES || ''
+    record.ZNO_INVOICES || '',
+    record.ZCREATED_DT || ''
   ]));
 
   autoTable(doc, {

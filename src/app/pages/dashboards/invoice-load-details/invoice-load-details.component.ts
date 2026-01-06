@@ -30,7 +30,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   sapType = '';
   invoicenumber = '';
   ponumber = '';
-  showTable = false;
+  
   isAllSelected: boolean = false;
   vehicleTypes: any[] = [];
   isUpdateMode: boolean = false;
@@ -174,7 +174,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   }
 
   onOrderTypeSelection(): void {
-    this.showTable = false;
+    this.showForm = false;
     this.invoices.clear();
     this.referenceItems.clear();
     this.addRow();
@@ -223,11 +223,11 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
     this.invoices.clear();
     this.addRow();
-    this.showTable = this.sapType !== 'SAP';
+    this.showForm = this.sapType !== 'SAP';
   }
 
   resetConditionalFields(): void {
-    this.showTable = false;
+    this.showForm = false;
     this.searchOptionsList = [];
     this.selectedItems = [];
     this.InvoiceForm.reset();
@@ -422,7 +422,8 @@ export class InvoiceLoadDetailsComponent implements OnInit {
         if (Array.isArray(res) && res.length > 0) {
           this.invoices.clear();
           res.forEach((item: any) => this.addRow(item));
-          this.showTable = true;
+          this.showForm = true;
+          this.searchOptionsList = [];
 
           Swal.fire('Success', 'Invoice details loaded', 'success');
         } else {
@@ -439,7 +440,8 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   onInputChange(type: 'purchase' | 'invoice'): void {
     const value = type === 'purchase' ? this.ponumber : this.invoicenumber;
     if (!value || value.trim() === '') {
-      this.showTable = false;
+      this.showForm = false;
+      this.searchOptionsList = [];
     }
   }
 
@@ -660,7 +662,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     this.sapType = '';
     this.invoicenumber = '';
     this.ponumber = '';
-    this.showTable = false;
+    this.showForm = false;
     this.searchOptionsList = [];
     this.selectedItems = [];
     this.searchReference = '';
@@ -724,10 +726,13 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     return this.sapType === 'SAP';
   }
 
-  onSearchTypeChange(): void {
+ onSearchTypeChange(): void {
+    // Reset data when search type changes
     this.searchReference = '';
     this.searchOptionsList = [];
     this.showForm = false;
+   
+
     console.log('🔄 Search type changed. Data reset.');
   }
 
@@ -786,6 +791,9 @@ export class InvoiceLoadDetailsComponent implements OnInit {
         } else {
           this.searchOptionsList = res.HEADER;
           this.showForm = false;
+          
+          
+
           Swal.fire('Data fetched successfully!', '', 'success');
         }
       },

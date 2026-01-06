@@ -213,7 +213,7 @@
 
 
       <!-- Invoice Load Table -->
-      <div *ngIf="showTable" class="table-responsive mt-3">
+      <div *ngIf="showForm" class="table-responsive mt-3">
         <form [formGroup]="InvoiceForm">
           <table class="table table-bordered">
             <thead>
@@ -409,7 +409,7 @@
     </div>
 
     <!-- Save Buttons -->
-    <div *ngIf="showTable" class="text-right">
+    <div *ngIf="showForm" class="text-right">
       <button class="btn btn-md btn-raised btnSave" (click)="onSave('stay')">Save</button>
       <button class="btn btn-md btn-raised btnSave move" (click)="onSave('next')">Save and Next</button>
       <button class="btn btn-md btn-raised btnSave prev" (click)="onSave('previous')">Save and Previous</button>

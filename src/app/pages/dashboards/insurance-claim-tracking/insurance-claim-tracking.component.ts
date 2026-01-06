@@ -203,6 +203,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     this.selectedItems = [];
     this.searchReference = '';
     this.selectedType = '';
+     this.SavedDataShow = false; // ✅ Added
 
     if (this.sapType !== 'Non-SAP') {
       this.ShowHeaderForm = false;
@@ -218,9 +219,17 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       this.ShowHeaderForm = false;
       this.showForm = false;
     }
-
+    // ✅ Clear all input fields and data
+    this.invoicenumber = '';
+    this.ponumber = '';
+    this.searchReference = '';
+    this.selectedType = '';
     this.searchOptionsList = [];
     this.selectedItems = [];
+    this.SavedDataShow = false;
+
+    
+    
     this.HeaderForm.reset();
     this.referenceItems.clear();
     this.referenceItems.push(this.createReferenceRow());
@@ -252,6 +261,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     // Reset search values
     this.selectedType = '';
     this.searchReference = '';
+    this.SavedDataShow = false;
 
     this.searchOptionsList = [];
 
@@ -265,17 +275,52 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     if (this.previousOrderType !== null && this.previousOrderType !== this.orderType) {
       this.sapType = null;
       this.previousSapType = null;
+      this.invoicenumber = '';
+      this.ponumber = '';
+      this.searchReference = '';
+      this.selectedType = '';
+      this.searchOptionsList = [];
+      this.SavedDataShow = false;
       this.resetConditionalFields();
     }
     this.previousOrderType = this.orderType;
   }
 
-  onSapTypeSelection(): void {
+     onSapTypeSelection() {
     if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
       this.resetConditionalFields();
     }
     this.previousSapType = this.sapType;
+    // ✅ Complete reset when SAP mode changes
+    this.invoicenumber = '';
+    this.ponumber = '';
+    this.searchReference = '';
+    this.selectedType = '';
+    this.searchOptionsList = [];
+    this.selectedItems = [];
+    this.SavedDataShow = false;
     this.resetForms();
+
+    // ✅ Auto-show forms for Non-SAP
+    if (this.sapType === 'Non-SAP') {
+      this.ShowHeaderForm = true;
+      this.showTable = true;
+      this.showForm = true;
+      
+
+
+      // Add one empty row to items table
+      if (this.items.length === 0) {
+        this.addItemRow();
+      }
+
+      console.log('✅ Non-SAP selected - Forms displayed automatically');
+    } else {
+      // For SAP, keep forms hidden until GET is clicked
+      this.ShowHeaderForm = false;
+      this.showTable = false;
+      this.showForm = false;
+    }
   }
 
   // Reference Table: Field Blur Handler
@@ -597,6 +642,10 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
         const header = res[0].HEADER;
         const items = res[0].ITEM;
+
+         // ✅ Hide search results when showing invoice data
+        this.SavedDataShow = false;
+        this.searchOptionsList = [];
 
         this.showTable = true;
         this.ShowHeaderForm = true;

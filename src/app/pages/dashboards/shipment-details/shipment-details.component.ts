@@ -621,6 +621,7 @@ export class ShipmentDetailsComponent implements OnInit {
         });
 
         this.showForm = true;
+        this.searchOptionsList = [];
         this.spinner.hide();
       },
 
@@ -637,6 +638,7 @@ export class ShipmentDetailsComponent implements OnInit {
     const value = type === 'purchase' ? this.ponumber : this.invoicenumber;
     if (!value || value.trim() === '') {
       this.showForm = false;
+      this.searchOptionsList = [];
     }
   }
 
@@ -932,7 +934,7 @@ export class ShipmentDetailsComponent implements OnInit {
     const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
 
     if (plantObj) {
-      this.filterPlant = plantObj.PLANT;
+      this.filterPlant = plantObj.PLANT + '_' + plantObj.PLANT_DESC;
     } else {
       this.filterPlant = '';
     }
@@ -940,7 +942,10 @@ export class ShipmentDetailsComponent implements OnInit {
   }
 
   onFilterPlantChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.PLANT === this.filterPlant);
+    // Extract the plant code from the combined value
+    const plantCode = this.filterPlant.split('_')[0];
+
+    const plantObj = this.PlantCodeList.find(item => item.PLANT === plantCode);
 
     if (plantObj) {
       this.filterDivision = plantObj.DIVISION;

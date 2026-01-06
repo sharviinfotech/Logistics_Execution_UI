@@ -349,6 +349,7 @@
             <th>Loading Point</th>
             <th>Unloading Point</th>
             <th>No of Invoices</th>
+            <th>Created Date</th>
           </tr>
         </thead>
         <tbody>
@@ -369,6 +370,7 @@
             <td>{{ record.ZLOAD_PT }}</td>
             <td>{{ record.ZUNLOAD_PT }}</td>
             <td>{{ record.ZNO_INVOICES }}</td>
+            <td>{{ record.ZCREATED_DT | date: 'dd-MM-yyyy ' }}</td>
           </tr>
         </tbody>
       </table>

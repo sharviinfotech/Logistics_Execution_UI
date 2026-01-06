@@ -249,6 +249,7 @@ export class SegmentInfoComponent implements OnInit {
         if (res && res.length > 0) {
           this.patchForm(res[0]);
           this.showForm = true;
+          this.searchOptionsList = [];
         } else {
           Swal.fire('No data found', '', 'info');
         }
