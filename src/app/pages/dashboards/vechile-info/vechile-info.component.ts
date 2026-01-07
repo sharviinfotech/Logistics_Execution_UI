@@ -67,6 +67,7 @@ export class VechileInfoComponent implements OnInit {
   VehicleInfoData: any[] = [];
   dispatchData: any[] = [];
   filterSapType: string = '';
+  shipmentType: string = '';
 
 
 
@@ -105,7 +106,11 @@ export class VechileInfoComponent implements OnInit {
       MANDT: [data?.MANDT],
       POSNR: [data?.POSNR],
       ZMAPID: [data?.ZMAPID || ''],
-      ZTRX_TYPE: [data?.ZTRX_TYPE || '', Validators.required],
+
+      ZTRX_TYPE: [
+        data?.ZTRX_TYPE || this.shipmentType || '',
+        Validators.required
+      ],
       ZTRANSPORTER: [data?.ZTRANSPORTER || '', Validators.required],
       ZLRNO: [data?.ZLRNO || '', Validators.required],
       ZTRUC_TYPE: [data?.ZTRUC_TYPE || '', Validators.required],
@@ -284,8 +289,14 @@ export class VechileInfoComponent implements OnInit {
 
     console.log("🚀 Hitting VehicleInfoMapid API:", reqBody);
 
+    const apiCall$ =
+      this.orderType === 'Outward'
+        ? this.service.VehicleInfoMapidForNonsap(reqBody) // PUT
+        : this.service.VehicleInfoMapid(reqBody);
+
+
     this.spinner.show();
-    this.service.VehicleInfoMapid(reqBody).subscribe({
+    apiCall$.subscribe({
       next: (res: any) => {
         this.spinner.hide();
         console.log("🚛 MAPID Vehicle Info Response:", res);
@@ -297,6 +308,7 @@ export class VechileInfoComponent implements OnInit {
             ZTRUC_VOL: res.ZTRUC_VOL || ""
           });
         }
+        this.applyShipmentTypeToAllRows();
       },
       error: (err) => {
         this.spinner.hide();
@@ -473,7 +485,7 @@ export class VechileInfoComponent implements OnInit {
       return;
     }
 
-     this.showTable = false;
+    this.showTable = false;
 
 
     let payload1: any = {
@@ -524,7 +536,7 @@ export class VechileInfoComponent implements OnInit {
           this.searchOptionsList = res.HEADER;
           this.showForm = false;
 
-          
+
           Swal.fire('Data fetched successfully!', '', 'success');
         }
       },
@@ -573,8 +585,8 @@ export class VechileInfoComponent implements OnInit {
     }
 
     this.searchOptionsList = [];
-  this.searchReference = '';
-  this.selectedType = '';
+    this.searchReference = '';
+    this.selectedType = '';
 
 
     const selectedMapId = this.selectedItems?.[0]?.MAPID || "";
@@ -605,7 +617,7 @@ export class VechileInfoComponent implements OnInit {
           Swal.fire('Success', 'Vehicle details loaded successfully.', 'success');
         } else {
           this.showTable = false;
-         
+
           Swal.fire('Info', 'No data found.', 'info');
         }
       },
@@ -896,6 +908,52 @@ export class VechileInfoComponent implements OnInit {
     });
   }
 
+  fetchDCReferenceNo(): void {
+
+    if (this.sapType !== 'Non-SAP') return;
+
+    const invoiceNo = this.VehicleForm.get('INV_VBELN')?.value;
+    if (!invoiceNo) {
+      Swal.fire('Warning', 'Invoice number is required', 'warning');
+      return;
+    }
+
+    const payload = { INV_NO: invoiceNo };
+
+    this.spinner.show();
+
+    this.service.DCReferenceNo(payload).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        console.log('✅ DC Response:', res);
+
+        if (res?.ZTRANS_TYPE) {
+
+          // 🔥 STORE GLOBALLY
+          this.shipmentType = res.ZTRANS_TYPE;
+
+          // 🔥 APPLY TO ALL EXISTING ROWS
+          this.applyShipmentTypeToAllRows();
+        }
+      },
+      error: () => {
+        this.spinner.hide();
+        Swal.fire('Error', 'Failed to fetch DC Reference', 'error');
+      }
+    });
+  }
+
+
+  applyShipmentTypeToAllRows() {
+    if (!this.shipmentType) return;
+
+    this.vehicles.controls.forEach(ctrl => {
+      ctrl.patchValue({
+        ZTRX_TYPE: this.shipmentType
+      });
+    });
+  }
+
 
 
 
@@ -998,7 +1056,7 @@ export class VechileInfoComponent implements OnInit {
     Swal.fire('Success', `Excel file downloaded: ${fileName}`, 'success');
   }
 
-   downloadPDF() {
+  downloadPDF() {
     // 1️⃣ Determine data source based on status
     let exportSource: any[] = [];
     let fileName = '';
@@ -1024,10 +1082,10 @@ export class VechileInfoComponent implements OnInit {
     }
 
     const doc = new (jsPDF as any).default({
-    orientation: 'landscape',
-    unit: 'mm',
-    format: [420, 297] // ✅ A2 Landscape (WIDE)
-  });
+      orientation: 'landscape',
+      unit: 'mm',
+      format: [420, 297] // ✅ A2 Landscape (WIDE)
+    });
 
 
     /* ===== PDF HEADING ===== */
@@ -1053,59 +1111,59 @@ export class VechileInfoComponent implements OnInit {
     if (this.filterStatus === 'Completed') {
       headers = [[
         'SI.No',
-      'Map ID',
-      'REFNO',
-      'Invoice No',
-      'ODN No',
-      'SO No',
-      'Vehicle Line',
-      'Type of Shipment',
-      'Type of Vehicle',
-      'Passing Weight (Tons)',
-      'Volume of Truck',
-      'Vehicle Number',
-      'No of Vehicles',
-      'Sales Person',
-      'Driver Name',
-      'Driver Mobile',
-      'Work Order',
-      'Location',
-      'Plant',
-      'Division',
-      'LR No',
-      'Transporter',
-      'Created Date',
-      'Vehicle Type'
+        'Map ID',
+        'REFNO',
+        'Invoice No',
+        'ODN No',
+        'SO No',
+        'Vehicle Line',
+        'Type of Shipment',
+        'Type of Vehicle',
+        'Passing Weight (Tons)',
+        'Volume of Truck',
+        'Vehicle Number',
+        'No of Vehicles',
+        'Sales Person',
+        'Driver Name',
+        'Driver Mobile',
+        'Work Order',
+        'Location',
+        'Plant',
+        'Division',
+        'LR No',
+        'Transporter',
+        'Created Date',
+        'Vehicle Type'
 
       ]];
 
       data = exportSource.map((record, index) => ([
         index + 1,
-      record.ZMAPID || '',
-      record.ZREFNO || '',
-      record.VBELN || '',
-      record.ZODN_NO || '',
-      record.ZSONO || '',
-      record.ZVEH_LINE || '',
-      record.ZTRX_TYPE || '',
-      record.ZTRUC_TYPE || '',
-      record.ZTRUC_WT || '',
-      record.ZTRUC_VOL || '',
-      record.ZVEH_NUM || '',
-      record.ZNOOFVEH || '',
-      record.ZSALE_PERSON || '',
-      record.ZDNAME || '',
-      record.ZDNUMBER || '',
-      record.ZWORK_ORDER || '',
-      record.ZLOCATION || '',
-      record.ZPLANT || '',
-      record.ZDIVISION || '',
-      record.ZLRNO || '',
-      record.ZTRANSPORTER || '',
-      record.ZCREATED_DT
-        ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB')
-        : '',
-      record.ZVEH_TYPE || ''
+        record.ZMAPID || '',
+        record.ZREFNO || '',
+        record.VBELN || '',
+        record.ZODN_NO || '',
+        record.ZSONO || '',
+        record.ZVEH_LINE || '',
+        record.ZTRX_TYPE || '',
+        record.ZTRUC_TYPE || '',
+        record.ZTRUC_WT || '',
+        record.ZTRUC_VOL || '',
+        record.ZVEH_NUM || '',
+        record.ZNOOFVEH || '',
+        record.ZSALE_PERSON || '',
+        record.ZDNAME || '',
+        record.ZDNUMBER || '',
+        record.ZWORK_ORDER || '',
+        record.ZLOCATION || '',
+        record.ZPLANT || '',
+        record.ZDIVISION || '',
+        record.ZLRNO || '',
+        record.ZTRANSPORTER || '',
+        record.ZCREATED_DT
+          ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB')
+          : '',
+        record.ZVEH_TYPE || ''
 
       ]));
     } else if (this.filterStatus === 'Pending') {

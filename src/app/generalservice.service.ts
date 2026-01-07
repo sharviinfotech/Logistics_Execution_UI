@@ -207,6 +207,12 @@ export class GeneralserviceService {
   VehicleInfoMapid(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/Vehicleinfo/Outward/Save', obj);
   }
+  VehicleInfoMapidForNonsap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/Vehicleinfo/Outward/Mapid', obj);
+  }
+  DCReferenceNo(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/Vehicleinfo/NonSap/DCNO', obj);
+  }
   Invoiceloaddetailsfetch(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/InvoiceloadDetails/Outward/fetchInvoiceList', obj);
   }
@@ -287,12 +293,12 @@ export class GeneralserviceService {
     return this.http.post(environment.baseUrl + 'api/external/LE/orderinfo/Filter_Creation', obj);
   }
 
-   fetchDispatchFilteredNonSap(obj) {
+  fetchDispatchFilteredNonSap(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/Dispatch/Outward/Filter_Creation_NonSap', obj);
   }
 
 
-   fetchOrderInfoFiltered(obj) {
+  fetchOrderInfoFiltered(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/orderinfo/Outward/Filter_Creation', obj);
   }
 

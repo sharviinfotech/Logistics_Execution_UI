@@ -748,7 +748,7 @@ export class SegmentInfoComponent implements OnInit {
         INV_NUM: formValue.INV_VBELN || this.invoicenumber || '',
         SALES_EMP: formValue.SALE_PERSON || '',
         SEGMENT: formValue.SEGMENT || '',
-        APPTYP: formValue.APPTYP || '',
+        APPTYP: formValue.APPTYP.DESC || '',
         CUST_PROF: formValue.CUST_PROF || '',
         BRANCH: formValue.BRANCH || '',
         BRANCH_ZONE: formValue.BRANCH_ZONE || '',

@@ -198,14 +198,16 @@
         </div>
       </div>
 
-      <form [formGroup]="Vehicle_Form">
+      <form [formGroup]="VehicleForm">
         <div class="form-grid">
           <div class="form-field" *ngIf="sapType === 'Non-SAP'">
-            <input type="text" formControlName="INV_VBELN" placeholder=" " />
-            <label>DC Reference Number</label>
+            <input type="text" formControlName="INV_VBELN" (keydown.enter)="fetchDCReferenceNo()"
+              (blur)="fetchDCReferenceNo()" />
+            <label>Invoice Number</label>
           </div>
         </div>
       </form>
+
 
 
       <!-- Vehicle Table -->
