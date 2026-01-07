@@ -437,6 +437,7 @@ export class OrderInfoComponent implements OnInit {
         if (res && res.length > 0) {
           this.patchForm(res[0]);
           this.showForm = true;
+          Swal.fire('Success', 'Invoice details loaded', 'success');
           this.spinner.hide();
         } else {
           this.showForm = false;
