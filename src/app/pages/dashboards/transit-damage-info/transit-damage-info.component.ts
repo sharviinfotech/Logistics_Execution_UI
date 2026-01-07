@@ -48,6 +48,9 @@ export class TransitDamageInfoComponent implements OnInit {
   previousSapType: string | null = null;
 
   PlantCodeList: any[] = [];
+  TransitDamageInfoHeader: any[] = [];  // ✅ Add this
+  TransitDamageInfoItems: any[] = [];   // ✅ Add this
+  transitResponse: any = {};
   VendorCodeList: any[] = [];
   mainMode: string = 'creation'; // Default to creation mode
 
@@ -241,9 +244,9 @@ export class TransitDamageInfoComponent implements OnInit {
       this.selectedType = '';
       this.searchOptionsList = [];
       this.SavedDataShow = false;
-      
+
       this.resetConditionalFields();
-    } 
+    }
     this.previousOrderType = this.orderType;
   }
 
@@ -252,7 +255,7 @@ export class TransitDamageInfoComponent implements OnInit {
       this.resetConditionalFields();
     }
     this.previousSapType = this.sapType;
-      // ✅ Complete reset when SAP mode changes
+    // ✅ Complete reset when SAP mode changes
     this.invoicenumber = '';
     this.ponumber = '';
     this.searchReference = '';
@@ -299,8 +302,8 @@ export class TransitDamageInfoComponent implements OnInit {
     this.selectedItems = [];
     this.SavedDataShow = false;
 
-   
-  
+
+
     this.HeaderForm.reset();
     this.referenceItems.clear();
     this.referenceItems.push(this.createReferenceRow());
@@ -461,7 +464,7 @@ export class TransitDamageInfoComponent implements OnInit {
     this.SavedDataShow = false;
     this.ShowHeaderForm = false;
 
-     // ✅ Hide invoice table and clear items when searching
+    // ✅ Hide invoice table and clear items when searching
     this.showTable = false;
     this.showForm = false;
 
@@ -1013,7 +1016,6 @@ export class TransitDamageInfoComponent implements OnInit {
       return;
     }
 
-
     this.filterApplied = false;
 
     const payload = {
@@ -1030,11 +1032,6 @@ export class TransitDamageInfoComponent implements OnInit {
     this.spinner.show();
 
     let apiCall;
-    // if (this.sapType === 'SAP') {
-    //   apiCall = this.service.fetchOrderInfoFiltered(payload);
-    // } else {
-    //   apiCall = this.service.fetchGlobalFilteredNonSap( payload );
-    // }
 
     if (this.filterSapType === 'SAP') {
       apiCall = this.service.fetchOrderInfoFiltered(payload);
@@ -1052,7 +1049,8 @@ export class TransitDamageInfoComponent implements OnInit {
 
         /** 🔴 NO DATA FOUND HANDLING */
         if (res?.STATUS === 'FALSE') {
-          this.TransitdamageInfoData = [];
+          this.TransitDamageInfoHeader = [];
+          this.TransitDamageInfoItems = [];
           this.dispatchData = [];
 
           Swal.fire({
@@ -1063,33 +1061,20 @@ export class TransitDamageInfoComponent implements OnInit {
           return;
         }
 
-        // this.transitResponse = res;
+        this.transitResponse = res;
         this.filterApplied = true;
 
-
-        /** 🟢 DATA FOUND - Combine HEADER and ITEMS */
+        /** 🟢 DATA FOUND */
         if (this.filterStatus === 'Completed') {
-          // Combine header data with items data
-          const flattenedData: any[] = [];
-
-          if (res?.HEADER && res?.ITEMS) {
-            res.ITEMS.forEach((item: any) => {
-              // Find matching header for this item
-              const header = res.HEADER.find((h: any) => h.ZREFNO === item.ZREFNO);
-
-              if (header) {
-                // Merge header and item data
-                flattenedData.push({
-                  ...header,
-                  ...item
-                });
-              }
-            });
-          }
-
-          this.TransitdamageInfoData = flattenedData;
+          // ✅ Store header and items separately
+          this.TransitDamageInfoHeader = res?.HEADER || [];
+          this.TransitDamageInfoItems = res?.ITEMS || [];
           this.dispatchData = [];
-          Swal.fire('Success', `Transit Damage Info records: ${flattenedData.length}`, 'success');
+
+          const headerCount = this.TransitDamageInfoHeader.length;
+          const itemsCount = this.TransitDamageInfoItems.length;
+
+          Swal.fire('Success', `Headers: ${headerCount}, Items: ${itemsCount}`, 'success');
         }
         else if (this.filterStatus === 'Pending') {
           let records: any[] = [];
@@ -1098,15 +1083,22 @@ export class TransitDamageInfoComponent implements OnInit {
           else if (res?.DATA) records = res.DATA;
 
           this.dispatchData = records;
-          this.TransitdamageInfoData = [];
+          this.TransitDamageInfoHeader = [];
+          this.TransitDamageInfoItems = [];
           Swal.fire('Success', `Dispatch records: ${records.length}`, 'success');
         }
         else {
-          this.TransitdamageInfoData = [];
+          this.TransitDamageInfoHeader = [];
+          this.TransitDamageInfoItems = [];
           this.dispatchData = [];
           Swal.fire('Info', 'Please select valid status', 'info');
         }
       },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('❌ Filter Error:', err);
+        Swal.fire('Error', 'Failed to fetch data', 'error');
+      }
     });
   }
 
@@ -1129,8 +1121,21 @@ export class TransitDamageInfoComponent implements OnInit {
     let exportSource: any[] = [];
     let fileName = '';
 
+
+
     if (this.filterStatus === 'Completed') {
-      exportSource = this.TransitdamageInfoData;
+      const combinedData: any[] = [];
+
+      this.TransitDamageInfoItems.forEach(item => {
+        const header = this.TransitDamageInfoHeader.find(h => h.ZREFNO === item.ZREFNO);
+        combinedData.push({
+          ...(header || {}),
+          ...item
+        });
+      });
+
+      exportSource = combinedData;
+
       fileName = this.filterSapType === 'SAP' ? 'TransitdamageInfo_Completed_SAP.xlsx' : 'TransitdamageInfo_Completed_NonSAP.xlsx';
     } else if (this.filterStatus === 'Pending') {
       exportSource = this.dispatchData;
@@ -1228,13 +1233,28 @@ export class TransitDamageInfoComponent implements OnInit {
     let fileName = '';
     let reportTitle = '';
 
+
+
     if (this.filterStatus === 'Completed') {
+
       exportSource = this.TransitdamageInfoData;
-      fileName = this.sapType === 'SAP' ? 'TransitdamageInfo_Completed_SAP.pdf' : 'TransitdamageInfo_Completed_NonSAP.pdf';
+      // ✅ Combine Header and Items for export
+      const combinedData: any[] = [];
+
+      this.TransitDamageInfoItems.forEach(item => {
+        const header = this.TransitDamageInfoHeader.find(h => h.ZREFNO === item.ZREFNO);
+        combinedData.push({
+          ...(header || {}),
+          ...item
+        });
+      });
+
+      exportSource = combinedData;
+      fileName = this.filterSapType === 'SAP' ? 'TransitdamageInfo_Completed_SAP.pdf' : 'TransitdamageInfo_Completed_NonSAP.pdf';
       reportTitle = 'Transit Info Records (Completed)';
     } else if (this.filterStatus === 'Pending') {
       exportSource = this.dispatchData;
-      fileName = this.sapType === 'SAP' ? 'Dispatch_Pending_SAP.pdf' : 'Dispatch_Pending_NonSAP.pdf';
+      fileName = this.filterSapType === 'SAP' ? 'Dispatch_Pending_SAP.pdf' : 'Dispatch_Pending_NonSAP.pdf';
       reportTitle = 'Dispatch Records (Pending)';
     } else {
       Swal.fire('Warning', 'Please select valid status before download', 'warning');

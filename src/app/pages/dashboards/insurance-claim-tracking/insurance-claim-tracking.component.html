@@ -505,19 +505,19 @@
           <!-- <button class="btn btn-clear-filter" (click)="clearFilters()">
             <i class="fas fa-times"></i> Clear Filters
           </button> -->
-          <button class="btn btn-download-excel" (click)="downloadExcel()" [disabled]="
-            !filterApplied ||
-            (filterStatus === 'Completed' && InsuranceClaimTrackingData.length === 0) ||
-            (filterStatus === 'Pending' && dispatchData.length === 0)
-            ">
+                       <button class="btn btn-download-excel" (click)="downloadExcel()" [disabled]="
+           !filterApplied ||
+            (filterStatus === 'Completed' && (InsurancetrackingHeader.length === 0 || InsurancetrackingItems.length === 0)) ||
+           (filterStatus === 'Pending' && dispatchData.length === 0)
+           ">
             <i class="fas fa-file-excel"></i> Download Excel
           </button>
 
           <button class="btn btn-download-pdf" (click)="downloadPDF()" [disabled]="
-            !filterApplied ||
-            (filterStatus === 'Completed' && InsuranceClaimTrackingData.length === 0) ||
-            (filterStatus === 'Pending' && dispatchData.length === 0)
-            ">
+           !filterApplied ||
+           (filterStatus === 'Completed' && (InsurancetrackingHeader.length === 0 || InsurancetrackingItems.length === 0)) ||
+           (filterStatus === 'Pending' && dispatchData.length === 0)
+           ">
             <i class="fas fa-file-pdf"></i> Download PDF
           </button>
 
@@ -573,7 +573,7 @@
 </div>
 
 <div class="card" style="margin-top: 10px;"
-  *ngIf=" filterApplied && filterStatus === 'Completed' &&  InsuranceClaimTrackingData?.length > 0 && mainMode === 'filter'">
+  *ngIf=" filterApplied && filterStatus === 'Completed' &&  InsurancetrackingHeader?.length > 0 && mainMode === 'filter'">
   <div class="card-body-LE">
     <h5 class="mb-3">Header Items</h5>
     <div class="table-responsive">
@@ -614,7 +614,7 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let item of  InsuranceClaimTrackingData; let i = index">
+          <tr *ngFor="let item of  InsurancetrackingHeader; let i = index">
             <td>{{ i + 1 }}</td>
 
             <td>{{ item.ZREFNO }}</td>
@@ -653,7 +653,7 @@
 </div>
 
 <div class="card" style="margin-top: 10px;"
-  *ngIf=" filterApplied && filterStatus === 'Completed' &&  InsuranceClaimTrackingData?.length > 0 && mainMode === 'filter'">
+  *ngIf=" filterApplied && filterStatus === 'Completed' &&  InsurancetrackingItems?.length > 0 && mainMode === 'filter'">
   <div class="card-body-LE">
     <h5 class="mb-3">Line Items</h5>
     <div class="table-responsive">
@@ -680,7 +680,7 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let item of  InsuranceClaimTrackingData; let i = index">
+          <tr *ngFor="let item of InsurancetrackingItems; let i = index">
             <td>{{ i + 1 }}</td>
             <td>{{ item.ZMAPID }}</td>
             <td>{{ item.ZREFNO }}</td>

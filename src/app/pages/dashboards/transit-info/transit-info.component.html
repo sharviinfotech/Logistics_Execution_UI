@@ -334,18 +334,18 @@
             <i class="fas fa-times"></i> Clear Filters
           </button> -->
           <button class="btn btn-download-excel" (click)="downloadExcel()" [disabled]="
-            !filterApplied ||
-            (filterStatus === 'Completed' && TransitInfoData.length === 0) ||
-            (filterStatus === 'Pending' && dispatchData.length === 0)
-            ">
+           !filterApplied ||
+            (filterStatus === 'Completed' && (TransitInfoHeader.length === 0 || TransitInfoItems.length === 0)) ||
+           (filterStatus === 'Pending' && dispatchData.length === 0)
+           ">
             <i class="fas fa-file-excel"></i> Download Excel
           </button>
 
           <button class="btn btn-download-pdf" (click)="downloadPDF()" [disabled]="
-            !filterApplied ||
-            (filterStatus === 'Completed' && TransitInfoData.length === 0) ||
-            (filterStatus === 'Pending' && dispatchData.length === 0)
-            ">
+           !filterApplied ||
+           (filterStatus === 'Completed' && (TransitInfoHeader.length === 0 || TransitInfoItems.length === 0)) ||
+           (filterStatus === 'Pending' && dispatchData.length === 0)
+           ">
             <i class="fas fa-file-pdf"></i> Download PDF
           </button>
 
@@ -431,7 +431,7 @@
 </div>
 
 <div class="card" style="margin-top: 10px;"
-  *ngIf=" filterApplied && filterStatus === 'Completed' &&  TransitInfoData?.length > 0 && mainMode === 'filter'">
+  *ngIf=" filterApplied && filterStatus === 'Completed' &&  TransitInfoHeader?.length > 0 && mainMode === 'filter'">
   <div class="card-body-LE">
     <h5 class="mb-3">Header Items</h5>
     <div class="table-responsive">
@@ -458,7 +458,7 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let item of  TransitInfoData; let i = index">
+          <tr *ngFor="let item of TransitInfoHeader; let i = index">
             <td>{{ i + 1 }}</td>
 
             <td>{{ item.ZREFNO }}</td>
@@ -483,7 +483,7 @@
 </div>
 
 <div class="card" style="margin-top: 10px;"
-  *ngIf=" filterApplied && filterStatus === 'Completed' &&  TransitInfoData?.length > 0 && mainMode === 'filter'">
+  *ngIf=" filterApplied && filterStatus === 'Completed' &&   TransitInfoItems?.length > 0 && mainMode === 'filter'">
   <div class="card-body-LE">
     <h5 class="mb-3">Line Items</h5>
     <div class="table-responsive">
@@ -503,13 +503,12 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let item of  TransitInfoData; let i = index">
+          <tr *ngFor="let item of TransitInfoItems; let i = index">
             <td>{{ i + 1 }}</td>
 
             <td>{{ item.ZREFNO }}</td>
             <td>{{ item.ZINV_NO }}</td>
             <td>{{ item.ZVEH_LINE}}</td>
-
             <td>{{ item.ZVEH_NUM }}</td>
             <td>{{ item.ZLRNO }}</td>
             <td>{{ item.ZWORK_ORDER }}</td>

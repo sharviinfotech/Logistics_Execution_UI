@@ -38,6 +38,9 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   SavedDataShow = false;
   headerData: any = null;
   itemsList: any[] = [];
+  InsurancetrackingHeader: any[] = [];  // ✅ Add this
+  InsurancetrackingItems: any[] = [];   // ✅ Add this
+  transitResponse: any = {};
   showForm = false;
   isEditMode = false;
   isAllSelected = false;
@@ -1070,108 +1073,97 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
     this.cd.detectChanges();
   }
-  applyFilter() {
-    if (!this.filterFromDate || !this.filterToDate) {
-      Swal.fire('Warning', 'Please select From Date and To Date', 'warning');
-      return;
-    }
-
-
-    this.filterApplied = false;
-
-    const payload = {
-      GLOBAL: 'INSURANCE CLAIM STATUS',
-      DATE_FROM: this.filterFromDate,
-      DATE_TO: this.filterToDate,
-      PLANT: this.filterPlant || '',
-      DIVISION: this.filterDivision || '',
-      TRANSPORTER: this.filterTransporter || '',
-      VEHICLE_TYPE: this.filterVehicleType || '',
-      STATUS: this.filterStatus || ''
-    };
-
-    this.spinner.show();
-
-    let apiCall;
-    // if (this.sapType === 'SAP') {
-    //   apiCall = this.service.fetchOrderInfoFiltered(payload);
-    // } else {
-    //   apiCall = this.service.fetchGlobalFilteredNonSap( payload );
-    // }
-
-    if (this.filterSapType === 'SAP') {
-      apiCall = this.service.fetchOrderInfoFiltered(payload);
-    } else if (this.filterSapType === 'Non-SAP') {
-      apiCall = this.service.fetchGlobalFilteredNonSap(payload);
-    } else {
-      this.spinner.hide();
-      Swal.fire('Error', 'Invalid SAP Type selected', 'error');
-      return;
-    }
-
-    apiCall.subscribe({
-      next: (res: any) => {
+    applyFilter() {
+      if (!this.filterFromDate || !this.filterToDate) {
+        Swal.fire('Warning', 'Please select From Date and To Date', 'warning');
+        return;
+      }
+  
+      this.filterApplied = false;
+  
+      const payload = {
+        GLOBAL: 'INSURANCE CLAIM STATUS',
+        DATE_FROM: this.filterFromDate,
+        DATE_TO: this.filterToDate,
+        PLANT: this.filterPlant || '',
+        DIVISION: this.filterDivision || '',
+        TRANSPORTER: this.filterTransporter || '',
+        VEHICLE_TYPE: this.filterVehicleType || '',
+        STATUS: this.filterStatus || ''
+      };
+  
+      this.spinner.show();
+  
+      let apiCall;
+  
+      if (this.filterSapType === 'SAP') {
+        apiCall = this.service.fetchOrderInfoFiltered(payload);
+      } else if (this.filterSapType === 'Non-SAP') {
+        apiCall = this.service.fetchGlobalFilteredNonSap(payload);
+      } else {
         this.spinner.hide();
-
-        /** 🔴 NO DATA FOUND HANDLING */
-        if (res?.STATUS === 'FALSE') {
-          this.InsuranceClaimTrackingData = [];
-          this.dispatchData = [];
-
-          Swal.fire({
-            icon: 'info',
-            title: 'No Data Found',
-            text: res.MSG || 'No records available for selected filters'
-          });
-          return;
-        }
-
-        // this.transitResponse = res;
-        this.filterApplied = true;
-
-
-        /** 🟢 DATA FOUND - Combine HEADER and ITEMS */
-        if (this.filterStatus === 'Completed') {
-          // Combine header data with items data
-          const flattenedData: any[] = [];
-
-          if (res?.HEADER && res?.ITEMS) {
-            res.ITEMS.forEach((item: any) => {
-              // Find matching header for this item
-              const header = res.HEADER.find((h: any) => h.ZREFNO === item.ZREFNO);
-
-              if (header) {
-                // Merge header and item data
-                flattenedData.push({
-                  ...header,
-                  ...item
-                });
-              }
+        Swal.fire('Error', 'Invalid SAP Type selected', 'error');
+        return;
+      }
+  
+      apiCall.subscribe({
+        next: (res: any) => {
+          this.spinner.hide();
+  
+          /** 🔴 NO DATA FOUND HANDLING */
+          if (res?.STATUS === 'FALSE') {
+            this.InsurancetrackingHeader = [];
+            this.InsurancetrackingItems = []; 
+            this.dispatchData = [];
+  
+            Swal.fire({
+              icon: 'info',
+              title: 'No Data Found',
+              text: res.MSG || 'No records available for selected filters'
             });
+            return;
           }
-
-          this.InsuranceClaimTrackingData = flattenedData;
-          this.dispatchData = [];
-          Swal.fire('Success', `InsuranceClaimTracking records: ${flattenedData.length}`, 'success');
+  
+          this.transitResponse = res;
+          this.filterApplied = true;
+  
+          /** 🟢 DATA FOUND */
+          if (this.filterStatus === 'Completed') {
+            // ✅ Store header and items separately
+            this.InsurancetrackingHeader = res?.HEADER || [];
+            this.InsurancetrackingItems = res?.ITEMS || [];
+            this.dispatchData = [];
+  
+            const headerCount = this.InsurancetrackingHeader.length;
+            const itemsCount = this.InsurancetrackingItems.length;
+  
+            Swal.fire('Success', `Headers: ${headerCount}, Items: ${itemsCount}`, 'success');
+          }
+          else if (this.filterStatus === 'Pending') {
+            let records: any[] = [];
+            if (Array.isArray(res)) records = res;
+            else if (res?.HEADER) records = res.HEADER;
+            else if (res?.DATA) records = res.DATA;
+  
+            this.dispatchData = records;
+            this.InsurancetrackingHeader = [];
+            this.InsurancetrackingItems = [];
+            Swal.fire('Success', `Dispatch records: ${records.length}`, 'success');
+          }
+          else {
+            this.InsurancetrackingHeader = [];
+            this.InsurancetrackingItems = [];
+            this.dispatchData = [];
+            Swal.fire('Info', 'Please select valid status', 'info');
+          }
+        },
+        error: (err) => {
+          this.spinner.hide();
+          console.error('❌ Filter Error:', err);
+          Swal.fire('Error', 'Failed to fetch data', 'error');
         }
-        else if (this.filterStatus === 'Pending') {
-          let records: any[] = [];
-          if (Array.isArray(res)) records = res;
-          else if (res?.HEADER) records = res.HEADER;
-          else if (res?.DATA) records = res.DATA;
-
-          this.dispatchData = records;
-          this.InsuranceClaimTrackingData = [];
-          Swal.fire('Success', `Dispatch records: ${records.length}`, 'success');
-        }
-        else {
-          this.InsuranceClaimTrackingData = [];
-          this.dispatchData = [];
-          Swal.fire('Info', 'Please select valid status', 'info');
-        }
-      },
-    });
-  }
+      });
+    }
 
   clearFilter() {
     this.filterFromDate = '';
@@ -1191,7 +1183,18 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     let fileName = '';
 
     if (this.filterStatus === 'Completed') {
-      exportSource = this.InsuranceClaimTrackingData;
+      const combinedData: any[] = [];
+
+      this.InsurancetrackingItems.forEach(item => {
+        const header = this.InsurancetrackingHeader.find(h => h.ZREFNO === item.ZREFNO);
+        combinedData.push({
+          ...(header || {}),
+          ...item
+        });
+      });
+
+      exportSource = combinedData;
+      
       fileName = this.filterSapType === 'SAP' ? 'InsuranceClaimTracking_Completed_SAP.xlsx' : 'InsuranceClaimTracking_Completed_NonSAP.xlsx';
     } else if (this.filterStatus === 'Pending') {
       exportSource = this.dispatchData;
@@ -1302,8 +1305,19 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     let reportTitle = '';
 
     if (this.filterStatus === 'Completed') {
-      exportSource = this.InsuranceClaimTrackingData;
-      fileName = this.sapType === 'SAP' ? 'InsuranceClaimTracking_Completed_SAP.pdf' : 'InsuranceClaimTracking_Completed_NonSAP.pdf';
+            const combinedData: any[] = [];
+
+      this.InsurancetrackingItems.forEach(item => {
+        const header = this.InsurancetrackingHeader.find(h => h.ZREFNO === item.ZREFNO);
+        combinedData.push({
+          ...(header || {}),
+          ...item
+        });
+      });
+
+      exportSource = combinedData;
+      
+      fileName = this.filterSapType === 'SAP' ? 'InsuranceClaimTracking_Completed_SAP.pdf' : 'InsuranceClaimTracking_Completed_NonSAP.pdf';
       reportTitle = 'Insurance Claim Tracking Records (Completed)';
     } else if (this.filterStatus === 'Pending') {
       exportSource = this.dispatchData;
