@@ -342,14 +342,22 @@ export class TransitDamageInfoComponent implements OnInit {
     console.log('🔹 Sending Object:', obj);
 
     this.spinner.show();
-    this.service.GlobalReferenceNoFetch(obj).subscribe({
+    let apiCall;
+
+    if (this.sapType === 'SAP') {
+      apiCall = this.service.GlobalReferenceNoFetch(obj); // POST
+    } else {
+      apiCall = this.service.GlobalReferenceNoFetchwithoutsap(obj); // PUT
+    }
+
+    apiCall.subscribe({
       next: (res: any) => {
-        console.log('✅ GlobalRefSearch Response:', res);
+        console.log('✅ Response:', res);
         this.spinner.hide();
         this.populateReferenceRows(res);
       },
       error: err => {
-        console.error('❌ Ref Fetch Error:', err);
+        console.error('❌ Error:', err);
         this.spinner.hide();
       }
     });
@@ -592,7 +600,7 @@ export class TransitDamageInfoComponent implements OnInit {
     if (this.sapType === 'SAP') {
       this.fetchInvoiceDetails();
     } else if (this.sapType === 'Non-SAP') {
-      this.fetchInvoiceDetailsnonsap();
+      this.fetchInvoiceDetailsNonSap();
     }
   }
 
@@ -756,39 +764,45 @@ export class TransitDamageInfoComponent implements OnInit {
     });
   }
 
-  fetchInvoiceDetailsnonsap() {
-    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+  fetchInvoiceDetailsNonSap() {
 
-    if (!referenceNumber) {
-      Swal.fire('Warning', `Please enter ${this.orderType === 'Inward' ? 'PO' : 'Invoice'} number`, 'warning');
+    if (this.sapType !== 'Non-SAP') {
+      return;
+    }
+
+    const dcRefNo = this.HeaderForm.get('VBELN')?.value;
+
+    if (!dcRefNo) {
+      Swal.fire('Warning', 'Please enter DC Reference Number', 'warning');
       return;
     }
 
     const payload = {
-      VBELN: referenceNumber
+      VBELN: dcRefNo
     };
 
     this.spinner.show();
+
     this.service.fetchinvoicelistnonsapwosp(payload).subscribe({
-      next: (res: any) => {
+      next: (res: any[]) => {
         this.spinner.hide();
 
         if (!res || res.length === 0) {
-          Swal.fire("No data found", '', 'info');
+          Swal.fire('No data found', '', 'info');
           return;
         }
 
         const header = res[0].HEADER;
         const items = res[0].ITEM;
 
-        // ✅ Hide search results when showing invoice data
+        // UI flags
         this.SavedDataShow = false;
         this.searchOptionsList = [];
-
         this.showTable = true;
         this.ShowHeaderForm = true;
         this.showForm = true;
 
+        /* ===== PATCH HEADER ===== */
         this.HeaderForm.patchValue({
           INV_NO: header.INV_NO,
           INV_DATE: header.INV_DATE,
@@ -803,36 +817,40 @@ export class TransitDamageInfoComponent implements OnInit {
           IMAGES: header.IMAGES
         });
 
-        while (this.items.length !== 0) {
+        /* ===== CLEAR ITEMS ===== */
+        while (this.items.length) {
           this.items.removeAt(0);
         }
 
+        /* ===== PATCH ITEMS ===== */
         items.forEach((x: any) => {
           const row = this.fb.group({
             selected: [false],
-            ZMAPID: [''],
+            ZMAPID: [x.ZMAPID],
+            REFNO: [x.REFNO],
             INV_NO: [x.INV_NO],
             POSNR: [x.POSNR],
             VEH_LINE: [x.VEH_LINE],
             TRUCK_NO: [x.TRUCK_NO],
             LR_NO: [x.LR_NO],
             TRANSPORTER: [x.TRANSPORTER],
-            REFNO: [''],
-            WORK_ORDER: [''],
-            PRODUCT: [''],
-            BILLNO: ['']
+            BILLNO: [x.BILLNO],
+            PRODUCT: [x.PRODUCT],
+            WORK_ORDER: [x.WORK_ORDER]
           });
 
           this.items.push(row);
         });
       },
+
       error: (err) => {
         this.spinner.hide();
         console.error(err);
-        Swal.fire("Error fetching NON-SAP data", '', 'error');
+        Swal.fire('Error fetching Non-SAP data', '', 'error');
       }
     });
   }
+
 
   onSaveNonSap(action: 'stay' | 'next' | 'previous' = 'stay') {
     if (this.orderType === 'Outward' && this.selectedItems.length === 0) {

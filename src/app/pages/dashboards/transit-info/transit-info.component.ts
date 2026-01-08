@@ -576,8 +576,16 @@ export class TransitInfoComponent implements OnInit {
     console.log("FINAL TRANSIT PAYLOAD:", payload);
 
     this.spinner.show();
+    let request$;
 
-    let request$ = this.service.TransitInfoSave(payload);
+    if (this.sapType === 'Non-SAP') {
+      // NON-SAP → PUT
+      request$ = this.service.TransitInfoNonSap(payload);
+    } else {
+      // SAP → POST
+      request$ = this.service.TransitInfoSave(payload);
+    }
+
 
     request$.subscribe({
       next: (res: any) => {
@@ -709,7 +717,7 @@ export class TransitInfoComponent implements OnInit {
     this.cd.detectChanges();
   }
 
-   applyFilter() {
+  applyFilter() {
     if (!this.filterFromDate || !this.filterToDate) {
       Swal.fire('Warning', 'Please select From Date and To Date', 'warning');
       return;
@@ -769,10 +777,10 @@ export class TransitInfoComponent implements OnInit {
           this.TransitInfoHeader = res?.HEADER || [];
           this.TransitInfoItems = res?.ITEMS || [];
           this.dispatchData = [];
-          
+
           const headerCount = this.TransitInfoHeader.length;
           const itemsCount = this.TransitInfoItems.length;
-          
+
           Swal.fire('Success', `Headers: ${headerCount}, Items: ${itemsCount}`, 'success');
         }
         else if (this.filterStatus === 'Pending') {
@@ -819,269 +827,269 @@ export class TransitInfoComponent implements OnInit {
 
 
   downloadExcel() {
-  
-  let exportSource: any[] = [];
-  let fileName = '';
 
-  if (this.filterStatus === 'Completed') {
-    
-    const combinedData: any[] = [];
-    
-    this.TransitInfoItems.forEach(item => {
-      const header = this.TransitInfoHeader.find(h => h.ZREFNO === item.ZREFNO);
-      combinedData.push({ 
-        ...(header || {}),  
-        ...item              
+    let exportSource: any[] = [];
+    let fileName = '';
+
+    if (this.filterStatus === 'Completed') {
+
+      const combinedData: any[] = [];
+
+      this.TransitInfoItems.forEach(item => {
+        const header = this.TransitInfoHeader.find(h => h.ZREFNO === item.ZREFNO);
+        combinedData.push({
+          ...(header || {}),
+          ...item
+        });
       });
-    });
-    
-    exportSource = combinedData;
-    fileName = this.filterSapType === 'SAP' ? 'TransitInfo_Completed_SAP.xlsx' : 'TransitInfo_Completed_NonSAP.xlsx';
-  } else if (this.filterStatus === 'Pending') {
-    exportSource = this.dispatchData;
-    fileName = this.filterSapType === 'SAP' ? 'Dispatch_Pending_SAP.xlsx' : 'Dispatch_Pending_NonSAP.xlsx';
-  } else {
-    Swal.fire('Warning', 'Please select valid status before download', 'warning');
-    return;
+
+      exportSource = combinedData;
+      fileName = this.filterSapType === 'SAP' ? 'TransitInfo_Completed_SAP.xlsx' : 'TransitInfo_Completed_NonSAP.xlsx';
+    } else if (this.filterStatus === 'Pending') {
+      exportSource = this.dispatchData;
+      fileName = this.filterSapType === 'SAP' ? 'Dispatch_Pending_SAP.xlsx' : 'Dispatch_Pending_NonSAP.xlsx';
+    } else {
+      Swal.fire('Warning', 'Please select valid status before download', 'warning');
+      return;
+    }
+
+    // 2️⃣ Check if data is available
+    if (!exportSource || exportSource.length === 0) {
+      Swal.fire('Warning', 'No data available to download', 'warning');
+      return;
+    }
+
+    // 3️⃣ Map data for Excel
+    let exportData: any[] = [];
+
+    if (this.filterStatus === 'Completed') {
+      exportData = exportSource.map(record => ({
+        'REFNO': record.ZREFNO || '',
+        'Invoice No': record.ZINV_NO || '',
+        'ODN Number': record.ZODN_NO || '',
+        'SO Number': record.ZSONO || '',
+        'Sales Person': record.ZSALE_PERSON || '',
+        'Physical Arrived': record.ZPY_ARRIVED_DEST || '',
+        'Unloading DT': record.ZUNLOADING_DT || '',
+        'POD Scan': record.ZPOD_SCAN || '',
+        'SIT/SALE': record.ZSIT_SALE || '',
+        'Location': record.ZLOCATION || '',
+        'Plant': record.ZPLANT || '',
+        'Division': record.ZDIVISION || '',
+        'Created Date': record.ZCREATED_DT
+          ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB')
+          : '',
+        'Vehicle Type': record.ZVEH_TYPE || '',
+        'Vehicle Line': record.ZVEH_LINE || '',
+        'Vehicle Number': record.ZVEH_NUM || '',
+        'LR No': record.ZLRNO || '',
+        'Work Order': record.ZWORK_ORDER || '',
+        'Transporter': record.ZTRANSPORTER || ''
+      }));
+    } else if (this.filterStatus === 'Pending') {
+      exportData = exportSource.map(record => ({
+        'Reference No': record.ZREFNO || '',
+        'Date': record.ZCREATED_DT ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB') : '',
+        'Plant': record.ZWERKS || '',
+        'Division': record.ZDIVISION || '',
+        'Vehicle Type': record.ZVEH_TYPE || '',
+        'No. of Trucks': record.ZNO_TRUCKS || '',
+        'Work Order': record.ZWORK_ORDER || '',
+        'Vendor Code': record.ZVENDOR_CD || '',
+        'Transporter': record.ZTRANSPORTER || '',
+        'No. of LRs': record.ZNO_LRS || '',
+        'LR Number': record.ZLR_NO || '',
+        'Loading Point': record.ZLOAD_PT || '',
+        'Unloading Point': record.ZUNLOAD_PT || '',
+        'No Of Invoices': record.ZNO_INVOICES || ''
+      }));
+    }
+
+    // 4️⃣ Create Excel sheet and workbook
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Records');
+
+    // 5️⃣ Set auto column width
+    const colWidths = Object.keys(exportData[0]).map(key => ({ wch: Math.max(key.length + 5, 18) }));
+    ws['!cols'] = colWidths;
+
+    // 6️⃣ Write file
+    XLSX.writeFile(wb, fileName);
+
+    Swal.fire('Success', `Excel file downloaded: ${fileName}`, 'success');
   }
 
-  // 2️⃣ Check if data is available
-  if (!exportSource || exportSource.length === 0) {
-    Swal.fire('Warning', 'No data available to download', 'warning');
-    return;
-  }
+  downloadPDF() {
+    // 1️⃣ Determine data source based on status
+    let exportSource: any[] = [];
+    let fileName = '';
+    let reportTitle = '';
 
-  // 3️⃣ Map data for Excel
-  let exportData: any[] = [];
+    if (this.filterStatus === 'Completed') {
+      // ✅ Combine Header and Items for export
+      const combinedData: any[] = [];
 
-  if (this.filterStatus === 'Completed') {
-    exportData = exportSource.map(record => ({
-      'REFNO': record.ZREFNO || '',
-      'Invoice No': record.ZINV_NO || '',
-      'ODN Number': record.ZODN_NO || '',
-      'SO Number': record.ZSONO || '',
-      'Sales Person': record.ZSALE_PERSON || '',
-      'Physical Arrived': record.ZPY_ARRIVED_DEST || '',
-      'Unloading DT': record.ZUNLOADING_DT || '',
-      'POD Scan': record.ZPOD_SCAN || '',
-      'SIT/SALE': record.ZSIT_SALE || '',
-      'Location': record.ZLOCATION || '',
-      'Plant': record.ZPLANT || '',
-      'Division': record.ZDIVISION || '',
-      'Created Date': record.ZCREATED_DT
-        ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB')
-        : '',
-      'Vehicle Type': record.ZVEH_TYPE || '',
-      'Vehicle Line': record.ZVEH_LINE || '',
-      'Vehicle Number': record.ZVEH_NUM || '',
-      'LR No': record.ZLRNO || '',
-      'Work Order': record.ZWORK_ORDER || '',
-      'Transporter': record.ZTRANSPORTER || ''
-    }));
-  } else if (this.filterStatus === 'Pending') {
-    exportData = exportSource.map(record => ({
-      'Reference No': record.ZREFNO || '',
-      'Date': record.ZCREATED_DT ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB') : '',
-      'Plant': record.ZWERKS || '',
-      'Division': record.ZDIVISION || '',
-      'Vehicle Type': record.ZVEH_TYPE || '',
-      'No. of Trucks': record.ZNO_TRUCKS || '',
-      'Work Order': record.ZWORK_ORDER || '',
-      'Vendor Code': record.ZVENDOR_CD || '',
-      'Transporter': record.ZTRANSPORTER || '',
-      'No. of LRs': record.ZNO_LRS || '',
-      'LR Number': record.ZLR_NO || '',
-      'Loading Point': record.ZLOAD_PT || '',
-      'Unloading Point': record.ZUNLOAD_PT || '',
-      'No Of Invoices': record.ZNO_INVOICES || ''
-    }));
-  }
-
-  // 4️⃣ Create Excel sheet and workbook
-  const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
-  const wb: XLSX.WorkBook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Records');
-
-  // 5️⃣ Set auto column width
-  const colWidths = Object.keys(exportData[0]).map(key => ({ wch: Math.max(key.length + 5, 18) }));
-  ws['!cols'] = colWidths;
-
-  // 6️⃣ Write file
-  XLSX.writeFile(wb, fileName);
-
-  Swal.fire('Success', `Excel file downloaded: ${fileName}`, 'success');
-}
-
-downloadPDF() {
-  // 1️⃣ Determine data source based on status
-  let exportSource: any[] = [];
-  let fileName = '';
-  let reportTitle = '';
-
-  if (this.filterStatus === 'Completed') {
-    // ✅ Combine Header and Items for export
-    const combinedData: any[] = [];
-    
-    this.TransitInfoItems.forEach(item => {
-      const header = this.TransitInfoHeader.find(h => h.ZREFNO === item.ZREFNO);
-      combinedData.push({ 
-        ...(header || {}),
-        ...item
+      this.TransitInfoItems.forEach(item => {
+        const header = this.TransitInfoHeader.find(h => h.ZREFNO === item.ZREFNO);
+        combinedData.push({
+          ...(header || {}),
+          ...item
+        });
       });
+
+      exportSource = combinedData;
+      fileName = this.filterSapType === 'SAP' ? 'Transit_Info_Completed_SAP.pdf' : 'Transit_Info_Completed_NonSAP.pdf';
+      reportTitle = 'Transit Info Records (Completed)';
+    } else if (this.filterStatus === 'Pending') {
+      exportSource = this.dispatchData;
+      fileName = this.filterSapType === 'SAP' ? 'Dispatch_Pending_SAP.pdf' : 'Dispatch_Pending_NonSAP.pdf';
+      reportTitle = 'Dispatch Records (Pending)';
+    } else {
+      Swal.fire('Warning', 'Please select valid status before download', 'warning');
+      return;
+    }
+
+    // 2️⃣ Check if data is available
+    if (!exportSource || exportSource.length === 0) {
+      Swal.fire('Warning', 'No data available to download', 'warning');
+      return;
+    }
+
+    const doc = new (jsPDF as any).default({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: [420, 297] // ✅ A2 Landscape (WIDE)
     });
-    
-    exportSource = combinedData;
-    fileName = this.filterSapType === 'SAP' ? 'Transit_Info_Completed_SAP.pdf' : 'Transit_Info_Completed_NonSAP.pdf';
-    reportTitle = 'Transit Info Records (Completed)';
-  } else if (this.filterStatus === 'Pending') {
-    exportSource = this.dispatchData;
-    fileName = this.filterSapType === 'SAP' ? 'Dispatch_Pending_SAP.pdf' : 'Dispatch_Pending_NonSAP.pdf';
-    reportTitle = 'Dispatch Records (Pending)';
-  } else {
-    Swal.fire('Warning', 'Please select valid status before download', 'warning');
-    return;
+
+    /* ===== PDF HEADING ===== */
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text(reportTitle, doc.internal.pageSize.getWidth() / 2, 12, {
+      align: 'center'
+    });
+
+    /* Optional subtitle */
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`,
+      doc.internal.pageSize.getWidth() / 2,
+      18,
+      { align: 'center' }
+    );
+
+    let headers: any[] = [];
+    let data: any[] = [];
+
+    // 3️⃣ Generate headers and data based on status
+    if (this.filterStatus === 'Completed') {
+      headers = [[
+        'SI.No',
+        'REFNO',
+        'Invoice No',
+        'ODN No',
+        'SO No',
+        'Sales Person',
+        'Physical Arrived',
+        'Unloading DT',
+        'POD Scan',
+        'SIT/SALE',
+        'Location',
+        'Plant',
+        'Division',
+        'Vehicle Line',
+        'Vehicle Number',
+        'LR No',
+        'Work Order',
+        'Transporter',
+        'Created Date',
+        'Vehicle Type'
+      ]];
+
+      data = exportSource.map((record, index) => ([
+        index + 1,
+        record.ZREFNO || '',
+        record.ZINV_NO || '',
+        record.ZODN_NO || '',
+        record.ZSONO || '',
+        record.ZSALE_PERSON || '',
+        record.ZPY_ARRIVED_DEST || '',
+        record.ZUNLOADING_DT || '',
+        record.ZPOD_SCAN || '',
+        record.ZSIT_SALE || '',
+        record.ZLOCATION || '',
+        record.ZPLANT || '',
+        record.ZDIVISION || '',
+        record.ZVEH_LINE || '',
+        record.ZVEH_NUM || '',
+        record.ZLRNO || '',
+        record.ZWORK_ORDER || '',
+        record.ZTRANSPORTER || '',
+        record.ZCREATED_DT
+          ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB')
+          : '',
+        record.ZVEH_TYPE || ''
+      ]));
+    } else if (this.filterStatus === 'Pending') {
+      headers = [[
+        'SI.No',
+        'Reference No',
+        'Date',
+        'Plant',
+        'Division',
+        'Vehicle Type',
+        'No. of Trucks',
+        'Work Order',
+        'Vendor Code',
+        'Transporter',
+        'No. of LRs',
+        'LR Number',
+        'Loading Point',
+        'Unloading Point',
+        'No Of Invoices'
+      ]];
+
+      data = exportSource.map((record, index) => ([
+        index + 1,
+        record.ZREFNO || '',
+        record.ZCREATED_DT ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB') : '',
+        record.ZWERKS || '',
+        record.ZDIVISION || '',
+        record.ZVEH_TYPE || '',
+        record.ZNO_TRUCKS || '',
+        record.ZWORK_ORDER || '',
+        record.ZVENDOR_CD || '',
+        record.ZTRANSPORTER || '',
+        record.ZNO_LRS || '',
+        record.ZLR_NO || '',
+        record.ZLOAD_PT || '',
+        record.ZUNLOAD_PT || '',
+        record.ZNO_INVOICES || ''
+      ]));
+    }
+
+    autoTable(doc, {
+      head: headers,
+      body: data,
+      startY: 25,
+      styles: {
+        fontSize: 6,
+        cellPadding: 1.5
+      },
+      headStyles: {
+        fillColor: [52, 152, 219],
+        fontStyle: 'bold',
+        fontSize: 6
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245]
+      },
+      theme: 'grid'
+    });
+
+    doc.save(fileName);
+    Swal.fire('Success', `PDF file downloaded: ${fileName}`, 'success');
   }
-
-  // 2️⃣ Check if data is available
-  if (!exportSource || exportSource.length === 0) {
-    Swal.fire('Warning', 'No data available to download', 'warning');
-    return;
-  }
-
-  const doc = new (jsPDF as any).default({
-    orientation: 'landscape',
-    unit: 'mm',
-    format: [420, 297] // ✅ A2 Landscape (WIDE)
-  });
-
-  /* ===== PDF HEADING ===== */
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  doc.text(reportTitle, doc.internal.pageSize.getWidth() / 2, 12, {
-    align: 'center'
-  });
-
-  /* Optional subtitle */
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`Generated on: ${new Date().toLocaleDateString()}`,
-    doc.internal.pageSize.getWidth() / 2,
-    18,
-    { align: 'center' }
-  );
-
-  let headers: any[] = [];
-  let data: any[] = [];
-
-  // 3️⃣ Generate headers and data based on status
-  if (this.filterStatus === 'Completed') {
-    headers = [[
-      'SI.No',
-      'REFNO',
-      'Invoice No',
-      'ODN No',
-      'SO No',
-      'Sales Person',
-      'Physical Arrived',
-      'Unloading DT',
-      'POD Scan',
-      'SIT/SALE',
-      'Location',
-      'Plant',
-      'Division',
-      'Vehicle Line',
-      'Vehicle Number',
-      'LR No',
-      'Work Order',
-      'Transporter',
-      'Created Date',
-      'Vehicle Type'
-    ]];
-
-    data = exportSource.map((record, index) => ([
-      index + 1,
-      record.ZREFNO || '',
-      record.ZINV_NO || '',
-      record.ZODN_NO || '',
-      record.ZSONO || '',
-      record.ZSALE_PERSON || '',
-      record.ZPY_ARRIVED_DEST || '',
-      record.ZUNLOADING_DT || '',
-      record.ZPOD_SCAN || '',
-      record.ZSIT_SALE || '',
-      record.ZLOCATION || '',
-      record.ZPLANT || '',
-      record.ZDIVISION || '',
-      record.ZVEH_LINE || '',
-      record.ZVEH_NUM || '',
-      record.ZLRNO || '',
-      record.ZWORK_ORDER || '',
-      record.ZTRANSPORTER || '',
-      record.ZCREATED_DT
-        ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB')
-        : '',
-      record.ZVEH_TYPE || ''
-    ]));
-  } else if (this.filterStatus === 'Pending') {
-    headers = [[
-      'SI.No',
-      'Reference No',
-      'Date',
-      'Plant',
-      'Division',
-      'Vehicle Type',
-      'No. of Trucks',
-      'Work Order',
-      'Vendor Code',
-      'Transporter',
-      'No. of LRs',
-      'LR Number',
-      'Loading Point',
-      'Unloading Point',
-      'No Of Invoices'
-    ]];
-
-    data = exportSource.map((record, index) => ([
-      index + 1,
-      record.ZREFNO || '',
-      record.ZCREATED_DT ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB') : '',
-      record.ZWERKS || '',
-      record.ZDIVISION || '',
-      record.ZVEH_TYPE || '',
-      record.ZNO_TRUCKS || '',
-      record.ZWORK_ORDER || '',
-      record.ZVENDOR_CD || '',
-      record.ZTRANSPORTER || '',
-      record.ZNO_LRS || '',
-      record.ZLR_NO || '',
-      record.ZLOAD_PT || '',
-      record.ZUNLOAD_PT || '',
-      record.ZNO_INVOICES || ''
-    ]));
-  }
-  
-  autoTable(doc, {
-    head: headers,
-    body: data,
-    startY: 25,
-    styles: {
-      fontSize: 6,
-      cellPadding: 1.5
-    },
-    headStyles: {
-      fillColor: [52, 152, 219],
-      fontStyle: 'bold',
-      fontSize: 6
-    },
-    alternateRowStyles: {
-      fillColor: [245, 245, 245]
-    },
-    theme: 'grid'
-  });
-
-  doc.save(fileName);
-  Swal.fire('Success', `PDF file downloaded: ${fileName}`, 'success');
-}
 
 
 

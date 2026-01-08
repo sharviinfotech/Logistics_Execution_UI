@@ -81,7 +81,7 @@ export class VechileInfoComponent implements OnInit {
 
   ngOnInit(): void {
     this.VehicleForm = this.fb.group({
-      INV_VBELN: [''],
+      VBELN: [''],
       vehicles: this.fb.array([]),
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
@@ -254,68 +254,94 @@ export class VechileInfoComponent implements OnInit {
     this.referenceItems.push(this.createReferenceRow());
   }
 
+
   onchangeMAPID(index: number) {
+
     const rowForm = this.vehicles.at(index) as FormGroup;
     const selectedMapId = rowForm.get('ZMAPID')?.value;
-    console.log("Selected MAPID:", selectedMapId);
 
-    // Get selected reference object
-    const selectedObj = this.selectedItems.find(item => item.MAPID == selectedMapId);
+    console.log('Selected MAPID:', selectedMapId);
+
+
+
+    const selectedObj = this.selectedItems.find(
+      item => String(item.MAPID) === String(selectedMapId)
+    );
 
     if (selectedObj) {
       rowForm.patchValue({
-        ZREFNO: selectedObj.referenceNumber || "",
-        ZWORK_ORDER: selectedObj.workOrderNumber || "",
-        ZLRNO: selectedObj.lrNumber || "",
-        ZTRANSPORTER: selectedObj.transporter || "",
-        ZMAPID: selectedObj.MAPID || ""
+        ZREFNO: selectedObj.referenceNumber || '',
+        ZWORK_ORDER: selectedObj.workOrderNumber || '',
+        ZLRNO: selectedObj.lrNumber || '',
+        ZTRANSPORTER: selectedObj.transporter || '',
+        ZMAPID: selectedObj.MAPID || ''
       });
     }
 
-    console.log("Step-1 Updated form:", this.vehicles.value);
+    console.log('Step-1 Updated form:', this.vehicles.value);
 
-    // 🚀 Step-2: API Call to fetch TRUCK details based on MAPID
-    const vbeln = this.orderType === 'Inward' ? this.ponumber.trim() : this.invoicenumber.trim();
 
-    if (!vbeln) {
-      console.warn("VBELN missing, cannot hit MAPID API");
+
+    const vbeln =
+      this.sapType === 'Non-SAP'
+        ? this.VehicleForm.get('VBELN')?.value?.trim()
+        : (this.orderType === 'Inward'
+          ? this.ponumber
+          : this.invoicenumber
+        )?.trim();
+
+    if (!vbeln || !selectedMapId) {
+      console.log('VBELN or MAPID missing, API not called');
       return;
     }
 
-    const reqBody = {
-      VBELN: vbeln,
-      MAPID: selectedMapId
-    };
 
-    console.log("🚀 Hitting VehicleInfoMapid API:", reqBody);
+    const reqBody =
+      this.sapType === 'SAP'
+        ? {
+          VBELN: vbeln,
+          MAPID: selectedMapId
+        }
+        : {
+          VBELN: vbeln,
+          MPID: selectedMapId
+        };
 
-    const apiCall$ =
-      this.orderType === 'Outward'
-        ? this.service.VehicleInfoMapidForNonsap(reqBody) // PUT
-        : this.service.VehicleInfoMapid(reqBody);
+    console.log('🚀 MAPID API Payload:', reqBody);
+
 
 
     this.spinner.show();
-    apiCall$.subscribe({
+
+    const apiCall =
+      this.sapType === 'SAP'
+        ? this.service.VehicleInfoMapid(reqBody)
+        : this.service.VehicleInfoMapidForNonsap(reqBody);
+
+    apiCall.subscribe({
       next: (res: any) => {
         this.spinner.hide();
-        console.log("🚛 MAPID Vehicle Info Response:", res);
+        console.log('🚛 MAPID API Response:', res);
 
         if (res) {
           rowForm.patchValue({
-            ZTRUC_TYPE: res.ZTRUC_TYPE || "",
-            ZTRUC_WT: res.ZTRUC_WT || "",
-            ZTRUC_VOL: res.ZTRUC_VOL || ""
+            ZTRUC_TYPE: res.ZTRUC_TYPE || '',
+            ZTRUC_WT: res.ZTRUC_WT || '',
+            ZTRUC_VOL: res.ZTRUC_VOL || ''
           });
         }
-        this.applyShipmentTypeToAllRows();
       },
       error: (err) => {
         this.spinner.hide();
-        console.error("❌ MAPID Fetch Error:", err);
+        console.error('❌ MAPID API Error:', err);
       }
     });
   }
+
+
+
+
+
 
 
 
@@ -631,9 +657,28 @@ export class VechileInfoComponent implements OnInit {
 
 
   saveVehicleInfo(action: 'stay' | 'next' | 'previous' = 'stay'): void {
+
+    const vbeln =
+
+      this.sapType === 'Non-SAP'
+        ? this.VehicleForm.get('VBELN')?.value?.trim()
+        : (this.orderType === 'Inward'
+          ? this.ponumber
+          : this.invoicenumber
+        )?.trim();
+
+    if (!vbeln) {
+      Swal.fire('Warning', 'Invoice / PO number is required', 'warning');
+      return;
+    }
+
     const filtered = this.vehicles.value
       .filter((row: any) => row.selected === true)
-      .map(({ selected, ...rest }) => rest);
+      .map(({ selected, ...rest }, index) => ({
+        ...rest,
+        VBELN: vbeln,
+        POSNR: (index + 1) * 10
+      }));
 
 
     if (filtered.length === 0) {
@@ -912,7 +957,7 @@ export class VechileInfoComponent implements OnInit {
 
     if (this.sapType !== 'Non-SAP') return;
 
-    const invoiceNo = this.VehicleForm.get('INV_VBELN')?.value;
+    const invoiceNo = this.VehicleForm.get('VBELN')?.value;
     if (!invoiceNo) {
       Swal.fire('Warning', 'Invoice number is required', 'warning');
       return;

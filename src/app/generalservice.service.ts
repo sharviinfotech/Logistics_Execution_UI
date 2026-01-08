@@ -205,11 +205,12 @@ export class GeneralserviceService {
     return this.http.put(environment.baseUrl + 'api/external/LE/Vehicleinfo/NonSap/Save', obj);
   }
   VehicleInfoMapid(obj) {
-    return this.http.post(environment.baseUrl + 'api/external/LE/Vehicleinfo/Outward/Save', obj);
+    return this.http.post(environment.baseUrl + 'api/external/LE/Vehicleinfo/Outward/WithSapMapid', obj);
   }
   VehicleInfoMapidForNonsap(obj) {
-    return this.http.put(environment.baseUrl + 'api/external/LE/Vehicleinfo/Outward/Mapid', obj);
+    return this.http.put(environment.baseUrl + 'api/external/LE/Vehicleinfo/Outward/WithoutSapMapid', obj);
   }
+
   DCReferenceNo(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/Vehicleinfo/NonSap/DCNO', obj);
   }

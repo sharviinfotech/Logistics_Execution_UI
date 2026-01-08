@@ -200,8 +200,8 @@
 
       <form [formGroup]="VehicleForm">
         <div class="form-grid">
-          <div class="form-field" *ngIf="sapType === 'Non-SAP'">
-            <input type="text" formControlName="INV_VBELN" (keydown.enter)="fetchDCReferenceNo()"
+          <div class="form-field" [hidden]="sapType !== 'Non-SAP'">
+            <input type="text" formControlName="VBELN" (keydown.enter)="fetchDCReferenceNo()"
               (blur)="fetchDCReferenceNo()" />
             <label>Invoice Number</label>
           </div>
@@ -495,7 +495,6 @@
             <th>Location</th>
             <th>Plant</th>
             <th>Division</th>
-            <th>Work Order</th>
             <th>LR No</th>
             <th>Transporter</th>
             <th>Created date</th>
@@ -525,7 +524,6 @@
             <td>{{ item.ZLOCATION }}</td>
             <td>{{ item.ZPLANT }}</td>
             <td>{{ item.ZDIVISION }}</td>
-            <td>{{ item.ZWORK_ORDER }}</td>
             <td>{{ item.ZLRNO }}</td>
             <td>{{ item.ZTRANSPORTER }}</td>
             <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
