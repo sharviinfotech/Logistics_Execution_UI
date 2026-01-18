@@ -206,7 +206,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     this.selectedItems = [];
     this.searchReference = '';
     this.selectedType = '';
-     this.SavedDataShow = false; // ✅ Added
+    this.SavedDataShow = false; // ✅ Added
 
     if (this.sapType !== 'Non-SAP') {
       this.ShowHeaderForm = false;
@@ -231,8 +231,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     this.selectedItems = [];
     this.SavedDataShow = false;
 
-    
-    
+
+
     this.HeaderForm.reset();
     this.referenceItems.clear();
     this.referenceItems.push(this.createReferenceRow());
@@ -289,7 +289,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     this.previousOrderType = this.orderType;
   }
 
-     onSapTypeSelection() {
+  onSapTypeSelection() {
     if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
       this.resetConditionalFields();
     }
@@ -309,7 +309,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       this.ShowHeaderForm = true;
       this.showTable = true;
       this.showForm = true;
-      
+
 
 
       // Add one empty row to items table
@@ -557,7 +557,11 @@ export class InsuranceClaimTrackingComponent implements OnInit {
           this.searchOptionsList = [];
           Swal.fire('', res.MESSAGE, 'warning');
         } else {
-          this.searchOptionsList = res.ITEMS;
+          this.searchOptionsList = (res.ITEMS || []).map((item: any) => ({
+            ...item,
+            isEdit: false,      // 👈 edit enable flag
+            _backup: null       // 👈 optional (for cancel edit)
+          }));
           this.showForm = false;
           this.SavedDataShow = true;
           this.ShowHeaderForm = true;
@@ -618,7 +622,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     if (this.sapType === 'SAP') {
       this.fetchInvoiceDetails();
     } else if (this.sapType === 'Non-SAP') {
-      this.fetchInvoiceDetailsnonsap();
+      this.fetchInvoiceDetailsNonSap();
     }
   }
 
@@ -646,7 +650,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         const header = res[0].HEADER;
         const items = res[0].ITEM;
 
-         // ✅ Hide search results when showing invoice data
+        // ✅ Hide search results when showing invoice data
         this.SavedDataShow = false;
         this.searchOptionsList = [];
 
@@ -813,19 +817,30 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   }
 
   // Fetch Invoice Details Non-SAP
-  fetchInvoiceDetailsnonsap(): void {
-    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+  fetchInvoiceDetailsNonSap(event?: any) {
 
-    if (!referenceNumber) {
-      Swal.fire('Warning', `Please enter ${this.orderType === 'Inward' ? 'PO' : 'Invoice'} number`, 'warning');
+    if (this.sapType !== 'Non-SAP') {
       return;
     }
 
-    const payload = { VBELN: referenceNumber };
+    // 🔴 IMPORTANT FIX
+    const dcRefNo = event?.target?.value || this.invoicenumber;
+
+    if (!dcRefNo || !dcRefNo.toString().trim()) {
+      Swal.fire('Warning', 'Please enter DC Reference Number', 'warning');
+      return;
+    }
+
+    const payload = {
+      VBELN: dcRefNo.toString().trim()
+    };
+
+    console.log('📤 Non-SAP Fetch Payload:', payload);
 
     this.spinner.show();
+
     this.service.fetchinvoicelistnonsap(payload).subscribe({
-      next: (res: any) => {
+      next: (res: any[]) => {
         this.spinner.hide();
 
         if (!res || res.length === 0) {
@@ -841,7 +856,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         this.showForm = true;
 
         this.HeaderForm.patchValue({
-          INV_NO: header.INV_NO,
+          INV_NO: dcRefNo,
           FI: header.FI,
           REP_DATE: header.REP_DATE,
           CLAIM_REF: header.CLAIM_REF,
@@ -861,20 +876,19 @@ export class InsuranceClaimTrackingComponent implements OnInit {
           PAY_ST: header.PAY_ST,
           PAY_INFO: header.PAY_INFO,
           UTR: header.UTR,
-          CLM_SET_DT: header.CLM_SET_DT
+          CLM_SET_DT: header.CLM_SET_DT,
+          SALE_PERSON: header.SALE_PERSON
         });
 
-        while (this.items.length !== 0) {
-          this.items.removeAt(0);
-        }
+        this.items.clear();
 
         items.forEach((x: any) => {
-          const row = this.fb.group({
+          this.items.push(this.fb.group({
             selected: [false],
-            ZMAPID: [''],
-            ZREFNO: [''],
-            ZLINE_NO: [x.ZLINE_NO],
-            INV_NO: [x.INV_NO],
+            ZMAPID: [x.ZMAPID],
+            ZREFNO: [x.REFNO],
+            ZLINE_NO: [x.LINE_NO],
+            INV_NO: [dcRefNo],
             POSNR: [x.POSNR],
             VEH_LINE: [x.VEH_LINE],
             VEHICLE: [x.VEHICLE],
@@ -883,17 +897,15 @@ export class InsuranceClaimTrackingComponent implements OnInit {
             AH: [x.AH],
             NO_SETS: [x.NO_SETS],
             TRANSPORTER: [x.TRANSPORTER],
-            ZWORK_ORDER: [''],
-            ZBILLNO: ['']
-          });
-
-          this.items.push(row);
+            ZWORK_ORDER: [x.WORK_ORDER],
+            ZBILLNO: [x.BILLNO]
+          }));
         });
+
       },
-      error: err => {
+      error: () => {
         this.spinner.hide();
-        console.error(err);
-        Swal.fire('Error fetching NON-SAP data', '', 'error');
+        Swal.fire('Error fetching Non-SAP data', '', 'error');
       }
     });
   }
@@ -908,20 +920,30 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       return;
     }
 
-    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+    const invoiceNo =
+      this.HeaderForm.get('INV_NO')?.value?.toString().trim() || null;
+
+    const refNo =
+      this.selectedItems.length > 0
+        ? this.selectedItems[0].referenceNumber
+        : null;
 
     const headerValue = { ...this.HeaderForm.value };
     delete headerValue.referenceItems;
 
-    headerValue.INV_NO = referenceNumber;
-
-    this.items.controls.forEach(row => {
-      row.patchValue({ INV_NO: referenceNumber });
-    });
+    headerValue.INV_NO = invoiceNo;
+    headerValue.REFNO = refNo;
+    const itemsPayload = this.items.controls
+      .filter(ctrl => ctrl.value.selected === true)
+      .map(ctrl => ({
+        ...ctrl.value,
+        INV_NO: invoiceNo,
+        REFNO: refNo
+      }));
 
     const payload = {
       HEADER: headerValue,
-      ITEM: this.ItemForm.value.ITEMS
+      ITEM: itemsPayload
     };
 
     console.log('📤 Non-SAP Final Payload:', payload);
@@ -963,6 +985,169 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       }
     });
   }
+
+  editSearchRow(row: any): void {
+    // Backup original data
+    row._backup = { ...row };
+    row.isEdit = true;
+  }
+
+  cancelSearchEdit(row: any): void {
+    if (row._backup) {
+      Object.assign(row, row._backup); // Restore original values
+      delete row._backup;
+    }
+    row.isEdit = false;
+  }
+
+
+  // Method to update the edited row
+  updateSearchRow(row: any, index: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to update this record?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Update',
+      cancelButtonText: 'Cancel'
+    }).then(result => {
+      if (!result.isConfirmed) return;
+
+      /* =====================================================
+         1️⃣ HEADER PAYLOAD  (💯 SAME AS SAVE)
+      ===================================================== */
+      const headerValue: any = {
+        INV_NO: row.ZINV_NO || null,
+        FI: row.ZFI || null,
+        REP_DATE: row.ZREP_DATE || null,
+        CLAIM_REF: row.ZCLAIM_REF || null,
+        INV_DATE: row.ZINV_DATE || null,
+        INV_BV: row.ZINV_BV || null,
+        LOSS_DCL: row.ZLOSS_DCL || null,
+        CLM_RF: row.ZCLM_RF || null,
+        SOL_VAL: row.ZSOL_VAL || null,
+        CUSTOMER: row.ZCUSTOMER || null,
+        SO_NO: row.ZSO_NO || null,
+        ODN_NO: row.ZODN_NO || null,
+        SALE_PERSON: row.ZSALE_PERSON || null,
+        LOCATION: row.ZLOCATION || null,
+        DAMAGE_RMK: row.ZDAMAGE_RMK || null,
+        CLM_INF: row.ZCLM_INF || null,
+        CLM_ST: row.ZCLM_ST || null,
+        CLM_DOC_ST: row.ZCLM_DOC_ST || null,
+        COURIER_DET: row.ZCOURIER_DET || null,
+        PAY_ST: row.ZPAY_ST || null,
+        PAY_INFO: row.ZPAY_INFO || null,
+        UTR: row.ZUTR || null,
+        CLM_SET_DT: row.ZCLM_SET_DT || null,
+
+        // 🔥 IMPORTANT
+        REFNO: row.ZREFNO || null
+      };
+
+      /* =====================================================
+         2️⃣ ITEM PAYLOAD (ONLY ONE ROW – SAME AS SAVE)
+      ===================================================== */
+      const itemPayload: any = {
+        ZMAPID: row.ZMAPID || null,
+        INV_NO: headerValue.INV_NO,
+        REFNO: headerValue.REFNO,
+        POSNR: row.ZLINE_NO || row.POSNR || null,
+
+        VEH_LINE: row.ZVEH_LINE || null,
+        VEHICLE: row.ZVEHICLE || null,
+        TRUCK_NO: row.ZTRUCK_NO || row.ZVEH_NUM || null,
+        LR_NO: row.ZLRNO || null,
+        AH: row.ZAH || null,
+        NO_SETS: row.ZNO_SETS || null,
+        TRANSPORTER: row.ZTRANSPORTER || null,
+
+        // 🔥 backend expects both keys
+        WORK_ORDER: row.ZWORK_ORDER || row.WORK_ORDER || null,
+        ZWORK_ORDER: row.ZWORK_ORDER || row.WORK_ORDER || null,
+
+        BILLNO: row.ZBILLNO || row.BILLNO || null,
+        ZBILLNO: row.ZBILLNO || row.BILLNO || null
+      };
+
+      /* =====================================================
+         3️⃣ FINAL PAYLOAD (SAME AS SAVE)
+      ===================================================== */
+      const payload = {
+        HEADER: headerValue,
+        ITEM: [itemPayload] // ✅ SINGLE RECORD ARRAY
+      };
+
+      console.log('🛠 UPDATE PAYLOAD (SAVE FORMAT):', payload);
+
+      /* =====================================================
+         4️⃣ API SELECTION (💯 SAME AS SAVE)
+      ===================================================== */
+      this.spinner.show();
+
+      let apiCall;
+      if (this.sapType === 'SAP') {
+        apiCall = this.service.InsuranceClaimTrackingSave(payload);
+      } else {
+        apiCall = this.service.Nonsapsave(payload);
+      }
+
+      apiCall.subscribe({
+        next: (res: any) => {
+          this.spinner.hide();
+
+          if (res?.STATUS === 'TRUE' || res?.STATUS === true) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Updated',
+              text: res.MESSAGE || 'Record updated successfully',
+              confirmButtonText: 'OK'
+            }).then(() => {
+              row.isEdit = false;
+              delete row._backup;
+
+              // 🔄 Refresh updated search data
+              this.onSearchReference();
+            });
+          } else {
+            Swal.fire('Update Failed', res?.MESSAGE || '', 'warning');
+          }
+        },
+        error: (err) => {
+          this.spinner.hide();
+          console.error('❌ Update Error:', err);
+          Swal.fire('Error', 'Update failed', 'error');
+        }
+      });
+    });
+  }
+
+
+
+
+
+  deleteSearchRow(row: any, index: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this record? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      this.searchOptionsList.splice(index, 1);
+      Swal.fire({
+        title: 'Deleted',
+        text: 'Record deleted successfully',
+        icon: 'success',
+        confirmButtonText: 'Ok',
+      });
+    });
+  }
+
+
 
   toggleDropdown(): void {
     this.dropdownOpen = !this.dropdownOpen;
@@ -1073,97 +1258,97 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
     this.cd.detectChanges();
   }
-    applyFilter() {
-      if (!this.filterFromDate || !this.filterToDate) {
-        Swal.fire('Warning', 'Please select From Date and To Date', 'warning');
-        return;
-      }
-  
-      this.filterApplied = false;
-  
-      const payload = {
-        GLOBAL: 'INSURANCE CLAIM STATUS',
-        DATE_FROM: this.filterFromDate,
-        DATE_TO: this.filterToDate,
-        PLANT: this.filterPlant || '',
-        DIVISION: this.filterDivision || '',
-        TRANSPORTER: this.filterTransporter || '',
-        VEHICLE_TYPE: this.filterVehicleType || '',
-        STATUS: this.filterStatus || ''
-      };
-  
-      this.spinner.show();
-  
-      let apiCall;
-  
-      if (this.filterSapType === 'SAP') {
-        apiCall = this.service.fetchOrderInfoFiltered(payload);
-      } else if (this.filterSapType === 'Non-SAP') {
-        apiCall = this.service.fetchGlobalFilteredNonSap(payload);
-      } else {
-        this.spinner.hide();
-        Swal.fire('Error', 'Invalid SAP Type selected', 'error');
-        return;
-      }
-  
-      apiCall.subscribe({
-        next: (res: any) => {
-          this.spinner.hide();
-  
-          /** 🔴 NO DATA FOUND HANDLING */
-          if (res?.STATUS === 'FALSE') {
-            this.InsurancetrackingHeader = [];
-            this.InsurancetrackingItems = []; 
-            this.dispatchData = [];
-  
-            Swal.fire({
-              icon: 'info',
-              title: 'No Data Found',
-              text: res.MSG || 'No records available for selected filters'
-            });
-            return;
-          }
-  
-          this.transitResponse = res;
-          this.filterApplied = true;
-  
-          /** 🟢 DATA FOUND */
-          if (this.filterStatus === 'Completed') {
-            // ✅ Store header and items separately
-            this.InsurancetrackingHeader = res?.HEADER || [];
-            this.InsurancetrackingItems = res?.ITEMS || [];
-            this.dispatchData = [];
-  
-            const headerCount = this.InsurancetrackingHeader.length;
-            const itemsCount = this.InsurancetrackingItems.length;
-  
-            Swal.fire('Success', `Headers: ${headerCount}, Items: ${itemsCount}`, 'success');
-          }
-          else if (this.filterStatus === 'Pending') {
-            let records: any[] = [];
-            if (Array.isArray(res)) records = res;
-            else if (res?.HEADER) records = res.HEADER;
-            else if (res?.DATA) records = res.DATA;
-  
-            this.dispatchData = records;
-            this.InsurancetrackingHeader = [];
-            this.InsurancetrackingItems = [];
-            Swal.fire('Success', `Dispatch records: ${records.length}`, 'success');
-          }
-          else {
-            this.InsurancetrackingHeader = [];
-            this.InsurancetrackingItems = [];
-            this.dispatchData = [];
-            Swal.fire('Info', 'Please select valid status', 'info');
-          }
-        },
-        error: (err) => {
-          this.spinner.hide();
-          console.error('❌ Filter Error:', err);
-          Swal.fire('Error', 'Failed to fetch data', 'error');
-        }
-      });
+  applyFilter() {
+    if (!this.filterFromDate || !this.filterToDate) {
+      Swal.fire('Warning', 'Please select From Date and To Date', 'warning');
+      return;
     }
+
+    this.filterApplied = false;
+
+    const payload = {
+      GLOBAL: 'INSURANCE CLAIM STATUS',
+      DATE_FROM: this.filterFromDate,
+      DATE_TO: this.filterToDate,
+      PLANT: this.filterPlant || '',
+      DIVISION: this.filterDivision || '',
+      TRANSPORTER: this.filterTransporter || '',
+      VEHICLE_TYPE: this.filterVehicleType || '',
+      STATUS: this.filterStatus || ''
+    };
+
+    this.spinner.show();
+
+    let apiCall;
+
+    if (this.filterSapType === 'SAP') {
+      apiCall = this.service.fetchOrderInfoFiltered(payload);
+    } else if (this.filterSapType === 'Non-SAP') {
+      apiCall = this.service.fetchGlobalFilteredNonSap(payload);
+    } else {
+      this.spinner.hide();
+      Swal.fire('Error', 'Invalid SAP Type selected', 'error');
+      return;
+    }
+
+    apiCall.subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+
+        /** 🔴 NO DATA FOUND HANDLING */
+        if (res?.STATUS === 'FALSE') {
+          this.InsurancetrackingHeader = [];
+          this.InsurancetrackingItems = [];
+          this.dispatchData = [];
+
+          Swal.fire({
+            icon: 'info',
+            title: 'No Data Found',
+            text: res.MSG || 'No records available for selected filters'
+          });
+          return;
+        }
+
+        this.transitResponse = res;
+        this.filterApplied = true;
+
+        /** 🟢 DATA FOUND */
+        if (this.filterStatus === 'Completed') {
+          // ✅ Store header and items separately
+          this.InsurancetrackingHeader = res?.HEADER || [];
+          this.InsurancetrackingItems = res?.ITEMS || [];
+          this.dispatchData = [];
+
+          const headerCount = this.InsurancetrackingHeader.length;
+          const itemsCount = this.InsurancetrackingItems.length;
+
+          Swal.fire('Success', `Headers: ${headerCount}, Items: ${itemsCount}`, 'success');
+        }
+        else if (this.filterStatus === 'Pending') {
+          let records: any[] = [];
+          if (Array.isArray(res)) records = res;
+          else if (res?.HEADER) records = res.HEADER;
+          else if (res?.DATA) records = res.DATA;
+
+          this.dispatchData = records;
+          this.InsurancetrackingHeader = [];
+          this.InsurancetrackingItems = [];
+          Swal.fire('Success', `Dispatch records: ${records.length}`, 'success');
+        }
+        else {
+          this.InsurancetrackingHeader = [];
+          this.InsurancetrackingItems = [];
+          this.dispatchData = [];
+          Swal.fire('Info', 'Please select valid status', 'info');
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('❌ Filter Error:', err);
+        Swal.fire('Error', 'Failed to fetch data', 'error');
+      }
+    });
+  }
 
   clearFilter() {
     this.filterFromDate = '';
@@ -1194,7 +1379,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       });
 
       exportSource = combinedData;
-      
+
       fileName = this.filterSapType === 'SAP' ? 'InsuranceClaimTracking_Completed_SAP.xlsx' : 'InsuranceClaimTracking_Completed_NonSAP.xlsx';
     } else if (this.filterStatus === 'Pending') {
       exportSource = this.dispatchData;
@@ -1305,7 +1490,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     let reportTitle = '';
 
     if (this.filterStatus === 'Completed') {
-            const combinedData: any[] = [];
+      const combinedData: any[] = [];
 
       this.InsurancetrackingItems.forEach(item => {
         const header = this.InsurancetrackingHeader.find(h => h.ZREFNO === item.ZREFNO);
@@ -1316,7 +1501,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       });
 
       exportSource = combinedData;
-      
+
       fileName = this.filterSapType === 'SAP' ? 'InsuranceClaimTracking_Completed_SAP.pdf' : 'InsuranceClaimTracking_Completed_NonSAP.pdf';
       reportTitle = 'Insurance Claim Tracking Records (Completed)';
     } else if (this.filterStatus === 'Pending') {

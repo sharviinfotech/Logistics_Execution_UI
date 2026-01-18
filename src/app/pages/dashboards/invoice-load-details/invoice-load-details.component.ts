@@ -30,7 +30,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   sapType = '';
   invoicenumber = '';
   ponumber = '';
-  
+
   isAllSelected: boolean = false;
   vehicleTypes: any[] = [];
   isUpdateMode: boolean = false;
@@ -642,6 +642,8 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     });
   }
 
+
+
   onSave(action: 'stay' | 'next' | 'previous' = 'stay'): void {
     if (this.sapType === 'SAP') {
       this.saveInvoiceDetails(action);
@@ -650,6 +652,112 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     } else {
       Swal.fire('Warning', 'Please select SAP type before saving', 'warning');
     }
+  }
+
+  editSearchRow(row: any): void {
+    // Backup original data
+    row._backup = { ...row };
+    row.isEdit = true;
+  }
+
+  cancelSearchEdit(row: any): void {
+    if (row._backup) {
+      Object.assign(row, row._backup); // Restore original values
+      delete row._backup;
+    }
+    row.isEdit = false;
+  }
+
+
+  // Method to update the edited row
+
+  updateSearchRow(row: any): void {
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to update this record?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Update',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+
+      // ✅ CLEAN PAYLOAD (UI fields remove)
+      const payload = {
+        ZMAPID: row.ZMAPID || '',
+        VBELN: row.VBELN || '',
+        POSNR: row.POSNR || '10',
+
+        ZREFNO: row.ZREFNO || '',
+        ZWORK_ORDER: row.ZWORK_ORDER || '',
+        ZLRNO: row.ZLRNO || '',
+        ZTRANSPORTER: row.ZTRANSPORTER || '',
+        ZSO_NO: row.ZSO_NO || '',
+        ZODN_NO: row.ZODN_NO || '',
+
+        ZTRUC_TYPE: row.ZTRUC_TYPE,
+        ZTRUC_WT: row.ZTRUC_WT,
+        ZACT_LOAD: row.ZACT_LOAD,
+        ZACT_VOL: row.ZACT_VOL,
+        ZLF_VOL: row.ZLF_VOL,
+        ZLF_WT: row.ZLF_WT,
+        ZWEEK_SF: row.ZWEEK_SF,
+        ZEWAYBILL_NO: row.ZEWAYBILL_NO,
+        ZEWAYBILL_DT: row.ZEWAYBILL_DT
+      };
+
+      this.spinner.show();
+
+      const api$ =
+        this.sapType === 'SAP'
+          ? this.service.InvoiceloaddetailsSave([payload])
+          : this.service.InvoiceloaddetailsNonSap({
+            NSAP_LOAD: [payload]
+          });
+
+      api$.subscribe({
+        next: (res: any) => {
+          this.spinner.hide();
+
+          if (res?.NUMBER === '200' || res?.STATUS === 'true') {
+            Swal.fire('Success', 'Updated successfully', 'success');
+            row.isEdit = false;   // ✅ just exit edit mode
+          } else {
+            Swal.fire('Error', res.MSG || res.MESSAGE || 'Update failed', 'error');
+          }
+        },
+        error: () => {
+          this.spinner.hide();
+          Swal.fire('Error', 'Server error', 'error');
+        }
+      });
+    });
+  }
+
+
+
+
+
+  deleteSearchRow(row: any, index: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this record? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      this.searchOptionsList.splice(index, 1);
+      Swal.fire({
+        title: 'Deleted',
+        text: 'Record deleted successfully',
+        icon: 'success',
+        confirmButtonText: 'Ok',
+      });
+    });
   }
 
   resetForm(): void {
@@ -726,12 +834,12 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     return this.sapType === 'SAP';
   }
 
- onSearchTypeChange(): void {
+  onSearchTypeChange(): void {
     // Reset data when search type changes
     this.searchReference = '';
     this.searchOptionsList = [];
     this.showForm = false;
-   
+
 
     console.log('🔄 Search type changed. Data reset.');
   }
@@ -789,10 +897,13 @@ export class InvoiceLoadDetailsComponent implements OnInit {
           this.searchOptionsList = [];
           Swal.fire('No records found', '', 'info');
         } else {
-          this.searchOptionsList = res.HEADER;
+          this.searchOptionsList = res.HEADER.map((item: any) => ({
+            ...item,
+            isEdit: false
+          }));
           this.showForm = false;
-          
-          
+
+
 
           Swal.fire('Data fetched successfully!', '', 'success');
         }
@@ -971,7 +1082,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     });
   }
 
-   clearFilter() {
+  clearFilter() {
     this.filterFromDate = '';
     this.filterToDate = '';
     this.filterPlant = '';
@@ -986,282 +1097,282 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
   downloadExcel() {
 
-  let exportSource: any[] = [];
-  let fileName = '';
+    let exportSource: any[] = [];
+    let fileName = '';
 
-  // 1️⃣ Status based data
-  if (this.filterStatus === 'Completed') {
-    exportSource = this.InvoiceLoadDetailsData;
-    fileName = this.sapType === 'SAP'
-      ? 'InvoiceLoadDetails_Completed_SAP.xlsx'
-      : 'InvoiceLoadDetails_Completed_NonSAP.xlsx';
-  } else if (this.filterStatus === 'Pending') {
-    exportSource = this.dispatchData;
-    fileName = this.sapType === 'SAP'
-      ? 'Dispatch_Pending_SAP.xlsx'
-      : 'Dispatch_Pending_NonSAP.xlsx';
-  } else {
-    Swal.fire('Warning', 'Please select valid status before download', 'warning');
-    return;
-  }
+    // 1️⃣ Status based data
+    if (this.filterStatus === 'Completed') {
+      exportSource = this.InvoiceLoadDetailsData;
+      fileName = this.sapType === 'SAP'
+        ? 'InvoiceLoadDetails_Completed_SAP.xlsx'
+        : 'InvoiceLoadDetails_Completed_NonSAP.xlsx';
+    } else if (this.filterStatus === 'Pending') {
+      exportSource = this.dispatchData;
+      fileName = this.sapType === 'SAP'
+        ? 'Dispatch_Pending_SAP.xlsx'
+        : 'Dispatch_Pending_NonSAP.xlsx';
+    } else {
+      Swal.fire('Warning', 'Please select valid status before download', 'warning');
+      return;
+    }
 
-  // 2️⃣ No data check
-  if (!exportSource || exportSource.length === 0) {
-    Swal.fire('Warning', 'No data available to download', 'warning');
-    return;
-  }
+    // 2️⃣ No data check
+    if (!exportSource || exportSource.length === 0) {
+      Swal.fire('Warning', 'No data available to download', 'warning');
+      return;
+    }
 
-  let exportData: any[] = [];
+    let exportData: any[] = [];
 
-  // 3️⃣ COMPLETED – HTML table keys mapping
-  if (this.filterStatus === 'Completed') {
-    exportData = exportSource.map((item, index) => ({
-      
-      'Map ID': item.ZMAPID || '',
-      'Line No': item.ZLINE_NO || '',
-      'REFNO': item.ZREFNO || '',
-      'Invoice No': item.VBELN || '',
-      'ODN Number': item.ZODN_NO || '',
-      'SO Number': item.ZSO_NO || '',
-      'Truck Type': item.ZTRUC_TYPE || '',
-      'Passing Weight (Tons)': item.ZTRUC_WT || '',
-      'Actual Load (Tons)': item.ZACT_LOAD || '',
-      'Loading factor % (w.r.t weight)': item.ZLF_WT || '',
-      'Actual Volume Occupied': item.ZACT_VOL || '',
-      'Loading Factor w.r.t Volume': item.ZLF_VOL || '',
-      'Week Wise Shipment Flow': item.ZWEEK_SF || '',
-      'Eway Bill Number': item.ZEWAYBILL_NO || '',
-      'Eway Bill Expiry Date': item.ZEWAYBILL_DT || '',
-      'Plant': item.ZPLANT || '',
-      'Division': item.ZDIVISION || '',
-      'Work Order': item.ZWORK_ORDER || '',
-      'LR No': item.ZLRNO || '',
-      'Transporter': item.ZTRANSPORTER || '',
-      'Created Date': item.ZCREATED_DT
-        ? new Date(item.ZCREATED_DT).toLocaleDateString('en-GB')
-        : '',
-      'Vehicle Type': item.ZVEH_TYPE || ''
+    // 3️⃣ COMPLETED – HTML table keys mapping
+    if (this.filterStatus === 'Completed') {
+      exportData = exportSource.map((item, index) => ({
+
+        'Map ID': item.ZMAPID || '',
+        'Line No': item.ZLINE_NO || '',
+        'REFNO': item.ZREFNO || '',
+        'Invoice No': item.VBELN || '',
+        'ODN Number': item.ZODN_NO || '',
+        'SO Number': item.ZSO_NO || '',
+        'Truck Type': item.ZTRUC_TYPE || '',
+        'Passing Weight (Tons)': item.ZTRUC_WT || '',
+        'Actual Load (Tons)': item.ZACT_LOAD || '',
+        'Loading factor % (w.r.t weight)': item.ZLF_WT || '',
+        'Actual Volume Occupied': item.ZACT_VOL || '',
+        'Loading Factor w.r.t Volume': item.ZLF_VOL || '',
+        'Week Wise Shipment Flow': item.ZWEEK_SF || '',
+        'Eway Bill Number': item.ZEWAYBILL_NO || '',
+        'Eway Bill Expiry Date': item.ZEWAYBILL_DT || '',
+        'Plant': item.ZPLANT || '',
+        'Division': item.ZDIVISION || '',
+        'Work Order': item.ZWORK_ORDER || '',
+        'LR No': item.ZLRNO || '',
+        'Transporter': item.ZTRANSPORTER || '',
+        'Created Date': item.ZCREATED_DT
+          ? new Date(item.ZCREATED_DT).toLocaleDateString('en-GB')
+          : '',
+        'Vehicle Type': item.ZVEH_TYPE || ''
+      }));
+    }
+
+    // 4️⃣ PENDING (unchanged – already correct)
+    if (this.filterStatus === 'Pending') {
+      exportData = exportSource.map((item, index) => ({
+        'SI.No': index + 1,
+        'Reference No': item.ZREFNO || '',
+        'Line No': item.ZLINE_NO || '',
+        'Date': item.ZCREATED_DT
+          ? new Date(item.ZCREATED_DT).toLocaleDateString('en-GB')
+          : '',
+        'Plant': item.ZWERKS || '',
+        'Division': item.ZDIVISION || '',
+        'Vehicle Type': item.ZVEH_TYPE || '',
+        'No. of Trucks': item.ZNO_TRUCKS || '',
+        'Work Order': item.ZWORK_ORDER || '',
+        'Vendor Code': item.ZVENDOR_CD || '',
+        'Transporter': item.ZTRANSPORTER || '',
+        'No. of LRs': item.ZNO_LRS || '',
+        'LR Number': item.ZLR_NO || '',
+        'Loading Point': item.ZLOAD_PT || '',
+        'Unloading Point': item.ZUNLOAD_PT || ''
+      }));
+    }
+
+
+    // 5️⃣ Create Excel
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Records');
+
+    // 6️⃣ Auto column width
+    ws['!cols'] = Object.keys(exportData[0]).map(key => ({
+      wch: Math.max(key.length + 5, 18)
     }));
+
+    // 7️⃣ Download
+    XLSX.writeFile(wb, fileName);
+
+    Swal.fire('Success', `Excel file downloaded: ${fileName}`, 'success');
   }
 
-  // 4️⃣ PENDING (unchanged – already correct)
-  if (this.filterStatus === 'Pending') {
-  exportData = exportSource.map((item, index) => ({
-    'SI.No': index + 1,
-    'Reference No': item.ZREFNO || '',
-    'Line No': item.ZLINE_NO || '',
-    'Date': item.ZCREATED_DT
-      ? new Date(item.ZCREATED_DT).toLocaleDateString('en-GB')
-      : '',
-    'Plant': item.ZWERKS || '',
-    'Division': item.ZDIVISION || '',
-    'Vehicle Type': item.ZVEH_TYPE || '',
-    'No. of Trucks': item.ZNO_TRUCKS || '',
-    'Work Order': item.ZWORK_ORDER || '',
-    'Vendor Code': item.ZVENDOR_CD || '',
-    'Transporter': item.ZTRANSPORTER || '',
-    'No. of LRs': item.ZNO_LRS || '',
-    'LR Number': item.ZLR_NO || '',
-    'Loading Point': item.ZLOAD_PT || '',
-    'Unloading Point': item.ZUNLOAD_PT || ''
-  }));
-}
+  downloadPDF() {
 
+    let exportSource: any[] = [];
+    let fileName = '';
+    let reportTitle = '';
 
-  // 5️⃣ Create Excel
-  const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
-  const wb: XLSX.WorkBook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Records');
+    // 1️⃣ Status based data
+    if (this.filterStatus === 'Completed') {
+      exportSource = this.InvoiceLoadDetailsData; // ⚠️ ShipmentData kakunda HTML data
+      fileName = this.sapType === 'SAP'
+        ? 'Shipmentdata_Completed_SAP.pdf'
+        : 'Shipmentdata_Completed_NonSAP.pdf';
+      reportTitle = 'Shipment Data Records (Completed)';
+    } else if (this.filterStatus === 'Pending') {
+      exportSource = this.dispatchData;
+      fileName = this.sapType === 'SAP'
+        ? 'Dispatch_Pending_SAP.pdf'
+        : 'Dispatch_Pending_NonSAP.pdf';
+      reportTitle = 'Dispatch Records (Pending)';
+    } else {
+      Swal.fire('Warning', 'Please select valid status before download', 'warning');
+      return;
+    }
 
-  // 6️⃣ Auto column width
-  ws['!cols'] = Object.keys(exportData[0]).map(key => ({
-    wch: Math.max(key.length + 5, 18)
-  }));
+    // 2️⃣ No data check
+    if (!exportSource || exportSource.length === 0) {
+      Swal.fire('Warning', 'No data available to download', 'warning');
+      return;
+    }
 
-  // 7️⃣ Download
-  XLSX.writeFile(wb, fileName);
+    // 3️⃣ PDF config (A2 Landscape – Wide)
+    const doc = new (jsPDF as any).default({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: [420, 297]
+    });
 
-  Swal.fire('Success', `Excel file downloaded: ${fileName}`, 'success');
-}
+    /* ===== TITLE ===== */
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text(reportTitle, doc.internal.pageSize.getWidth() / 2, 12, { align: 'center' });
 
-downloadPDF() {
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(
+      `Generated on: ${new Date().toLocaleDateString()}`,
+      doc.internal.pageSize.getWidth() / 2,
+      18,
+      { align: 'center' }
+    );
 
-  let exportSource: any[] = [];
-  let fileName = '';
-  let reportTitle = '';
+    let headers: any[] = [];
+    let data: any[] = [];
 
-  // 1️⃣ Status based data
-  if (this.filterStatus === 'Completed') {
-    exportSource = this.InvoiceLoadDetailsData; // ⚠️ ShipmentData kakunda HTML data
-    fileName = this.sapType === 'SAP'
-      ? 'Shipmentdata_Completed_SAP.pdf'
-      : 'Shipmentdata_Completed_NonSAP.pdf';
-    reportTitle = 'Shipment Data Records (Completed)';
-  } else if (this.filterStatus === 'Pending') {
-    exportSource = this.dispatchData;
-    fileName = this.sapType === 'SAP'
-      ? 'Dispatch_Pending_SAP.pdf'
-      : 'Dispatch_Pending_NonSAP.pdf';
-    reportTitle = 'Dispatch Records (Pending)';
-  } else {
-    Swal.fire('Warning', 'Please select valid status before download', 'warning');
-    return;
+    // ================= COMPLETED =================
+    if (this.filterStatus === 'Completed') {
+
+      headers = [[
+        'SI.No',
+        'Map ID',
+        'Line No',
+        'REFNO',
+        'Invoice No',
+        'ODN Number',
+        'SO Number',
+        'Truck Type',
+        'Passing Weight (Tons)',
+        'Actual Load (Tons)',
+        'Loading factor % (Wt)',
+        'Actual Volume',
+        'Loading Factor (Vol)',
+        'Week Wise Shipment Flow',
+        'Eway Bill No',
+        'Eway Bill Expiry',
+        'Plant',
+        'Division',
+        'Work Order',
+        'LR No',
+        'Transporter',
+        'Created Date',
+        'Vehicle Type'
+      ]];
+
+      data = exportSource.map((item, index) => ([
+        index + 1,
+        item.ZMAPID || '',
+        item.ZLINE_NO || '',
+        item.ZREFNO || '',
+        item.VBELN || '',
+        item.ZODN_NO || '',
+        item.ZSO_NO || '',
+        item.ZTRUC_TYPE || '',
+        item.ZTRUC_WT || '',
+        item.ZACT_LOAD || '',
+        item.ZLF_WT || '',
+        item.ZACT_VOL || '',
+        item.ZLF_VOL || '',
+        item.ZWEEK_SF || '',
+        item.ZEWAYBILL_NO || '',
+        item.ZEWAYBILL_DT || '',
+        item.ZPLANT || '',
+        item.ZDIVISION || '',
+        item.ZWORK_ORDER || '',
+        item.ZLRNO || '',
+        item.ZTRANSPORTER || '',
+        item.ZCREATED_DT
+          ? new Date(item.ZCREATED_DT).toLocaleDateString('en-GB')
+          : '',
+        item.ZVEH_TYPE || ''
+      ]));
+    }
+
+    // ================= PENDING =================
+    if (this.filterStatus === 'Pending') {
+
+      headers = [[
+        'SI.No',
+        'Reference No',
+        'Line No',
+        'Date',
+        'Plant',
+        'Division',
+        'Vehicle Type',
+        'No. of Trucks',
+        'Work Order',
+        'Vendor Code',
+        'Transporter',
+        'No. of LRs',
+        'LR Number',
+        'Loading Point',
+        'Unloading Point'
+      ]];
+
+      data = exportSource.map((item, index) => ([
+        index + 1,
+        item.ZREFNO || '',
+        item.ZLINE_NO || '',
+        item.ZCREATED_DT
+          ? new Date(item.ZCREATED_DT).toLocaleDateString('en-GB')
+          : '',
+        item.ZWERKS || '',
+        item.ZDIVISION || '',
+        item.ZVEH_TYPE || '',
+        item.ZNO_TRUCKS || '',
+        item.ZWORK_ORDER || '',
+        item.ZVENDOR_CD || '',
+        item.ZTRANSPORTER || '',
+        item.ZNO_LRS || '',
+        item.ZLR_NO || '',
+        item.ZLOAD_PT || '',
+        item.ZUNLOAD_PT || ''
+      ]));
+    }
+
+    // 4️⃣ AutoTable
+    autoTable(doc, {
+      head: headers,
+      body: data,
+      startY: 25,
+      styles: {
+        fontSize: 6,
+        cellPadding: 1.5
+      },
+      headStyles: {
+        fillColor: [52, 152, 219],
+        fontStyle: 'bold',
+        fontSize: 6
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245]
+      },
+      theme: 'grid'
+    });
+
+    // 5️⃣ Save
+    doc.save(fileName);
+    Swal.fire('Success', `PDF file downloaded: ${fileName}`, 'success');
   }
-
-  // 2️⃣ No data check
-  if (!exportSource || exportSource.length === 0) {
-    Swal.fire('Warning', 'No data available to download', 'warning');
-    return;
-  }
-
-  // 3️⃣ PDF config (A2 Landscape – Wide)
-  const doc = new (jsPDF as any).default({
-    orientation: 'landscape',
-    unit: 'mm',
-    format: [420, 297]
-  });
-
-  /* ===== TITLE ===== */
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  doc.text(reportTitle, doc.internal.pageSize.getWidth() / 2, 12, { align: 'center' });
-
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.text(
-    `Generated on: ${new Date().toLocaleDateString()}`,
-    doc.internal.pageSize.getWidth() / 2,
-    18,
-    { align: 'center' }
-  );
-
-  let headers: any[] = [];
-  let data: any[] = [];
-
-  // ================= COMPLETED =================
-  if (this.filterStatus === 'Completed') {
-
-    headers = [[
-      'SI.No',
-      'Map ID',
-      'Line No',
-      'REFNO',
-      'Invoice No',
-      'ODN Number',
-      'SO Number',
-      'Truck Type',
-      'Passing Weight (Tons)',
-      'Actual Load (Tons)',
-      'Loading factor % (Wt)',
-      'Actual Volume',
-      'Loading Factor (Vol)',
-      'Week Wise Shipment Flow',
-      'Eway Bill No',
-      'Eway Bill Expiry',
-      'Plant',
-      'Division',
-      'Work Order',
-      'LR No',
-      'Transporter',
-      'Created Date',
-      'Vehicle Type'
-    ]];
-
-    data = exportSource.map((item, index) => ([
-      index + 1,
-      item.ZMAPID || '',
-      item.ZLINE_NO || '',
-      item.ZREFNO || '',
-      item.VBELN || '',
-      item.ZODN_NO || '',
-      item.ZSO_NO || '',
-      item.ZTRUC_TYPE || '',
-      item.ZTRUC_WT || '',
-      item.ZACT_LOAD || '',
-      item.ZLF_WT || '',
-      item.ZACT_VOL || '',
-      item.ZLF_VOL || '',
-      item.ZWEEK_SF || '',
-      item.ZEWAYBILL_NO || '',
-      item.ZEWAYBILL_DT || '',
-      item.ZPLANT || '',
-      item.ZDIVISION || '',
-      item.ZWORK_ORDER || '',
-      item.ZLRNO || '',
-      item.ZTRANSPORTER || '',
-      item.ZCREATED_DT
-        ? new Date(item.ZCREATED_DT).toLocaleDateString('en-GB')
-        : '',
-      item.ZVEH_TYPE || ''
-    ]));
-  }
-
-  // ================= PENDING =================
-  if (this.filterStatus === 'Pending') {
-
-    headers = [[
-      'SI.No',
-      'Reference No',
-      'Line No',
-      'Date',
-      'Plant',
-      'Division',
-      'Vehicle Type',
-      'No. of Trucks',
-      'Work Order',
-      'Vendor Code',
-      'Transporter',
-      'No. of LRs',
-      'LR Number',
-      'Loading Point',
-      'Unloading Point'
-    ]];
-
-    data = exportSource.map((item, index) => ([
-      index + 1,
-      item.ZREFNO || '',
-      item.ZLINE_NO || '',
-      item.ZCREATED_DT
-        ? new Date(item.ZCREATED_DT).toLocaleDateString('en-GB')
-        : '',
-      item.ZWERKS || '',
-      item.ZDIVISION || '',
-      item.ZVEH_TYPE || '',
-      item.ZNO_TRUCKS || '',
-      item.ZWORK_ORDER || '',
-      item.ZVENDOR_CD || '',
-      item.ZTRANSPORTER || '',
-      item.ZNO_LRS || '',
-      item.ZLR_NO || '',
-      item.ZLOAD_PT || '',
-      item.ZUNLOAD_PT || ''
-    ]));
-  }
-
-  // 4️⃣ AutoTable
-  autoTable(doc, {
-    head: headers,
-    body: data,
-    startY: 25,
-    styles: {
-      fontSize: 6,
-      cellPadding: 1.5
-    },
-    headStyles: {
-      fillColor: [52, 152, 219],
-      fontStyle: 'bold',
-      fontSize: 6
-    },
-    alternateRowStyles: {
-      fillColor: [245, 245, 245]
-    },
-    theme: 'grid'
-  });
-
-  // 5️⃣ Save
-  doc.save(fileName);
-  Swal.fire('Success', `PDF file downloaded: ${fileName}`, 'success');
-}
 
 
 }

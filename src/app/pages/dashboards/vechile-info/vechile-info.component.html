@@ -405,67 +405,169 @@
 </div>
 
 <!-- Search Results Table -->
-<div class="card" style="margin-top: 10px;" *ngIf="searchOptionsList?.length > 0">
-  <div class="card-body-LE">
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped text-center">
-        <thead>
-          <tr>
-            <th>Map ID</th>
-            <th>Ref No</th>
-            <th>Invoice No</th>
-            <th>Vehicle Line</th>
-            <th>ODN No</th>
-            <th>SO NO</th>
-            <th>Type of Shipment</th>
-            <th>Transporter</th>
-            <th>LR No</th>
-            <th>Type of Vehicle</th>
-            <th>Passing Weight (Tons)</th>
-            <th>Volume of Truck</th>
-            <th>Vehicle Number</th>
-            <th>No of Vehicles</th>
-            <th>Sales Person</th>
-            <th>Driver Name</th>
-            <th>Driver Mobile</th>
-            <th>Work Order</th>
-            <th>Location</th>
-            <th>Plant</th>
-            <th>Division</th>
-            <th>Vehicle Type</th>
+<div class="card mt-3" *ngIf="searchOptionsList?.length > 0 && mainMode === 'creation'">
+  <div class="card-body-LE table-responsive">
+    <table class="table table-bordered table-striped text-center">
+      <thead>
+        <tr>
+          <th>Map ID</th>
+          <th>Ref No</th>
+          <th>Invoice No</th>
+          <th>Vehicle Line</th>
+          <th>ODN No</th>
+          <th>SO NO</th>
+          <th>Type of Shipment</th>
+          <th>Transporter</th>
+          <th>LR No</th>
+          <th>Type of Vehicle</th>
+          <th>Passing Weight</th>
+          <th>Volume</th>
+          <th>Vehicle Number</th>
+          <th>No of Vehicles</th>
+          <th>Sales Person</th>
+          <th>Driver Name</th>
+          <th>Driver Mobile</th>
+          <th>Work Order</th>
+          <th>Location</th>
+          <th>Plant</th>
+          <th>Division</th>
+          <th>Vehicle Type</th>
+          <th>Action</th>
+        </tr>
+      </thead>
 
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of searchOptionsList">
-            <td>{{ item.ZMAPID }}</td>
-            <td>{{ item.ZREFNO }}</td>
-            <td>{{ item.VBELN }}</td>
-            <td>{{ item.ZVEH_LINE }}</td>
-            <td>{{ item.ZODN_NO }}</td>
-            <td>{{ item.ZSONO }}</td>
-            <td>{{ item.ZTRX_TYPE }}</td>
-            <td>{{ item.ZTRANSPORTER }}</td>
-            <td>{{ item.ZLRNO }}</td>
-            <td>{{ item.ZTRUC_TYPE }}</td>
-            <td>{{ item.ZTRUC_WT }}</td>
-            <td>{{ item.ZTRUC_VOL }}</td>
-            <td>{{ item.ZVEH_NUM }}</td>
-            <td>{{ item.ZNOOFVEH }}</td>
-            <td>{{ item.ZSALE_PERSON }}</td>
-            <td>{{ item.ZDNAME }}</td>
-            <td>{{ item.ZDNUMBER }}</td>
-            <td>{{ item.ZWORK_ORDER }}</td>
-            <td>{{ item.ZLOCATION }}</td>
-            <td>{{ item.ZPLANT }}</td>
-            <td>{{ item.ZDIVISION }}</td>
-            <td>{{ item.ZVEH_TYPE }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <tbody>
+        <tr *ngFor="let item of searchOptionsList; let i = index" [class.editing]="item.isEdit">
+
+          <!-- MAP ID -->
+          <td>{{ item.ZMAPID }}</td>
+
+          <!-- REF NO -->
+          <td>
+            <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZREFNO">
+            <span *ngIf="!item.isEdit">{{ item.ZREFNO }}</span>
+          </td>
+
+          <!-- Invoice -->
+          <td>{{ item.VBELN }}</td>
+
+          <!-- Vehicle Line -->
+          <td>{{ item.ZVEH_LINE }}</td>
+
+          <!-- ODN -->
+          <td>
+            <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZODN_NO">
+            <span *ngIf="!item.isEdit">{{ item.ZODN_NO }}</span>
+          </td>
+
+          <!-- SO -->
+          <td>
+            <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZSONO">
+            <span *ngIf="!item.isEdit">{{ item.ZSONO }}</span>
+          </td>
+
+          <!-- Shipment -->
+          <td>
+            <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZTRX_TYPE">
+            <span *ngIf="!item.isEdit">{{ item.ZTRX_TYPE }}</span>
+          </td>
+
+          <!-- Transporter -->
+          <td>
+            <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZTRANSPORTER">
+            <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
+          </td>
+
+          <!-- LR -->
+          <td>
+            <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZLRNO">
+            <span *ngIf="!item.isEdit">{{ item.ZLRNO }}</span>
+          </td>
+
+          <!-- Vehicle Type -->
+          <td>
+            <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZTRUC_TYPE">
+            <span *ngIf="!item.isEdit">{{ item.ZTRUC_TYPE }}</span>
+          </td>
+
+          <!-- Weight -->
+          <td>
+            <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm" [(ngModel)]="item.ZTRUC_WT">
+            <span *ngIf="!item.isEdit">{{ item.ZTRUC_WT }}</span>
+          </td>
+
+          <!-- Volume -->
+          <td>
+            <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm" [(ngModel)]="item.ZTRUC_VOL">
+            <span *ngIf="!item.isEdit">{{ item.ZTRUC_VOL }}</span>
+          </td>
+
+          <!-- Vehicle No -->
+          <td>
+            <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZVEH_NUM">
+            <span *ngIf="!item.isEdit">{{ item.ZVEH_NUM }}</span>
+          </td>
+
+          <!-- No Vehicles -->
+          <td>
+            <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm" [(ngModel)]="item.ZNOOFVEH">
+            <span *ngIf="!item.isEdit">{{ item.ZNOOFVEH }}</span>
+          </td>
+
+          <!-- Sales -->
+          <td>
+            <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZSALE_PERSON">
+            <span *ngIf="!item.isEdit">{{ item.ZSALE_PERSON }}</span>
+          </td>
+
+          <!-- Driver -->
+          <td>
+            <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZDNAME">
+            <span *ngIf="!item.isEdit">{{ item.ZDNAME }}</span>
+          </td>
+
+          <td>
+            <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZDNUMBER">
+            <span *ngIf="!item.isEdit">{{ item.ZDNUMBER }}</span>
+          </td>
+
+          <td>
+            <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZWORK_ORDER">
+            <span *ngIf="!item.isEdit">{{ item.ZWORK_ORDER }}</span>
+          </td>
+
+          <td>{{ item.ZLOCATION }}</td>
+          <td>{{ item.ZPLANT }}</td>
+          <td>{{ item.ZDIVISION }}</td>
+          <td>{{ item.ZVEH_TYPE }}</td>
+
+          <!-- ACTION -->
+          <td>
+            <div *ngIf="!item.isEdit">
+              <button class="btn btn-sm btn-primary me-1" (click)="editSearchRow(item)">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="deleteSearchRow(item, i)">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+
+            <div *ngIf="item.isEdit">
+              <button class="btn btn-sm btn-success me-1" (click)="updateSearchRow(item)">
+                <i class="fas fa-check"></i>
+              </button>
+              <button class="btn btn-sm btn-secondary" (click)="cancelSearchEdit(item)">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
+
 
 <div class="card" style="margin-top: 10px;"
   *ngIf=" filterApplied && filterStatus === 'Completed' && VehicleInfoData?.length > 0 && mainMode === 'filter'">

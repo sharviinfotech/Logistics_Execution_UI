@@ -486,7 +486,11 @@ export class ShipmentDetailsComponent implements OnInit {
           this.searchOptionsList = [];
           Swal.fire('No records found', '', 'info');
         } else {
-          this.searchOptionsList = res.HEADER;
+          this.searchOptionsList = res.HEADER.map((item: any) => ({
+            ...item,
+            isEdit: false
+          }));
+
           this.showForm = false;
           Swal.fire('Data fetched successfully!', '', 'success');
         }
@@ -759,7 +763,7 @@ export class ShipmentDetailsComponent implements OnInit {
       );
     } else {
       this.spinner.show();
-      this.service.shipmentdetailsNonSapSave(finalPayload).subscribe(  // ← Changed here
+      this.service.shipmentdetailsNonSapSave(finalPayload).subscribe(
         (res: any) => {
           console.log("✅ Non-SAP Save Response:", res);
           this.spinner.hide();
@@ -800,6 +804,125 @@ export class ShipmentDetailsComponent implements OnInit {
         }
       );
     }
+  }
+
+  editSearchRow(row: any): void {
+    // Backup original data
+    row._backup = { ...row };
+    row.isEdit = true;
+  }
+
+  cancelSearchEdit(row: any): void {
+    if (row._backup) {
+      Object.assign(row, row._backup); // Restore original values
+      delete row._backup;
+    }
+    row.isEdit = false;
+  }
+
+
+  // Method to update the edited row
+  updateSearchRow(row: any, index: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to update this record?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Update',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+
+
+      const commonFields = {
+        ZINCO: this.ProductInfo.get('ZINCO')?.value || '',
+        ZINS_SCPOE: this.ProductInfo.get('ZINS_SCPOE')?.value || '',
+        ZKM: this.ProductInfo.get('ZKM')?.value ?? 0,
+        VBELN: this.ProductInfo.get('VBELN')?.value || ''
+      };
+
+      const updatePayload = [{
+        ...row,
+
+        ZINS_SCPOE: row.ZINS_SCPOE?.trim() ? row.ZINS_SCPOE : commonFields.ZINS_SCPOE,
+        ZKM: row.ZKM ?? commonFields.ZKM,
+        ZINCO: row.ZINCO?.trim() ? row.ZINCO : commonFields.ZINCO,
+        VBELN: row.VBELN?.trim() ? row.VBELN : commonFields.VBELN,
+        ZLINE_NO: row.ZLINE_NO ?? '',
+        ZSETS: row.ZSETS ?? 0,
+        ZAH: row.ZAH ?? 0,
+        ZSHIP_WT: row.ZSHIP_WT ?? 0
+      }];
+
+      console.log('🛠 UPDATE PAYLOAD (ARRAY):', updatePayload);
+
+
+      this.spinner.show();
+
+      const apiCall =
+        this.sapType === 'SAP'
+          ? this.service.ShipmentOutwardSave(updatePayload)
+          : this.service.shipmentdetailsNonSapSave(updatePayload);
+
+      apiCall.subscribe(
+        (res: any) => {
+          this.spinner.hide();
+
+          if (res.STATUS === 'true' || res.NUMBER === '200') {
+            Swal.fire({
+              title: 'Success',
+              text: res.MESSAGE || res.MSG || 'Record updated successfully',
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            }).then(() => {
+              row.isEdit = false;
+              delete row._backup;
+              this.onSearchReference(); // 🔄 refresh list
+            });
+          } else {
+            Swal.fire({
+              title: 'Error',
+              text: res.MESSAGE || res.MSG || 'Failed to update record',
+              icon: 'error',
+              confirmButtonText: 'Ok'
+            });
+          }
+        },
+        (error) => {
+          this.spinner.hide();
+          console.error('❌ Update Error:', error);
+          Swal.fire({
+            title: 'Error',
+            text: 'Internal Server Error. Please try again later.',
+            icon: 'error'
+          });
+        }
+      );
+    });
+  }
+
+
+
+
+  deleteSearchRow(row: any, index: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this record? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      this.searchOptionsList.splice(index, 1);
+      Swal.fire({
+        title: 'Deleted',
+        text: 'Record deleted successfully',
+        icon: 'success',
+        confirmButtonText: 'Ok',
+      });
+    });
   }
 
 

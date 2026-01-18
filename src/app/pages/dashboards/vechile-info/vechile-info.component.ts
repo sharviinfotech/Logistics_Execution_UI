@@ -559,7 +559,10 @@ export class VechileInfoComponent implements OnInit {
           this.searchOptionsList = [];
           Swal.fire('No records found', '', 'info');
         } else {
-          this.searchOptionsList = res.HEADER;
+          this.searchOptionsList = res.HEADER.map((item: any) => ({
+            ...item,
+            isEdit: false
+          }));
           this.showForm = false;
 
 
@@ -760,6 +763,112 @@ export class VechileInfoComponent implements OnInit {
         console.error('Save API Error:', err);
         Swal.fire('Error', 'Failed to save vehicle info.', 'error');
       }
+    });
+  }
+
+  editSearchRow(row: any): void {
+    // Backup original data
+    row._backup = { ...row };
+    row.isEdit = true;
+  }
+
+  cancelSearchEdit(row: any): void {
+    if (row._backup) {
+      Object.assign(row, row._backup); // Restore original values
+      delete row._backup;
+    }
+    row.isEdit = false;
+  }
+
+
+  // Method to update the edited row
+  updateSearchRow(row: any): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to update this record?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Update',
+      cancelButtonText: 'Cancel'
+    }).then(result => {
+      if (!result.isConfirmed) return;
+
+      const vbeln =
+        this.sapType === 'Non-SAP'
+          ? this.VehicleForm.get('VBELN')?.value?.trim()
+          : (this.orderType === 'Inward'
+            ? this.ponumber
+            : this.invoicenumber)?.trim();
+
+      if (!vbeln) {
+        Swal.fire('Warning', 'Invoice / PO number is required', 'warning');
+        return;
+      }
+
+      /** ✅ SAME PAYLOAD AS SAVE */
+      const updatePayload = [{
+        ...row,
+        VBELN: vbeln
+      }];
+
+      console.log('🛠 UPDATE PAYLOAD:', updatePayload);
+
+      this.spinner.show();
+
+      const apiCall =
+        this.sapType === 'SAP'
+          ? this.service.VehicleInfosave(updatePayload)
+          : this.service.VehicleInfoNonSap(updatePayload);
+
+      apiCall.subscribe({
+        next: (res: any) => {
+          this.spinner.hide();
+
+          if (res?.NUMBER === '200') {
+            Swal.fire({
+              title: 'Success',
+              text: 'Vehicle information updated successfully!',
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            }).then(() => {
+              row.isEdit = false;
+              delete row._backup;
+              this.onSearchReference(); // refresh list
+            });
+          } else {
+            Swal.fire('Error', res?.MSG || 'Update failed', 'error');
+          }
+        },
+        error: err => {
+          this.spinner.hide();
+          console.error(err);
+          Swal.fire('Error', 'Failed to update vehicle info', 'error');
+        }
+      });
+    });
+  }
+
+
+
+
+  deleteSearchRow(row: any, index: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this record? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      this.searchOptionsList.splice(index, 1);
+      Swal.fire({
+        title: 'Deleted',
+        text: 'Record deleted successfully',
+        icon: 'success',
+        confirmButtonText: 'Ok',
+      });
     });
   }
 

@@ -205,10 +205,13 @@
 
         <!-- DC Reference Number → ONLY FOR NON-SAP -->
         <div class="form-field" *ngIf="sapType === 'Non-SAP'">
-          <input type="text" formControlName="VBELN" placeholder=" "
-            (keydown.enter)="$event.preventDefault(); fetchInvoiceDetailsNonSap()" />
+          <input type="text" [(ngModel)]="invoicenumber" name="dcRefNo" placeholder=" "
+            (keyup.enter)="fetchInvoiceDetailsNonSap($event)" />
           <label>DC Reference Number</label>
         </div>
+
+
+
 
 
         <div class="form-field">
@@ -506,40 +509,113 @@
 <div class="card" style="margin-top: 10px;" *ngIf="SavedDataShow">
   <div class="card-body-LE">
     <div class="table-responsive">
+
       <table class="table table-bordered table-striped text-center">
         <thead>
           <tr>
             <th>Map ID</th>
             <th>Ref No</th>
             <th>Invoice No</th>
-            <th>Vehile Line</th>
+            <th>Vehicle Line</th>
             <th>Vehicle Number</th>
             <th>Bill NO</th>
             <th>Product</th>
             <th>Work Order</th>
             <th>LR No</th>
             <th>Transporter</th>
-
+            <th>Action</th>
           </tr>
         </thead>
+
         <tbody>
-          <tr *ngFor="let item of searchOptionsList">
-            <td>{{ item.ZMAPID }}</td>
-            <td>{{ item.ZREFNO }}</td>
-            <td>{{ item.ZINV_NO }}</td>
-            <td>{{ item.ZVEH_LINE }}</td>
-            <td>{{ item.ZTRUCK_NO }}</td>
-            <td>{{ item.ZBILLNO }}</td>
-            <td>{{ item.ZPRODUCT }}</td>
-            <td>{{ item.ZWORK_ORDER}}</td>
-            <td>{{ item.ZLRNO}}</td>
-            <td>{{ item.ZTRANSPORTER}}</td>
+          <tr *ngFor="let item of searchOptionsList" [class.editing]="item.isEdit">
+
+            <!-- MAP ID -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZMAPID">
+              <span *ngIf="!item.isEdit">{{ item.ZMAPID }}</span>
+            </td>
+
+            <!-- REF NO -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZREFNO">
+              <span *ngIf="!item.isEdit">{{ item.ZREFNO }}</span>
+            </td>
+
+            <!-- INV NO -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZINV_NO">
+              <span *ngIf="!item.isEdit">{{ item.ZINV_NO }}</span>
+            </td>
+
+            <!-- VEH LINE -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZVEH_LINE">
+              <span *ngIf="!item.isEdit">{{ item.ZVEH_LINE }}</span>
+            </td>
+
+            <!-- VEH NUMBER / TRUCK -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZTRUCK_NO">
+              <span *ngIf="!item.isEdit">{{ item.ZTRUCK_NO }}</span>
+            </td>
+
+            <!-- BILL NO -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZBILLNO">
+              <span *ngIf="!item.isEdit">{{ item.ZBILLNO }}</span>
+            </td>
+
+            <!-- PRODUCT -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZPRODUCT">
+              <span *ngIf="!item.isEdit">{{ item.ZPRODUCT }}</span>
+            </td>
+
+            <!-- WORK ORDER -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZWORK_ORDER">
+              <span *ngIf="!item.isEdit">{{ item.ZWORK_ORDER }}</span>
+            </td>
+
+            <!-- LR NO -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZLRNO">
+              <span *ngIf="!item.isEdit">{{ item.ZLRNO }}</span>
+            </td>
+
+            <!-- TRANSPORTER -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZTRANSPORTER">
+              <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
+            </td>
+
+            <!-- ACTION BUTTONS -->
+            <td>
+              <div *ngIf="!item.isEdit" class="btn-group">
+                <button class="btn btn-sm btn-primary me-1" (click)="editSavedRow(item)">
+                  <i class="fas fa-edit"></i>
+                </button>
+              </div>
+
+              <div *ngIf="item.isEdit" class="btn-group">
+                <button class="btn btn-sm btn-success me-1" (click)="updateSavedRow(item)">
+                  <i class="fas fa-check"></i>
+                </button>
+                <button class="btn btn-sm btn-secondary" (click)="cancelSavedEdit(item)">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </td>
+
           </tr>
         </tbody>
       </table>
+
     </div>
   </div>
 </div>
+
 
 <div class="card" style="margin-top: 10px;"
   *ngIf=" filterApplied && filterStatus === 'Completed' &&  TransitDamageInfoHeader?.length > 0 && mainMode === 'filter'">

@@ -109,6 +109,7 @@ export class TransitDamageInfoComponent implements OnInit {
 
   buildHeaderForm() {
     this.HeaderForm = this.fb.group({
+      VBELN: [''],
       INV_NO: [''],
       INV_DATE: [''],
       FSR_RPT_DT: [''],
@@ -526,7 +527,11 @@ export class TransitDamageInfoComponent implements OnInit {
           Swal.fire('', res.MESSAGE, 'warning');
         } else {
 
-          this.searchOptionsList = res.ITEMS;
+          this.searchOptionsList = (res.ITEMS || []).map((item: any) => ({
+            ...item,
+            isEdit: false,      // 👈 edit enable flag
+            _backup: null       // 👈 optional (for cancel edit)
+          }));
           this.showForm = false;
           this.SavedDataShow = true;
           this.ShowHeaderForm = true;
@@ -764,22 +769,25 @@ export class TransitDamageInfoComponent implements OnInit {
     });
   }
 
-  fetchInvoiceDetailsNonSap() {
+  fetchInvoiceDetailsNonSap(event?: any) {
 
     if (this.sapType !== 'Non-SAP') {
       return;
     }
 
-    const dcRefNo = this.HeaderForm.get('VBELN')?.value;
+    // 🔴 IMPORTANT FIX
+    const dcRefNo = event?.target?.value || this.invoicenumber;
 
-    if (!dcRefNo) {
+    if (!dcRefNo || !dcRefNo.toString().trim()) {
       Swal.fire('Warning', 'Please enter DC Reference Number', 'warning');
       return;
     }
 
     const payload = {
-      VBELN: dcRefNo
+      VBELN: dcRefNo.toString().trim()
     };
+
+    console.log('📤 Non-SAP Fetch Payload:', payload);
 
     this.spinner.show();
 
@@ -795,16 +803,12 @@ export class TransitDamageInfoComponent implements OnInit {
         const header = res[0].HEADER;
         const items = res[0].ITEM;
 
-        // UI flags
-        this.SavedDataShow = false;
-        this.searchOptionsList = [];
         this.showTable = true;
         this.ShowHeaderForm = true;
         this.showForm = true;
 
-        /* ===== PATCH HEADER ===== */
         this.HeaderForm.patchValue({
-          INV_NO: header.INV_NO,
+          INV_NO: dcRefNo,
           INV_DATE: header.INV_DATE,
           FSR_RPT_DT: header.FSR_RPT_DT,
           BASIC_VALUE: header.BASIC_VALUE,
@@ -817,18 +821,14 @@ export class TransitDamageInfoComponent implements OnInit {
           IMAGES: header.IMAGES
         });
 
-        /* ===== CLEAR ITEMS ===== */
-        while (this.items.length) {
-          this.items.removeAt(0);
-        }
+        this.items.clear();
 
-        /* ===== PATCH ITEMS ===== */
         items.forEach((x: any) => {
-          const row = this.fb.group({
+          this.items.push(this.fb.group({
             selected: [false],
             ZMAPID: [x.ZMAPID],
             REFNO: [x.REFNO],
-            INV_NO: [x.INV_NO],
+            INV_NO: [dcRefNo],
             POSNR: [x.POSNR],
             VEH_LINE: [x.VEH_LINE],
             TRUCK_NO: [x.TRUCK_NO],
@@ -837,84 +837,199 @@ export class TransitDamageInfoComponent implements OnInit {
             BILLNO: [x.BILLNO],
             PRODUCT: [x.PRODUCT],
             WORK_ORDER: [x.WORK_ORDER]
-          });
-
-          this.items.push(row);
+          }));
         });
       },
-
-      error: (err) => {
+      error: () => {
         this.spinner.hide();
-        console.error(err);
         Swal.fire('Error fetching Non-SAP data', '', 'error');
       }
     });
   }
 
 
+
+
   onSaveNonSap(action: 'stay' | 'next' | 'previous' = 'stay') {
-    if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        text: 'Please select at least one reference row before saving'
-      });
+
+    if (this.selectedItems.length === 0) {
+      Swal.fire('Warning', 'Please select at least one reference row', 'warning');
       return;
     }
 
-    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+    const invoiceNo =
+      this.HeaderForm.get('INV_NO')?.value?.toString().trim() || null;
 
-    // Get header form value and remove referenceItems array
-    const headerValue = { ...this.HeaderForm.value };
+    const refNo =
+      this.selectedItems.length > 0
+        ? this.selectedItems[0].referenceNumber
+        : null;
+
+    /* HEADER */
+    const headerValue: any = { ...this.HeaderForm.value };
     delete headerValue.referenceItems;
 
-    headerValue.INV_NO = referenceNumber;
+    headerValue.INV_NO = invoiceNo;
+    headerValue.REFNO = refNo;
 
-    this.items.controls.forEach(row => {
-      row.patchValue({ INV_NO: referenceNumber });
-    });
+    /* ITEMS */
+    const itemsPayload = this.items.controls
+      .filter(ctrl => ctrl.value.selected === true)
+      .map(ctrl => ({
+        ...ctrl.value,
+        INV_NO: invoiceNo,
+        REFNO: refNo
+      }));
 
     const payload = {
       HEADER: headerValue,
-      ITEM: this.ItemForm.value.ITEMS
+      ITEM: itemsPayload
     };
 
-    console.log("📤 Non-SAP Final Payload:", payload);
+    console.log('✅ FIXED Non-SAP SAVE PAYLOAD', payload);
 
     this.spinner.show();
     this.service.withoutsapSave(payload).subscribe({
       next: (res: any) => {
         this.spinner.hide();
-
-        if (res?.STATUS === "TRUE" || res?.STATUS === true) {
-          Swal.fire({
-            text: "✅ Data Saved Successfully!",
-            icon: "success",
-            showConfirmButton: false,
-            timer: 900,
-            willClose: () => {
-              if (action === 'next') {
-                this.router.navigate(['/insurance-claim-tracking']);
-              } else if (action === 'previous') {
-                this.router.navigate(['/freight-billing']);
-              } else {
-                this.resetForms();
-              }
-            }
-          });
+        if (res?.STATUS === true || res?.STATUS === 'TRUE') {
+          Swal.fire('Success', 'Data Saved Successfully', 'success');
+          this.resetForms();
         } else {
-          Swal.fire({
-            text: "⚠️ Save Failed: " + (res.MESSAGE || ''),
-            icon: "warning"
-          });
+          Swal.fire('Save Failed', res?.MESSAGE || '', 'warning');
         }
       },
       error: () => {
         this.spinner.hide();
-        Swal.fire({
-          text: "❌ Error while saving data",
-          icon: "error"
-        });
+        Swal.fire('Error', 'Save failed', 'error');
       }
+    });
+  }
+
+  editSearchRow(row: any): void {
+    // Backup original data
+    row._backup = { ...row };
+    row.isEdit = true;
+  }
+
+  cancelSearchEdit(row: any): void {
+    if (row._backup) {
+      Object.assign(row, row._backup); // Restore original values
+      delete row._backup;
+    }
+    row.isEdit = false;
+  }
+
+
+  // Method to update the edited row
+  updateSearchRow(row: any, index: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to update this record?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Update',
+      cancelButtonText: 'Cancel'
+    }).then(result => {
+      if (!result.isConfirmed) return;
+
+      /* ---------------- HEADER (Same as SAVE) ---------------- */
+      const headerPayload: any = {
+        INV_NO: row.ZINV_NO || null,
+        INV_DATE: row.ZINV_DATE || null,
+        BASIC_VALUE: row.ZBASIC_VALUE || null,
+        INC_DATE: row.ZINC_DATE || null,
+        CUSTOMER: row.ZCUST_NAME || null,
+        CONSIGN_NAME: row.ZCONSIGN_NAME || null,
+        SALE_PERSON: row.ZSALE_PERSON || null,
+        LOCATION: row.ZLOCATION || null,
+        ROUTE: row.ZROUTE || null,
+        REFNO: row.ZREFNO || null,
+        SETTLEMENT: row.ZSETTLEMENT,
+        CLOSING_DT: row.ZCLOSING_DT
+      };
+
+      /* ---------------- ITEM (Single edited row) ---------------- */
+      const itemPayload = {
+        ZMAPID: row.ZMAPID || null,
+        INV_NO: row.ZINV_NO || null,
+        REFNO: row.ZREFNO || null,
+        POSNR: row.ZLINE_NO || null,
+        VEH_LINE: row.ZVEH_LINE || null,
+        TRUCK_NO: row.ZVEH_NUM || null,
+        LR_NO: row.ZLRNO || null,
+        TRANSPORTER: row.ZTRANSPORTER || null,
+        WORK_ORDER: row.ZWORK_ORDER || null,
+        BILLNO: row.ZBILLNO || null,
+        PRODUCT: row.ZPRODUCT || null
+      };
+
+
+      const payload = {
+        HEADER: headerPayload,
+        ITEM: [itemPayload]   // ✅ SINGLE RECORD ARRAY
+      };
+
+      console.log('🛠 UPDATE PAYLOAD:', payload);
+
+      this.spinner.show();
+
+      const apiCall =
+        this.sapType === 'SAP'
+          ? this.service.TransitDamageInfoSave(payload)   // ✅ SAME AS SAP SAVE
+          : this.service.withoutsapSave(payload);
+
+      apiCall.subscribe({
+        next: (res: any) => {
+          this.spinner.hide();
+
+          if (res?.STATUS === 'TRUE' || res?.STATUS === true) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Updated',
+              text: res.MESSAGE || 'Record updated successfully',
+              confirmButtonText: 'OK'
+            }).then(() => {
+              row.isEdit = false;
+              delete row._backup;
+
+              // 🔄 Refresh search table
+              this.onSearchReference();
+            });
+          } else {
+            Swal.fire('Update Failed', res?.MESSAGE || '', 'warning');
+          }
+        },
+        error: (err) => {
+          this.spinner.hide();
+          console.error('❌ Update Error:', err);
+          Swal.fire('Error', 'Update failed', 'error');
+        }
+      });
+    });
+  }
+
+
+
+
+  deleteSearchRow(row: any, index: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this record? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      this.searchOptionsList.splice(index, 1);
+      Swal.fire({
+        title: 'Deleted',
+        text: 'Record deleted successfully',
+        icon: 'success',
+        confirmButtonText: 'Ok',
+      });
     });
   }
 

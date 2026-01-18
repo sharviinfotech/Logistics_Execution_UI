@@ -456,7 +456,10 @@ export class FreightBillingComponent implements OnInit {
           this.searchOptionsList = [];
           Swal.fire('No records found', '', 'info');
         } else {
-          this.searchOptionsList = res.HEADER;
+          this.searchOptionsList = res.HEADER.map((item: any) => ({
+            ...item,
+            isEdit: false
+          }));
           this.showForm = false;
           Swal.fire('Data fetched successfully!', '', 'success');
         }
@@ -587,6 +590,115 @@ export class FreightBillingComponent implements OnInit {
           timer: 3000
         });
       }
+    });
+  }
+
+  editSearchRow(row: any): void {
+    // Backup original data
+    row._backup = { ...row };
+    row.isEdit = true;
+  }
+
+  cancelSearchEdit(row: any): void {
+    if (row._backup) {
+      Object.assign(row, row._backup); // Restore original values
+      delete row._backup;
+    }
+    row.isEdit = false;
+  }
+
+
+  // Method to update the edited row
+  updateSearchRow(row: any, index: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to update this Freight Billing record?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Update',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+
+      // ✅ SAME payload as saveFreightBilling
+      const record = {
+        INV_NO: row.ZINV_NO || '',
+        REFNO: row.ZREFNO || '',
+        BILLNO: row.FreightBillNumber || row.ZBILLNO || '',
+        BILLDATE: row.FreightBillDate || row.ZBILLDATE || '',
+        PHY_DATE: row.FreightBillPhysicalSubmissionDate || row.ZPHY_DATE || '',
+        FRT_CHARGES: row.FreightCharges || row.ZFRT_CHARGES || 0,
+        ORDER_NO: row.WorkOrderNumber || row.ZORDER_NO || '',
+        WORKORDER: row.ZWORK_ORDER || '',
+        LRNO: row.ZLRNO || '',
+        TRANSPORTER: row.ZTRANSPORTER || '',
+        BILL_SUBMISSION: row.BillSubmission || row.ZBILL_SUBMISSION || '',
+      };
+
+      console.log('🛠 FREIGHT BILLING UPDATE PAYLOAD:', record);
+
+      this.spinner.show();
+
+      // ✅ REPLACED OrderInfo APIs with FreightBilling APIs
+      let request$ =
+        this.sapType === 'SAP'
+          ? this.service.FreightBillingSave({ SAVE: [record] })
+          : this.service.FreightBillingNonSap({ CREATE: [record] });
+
+      request$.subscribe(
+        (res: any) => {
+          this.spinner.hide();
+
+          if (res.STATUS === 'true' || res.NUMBER === '200') {
+            Swal.fire({
+              icon: 'success',
+              text: res.MESSAGE || 'Freight Billing updated successfully',
+              confirmButtonText: 'Ok'
+            }).then(() => {
+              row.isEdit = false;
+              delete row._backup;
+              this.onSearchReference(); // refresh table
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              text: res.MESSAGE || 'Failed to update Freight Billing',
+            });
+          }
+        },
+        (error) => {
+          this.spinner.hide();
+          console.error('❌ Freight Billing Update Error:', error);
+          Swal.fire({
+            icon: 'error',
+            text: 'Internal Server Error. Please try again later.'
+          });
+        }
+      );
+    });
+  }
+
+
+
+
+  deleteSearchRow(row: any, index: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this record? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      this.searchOptionsList.splice(index, 1);
+      Swal.fire({
+        title: 'Deleted',
+        text: 'Record deleted successfully',
+        icon: 'success',
+        confirmButtonText: 'Ok',
+      });
     });
   }
 

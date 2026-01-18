@@ -463,65 +463,190 @@
   </div>
 </div>
 
-  <!-- Search Results Table -->
-  <div class="card" style="margin-top: 10px;" *ngIf="searchOptionsList?.length > 0">
-    <div class="card-body-LE">
-      <div class="table-responsive">
-        <table class="table table-bordered table-striped text-center">
-          <thead>
-            <tr>
-              <th>Ref No</th>
-              <th>Invoice No</th>
-              <th>ODN No</th>
-              <th>SO NO</th>
-              <th>Sales Person</th>
-              <th>Segment</th>
-              <th>Application Type</th>
-              <th>Customer Profile</th>
-              <th>Branch</th>
-              <th>Branch Zone</th>
-              <th>TAT Type</th>
-              <th>TAT Days</th>
-              <th>ETA</th>
-              <th>Work Order</th>
-              <th>LR No</th>
-              <th>Transporter</th>
-              <th>Plant</th>
-              <th>Division</th>
-              <th>Created Date</th>
-              <th>Vehicle Type</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of searchOptionsList">
-              <td>{{ item.ZREFNO }}</td>
-              <td>{{ item.ZINV_NUM }}</td>
-              <td>{{ item.ZODN_NO }}</td>
-              <td>{{ item.ZSO_NO }}</td>
-              <td>{{ item.ZSALE_PERSON }}</td>
-              <td>{{ item.ZSEGMENT }}</td>
-              <td>{{ item.ZAPPTYP }}</td>
-              <td>{{ item.ZCUST_PROFILE }}</td>
-              <td>{{ item.ZBRANCH }}</td>
-              <td>{{ item.ZBRANCH_ZONE }}</td>
-              <td>{{ item.ZTAT_TYPE }}</td>
-              <td>{{ item.ZTAT }}</td>
-              <td>{{ item.ZETA | date:'dd-MM-yyyy' }}</td>
-              <td>{{ item.ZWORK_ORDER }}</td>
-              <td>{{ item.ZLRNO }}</td>
-              <td>{{ item.ZTRANSPORTER }}</td>
-              <td>{{ item.ZPLANT }}</td>
-              <td>{{ item.ZDIVISION }}</td>
-              <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
-              <td>{{ item.ZVEH_TYPE }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+<!-- Search Results Table -->
+<div class="card" style="margin-top: 10px;" *ngIf="searchOptionsList?.length > 0">
+  <div class="card-body-LE">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped text-center">
+        <thead>
+          <tr>
+            <th>Ref No</th>
+            <th>Invoice No</th>
+            <th>ODN No</th>
+            <th>SO NO</th>
+            <th>Sales Person</th>
+            <th>Segment</th>
+            <th>Application Type</th>
+            <th>Customer Profile</th>
+            <th>Branch</th>
+            <th>Branch Zone</th>
+            <th>TAT Type</th>
+            <th>TAT Days</th>
+            <th>ETA</th>
+            <th>Work Order</th>
+            <th>LR No</th>
+            <th>Transporter</th>
+            <th>Plant</th>
+            <th>Division</th>
+            <th>Created Date</th>
+            <th>Vehicle Type</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let item of searchOptionsList; let i = index" [class.editing]="item.isEdit">
+
+            <!-- Ref No -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZREFNO">
+              <span *ngIf="!item.isEdit">{{ item.ZREFNO }}</span>
+            </td>
+
+            <!-- Invoice -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZINV_NUM">
+              <span *ngIf="!item.isEdit">{{ item.ZINV_NUM }}</span>
+            </td>
+
+            <!-- ODN -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZODN_NO">
+              <span *ngIf="!item.isEdit">{{ item.ZODN_NO }}</span>
+            </td>
+
+            <!-- SO -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZSO_NO">
+              <span *ngIf="!item.isEdit">{{ item.ZSO_NO }}</span>
+            </td>
+
+            <!-- Sales Person -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZSALE_PERSON">
+              <span *ngIf="!item.isEdit">{{ item.ZSALE_PERSON }}</span>
+            </td>
+
+            <!-- Segment -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZSEGMENT">
+              <span *ngIf="!item.isEdit">{{ item.ZSEGMENT }}</span>
+            </td>
+
+            <!-- App Type -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZAPPTYP">
+              <span *ngIf="!item.isEdit">{{ item.ZAPPTYP }}</span>
+            </td>
+
+            <!-- Customer Profile -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZCUST_PROFILE">
+              <span *ngIf="!item.isEdit">{{ item.ZCUST_PROFILE }}</span>
+            </td>
+
+            <!-- Branch -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZBRANCH">
+              <span *ngIf="!item.isEdit">{{ item.ZBRANCH }}</span>
+            </td>
+
+            <!-- Branch Zone -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZBRANCH_ZONE">
+              <span *ngIf="!item.isEdit">{{ item.ZBRANCH_ZONE }}</span>
+            </td>
+
+            <!-- TAT -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZTAT_TYPE">
+              <span *ngIf="!item.isEdit">{{ item.ZTAT_TYPE }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZTAT">
+              <span *ngIf="!item.isEdit">{{ item.ZTAT }}</span>
+            </td>
+
+            <!-- ETA -->
+            <td>
+              <input *ngIf="item.isEdit" type="date" class="form-control form-control-sm" [(ngModel)]="item.ZETA">
+              <span *ngIf="!item.isEdit">{{ item.ZETA | date:'dd-MM-yyyy' }}</span>
+            </td>
+
+            <!-- Work Order -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZWORK_ORDER">
+              <span *ngIf="!item.isEdit">{{ item.ZWORK_ORDER }}</span>
+            </td>
+
+            <!-- LR -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZLRNO">
+              <span *ngIf="!item.isEdit">{{ item.ZLRNO }}</span>
+            </td>
+
+            <!-- Transporter -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZTRANSPORTER">
+              <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
+            </td>
+
+            <!-- Plant -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZPLANT">
+              <span *ngIf="!item.isEdit">{{ item.ZPLANT }}</span>
+            </td>
+
+            <!-- Division -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZDIVISION">
+              <span *ngIf="!item.isEdit">{{ item.ZDIVISION }}</span>
+            </td>
+
+            <!-- Created Date -->
+            <td>
+              <input *ngIf="item.isEdit" type="date" class="form-control form-control-sm"
+                [(ngModel)]="item.ZCREATED_DT">
+              <span *ngIf="!item.isEdit">{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</span>
+            </td>
+
+            <!-- Vehicle -->
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZVEH_TYPE">
+              <span *ngIf="!item.isEdit">{{ item.ZVEH_TYPE }}</span>
+            </td>
+
+            <!-- ACTION -->
+            <td>
+              <div *ngIf="!item.isEdit" class="btn-group">
+                <button class="btn btn-sm btn-primary me-1" (click)="editSearchRow(item)">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="updateSearchRow(item, i)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+
+              <div *ngIf="item.isEdit" class="btn-group">
+                <button class="btn btn-sm btn-success me-1" (click)="updateSearchRow(item, i)">
+                  <i class="fas fa-check"></i>
+                </button>
+                <button class="btn btn-sm btn-secondary" (click)="cancelSearchEdit(item)">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
+</div>
 
-  <div class="card" style="margin-top: 10px;"
+
+<div class="card" style="margin-top: 10px;"
   *ngIf="filterApplied && filterStatus === 'Completed' && SegmentData?.length > 0 && mainMode === 'filter'">
   <div class="card-body-LE">
     <div class="table-responsive">
@@ -529,21 +654,21 @@
         <thead>
           <tr>
             <th>SI.No</th>
-           
+
             <th>Line No</th>
             <th>REFNO</th>
             <th>Invoice No</th>
             <th>Odn Number</th>
             <th>SO Number</th>
             <th>Sales Person</th>
-              <th>Segment</th>
-              <th>Application Type</th>
-              <th>Customer Profile</th>
-              <th>Branch</th>
-              <th>Branch Zone</th>
-              <th>TAT Type</th>
-              <th>TAT Days</th>
-              <th>ETA</th>
+            <th>Segment</th>
+            <th>Application Type</th>
+            <th>Customer Profile</th>
+            <th>Branch</th>
+            <th>Branch Zone</th>
+            <th>TAT Type</th>
+            <th>TAT Days</th>
+            <th>ETA</th>
             <th>Plant</th>
             <th>Division</th>
             <th>Work Order</th>
@@ -557,7 +682,7 @@
         <tbody>
           <tr *ngFor="let item of SegmentData; let i = index">
             <td>{{ i + 1 }}</td>
-            
+
             <td>{{ item.ZLINE_NO }}</td>
             <td>{{ item.ZREFNO }}</td>
             <td>{{ item.ZINV_NUM }}</td>
@@ -571,13 +696,13 @@
             <td>{{ item.ZBRANCH_ZONE}}</td>
             <td>{{ item.ZTAT_TYPE}}</td>
             <td>{{ item.ZTAT}}</td>
-            <td>{{ item.ZETA  }}</td>
+            <td>{{ item.ZETA }}</td>
             <td>{{ item.ZPLANT }}</td>
             <td>{{ item.ZDIVISION }}</td>
             <td>{{ item.ZWORK_ORDER }}</td>
             <td>{{ item.ZLRNO }}</td>
             <td>{{ item.ZTRANSPORTER }}</td>
-            <td>{{ item.ZCREATED_DT  }}</td>
+            <td>{{ item.ZCREATED_DT }}</td>
             <td>{{ item.ZVEH_TYPE }}</td>
           </tr>
         </tbody>
@@ -587,49 +712,49 @@
 </div>
 <div *ngIf="filterApplied && filterStatus === 'Pending' && dispatchData?.length > 0 && mainMode === 'filter'">
   <div class="table-responsive">
-  <table class="table table-bordered table-striped text-center">
-    <thead>
-      <tr>
-        <th>SI.No</th>
-        <th>Reference No</th>
-        <th>Line No</th>
-        <th>Date</th>
-        <th>Plant</th>
-        <th>Division</th>
-        <th>Vehicle Type</th>
-        <th>No. of Trucks</th>
-        <th>Work Order</th>
-        <th>Vendor Code</th>
-        <th>Transporter</th>
-        <th>No. of LRs</th>
-        <th>LR Number</th>
-        <th>Loading Point</th>
-        <th>Unloading Point</th>
-      </tr>
-    </thead>
+    <table class="table table-bordered table-striped text-center">
+      <thead>
+        <tr>
+          <th>SI.No</th>
+          <th>Reference No</th>
+          <th>Line No</th>
+          <th>Date</th>
+          <th>Plant</th>
+          <th>Division</th>
+          <th>Vehicle Type</th>
+          <th>No. of Trucks</th>
+          <th>Work Order</th>
+          <th>Vendor Code</th>
+          <th>Transporter</th>
+          <th>No. of LRs</th>
+          <th>LR Number</th>
+          <th>Loading Point</th>
+          <th>Unloading Point</th>
+        </tr>
+      </thead>
 
-    <tbody>
-      <tr *ngFor="let item of dispatchData; let i = index">
+      <tbody>
+        <tr *ngFor="let item of dispatchData; let i = index">
 
-        <td>{{ i + 1 }}</td>
-        <td>{{ item.ZREFNO }}</td>
-        <td>{{ item.ZLINE_NO }}</td>
-        <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
-        <td>{{ item.ZWERKS }}</td>
-        <td>{{ item.ZDIVISION }}</td>
-        <td>{{ item.ZVEH_TYPE }}</td>
-        <td>{{ item.ZNO_TRUCKS }}</td>
-        <td>{{ item.ZWORK_ORDER }}</td>
-        <td>{{ item.ZVENDOR_CD }}</td>
-        <td>{{ item.ZTRANSPORTER }}</td>
-        <td>{{ item.ZNO_LRS }}</td>
-        <td>{{ item.ZLR_NO }}</td>
-        <td>{{ item.ZLOAD_PT }}</td>
-        <td>{{ item.ZUNLOAD_PT }}</td>
-      </tr>
+          <td>{{ i + 1 }}</td>
+          <td>{{ item.ZREFNO }}</td>
+          <td>{{ item.ZLINE_NO }}</td>
+          <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
+          <td>{{ item.ZWERKS }}</td>
+          <td>{{ item.ZDIVISION }}</td>
+          <td>{{ item.ZVEH_TYPE }}</td>
+          <td>{{ item.ZNO_TRUCKS }}</td>
+          <td>{{ item.ZWORK_ORDER }}</td>
+          <td>{{ item.ZVENDOR_CD }}</td>
+          <td>{{ item.ZTRANSPORTER }}</td>
+          <td>{{ item.ZNO_LRS }}</td>
+          <td>{{ item.ZLR_NO }}</td>
+          <td>{{ item.ZLOAD_PT }}</td>
+          <td>{{ item.ZUNLOAD_PT }}</td>
+        </tr>
 
 
-    </tbody>
-  </table>
+      </tbody>
+    </table>
   </div>
 </div>

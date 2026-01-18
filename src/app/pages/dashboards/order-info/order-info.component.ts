@@ -132,7 +132,7 @@ export class OrderInfoComponent implements OnInit {
     this.filterTransporter = '';
     this.filterVehicleType = '';
     this.filterStatus = '';
-     this.filterSapType = '';
+    this.filterSapType = '';
     this.filteredData = [];
     this.filterApplied = false;
 
@@ -168,6 +168,17 @@ export class OrderInfoComponent implements OnInit {
 
   isSap(): boolean {
     return this.sapType === 'SAP';
+  }
+
+  editRow(row: any) {
+    row._backup = { ...row }; // backup for cancel
+    row.isEdit = true;
+  }
+
+  cancelEdit(row: any) {
+    Object.assign(row, row._backup);
+    row.isEdit = false;
+    delete row._backup;
   }
 
   toggleOrderType() {
@@ -390,7 +401,7 @@ export class OrderInfoComponent implements OnInit {
       this.showForm = true;
     }
   }
-  
+
 
 
 
@@ -715,6 +726,244 @@ export class OrderInfoComponent implements OnInit {
     }
   }
 
+
+
+
+
+
+  // Method to enable edit mode for a row
+  editSearchRow(row: any): void {
+    // Backup original data
+    row._backup = { ...row };
+    row.isEdit = true;
+  }
+
+  cancelSearchEdit(row: any): void {
+    if (row._backup) {
+      Object.assign(row, row._backup); // Restore original values
+      delete row._backup;
+    }
+    row.isEdit = false;
+  }
+
+
+  // Method to update the edited row
+  updateSearchRow(row: any, index: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to update this record?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Update',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+
+      // ✅ Single record object
+      const updatePayload = {
+        REF_NO: row.ZREFNO || "",
+        WORK_ORDER_NO: row.ZWORK_ORDER || "",
+        LR_NO: row.ZLRNO || "",
+        TRANSPORTER: row.ZTRANSPORTER || "",
+        INV_VBELN: row.ZINV_NO || "",
+        INV_ODNO: row.ZODN_NO || "",
+        INV_DATE: row.ZINV_DATE || "",
+        BASIC_SHIP_VALUE: row.ZBASIC_VALUE || "",
+        INV_VALUE_GST: row.ZINV_VALUE_GST || "",
+        PHYS_DISPATCH: row.ZPHY_DISPATCH || "",
+        FISCAL_YEAR: row.ZFYEAR || "",
+        FISCAL_QUARTER: row.ZFIS_QUARTER || "",
+        MONTH: row.ZFIS_MONTH || "",
+        PLANT_NAME: row.ZPLANT || "",
+        TRAN_TYPE: row.ZTRX_TYPE || "",
+        TRAN_TEXT_BILL: row.ZBILL_TRX_TEXT || "",
+        DIVISION: row.ZDIVISION || "",
+        SUB_DIVISION: row.ZSUB_DIVISION || "",
+        SO_REF_NO: row.ZSO_NO || "",
+        CUST_NAME: row.ZCUST_NAME || "",
+        LINE_NO: row.ZLINE_NO || "",
+        CUST_GROUP: row.ZCUST_GRP || "",
+        CNEE_NAME: row.ZCONSIGN_NAME || "",
+        DEST_LOC: row.ZDES_LOC || "",
+        DEST_STATE: row.ZSTATE || "",
+        DEST_ZONE: row.ZZONE || ""
+      };
+
+      console.log("🛠 UPDATE RECORD:", updatePayload);
+
+      this.spinner.show();
+
+      // ✅ IMPORTANT FIX: payload MUST be ARRAY
+      let apiCall =
+        this.sapType === "SAP"
+          ? this.service.OrderInfoOutwardSave({
+            SAVE: [updatePayload]
+          })
+          : this.service.OrderInfoNonSap({
+            CREATE: [updatePayload]
+          });
+
+      apiCall.subscribe(
+        (res: any) => {
+          this.spinner.hide();
+
+          if (res.STATUS === 'true' || res.NUMBER === '200') {
+            Swal.fire({
+              title: 'Success',
+              text: res.MESSAGE || 'Record updated successfully',
+              icon: 'success',
+              confirmButtonText: 'Ok',
+            }).then(() => {
+              row.isEdit = false;
+              delete row._backup;
+              this.onSearchReference();
+            });
+          } else {
+            Swal.fire({
+              title: 'Error',
+              text: res.MESSAGE || 'Failed to update record',
+              icon: 'error',
+              confirmButtonText: 'Ok',
+            });
+          }
+        },
+        (error) => {
+          this.spinner.hide();
+          console.error('❌ Update Error:', error);
+          Swal.fire({
+            text: 'Internal Server Error. Please try again later.',
+            icon: 'error',
+          });
+        }
+      );
+    });
+  }
+
+
+  deleteRow(row: any, index: number): void {
+    if (row.SAP_TYPE === 'SAP') {
+      this.DeleteWithSap(row, index);
+    } else {
+      this.DeleteWithoutSap(row, index);
+    }
+  }
+
+  DeleteWithSap(row: any, index: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this record? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+
+      // 🔹 Prepare request payload (With SAP format)
+      const payload = {
+        DELETE: [
+          {
+            ZREFNO: row.ZREFNO,
+            ZINV_NO: row.ZINV_NO,
+            ZLINE_NO: row.ZLINE_NO
+          }
+        ]
+      };
+
+      // 🔹 Call API
+      this.service.OrderInfoDeleteWithSap(payload).subscribe({
+        next: (res: any) => {
+          if (res?.STATUS === 'TRUE') {
+            // 🔹 Remove row from table only after success
+            this.searchOptionsList.splice(index, 1);
+
+            Swal.fire({
+              title: 'Deleted',
+              text: res.MESSAGE || 'Record deleted successfully',
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            });
+          } else {
+            Swal.fire({
+              title: 'Failed',
+              text: res?.MESSAGE || 'Delete failed',
+              icon: 'error'
+            });
+          }
+        },
+        error: (err) => {
+          console.error(err);
+          Swal.fire({
+            title: 'Error',
+            text: 'Something went wrong while deleting',
+            icon: 'error'
+          });
+        }
+      });
+    });
+  }
+  DeleteWithoutSap(row: any, index: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this record? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+
+      // 🔹 Prepare request payload (With SAP format)
+      const payload = {
+        DELETE: [
+          {
+            ZREFNO: row.ZREFNO,
+            ZINV_NO: row.ZINV_NO,
+            ZLINE_NO: row.ZLINE_NO
+          }
+        ]
+      };
+
+      // 🔹 Call API
+      this.service.OrderInfoDeleteWithoutSap(payload).subscribe({
+        next: (res: any) => {
+          if (res?.STATUS === 'TRUE') {
+            // 🔹 Remove row from table only after success
+            this.searchOptionsList.splice(index, 1);
+
+            Swal.fire({
+              title: 'Deleted',
+              text: res.MESSAGE || 'Record deleted successfully',
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            });
+          } else {
+            Swal.fire({
+              title: 'Failed',
+              text: res?.MESSAGE || 'Delete failed',
+              icon: 'error'
+            });
+          }
+        },
+        error: (err) => {
+          console.error(err);
+          Swal.fire({
+            title: 'Error',
+            text: 'Something went wrong while deleting',
+            icon: 'error'
+          });
+        }
+      });
+    });
+  }
+
+
+
+
+  // Convert from other formats if needed
+
   private formatToDDMMYYYY(value: any): string {
     if (!value) return '';
 
@@ -747,7 +996,7 @@ export class OrderInfoComponent implements OnInit {
     return '';
   }
 
-  
+
   private convertToDateFormat(date: string): string {
     if (!date) return '';
 
@@ -761,7 +1010,7 @@ export class OrderInfoComponent implements OnInit {
       return `${year}-${month}-${day}`;
     }
 
-   
+
     return date;
   }
 
@@ -1103,7 +1352,11 @@ export class OrderInfoComponent implements OnInit {
           this.searchOptionsList = [];
           Swal.fire('No records found', '', 'info');
         } else {
-          this.searchOptionsList = res.HEADER;
+          this.searchOptionsList = res.HEADER.map((item: any) => ({
+            ...item,
+            isEdit: false
+          }));
+
           this.showForm = false;
           Swal.fire('Data fetched successfully!', '', 'success');
         }
@@ -1191,24 +1444,24 @@ export class OrderInfoComponent implements OnInit {
 
   onFilterSapTypeChange(): void {
 
-  // Reset filters
-  this.filterFromDate = '';
-  this.filterToDate = '';
-  this.filterPlant = '';
-  this.filterDivision = '';
-  this.filterTransporter = '';
-  this.filterVehicleType = '';
-  this.filterStatus = '';
+    // Reset filters
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterVehicleType = '';
+    this.filterStatus = '';
 
-  
-  this.orderInfoData = [];
-  this.dispatchData = [];
 
-  
-  this.filterApplied = false;
+    this.orderInfoData = [];
+    this.dispatchData = [];
 
-  this.cd.detectChanges();
-}
+
+    this.filterApplied = false;
+
+    this.cd.detectChanges();
+  }
 
   applyFilter() {
     if (!this.filterFromDate || !this.filterToDate) {
@@ -1236,19 +1489,19 @@ export class OrderInfoComponent implements OnInit {
     // if (this.filterSapType === 'SAP') {
     //   apiCall = this.service.fetchOrderInfoFiltered(payload); 
     // } else {
-     
+
     //   apiCall = this.service.fetchGlobalFilteredNonSap(payload);
     // }
 
     if (this.filterSapType === 'SAP') {
-        apiCall = this.service.fetchOrderInfoFiltered(payload);
-      } else if (this.filterSapType === 'Non-SAP') {
-        apiCall = this.service.fetchGlobalFilteredNonSap(payload);
-      } else {
-        this.spinner.hide();
-        Swal.fire('Error', 'Invalid SAP Type selected', 'error');
-        return;
-      }
+      apiCall = this.service.fetchOrderInfoFiltered(payload);
+    } else if (this.filterSapType === 'Non-SAP') {
+      apiCall = this.service.fetchGlobalFilteredNonSap(payload);
+    } else {
+      this.spinner.hide();
+      Swal.fire('Error', 'Invalid SAP Type selected', 'error');
+      return;
+    }
 
     apiCall.subscribe({
       next: (res: any) => {
@@ -1304,10 +1557,10 @@ export class OrderInfoComponent implements OnInit {
     let fileName = '';
 
     if (this.filterStatus === 'Completed') {
-      exportSource = this.orderInfoData; 
+      exportSource = this.orderInfoData;
       fileName = this.sapType === 'SAP' ? 'Order_Info_Completed_SAP.xlsx' : 'Order_Info_Completed_NonSAP.xlsx';
     } else if (this.filterStatus === 'Pending') {
-      exportSource = this.dispatchData; 
+      exportSource = this.dispatchData;
       fileName = this.sapType === 'SAP' ? 'Dispatch_Pending_SAP.xlsx' : 'Dispatch_Pending_NonSAP.xlsx';
     } else {
       Swal.fire('Warning', 'Please select valid status before download', 'warning');
@@ -1329,7 +1582,7 @@ export class OrderInfoComponent implements OnInit {
         'Invoice No': record.ZINV_NO || '',
         'Line No': record.ZLINE_NO || '',
         'ODN No': record.ZODN_NO || '',
-        
+
         'Invoice Date': record.ZINV_DATE ? new Date(record.ZINV_DATE).toLocaleDateString('en-GB') : '',
         'Basic Value': record.ZBASIC_VALUE || '',
         'Invoice Value (GST)': record.ZINV_VALUE_GST || '',
@@ -1416,10 +1669,10 @@ export class OrderInfoComponent implements OnInit {
     }
 
     const doc = new (jsPDF as any).default({
-    orientation: 'landscape',
-    unit: 'mm',
-    format: [420, 297] // ✅ A2 Landscape (WIDE)
-  });
+      orientation: 'landscape',
+      unit: 'mm',
+      format: [420, 297] // ✅ A2 Landscape (WIDE)
+    });
 
 
     /* ===== PDF HEADING ===== */

@@ -493,9 +493,7 @@
 
 
 <!-- Search Results Table -->
-<div class="card" style="margin-top: 10px;" *ngIf="searchOptionsList?.length > 0" >
-  <div class="card-body-LE">
-  <div class="table-responsive">
+<div *ngIf="searchOptionsList?.length > 0" class="table-responsive mt-3">
   <table class="table table-bordered table-striped text-center">
     <thead>
       <tr>
@@ -506,7 +504,6 @@
         <th>SO No</th>
         <th>Product</th>
         <th>Material Type</th>
-        <!-- <th>Type of Material</th> -->
         <th>Material Description</th>
         <th>No of Sets</th>
         <th>Ah Loaded</th>
@@ -522,40 +519,150 @@
         <th>Transporter</th>
         <th>Created Date</th>
         <th>Vehicle Type</th>
+        <th>Action</th>
       </tr>
     </thead>
+
     <tbody>
-      <tr *ngFor="let item of searchOptionsList">
+      <tr *ngFor="let item of searchOptionsList; let i = index" [class.editing]="item.isEdit">
+
+        <!-- Map ID (readonly) -->
         <td>{{ item.ZMAPID || '-' }}</td>
-        <td>{{ item.ZREFNO || '-' }}</td>
-        <td>{{ item.VBELN || '-' }}</td>
-        <td>{{ item.ZODN_NO || '-' }}</td>
-        <td>{{ item.ZSO_NO || '-' }}</td>
+
+        <!-- Ref No -->
+        <td>
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZREFNO" class="form-control form-control-sm" />
+          <span *ngIf="!item.isEdit">{{ item.ZREFNO || '-' }}</span>
+        </td>
+
+        <!-- Invoice No -->
+        <td>
+          <input *ngIf="item.isEdit" [(ngModel)]="item.VBELN" class="form-control form-control-sm" />
+          <span *ngIf="!item.isEdit">{{ item.VBELN || '-' }}</span>
+        </td>
+
+        <!-- ODN No -->
+        <td>
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZODN_NO" class="form-control form-control-sm" />
+          <span *ngIf="!item.isEdit">{{ item.ZODN_NO || '-' }}</span>
+        </td>
+
+        <!-- SO No -->
+        <td>
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZSO_NO" class="form-control form-control-sm" />
+          <span *ngIf="!item.isEdit">{{ item.ZSO_NO || '-' }}</span>
+        </td>
+
+        <!-- Product -->
         <td>{{ item.ZPRODUCT || '-' }}</td>
+
+        <!-- Material Type -->
         <td>{{ item.MTART || '-' }}</td>
-        <!-- <td>{{ item.MTART || '-' }}</td> -->
+
+        <!-- Material Description -->
         <td>{{ item.MAKTX || '-' }}</td>
-        <td>{{ item.ZSETS || '-' }}</td>
-        <td>{{ item.ZAH || '-' }}</td>
-        <td>{{ item.ZSHIP_WT | number: '1.2-2' }}</td>
-        <td>{{ item.ZBATCOND || '-' }}</td>
-        <td>{{ item.ZINCO }}</td>
-        <td>{{ item.ZINS_SCPOE }}</td>
-        <td>{{ item.ZKM }}</td>
+
+        <!-- Sets -->
+        <td>
+          <input *ngIf="item.isEdit" type="number" [(ngModel)]="item.ZSETS" class="form-control form-control-sm" />
+          <span *ngIf="!item.isEdit">{{ item.ZSETS || '-' }}</span>
+        </td>
+
+        <!-- AH -->
+        <td>
+          <input *ngIf="item.isEdit" type="number" [(ngModel)]="item.ZAH" class="form-control form-control-sm" />
+          <span *ngIf="!item.isEdit">{{ item.ZAH || '-' }}</span>
+        </td>
+
+        <!-- Shipment Weight -->
+        <td>
+          <input *ngIf="item.isEdit" type="number" [(ngModel)]="item.ZSHIP_WT" class="form-control form-control-sm" />
+          <span *ngIf="!item.isEdit">{{ item.ZSHIP_WT | number:'1.2-2' }}</span>
+        </td>
+
+        <!-- Battery Condition -->
+        <td>
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZBATCOND" class="form-control form-control-sm" />
+          <span *ngIf="!item.isEdit">{{ item.ZBATCOND || '-' }}</span>
+        </td>
+
+        <!-- Incoterms -->
+        <td>
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZINCO" class="form-control form-control-sm" />
+          <span *ngIf="!item.isEdit">{{ item.ZINCO }}</span>
+        </td>
+
+        <!-- Insurance Scope -->
+        <td>
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZINS_SCPOE" class="form-control form-control-sm" />
+          <span *ngIf="!item.isEdit">{{ item.ZINS_SCPOE }}</span>
+        </td>
+
+        <!-- KM -->
+        <td>
+          <input *ngIf="item.isEdit" type="number" [(ngModel)]="item.ZKM" class="form-control form-control-sm" />
+          <span *ngIf="!item.isEdit">{{ item.ZKM }}</span>
+        </td>
+
+        <!-- Plant -->
         <td>{{ item.ZPLANT || '-' }}</td>
-        <td>{{ item.ZDIVISION|| '-' }}</td>
-        <td>{{ item.ZWORK_ORDER || '-' }}</td>
-        <td>{{ item.ZLRNO || '-' }}</td>
-        <td>{{ item.ZTRANSPORTER || '-' }}</td>
+
+        <!-- Division -->
+        <td>{{ item.ZDIVISION || '-' }}</td>
+
+        <!-- Work Order -->
+        <td>
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZWORK_ORDER" class="form-control form-control-sm" />
+          <span *ngIf="!item.isEdit">{{ item.ZWORK_ORDER || '-' }}</span>
+        </td>
+
+        <!-- LR No -->
+        <td>
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZLRNO" class="form-control form-control-sm" />
+          <span *ngIf="!item.isEdit">{{ item.ZLRNO || '-' }}</span>
+        </td>
+
+        <!-- Transporter -->
+        <td>
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZTRANSPORTER" class="form-control form-control-sm" />
+          <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER || '-' }}</span>
+        </td>
+
+        <!-- Created Date -->
         <td>{{ item.ZCREATED_DT ? (item.ZCREATED_DT | date:'dd-MM-yyyy') : '-' }}</td>
-        <td>{{ item.ZVEH_TYPE || '-' }}</td>
+
+        <!-- Vehicle Type -->
+        <td>
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZVEH_TYPE" class="form-control form-control-sm" />
+          <span *ngIf="!item.isEdit">{{ item.ZVEH_TYPE || '-' }}</span>
+        </td>
+
+        <!-- ACTIONS -->
+        <td>
+          <div *ngIf="!item.isEdit" class="btn-group">
+            <button class="btn btn-sm btn-primary me-1" (click)="editSearchRow(item)" title="Edit">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="deleteSearchRow(item, i)" title="Delete">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+
+          <div *ngIf="item.isEdit" class="btn-group">
+            <button class="btn btn-sm btn-success me-1" (click)="updateSearchRow(item, i)" title="Update">
+              <i class="fas fa-check"></i> Update
+            </button>
+            <button class="btn btn-sm btn-secondary" (click)="cancelSearchEdit(item)" title="Cancel">
+              <i class="fas fa-times"></i> Cancel
+            </button>
+          </div>
+        </td>
 
       </tr>
     </tbody>
   </table>
-  </div>
-  </div>
 </div>
+
 
 <div *ngIf=" filterApplied && filterStatus === 'Completed' && ShipmentData?.length > 0 && mainMode === 'filter'">
   <div class="table-responsive">

@@ -378,21 +378,85 @@
           <th>POD Scan</th>
           <th>SIT/SALE</th>
           <th>Location</th>
+          <th>Action</th>
         </tr>
       </thead>
 
       <tbody>
-        <tr>
-          <td>{{ headerData.ZREFNO }}</td>
-          <td>{{ headerData.ZINV_NO }}</td>
-          <td>{{ headerData.ZODN_NO }}</td>
-          <td>{{ headerData.ZSONO }}</td>
-          <td>{{ headerData.ZSALE_PERSON }}</td>
-          <td>{{ headerData.ZPY_ARRIVED_DEST | date:'dd-MM-yyyy' }}</td>
-          <td>{{ headerData.ZUNLOADING_DT }}</td>
-          <td>{{ headerData.ZPOD_SCAN }}</td>
-          <td>{{ headerData.ZSIT_SALE }}</td>
-          <td>{{ headerData.ZLOCATION }}</td>
+        <tr [class.editing]="headerData.isEdit">
+
+          <td>
+            <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZREFNO">
+            <span *ngIf="!headerData.isEdit">{{ headerData.ZREFNO }}</span>
+          </td>
+
+          <td>
+            <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZINV_NO">
+            <span *ngIf="!headerData.isEdit">{{ headerData.ZINV_NO }}</span>
+          </td>
+
+          <td>
+            <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZODN_NO">
+            <span *ngIf="!headerData.isEdit">{{ headerData.ZODN_NO }}</span>
+          </td>
+
+          <td>
+            <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZSONO">
+            <span *ngIf="!headerData.isEdit">{{ headerData.ZSONO }}</span>
+          </td>
+
+          <td>
+            <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZSALE_PERSON">
+            <span *ngIf="!headerData.isEdit">{{ headerData.ZSALE_PERSON }}</span>
+          </td>
+
+          <td>
+            <input *ngIf="headerData.isEdit" type="date" class="form-control form-control-sm"
+              [(ngModel)]="headerData.ZPY_ARRIVED_DEST">
+            <span *ngIf="!headerData.isEdit">
+              {{ headerData.ZPY_ARRIVED_DEST | date:'dd-MM-yyyy' }}
+            </span>
+          </td>
+
+          <td>
+            <input *ngIf="headerData.isEdit" class="form-control form-control-sm"
+              [(ngModel)]="headerData.ZUNLOADING_DT">
+            <span *ngIf="!headerData.isEdit">{{ headerData.ZUNLOADING_DT }}</span>
+          </td>
+
+          <td>
+            <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZPOD_SCAN">
+            <span *ngIf="!headerData.isEdit">{{ headerData.ZPOD_SCAN }}</span>
+          </td>
+
+          <td>
+            <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZSIT_SALE">
+            <span *ngIf="!headerData.isEdit">{{ headerData.ZSIT_SALE }}</span>
+          </td>
+
+          <td>
+            <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZLOCATION">
+            <span *ngIf="!headerData.isEdit">{{ headerData.ZLOCATION }}</span>
+          </td>
+
+          <!-- ACTION -->
+          <td>
+            <div *ngIf="!headerData.isEdit">
+              <button class="btn btn-sm btn-primary" (click)="editRow(headerData)">
+                <i class="fas fa-edit"></i>
+              </button>
+            </div>
+
+            <div *ngIf="headerData.isEdit">
+              <button class="btn btn-sm btn-success me-1" (click)="updateRow(headerData)">
+                <i class="fas fa-check"></i>
+              </button>
+              <button class="btn btn-sm btn-secondary" (click)="cancelEdit(headerData)">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </td>
+
         </tr>
       </tbody>
     </table>
@@ -413,22 +477,66 @@
             <th>Work Order</th>
             <th>LR No</th>
             <th>Transporter</th>
+            <th>Action</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr *ngFor="let item of itemsList; trackBy: trackByIndex">
-            <td>{{ item.ZVEH_NUM }}</td>
-            <td>{{ item.ZVEH_LINE }}</td>
-            <td>{{ item.ZWORK_ORDER }}</td>
-            <td>{{ item.ZLRNO }}</td>
-            <td>{{ item.ZTRANSPORTER }}</td>
+          <tr *ngFor="let item of itemsList; let i = index" [class.editing]="item.isEdit">
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZVEH_NUM">
+              <span *ngIf="!item.isEdit">{{ item.ZVEH_NUM }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZVEH_LINE">
+              <span *ngIf="!item.isEdit">{{ item.ZVEH_LINE }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZWORK_ORDER">
+              <span *ngIf="!item.isEdit">{{ item.ZWORK_ORDER }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZLRNO">
+              <span *ngIf="!item.isEdit">{{ item.ZLRNO }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZTRANSPORTER">
+              <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
+            </td>
+
+            <!-- ACTION -->
+            <td>
+              <div *ngIf="!item.isEdit">
+                <button class="btn btn-sm btn-primary me-1" (click)="editRow(item)">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="deleteRow(itemsList, i)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+
+              <div *ngIf="item.isEdit">
+                <button class="btn btn-sm btn-success me-1" (click)="updateRow(item)">
+                  <i class="fas fa-check"></i>
+                </button>
+                <button class="btn btn-sm btn-secondary" (click)="cancelEdit(item)">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </td>
+
           </tr>
         </tbody>
       </table>
     </div>
   </div>
 </div>
+
 
 <div class="card" style="margin-top: 10px;"
   *ngIf=" filterApplied && filterStatus === 'Completed' &&  TransitInfoHeader?.length > 0 && mainMode === 'filter'">

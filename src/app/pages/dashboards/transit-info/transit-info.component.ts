@@ -444,8 +444,16 @@ export class TransitInfoComponent implements OnInit {
           this.searchOptionsList = [];
           Swal.fire('No records found', '', 'info');
         } else {
-          this.headerData = res.HEADER[0];
-          this.itemsList = res.ITEMS;
+          this.headerData = {
+            ...res.HEADER[0],
+            isEdit: false
+          };
+
+          this.searchOptionsList = res.ITEMS.map((item: any) => ({
+            ...item,
+            isEdit: false
+          }));
+
           this.showTable = true;
           this.showForm = false;
           Swal.fire('Data fetched successfully!', '', 'success');
@@ -606,6 +614,153 @@ export class TransitInfoComponent implements OnInit {
         this.spinner.hide();
         Swal.fire({ title: 'Error', text: `Error: ${err.status} - ${err.statusText}`, icon: 'error', timer: 3000 });
       }
+    });
+  }
+
+
+
+  editSearchRow(row: any): void {
+    // Backup original data
+    row._backup = { ...row };
+    row.isEdit = true;
+  }
+
+  cancelSearchEdit(row: any): void {
+    if (row._backup) {
+      Object.assign(row, row._backup); // Restore original values
+      delete row._backup;
+    }
+    row.isEdit = false;
+  }
+
+
+  // Method to update the edited row
+  updateSearchRow(row: any, index: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to update this record?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Update',
+      cancelButtonText: 'Cancel'
+    }).then(result => {
+      if (!result.isConfirmed) return;
+
+      /** -------------------------
+       *  SAME AS SAVE → HEAD
+       * ------------------------- */
+      const HEAD = {
+        REFNO: this.orderType === 'Inward'
+          ? row.ZREFNO || ''
+          : row.ZREFNO || '',
+
+        INV_NO: row.ZINV_NO || '',
+
+        PY_ARRIVED_DEST: row.ZPHY_DISPATCH
+          ? this.formatDate(row.ZPHY_DISPATCH)
+          : '',
+
+        UNLOADING_DT: row.ZSYS_DATE
+          ? this.formatDateTime(row.ZSYS_DATE)
+          : '',
+
+        POD_SCAN: '', // not available in grid → keep empty
+        SIT_SALE: ''  // not available in grid → keep empty
+      };
+
+      /** -------------------------
+       *  SAME AS SAVE → ITEM
+       * ------------------------- */
+      const ITEM = [
+        {
+          REFNO: row.ZREFNO || '',
+          INV_NO: row.ZINV_NO || '',
+          POSNR: row.ZLINE_NO || 10,
+          VEH_LINE: row.ZVEH_LINE || 1,
+          VEH_NUM: row.ZVEH_NUM || '',
+          LRNO: row.ZLRNO || '',
+          WORK_ORDER: row.ZWORK_ORDER || '',
+          TRANSPORTER: row.ZTRANSPORTER || ''
+        }
+      ];
+
+      /** -------------------------
+       *  FINAL PAYLOAD
+       * ------------------------- */
+      const payload = {
+        HEAD,
+        ITEM
+      };
+
+      console.log('🛠 TRANSIT UPDATE PAYLOAD:', payload);
+
+      this.spinner.show();
+
+      /** -------------------------
+       *  API REPLACED ✔
+       * ------------------------- */
+      const apiCall =
+        this.sapType === 'Non-SAP'
+          ? this.service.TransitInfoNonSap(payload)   // ✅ Non-SAP
+          : this.service.TransitInfoSave(payload);    // ✅ SAP
+
+      apiCall.subscribe({
+        next: (res: any) => {
+          this.spinner.hide();
+
+          if (res.STATUS?.toUpperCase() === 'TRUE' || res.NUMBER === '200') {
+            Swal.fire({
+              title: 'Success',
+              text: res.MESSAGE || 'Record updated successfully',
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            }).then(() => {
+              row.isEdit = false;
+              delete row._backup;
+              this.onSearchReference(); // reload grid
+            });
+          } else {
+            Swal.fire({
+              title: 'Error',
+              text: res.MESSAGE || 'Update failed',
+              icon: 'error'
+            });
+          }
+        },
+        error: (err) => {
+          this.spinner.hide();
+          console.error('❌ Update Error:', err);
+          Swal.fire({
+            title: 'Error',
+            text: 'Internal Server Error. Please try again.',
+            icon: 'error'
+          });
+        }
+      });
+    });
+  }
+
+
+
+
+  deleteSearchRow(row: any, index: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this record? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      this.searchOptionsList.splice(index, 1);
+      Swal.fire({
+        title: 'Deleted',
+        text: 'Record deleted successfully',
+        icon: 'success',
+        confirmButtonText: 'Ok',
+      });
     });
   }
 

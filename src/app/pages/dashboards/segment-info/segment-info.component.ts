@@ -630,6 +630,156 @@ export class SegmentInfoComponent implements OnInit {
     });
   }
 
+  editSearchRow(row: any): void {
+    // Backup original data
+    row._backup = { ...row };
+    row.isEdit = true;
+  }
+
+  cancelSearchEdit(row: any): void {
+    if (row._backup) {
+      Object.assign(row, row._backup); // Restore original values
+      delete row._backup;
+    }
+    row.isEdit = false;
+  }
+
+
+  // Method to update the edited row
+  updateSearchRow(row: any, index: number): void {
+
+    if (this.segmentInfo.invalid) {
+      Swal.fire({
+        title: 'Validation Error',
+        text: 'Please fill all required fields before saving.',
+        icon: 'warning',
+        confirmButtonText: 'Ok',
+      });
+      return;
+    }
+
+    // Outward validation
+    if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        text: 'Please select at least one reference row before saving'
+      });
+      return;
+    }
+
+    const formValue = this.segmentInfo.value;
+
+    // 🔹 Build SAVE array (SAME payload for SAP & NON-SAP)
+    const saveArray: any[] = [];
+
+    if (this.orderType === 'Outward') {
+      this.selectedItems.forEach(item => {
+        saveArray.push({
+          REFNO: item.referenceNumber || 0,
+          WORK_ORDER: item.workOrderNumber || '',
+          LRNO: item.lrNumber || '',
+          TRANSPORTER: item.transporter || '',
+
+          SO_NO: item.SONO || '',
+          ODN_NO: item.ODN_NO || '',
+
+          INV_NUM: formValue.INV_VBELN || this.invoicenumber || '',
+          SALE_PERSON: formValue.SALE_PERSON || '',
+          SEGMENT: formValue.SEGMENT || '',
+          APPTYP: formValue.APPTYP || '',
+
+          CUST_PROFILE: formValue.CUST_PROF || '',
+          BRANCH: formValue.BRANCH || '',
+          BRANCH_ZONE: formValue.BRANCH_ZONE || '',
+          TAT_TYPE: formValue.TAT_Type || '',
+          TAT: formValue.TAT_DAYS || '',
+          ETA: formValue.ETA_DATE || ''
+        });
+      });
+    }
+
+    if (saveArray.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        text: 'No records available to save'
+      });
+      return;
+    }
+
+    console.log('✅ Segment SAVE payload:', saveArray);
+
+    this.spinner.show();
+
+    // 🔹 SAP / NON-SAP API selection
+    const apiCall =
+      this.sapType === 'SAP'
+        ? this.service.SegmentInfoOutwardSave({
+          SAVE: saveArray
+        })
+        : this.service.SegmentInfoNonSap({
+          CREATE: saveArray
+        });
+
+
+    apiCall.subscribe(
+      (res: any) => {
+        this.spinner.hide();
+
+        if (res.STATUS === 'true' || res.NUMBER === '200') {
+          Swal.fire({
+            title: 'Success',
+            text: res.MESSAGE || 'Record updated successfully',
+            icon: 'success',
+            confirmButtonText: 'Ok',
+          }).then(() => {
+            row.isEdit = false;
+            delete row._backup;
+            this.onSearchReference();
+          });
+        } else {
+          Swal.fire({
+            title: 'Error',
+            text: res.MESSAGE || 'Failed to update record',
+            icon: 'error',
+            confirmButtonText: 'Ok',
+          });
+        }
+      },
+      (error) => {
+        this.spinner.hide();
+        console.error('❌ Update Error:', error);
+        Swal.fire({
+          text: 'Internal Server Error. Please try again later.',
+          icon: 'error',
+        });
+      }
+    );
+  }
+
+
+
+
+  deleteSearchRow(row: any, index: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this record? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      this.searchOptionsList.splice(index, 1);
+      Swal.fire({
+        title: 'Deleted',
+        text: 'Record deleted successfully',
+        icon: 'success',
+        confirmButtonText: 'Ok',
+      });
+    });
+  }
+
 
   TatTypeChange(): void {
     const formValue = this.segmentInfo.value;

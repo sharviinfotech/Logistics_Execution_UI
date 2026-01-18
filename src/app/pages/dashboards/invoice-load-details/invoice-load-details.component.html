@@ -420,56 +420,115 @@
 
 <!-- Search Results Table -->
 <!-- Search Results Table for Invoice Load Details -->
-<div class="card" style="margin-top: 10px;" *ngIf="searchOptionsList?.length > 0">
-  <div class="card-body-LE">
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped text-center">
-        <thead>
-          <tr>
-            <th>Map ID</th>
-            <th>Ref No</th>
-            <th>Invoice No</th>
-            <th>ODN No</th>
-            <th>SO No</th>
-            <th>Truck Type</th>
-            <th>Passing Weight (Tons)</th>
-            <th>Actual Load (Tons)</th>
-            <th>Actual Volume</th>
-            <th>Loading Factor (Volume)</th>
-            <th>Loading Factor (Weight)</th>
-            <th>Week Wise Shipment</th>
-            <th>E-way Bill No</th>
-            <th>E-way Bill Date</th>
-            <th>Work Order</th>
-            <th>LR No</th>
-            <th>Transporter</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of searchOptionsList">
-            <td>{{ item.ZMAPID }}</td>
-            <td>{{ item.ZREFNO }}</td>
-            <td>{{ item.VBELN }}</td>
-            <td>{{ item.ZODN_NO }}</td>
-            <td>{{ item.ZSO_NO }}</td>
-            <td>{{ item.ZTRUC_TYPE }}</td>
-            <td>{{ item.ZTRUC_WT }}</td>
-            <td>{{ item.ZACT_LOAD }}</td>
-            <td>{{ item.ZACT_VOL }}</td>
-            <td>{{ item.ZLF_VOL }}</td>
-            <td>{{ item.ZLF_WT }}</td>
-            <td>{{ item.ZWEEK_SF }}</td>
-            <td>{{ item.ZEWAYBILL_NO }}</td>
-            <td>{{ item.ZEWAYBILL_DT | date: 'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZWORK_ORDER }}</td>
-            <td>{{ item.ZLRNO }}</td>
-            <td>{{ item.ZTRANSPORTER }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+<div *ngIf="searchOptionsList?.length > 0" class="table-responsive mt-3">
+  <table class="table table-bordered table-striped text-center">
+    <thead>
+      <tr>
+        <th>Map ID</th>
+        <th>Ref No</th>
+        <th>Invoice No</th>
+        <th>ODN No</th>
+        <th>SO No</th>
+        <th>Truck Type</th>
+        <th>Actual Load</th>
+        <th>Actual Volume</th>
+        <th>E-Way Bill No</th>
+        <th>E-Way Bill Date</th>
+        <th>Work Order</th>
+        <th>LR No</th>
+        <th>Transporter</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let item of searchOptionsList; let i = index">
+
+        <td>{{ item.ZMAPID }}</td>
+
+        <td>
+          <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZREFNO">
+          <span *ngIf="!item.isEdit">{{ item.ZREFNO }}</span>
+        </td>
+
+        <td>
+          <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.VBELN">
+          <span *ngIf="!item.isEdit">{{ item.VBELN }}</span>
+        </td>
+
+        <td>
+          <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZODN_NO">
+          <span *ngIf="!item.isEdit">{{ item.ZODN_NO }}</span>
+        </td>
+
+        <td>
+          <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZSO_NO">
+          <span *ngIf="!item.isEdit">{{ item.ZSO_NO }}</span>
+        </td>
+
+        <td>
+          <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZTRUC_TYPE">
+          <span *ngIf="!item.isEdit">{{ item.ZTRUC_TYPE }}</span>
+        </td>
+
+        <td>
+          <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm" [(ngModel)]="item.ZACT_LOAD">
+          <span *ngIf="!item.isEdit">{{ item.ZACT_LOAD }}</span>
+        </td>
+
+        <td>
+          <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm" [(ngModel)]="item.ZACT_VOL">
+          <span *ngIf="!item.isEdit">{{ item.ZACT_VOL }}</span>
+        </td>
+
+        <td>
+          <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZEWAYBILL_NO">
+          <span *ngIf="!item.isEdit">{{ item.ZEWAYBILL_NO }}</span>
+        </td>
+
+        <td>
+          <input *ngIf="item.isEdit" type="date" class="form-control form-control-sm" [(ngModel)]="item.ZEWAYBILL_DT">
+          <span *ngIf="!item.isEdit">{{ item.ZEWAYBILL_DT | date:'dd-MM-yyyy' }}</span>
+        </td>
+
+        <td>
+          <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZWORK_ORDER">
+          <span *ngIf="!item.isEdit">{{ item.ZWORK_ORDER }}</span>
+        </td>
+
+        <td>
+          <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZLRNO">
+          <span *ngIf="!item.isEdit">{{ item.ZLRNO }}</span>
+        </td>
+
+        <td>
+          <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZTRANSPORTER">
+          <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
+        </td>
+
+        <!-- ACTION -->
+        <td>
+          <div *ngIf="!item.isEdit">
+            <button class="btn btn-sm btn-primary" (click)="editSearchRow(item)">
+              <i class="fas fa-edit"></i>
+            </button>
+          </div>
+
+          <div *ngIf="item.isEdit">
+            <button class="btn btn-sm btn-success me-1" (click)="updateSearchRow(item)">
+              <i class="fas fa-check"></i>
+            </button>
+            <button class="btn btn-sm btn-secondary" (click)="cancelSearchEdit(item)">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </td>
+
+      </tr>
+    </tbody>
+  </table>
 </div>
+
 
 <div class="card" style="margin-top: 10px;"
   *ngIf="filterApplied && filterStatus === 'Completed' && InvoiceLoadDetailsData?.length > 0 && mainMode === 'filter'">
@@ -522,7 +581,7 @@
             <td>{{ item.ZWEEK_SF }}</td>
             <td>{{ item.ZEWAYBILL_NO }}</td>
             <td>{{ item.ZEWAYBILL_DT }}</td>
-            
+
             <td>{{ item.ZPLANT }}</td>
             <td>{{ item.ZDIVISION }}</td>
             <td>{{ item.ZWORK_ORDER }}</td>
@@ -538,49 +597,49 @@
 </div>
 <div *ngIf="filterApplied && filterStatus === 'Pending' && dispatchData?.length > 0 && mainMode === 'filter'">
   <div class="table-responsive">
-  <table class="table table-bordered table-striped text-center">
-    <thead>
-      <tr>
-        <th>SI.No</th>
-        <th>Reference No</th>
-        <th>Line No</th>
-        <th>Date</th>
-        <th>Plant</th>
-        <th>Division</th>
-        <th>Vehicle Type</th>
-        <th>No. of Trucks</th>
-        <th>Work Order</th>
-        <th>Vendor Code</th>
-        <th>Transporter</th>
-        <th>No. of LRs</th>
-        <th>LR Number</th>
-        <th>Loading Point</th>
-        <th>Unloading Point</th>
-      </tr>
-    </thead>
+    <table class="table table-bordered table-striped text-center">
+      <thead>
+        <tr>
+          <th>SI.No</th>
+          <th>Reference No</th>
+          <th>Line No</th>
+          <th>Date</th>
+          <th>Plant</th>
+          <th>Division</th>
+          <th>Vehicle Type</th>
+          <th>No. of Trucks</th>
+          <th>Work Order</th>
+          <th>Vendor Code</th>
+          <th>Transporter</th>
+          <th>No. of LRs</th>
+          <th>LR Number</th>
+          <th>Loading Point</th>
+          <th>Unloading Point</th>
+        </tr>
+      </thead>
 
-    <tbody>
-      <tr *ngFor="let item of dispatchData; let i = index">
+      <tbody>
+        <tr *ngFor="let item of dispatchData; let i = index">
 
-        <td>{{ i + 1 }}</td>
-        <td>{{ item.ZREFNO }}</td>
-        <td>{{ item.ZLINE_NO }}</td>
-        <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
-        <td>{{ item.ZWERKS }}</td>
-        <td>{{ item.ZDIVISION }}</td>
-        <td>{{ item.ZVEH_TYPE }}</td>
-        <td>{{ item.ZNO_TRUCKS }}</td>
-        <td>{{ item.ZWORK_ORDER }}</td>
-        <td>{{ item.ZVENDOR_CD }}</td>
-        <td>{{ item.ZTRANSPORTER }}</td>
-        <td>{{ item.ZNO_LRS }}</td>
-        <td>{{ item.ZLR_NO }}</td>
-        <td>{{ item.ZLOAD_PT }}</td>
-        <td>{{ item.ZUNLOAD_PT }}</td>
-      </tr>
+          <td>{{ i + 1 }}</td>
+          <td>{{ item.ZREFNO }}</td>
+          <td>{{ item.ZLINE_NO }}</td>
+          <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
+          <td>{{ item.ZWERKS }}</td>
+          <td>{{ item.ZDIVISION }}</td>
+          <td>{{ item.ZVEH_TYPE }}</td>
+          <td>{{ item.ZNO_TRUCKS }}</td>
+          <td>{{ item.ZWORK_ORDER }}</td>
+          <td>{{ item.ZVENDOR_CD }}</td>
+          <td>{{ item.ZTRANSPORTER }}</td>
+          <td>{{ item.ZNO_LRS }}</td>
+          <td>{{ item.ZLR_NO }}</td>
+          <td>{{ item.ZLOAD_PT }}</td>
+          <td>{{ item.ZUNLOAD_PT }}</td>
+        </tr>
 
 
-    </tbody>
-  </table>
+      </tbody>
+    </table>
   </div>
 </div>

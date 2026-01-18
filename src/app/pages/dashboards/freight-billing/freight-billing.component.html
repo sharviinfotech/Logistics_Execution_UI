@@ -364,42 +364,141 @@
             <th>Freight Bill Date</th>
             <th>Physical Submission Date</th>
             <th>Freight Charges</th>
-            <th>Work order</th>
+            <th>Work Order</th>
             <th>Bill Submission</th>
-            <th>Work order type</th>
+            <th>Work Order Type</th>
             <th>LR No</th>
             <th>Transporter</th>
             <th>Location</th>
             <th>Vehicle Number</th>
             <th>Vehicle Line</th>
-
+            <th>Action</th>
           </tr>
         </thead>
+
         <tbody>
-          <tr *ngFor="let item of searchOptionsList">
-            <td>{{ item.ZREFNO }}</td>
-            <td>{{ item.ZINV_NO }}</td>
-            <td>{{ item.ZODN_NO }}</td>
-            <td>{{ item.ZSONO }}</td>
-            <td>{{ item.ZSALE_PERSON }}</td>
-            <td>{{ item.ZBILLNO }}</td>
-            <td>{{ item.ZBILLDATE | date: 'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZPHY_DATE | date: 'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZFRT_CHARGES | number: '1.2-2' }}</td>
-            <td>{{ item.ZWORK_ORDER }}</td>
-            <td>{{ item.ZBILL_SUBMISSION }}</td>
-            <td>{{ item.ZWORKORDER }}</td>
-            <td>{{ item.ZLRNO }}</td>
-            <td>{{ item.ZTRANSPORTER }}</td>
-            <td>{{ item.ZLOCATION }}</td>
-            <td>{{ item.ZVEH_NUM }}</td>
-            <td>{{ item.ZVEH_LINE }}</td>
+          <tr *ngFor="let item of searchOptionsList; let i = index" [class.editing]="item.isEdit">
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZREFNO">
+              <span *ngIf="!item.isEdit">{{ item.ZREFNO }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZINV_NO">
+              <span *ngIf="!item.isEdit">{{ item.ZINV_NO }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZODN_NO">
+              <span *ngIf="!item.isEdit">{{ item.ZODN_NO }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZSONO">
+              <span *ngIf="!item.isEdit">{{ item.ZSONO }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZSALE_PERSON">
+              <span *ngIf="!item.isEdit">{{ item.ZSALE_PERSON }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZBILLNO">
+              <span *ngIf="!item.isEdit">{{ item.ZBILLNO }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" type="date" class="form-control form-control-sm" [(ngModel)]="item.ZBILLDATE">
+              <span *ngIf="!item.isEdit">
+                {{ item.ZBILLDATE | date:'dd-MM-yyyy' }}
+              </span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" type="date" class="form-control form-control-sm" [(ngModel)]="item.ZPHY_DATE">
+              <span *ngIf="!item.isEdit">
+                {{ item.ZPHY_DATE | date:'dd-MM-yyyy' }}
+              </span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm"
+                [(ngModel)]="item.ZFRT_CHARGES">
+              <span *ngIf="!item.isEdit">
+                {{ item.ZFRT_CHARGES | number:'1.2-2' }}
+              </span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZWORK_ORDER">
+              <span *ngIf="!item.isEdit">{{ item.ZWORK_ORDER }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZBILL_SUBMISSION">
+              <span *ngIf="!item.isEdit">{{ item.ZBILL_SUBMISSION }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZWORKORDER">
+              <span *ngIf="!item.isEdit">{{ item.ZWORKORDER }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZLRNO">
+              <span *ngIf="!item.isEdit">{{ item.ZLRNO }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZTRANSPORTER">
+              <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZLOCATION">
+              <span *ngIf="!item.isEdit">{{ item.ZLOCATION }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZVEH_NUM">
+              <span *ngIf="!item.isEdit">{{ item.ZVEH_NUM }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZVEH_LINE">
+              <span *ngIf="!item.isEdit">{{ item.ZVEH_LINE }}</span>
+            </td>
+
+            <!-- ACTION -->
+            <td>
+              <div *ngIf="!item.isEdit" class="btn-group">
+                <button class="btn btn-sm btn-primary me-1" (click)="editSearchRow(item)">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="deleteSearchRow(item, i)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+
+              <div *ngIf="item.isEdit" class="btn-group">
+                <button class="btn btn-sm btn-success me-1" (click)="updateSearchRow(item, i)">
+                  <i class="fas fa-check"></i>
+                </button>
+                <button class="btn btn-sm btn-secondary" (click)="cancelSearchEdit(item)">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </td>
+
           </tr>
         </tbody>
       </table>
     </div>
   </div>
 </div>
+
 
 <div class="card" style="margin-top: 10px;"
   *ngIf=" filterApplied && filterStatus === 'Completed' && FreightBillingData?.length > 0 && mainMode === 'filter'">

@@ -140,6 +140,12 @@ export class GeneralserviceService {
   OrderInfoPhysicaldispatch(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/orderInfo/Outward/Physicaldispatch', obj);
   }
+  OrderInfoDeleteWithSap(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/orderInfo/Outward/DeleteWithSap', obj);
+  }
+  OrderInfoDeleteWithoutSap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/orderInfo/Outward/DeleteWithoutSap', obj);
+  }
   shipmentdetailsfetch(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/ShipmentDetails/Outward/fetchInvoiceList', obj);
   }
