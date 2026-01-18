@@ -38,14 +38,7 @@ input[type="radio"] {
   position: relative;
 }
 
-.input-flex {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: fit-content;
-  /* shrink to content size */
 
-}
 
 .form-field.flex-1 {
   flex: 1;

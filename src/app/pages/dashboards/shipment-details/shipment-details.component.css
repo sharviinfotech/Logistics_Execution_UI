@@ -104,37 +104,7 @@ input[type="radio"] {
     height: 48px;
     color: #333;
 } */
-.shipment-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-}
 
-.shipment-table th,
-.shipment-table td {
-    text-align: center;
-    vertical-align: middle;
-    padding: 8px 10px;
-}
-
-.shipment-table input,
-.shipment-table select {
-    width: 100%;
-    min-width: 130px;
-    height: 38px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-.shipment-table input:focus,
-.shipment-table select:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 4px rgba(0, 123, 255, 0.3);
-}
 
 .btn-add {
     background: #28a745;

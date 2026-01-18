@@ -31,12 +31,7 @@
   color: white;
 }
 
-/* ✅ Disabled dropdown text BLACK & visible */
-select:disabled {
-  color: #000 !important;
-  background-color: #f2f2f2;
-  opacity: 1 !important;
-}
+
 .sap-search-container {
   display: flex;
   align-items: center;
@@ -46,5 +41,9 @@ select:disabled {
 .sap-radio {
   flex-shrink: 0;
 }
+
+
+
+
 
 

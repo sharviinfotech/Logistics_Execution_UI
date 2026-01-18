@@ -168,7 +168,7 @@ export class DispatchComponent implements OnInit {
     this.dispatchForm.reset();
     this.showForm = !!(this.orderType && this.sapType);
     this.isUpdateMode = false;
-    this.originalTotalTrucks = 0;
+    
     
   }
 
@@ -688,52 +688,54 @@ export class DispatchComponent implements OnInit {
   }
 
   onchangePlantCode(index: number) {
-    const rowsArray = this.dispatchForm.get('rows') as FormArray;
-    const currentRow = rowsArray.at(index);
-    const selectedPlant = currentRow.get('Plant')?.value;
-    const plantObj = this.PlantCodeList.find(item => item.PLANT === selectedPlant);
+  const rowsArray = this.dispatchForm.get('rows') as FormArray;
+  const currentRow = rowsArray.at(index);
+  const selectedPlantText = currentRow.get('Plant')?.value;  
+  
+  
+  const plantObj = this.PlantCodeList.find(item => item.PLANT_TEXT === selectedPlantText);
 
-    if (plantObj) {
-      currentRow.patchValue({ Division: plantObj.DIVISION });
-    } else {
-      currentRow.patchValue({ Division: '' });
-    }
+  if (plantObj) {
+    currentRow.patchValue({ Division: plantObj.DIVISION });
+  } else {
+    currentRow.patchValue({ Division: '' });
   }
+}
 
-  onchangeDivisionCode(index: number) {
-    const rowsArray = this.dispatchForm.get('rows') as FormArray;
-    const currentRow = rowsArray.at(index);
-    const selectedDivision = currentRow.get('Division')?.value;
-    const plantObj = this.PlantCodeList.find(item => item.DIVISION === selectedDivision);
+ onchangeDivisionCode(index: number) {
+  const rowsArray = this.dispatchForm.get('rows') as FormArray;
+  const currentRow = rowsArray.at(index);
+  const selectedDivision = currentRow.get('Division')?.value;
+  const plantObj = this.PlantCodeList.find(item => item.DIVISION === selectedDivision);
 
-    if (plantObj) {
-      currentRow.patchValue({ Plant: plantObj.PLANT });
-    } else {
-      currentRow.patchValue({ Plant: '' });
-    }
+  if (plantObj) {
+    currentRow.patchValue({ Plant: plantObj.PLANT_TEXT }); 
+  } else {
+    currentRow.patchValue({ Plant: '' });
   }
+}
 
-  onFilterPlantChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.PLANT === this.filterPlant);
+onFilterPlantChange(): void {
+  const plantObj = this.PlantCodeList.find(item => item.PLANT_TEXT === this.filterPlant);  // ✅ Changed
 
-    if (plantObj) {
-      this.filterDivision = plantObj.DIVISION;
-    } else {
-      this.filterDivision = '';
-    }
-    this.cd.detectChanges();
+  if (plantObj) {
+    this.filterDivision = plantObj.DIVISION;
+  } else {
+    this.filterDivision = '';
   }
+  this.cd.detectChanges();
+}
 
-  onFilterDivisionChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
+onFilterDivisionChange(): void {
+  const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
 
-    if (plantObj) {
-      this.filterPlant = plantObj.PLANT;
-    } else {
-      this.filterPlant = '';
-    }
-    this.cd.detectChanges();
+  if (plantObj) {
+    this.filterPlant = plantObj.PLANT_TEXT;  // ✅ Set full text
+  } else {
+    this.filterPlant = '';
   }
+  this.cd.detectChanges();
+}
 
   onFilterTransporterChange(): void {
     this.cd.detectChanges();
