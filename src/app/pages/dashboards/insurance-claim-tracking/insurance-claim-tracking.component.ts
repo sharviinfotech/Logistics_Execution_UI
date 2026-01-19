@@ -1016,59 +1016,58 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       /* =====================================================
          1️⃣ HEADER PAYLOAD  (💯 SAME AS SAVE)
       ===================================================== */
+      const headerFormValue = this.HeaderForm.value;
+
       const headerValue: any = {
-        INV_NO: row.ZINV_NO || null,
-        FI: row.ZFI || null,
-        REP_DATE: row.ZREP_DATE || null,
-        CLAIM_REF: row.ZCLAIM_REF || null,
-        INV_DATE: row.ZINV_DATE || null,
-        INV_BV: row.ZINV_BV || null,
-        LOSS_DCL: row.ZLOSS_DCL || null,
-        CLM_RF: row.ZCLM_RF || null,
-        SOL_VAL: row.ZSOL_VAL || null,
-        CUSTOMER: row.ZCUSTOMER || null,
-        SO_NO: row.ZSO_NO || null,
-        ODN_NO: row.ZODN_NO || null,
-        SALE_PERSON: row.ZSALE_PERSON || null,
-        LOCATION: row.ZLOCATION || null,
-        DAMAGE_RMK: row.ZDAMAGE_RMK || null,
-        CLM_INF: row.ZCLM_INF || null,
-        CLM_ST: row.ZCLM_ST || null,
-        CLM_DOC_ST: row.ZCLM_DOC_ST || null,
-        COURIER_DET: row.ZCOURIER_DET || null,
-        PAY_ST: row.ZPAY_ST || null,
-        PAY_INFO: row.ZPAY_INFO || null,
-        UTR: row.ZUTR || null,
-        CLM_SET_DT: row.ZCLM_SET_DT || null,
+        INV_NO: headerFormValue.INV_NO,
+        FI: headerFormValue.FI,
+        REP_DATE: headerFormValue.REP_DATE,
+        CLAIM_REF: headerFormValue.CLAIM_REF,
+        INV_DATE: headerFormValue.INV_DATE,
+        INV_BV: headerFormValue.INV_BV,
+        LOSS_DCL: headerFormValue.LOSS_DCL,
+        CLM_RF: headerFormValue.CLM_RF,
+        SOL_VAL: headerFormValue.SOL_VAL,
+        CUSTOMER: headerFormValue.CUSTOMER,
+        SO_NO: headerFormValue.SO_NO,
+        LOCATION: headerFormValue.LOCATION,
+        DAMAGE_RMK: headerFormValue.DAMAGE_RMK,
+        CLM_INF: headerFormValue.CLM_INF,
+        CLM_ST: headerFormValue.CLM_ST,
+        CLM_DOC_ST: headerFormValue.CLM_DOC_ST,
+        COURIER_DET: headerFormValue.COURIER_DET,
+        PAY_ST: headerFormValue.PAY_ST,
+        PAY_INFO: headerFormValue.PAY_INFO,
+        UTR: headerFormValue.UTR,
+        CLM_SET_DT: headerFormValue.CLM_SET_DT,
 
         // 🔥 IMPORTANT
-        REFNO: row.ZREFNO || null
+        REFNO: headerFormValue.REFNO
       };
 
       /* =====================================================
          2️⃣ ITEM PAYLOAD (ONLY ONE ROW – SAME AS SAVE)
       ===================================================== */
-      const itemPayload: any = {
-        ZMAPID: row.ZMAPID || null,
+      const itemPayload = {
+        ZMAPID: row.ZMAPID,
         INV_NO: headerValue.INV_NO,
         REFNO: headerValue.REFNO,
-        POSNR: row.ZLINE_NO || row.POSNR || null,
 
-        VEH_LINE: row.ZVEH_LINE || null,
-        VEHICLE: row.ZVEHICLE || null,
-        TRUCK_NO: row.ZTRUCK_NO || row.ZVEH_NUM || null,
-        LR_NO: row.ZLRNO || null,
-        AH: row.ZAH || null,
-        NO_SETS: row.ZNO_SETS || null,
-        TRANSPORTER: row.ZTRANSPORTER || null,
+        VEH_LINE: row.ZVEH_LINE,
+        VEHICLE: row.ZVEHICLE,
+        TRUCK_NO: row.ZTRUCK_NO,
+        LR_NO: row.ZLRNO,
+        AH: row.ZAH,
+        NO_SETS: row.ZNO_SETS,
+        TRANSPORTER: row.ZTRANSPORTER,
 
-        // 🔥 backend expects both keys
-        WORK_ORDER: row.ZWORK_ORDER || row.WORK_ORDER || null,
-        ZWORK_ORDER: row.ZWORK_ORDER || row.WORK_ORDER || null,
+        WORK_ORDER: row.ZWORK_ORDER,
+        ZWORK_ORDER: row.ZWORK_ORDER,
 
-        BILLNO: row.ZBILLNO || row.BILLNO || null,
-        ZBILLNO: row.ZBILLNO || row.BILLNO || null
+        BILLNO: row.ZBILLNO,
+        ZBILLNO: row.ZBILLNO
       };
+
 
       /* =====================================================
          3️⃣ FINAL PAYLOAD (SAME AS SAVE)
@@ -1126,7 +1125,15 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
 
 
-  deleteSearchRow(row: any, index: number): void {
+  deleteRow(row: any, index: number): void {
+    if (row.SAP_TYPE === 'SAP') {
+      this.DeleteWithSap(row, index);
+    } else {
+      this.DeleteWithoutSap(row, index);
+    }
+  }
+
+  DeleteWithSap(row: any, index: number): void {
     Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to delete this record? This action cannot be undone.',
@@ -1137,12 +1144,102 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       confirmButtonColor: '#d33'
     }).then((result) => {
       if (!result.isConfirmed) return;
-      this.searchOptionsList.splice(index, 1);
-      Swal.fire({
-        title: 'Deleted',
-        text: 'Record deleted successfully',
-        icon: 'success',
-        confirmButtonText: 'Ok',
+
+      // 🔹 Prepare request payload (With SAP format)
+      const payload = {
+        DELETE: [
+          {
+            ZREFNO: row.ZREFNO,
+            ZINV_NO: row.ZINV_NO,
+            ZLINE_NO: row.ZLINE_NO
+          }
+        ]
+      };
+
+      // 🔹 Call API
+      this.service.InsuranceClaimTrackingDeleteWithSap(payload).subscribe({
+        next: (res: any) => {
+          if (res?.STATUS === 'TRUE') {
+            // 🔹 Remove row from table only after success
+            this.searchOptionsList.splice(index, 1);
+
+            Swal.fire({
+              title: 'Deleted',
+              text: res.MESSAGE || 'Record deleted successfully',
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            });
+          } else {
+            Swal.fire({
+              title: 'Failed',
+              text: res?.MESSAGE || 'Delete failed',
+              icon: 'error'
+            });
+          }
+        },
+        error: (err) => {
+          console.error(err);
+          Swal.fire({
+            title: 'Error',
+            text: 'Something went wrong while deleting',
+            icon: 'error'
+          });
+        }
+      });
+    });
+  }
+  DeleteWithoutSap(row: any, index: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this record? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+
+      // 🔹 Prepare request payload (With SAP format)
+      const payload = {
+        DELETE: [
+          {
+            ZREFNO: row.ZREFNO,
+            ZINV_NO: row.ZINV_NO,
+            ZLINE_NO: row.ZLINE_NO
+          }
+        ]
+      };
+
+      // 🔹 Call API
+      this.service.InsuranceClaimTrackingDeleteWithoutSap(payload).subscribe({
+        next: (res: any) => {
+          if (res?.STATUS === 'TRUE') {
+            // 🔹 Remove row from table only after success
+            this.searchOptionsList.splice(index, 1);
+
+            Swal.fire({
+              title: 'Deleted',
+              text: res.MESSAGE || 'Record deleted successfully',
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            });
+          } else {
+            Swal.fire({
+              title: 'Failed',
+              text: res?.MESSAGE || 'Delete failed',
+              icon: 'error'
+            });
+          }
+        },
+        error: (err) => {
+          console.error(err);
+          Swal.fire({
+            title: 'Error',
+            text: 'Something went wrong while deleting',
+            icon: 'error'
+          });
+        }
       });
     });
   }

@@ -512,6 +512,10 @@
             <button class="btn btn-sm btn-primary" (click)="editSearchRow(item)">
               <i class="fas fa-edit"></i>
             </button>
+
+            <button class="btn btn-sm btn-danger" (click)="deleteRow(item, i)">
+              <i class="fas fa-trash"></i>
+            </button>
           </div>
 
           <div *ngIf="item.isEdit">
