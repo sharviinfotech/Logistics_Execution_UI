@@ -970,7 +970,7 @@ onFilterDivisionChange(): void {
     return;
   }
 
-  const doc = new (jsPDF as any).default('l', 'mm', 'a4'); // landscape
+  const doc = new (jsPDF as any).default('l', 'mm', 'a3'); // landscape
 
   /* ===== PDF HEADING ===== */
   doc.setFontSize(16);
@@ -1023,6 +1023,8 @@ onFilterDivisionChange(): void {
     record.ZNO_INVOICES || '',
     record.ZCREATED_DT || ''
   ]));
+
+  
 
   autoTable(doc, {
     head: headers,

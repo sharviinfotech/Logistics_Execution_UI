@@ -841,7 +841,7 @@ export class OrderInfoComponent implements OnInit {
 
 
   deleteRow(row: any, index: number): void {
-    if (row.SAP_TYPE === 'SAP') {
+    if (row.sapType === 'SAP') {
       this.DeleteWithSap(row, index);
     } else {
       this.DeleteWithoutSap(row, index);
@@ -1675,14 +1675,14 @@ export class OrderInfoComponent implements OnInit {
     });
 
 
-    /* ===== PDF HEADING ===== */
+    
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
     doc.text(reportTitle, doc.internal.pageSize.getWidth() / 2, 12, {
       align: 'center'
     });
 
-    /* Optional subtitle */
+    
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`Generated on: ${new Date().toLocaleDateString()}`,
