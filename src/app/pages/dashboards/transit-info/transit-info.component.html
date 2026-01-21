@@ -364,7 +364,7 @@
 <div class="card" style="margin-top: 10px;" *ngIf="showTable && headerData">
   <div class="card-body-LE">
     <h5 class="mb-3">Header Details</h5>
-
+      <div class="table-responsive">
     <table class="table table-bordered table-striped text-center">
       <thead>
         <tr>
@@ -386,7 +386,7 @@
         <tr [class.editing]="headerData.isEdit">
 
           <td>
-            <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZREFNO">
+            <input *ngIf="headerData.isEdit"  class="form-control form-control-sm" [(ngModel)]="headerData.ZREFNO">
             <span *ngIf="!headerData.isEdit">{{ headerData.ZREFNO }}</span>
           </td>
 
@@ -460,6 +460,7 @@
         </tr>
       </tbody>
     </table>
+    </div>
   </div>
 </div>
 

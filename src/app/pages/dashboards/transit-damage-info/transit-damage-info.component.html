@@ -246,7 +246,7 @@
 
         <div class="form-field">
           <select formControlName="DAMAGE_RMK">
-            <option value="" disabled selected>Select Damage Remarks</option>
+            <option value="">Select Damage Remarks</option>
             <option value="Packing material damage">Packing material damage</option>
             <option value="Pallet damage">Pallet damage</option>
             <option value="Cells damage">Cells damage</option>
@@ -268,7 +268,7 @@
 
         <div class="form-field">
           <select formControlName="SETTLEMENT">
-            <option value="" disabled selected>Select Settlement</option>
+            <option value="">Select Settlement</option>
             <option value="Claim Settlement">Claim Settlement</option>
             <option value="Direct Deduction">Direct Deduction</option>
             <option value="Insurance claim">Insurance claim</option>
@@ -284,10 +284,11 @@
           <label>Closing Date</label>
         </div>
 
-        <div class="form-field upload-field">
-          <label class="floating-label">Images</label>
-          <input type="file" formControlName="IMAGES" id="imagesuploading" class="custom-file-input"
+        <div class="form-field ">
+          
+          <input type="file" formControlName="IMAGES" id="imagesuploading" 
             accept=".jpg,.jpeg,.png,.pdf" />
+            <label >Images</label>
         </div>
 
       </form>
@@ -323,10 +324,10 @@
                     </option>
                   </select>
                 </td>
-                <td><input formControlName="VEH_LINE"></td>
-                <td><input formControlName="TRUCK_NO"></td>
-                <td><input formControlName="LR_NO"></td>
-                <td><input formControlName="TRANSPORTER"></td>
+                <td><input type="text" formControlName="VEH_LINE"></td>
+                <td><input type="text" formControlName="TRUCK_NO"></td>
+                <td><input type="text" formControlName="LR_NO"></td>
+                <td><input type="text" formControlName="TRANSPORTER"></td>
 
                 <td>
                   <button type="button" (click)="addItemRow()">+</button>

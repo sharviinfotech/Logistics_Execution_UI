@@ -396,8 +396,8 @@
           <div class="form-field">
             <select [(ngModel)]="filterPlant" (change)="onFilterPlantChange()">
               <option value="">Select Plant</option>
-              <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT + '_' + plant.PLANT_DESC">
-                {{ plant.PLANT }} - {{ plant.PLANT_DESC }}
+              <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT_TEXT">
+                {{ plant.PLANT_TEXT }}
               </option>
             </select>
             <label>Plant</label>
@@ -531,25 +531,29 @@
 
         <!-- Ref No -->
         <td>
-          <input *ngIf="item.isEdit" [(ngModel)]="item.ZREFNO" type="text" class="form-control form-control-sm width-md" />
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZREFNO" type="text"
+            class="form-control form-control-sm width-md" />
           <span *ngIf="!item.isEdit">{{ item.ZREFNO || '-' }}</span>
         </td>
 
         <!-- Invoice No -->
         <td>
-          <input *ngIf="item.isEdit" [(ngModel)]="item.VBELN" type="text" class="form-control form-control-sm width-md" />
+          <input *ngIf="item.isEdit" [(ngModel)]="item.VBELN" type="text"
+            class="form-control form-control-sm width-md" />
           <span *ngIf="!item.isEdit">{{ item.VBELN || '-' }}</span>
         </td>
 
         <!-- ODN No -->
         <td>
-          <input *ngIf="item.isEdit" [(ngModel)]="item.ZODN_NO" type="text" class="form-control form-control-sm width-md" />
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZODN_NO" type="text"
+            class="form-control form-control-sm width-md" />
           <span *ngIf="!item.isEdit">{{ item.ZODN_NO || '-' }}</span>
         </td>
 
         <!-- SO No -->
         <td>
-          <input *ngIf="item.isEdit" [(ngModel)]="item.ZSO_NO" type="text" class="form-control form-control-sm width-md" />
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZSO_NO" type="text"
+            class="form-control form-control-sm width-md" />
           <span *ngIf="!item.isEdit">{{ item.ZSO_NO || '-' }}</span>
         </td>
 
@@ -564,7 +568,8 @@
 
         <!-- Sets -->
         <td>
-          <input *ngIf="item.isEdit" type="number" [(ngModel)]="item.ZSETS" class="form-control form-control-sm width-md" />
+          <input *ngIf="item.isEdit" type="number" [(ngModel)]="item.ZSETS"
+            class="form-control form-control-sm width-md" />
           <span *ngIf="!item.isEdit">{{ item.ZSETS || '-' }}</span>
         </td>
 
@@ -582,19 +587,22 @@
 
         <!-- Battery Condition -->
         <td>
-          <input *ngIf="item.isEdit" [(ngModel)]="item.ZBATCOND" type="text" class="form-control form-control-sm width-md" />
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZBATCOND" type="text"
+            class="form-control form-control-sm width-md" />
           <span *ngIf="!item.isEdit">{{ item.ZBATCOND || '-' }}</span>
         </td>
 
         <!-- Incoterms -->
         <td>
-          <input *ngIf="item.isEdit" [(ngModel)]="item.ZINCO" type="text" class="form-control form-control-sm width-md" />
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZINCO" type="text"
+            class="form-control form-control-sm width-md" />
           <span *ngIf="!item.isEdit">{{ item.ZINCO }}</span>
         </td>
 
         <!-- Insurance Scope -->
         <td>
-          <input *ngIf="item.isEdit" [(ngModel)]="item.ZINS_SCPOE" type="text" class="form-control form-control-sm width-md" />
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZINS_SCPOE" type="text"
+            class="form-control form-control-sm width-md" />
           <span *ngIf="!item.isEdit">{{ item.ZINS_SCPOE }}</span>
         </td>
 
@@ -612,19 +620,22 @@
 
         <!-- Work Order -->
         <td>
-          <input *ngIf="item.isEdit" [(ngModel)]="item.ZWORK_ORDER" type="text" class="form-control form-control-sm width-md" />
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZWORK_ORDER" type="text"
+            class="form-control form-control-sm width-md" />
           <span *ngIf="!item.isEdit">{{ item.ZWORK_ORDER || '-' }}</span>
         </td>
 
         <!-- LR No -->
         <td>
-          <input *ngIf="item.isEdit" [(ngModel)]="item.ZLRNO" type="text" class="form-control form-control-sm width-md" />
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZLRNO" type="text"
+            class="form-control form-control-sm width-md" />
           <span *ngIf="!item.isEdit">{{ item.ZLRNO || '-' }}</span>
         </td>
 
         <!-- Transporter -->
         <td>
-          <input *ngIf="item.isEdit" [(ngModel)]="item.ZTRANSPORTER" type="text" class="form-control form-control-sm width-md" />
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZTRANSPORTER" type="text"
+            class="form-control form-control-sm width-md" />
           <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER || '-' }}</span>
         </td>
 
@@ -633,7 +644,8 @@
 
         <!-- Vehicle Type -->
         <td>
-          <input *ngIf="item.isEdit" [(ngModel)]="item.ZVEH_TYPE" type="text" class="form-control form-control-sm width-md" />
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZVEH_TYPE" type="text"
+            class="form-control form-control-sm width-md" />
           <span *ngIf="!item.isEdit">{{ item.ZVEH_TYPE || '-' }}</span>
         </td>
 
@@ -650,10 +662,10 @@
 
           <div *ngIf="item.isEdit" class="btn-group">
             <button class="btn btn-sm btn-success me-1" (click)="updateSearchRow(item, i)" title="Update">
-              <i class="fas fa-check"></i> 
+              <i class="fas fa-check"></i>
             </button>
             <button class="btn btn-sm btn-secondary" (click)="cancelSearchEdit(item)" title="Cancel">
-              <i class="fas fa-times"></i> 
+              <i class="fas fa-times"></i>
             </button>
           </div>
         </td>

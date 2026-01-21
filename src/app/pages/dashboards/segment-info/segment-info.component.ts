@@ -646,114 +646,204 @@ export class SegmentInfoComponent implements OnInit {
 
 
   // Method to update the edited row
+  // updateSearchRow(row: any, index: number): void {
+
+  //   if (this.segmentInfo.invalid) {
+  //     Swal.fire({
+  //       title: 'Are you sure?',
+  //     text: 'Do you want to update this record?',
+  //     icon: 'question',
+  //     showCancelButton: true,
+  //     confirmButtonText: 'Yes, Update',
+  //     cancelButtonText: 'Cancel'
+  //     });
+  //     return;
+  //   }
+
+    
+  //   if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
+  //     Swal.fire({
+  //       icon: 'warning',
+  //       text: 'Please select at least one reference row before saving'
+  //     });
+  //     return;
+  //   }
+
+  //   const formValue = this.segmentInfo.value;
+
+    
+  //   const saveArray: any[] = [];
+
+  //   if (this.orderType === 'Outward') {
+  //     this.selectedItems.forEach(item => {
+  //       saveArray.push({
+  //         REFNO: item.referenceNumber || 0,
+  //         WORK_ORDER: item.workOrderNumber || '',
+  //         LRNO: item.lrNumber || '',
+  //         TRANSPORTER: item.transporter || '',
+
+  //         SO_NO: item.SONO || '',
+  //         ODN_NO: item.ODN_NO || '',
+
+  //         INV_NUM: formValue.INV_VBELN || this.invoicenumber || '',
+  //         SALE_PERSON: formValue.SALE_PERSON || '',
+  //         SEGMENT: formValue.SEGMENT || '',
+  //         APPTYP: formValue.APPTYP || '',
+
+  //         CUST_PROFILE: formValue.CUST_PROF || '',
+  //         BRANCH: formValue.BRANCH || '',
+  //         BRANCH_ZONE: formValue.BRANCH_ZONE || '',
+  //         TAT_TYPE: formValue.TAT_Type || '',
+  //         TAT: formValue.TAT_DAYS || '',
+  //         ETA: formValue.ETA_DATE || ''
+  //       });
+  //     });
+  //   }
+
+  //   if (saveArray.length === 0) {
+  //     Swal.fire({
+  //       icon: 'warning',
+  //       text: 'No records available to save'
+  //     });
+  //     return;
+  //   }
+
+  //   console.log('✅ Segment SAVE payload:', saveArray);
+
+  //   this.spinner.show();
+
+    
+  //   const apiCall =
+  //     this.sapType === 'SAP'
+  //       ? this.service.SegmentInfoOutwardSave({
+  //         SAVE: saveArray
+  //       })
+  //       : this.service.SegmentInfoNonSap({
+  //         CREATE: saveArray
+  //       });
+
+
+  //   apiCall.subscribe(
+  //     (res: any) => {
+  //       this.spinner.hide();
+
+  //       if (res.STATUS === 'true' || res.NUMBER === '200') {
+  //         Swal.fire({
+  //           title: 'Success',
+  //           text: res.MESSAGE || 'Record updated successfully',
+  //           icon: 'success',
+  //           confirmButtonText: 'Ok',
+  //         }).then(() => {
+  //           row.isEdit = false;
+  //           delete row._backup;
+  //           this.onSearchReference();
+  //         });
+  //       } else {
+  //         Swal.fire({
+  //           title: 'Error',
+  //           text: res.MESSAGE || 'Failed to update record',
+  //           icon: 'error',
+  //           confirmButtonText: 'Ok',
+  //         });
+  //       }
+  //     },
+  //     (error) => {
+  //       this.spinner.hide();
+  //       console.error('❌ Update Error:', error);
+  //       Swal.fire({
+  //         text: 'Internal Server Error. Please try again later.',
+  //         icon: 'error',
+  //       });
+  //     }
+  //   );
+  // }
+
   updateSearchRow(row: any, index: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to update this record?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Update',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
 
-    if (this.segmentInfo.invalid) {
-      Swal.fire({
-        title: 'Validation Error',
-        text: 'Please fill all required fields before saving.',
-        icon: 'warning',
-        confirmButtonText: 'Ok',
-      });
-      return;
-    }
+      
 
-    // Outward validation
-    if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        text: 'Please select at least one reference row before saving'
-      });
-      return;
-    }
+      // ✅ Single record object
+      const updatePayload = {
+         REFNO: row.ZREFNO || 0,
+          WORK_ORDER: row.ZWORK_ORDER || '',
+          LRNO: row.ZLRNO || '',
+          TRANSPORTER: row.ZTRANSPORTER || '',
 
-    const formValue = this.segmentInfo.value;
+          SO_NO: row.ZSO_NO || '',
+          ODN_NO: row.ZODN_NO || '',
 
-    // 🔹 Build SAVE array (SAME payload for SAP & NON-SAP)
-    const saveArray: any[] = [];
+          INV_NUM: row.ZINV_NUM || this.invoicenumber || '',
+          SALE_PERSON: row.ZSALE_PERSON || '',
+          SEGMENT: row.ZSEGMENT || '',
+          APPTYP: row.ZAPPTYP || '',
 
-    if (this.orderType === 'Outward') {
-      this.selectedItems.forEach(item => {
-        saveArray.push({
-          REFNO: item.referenceNumber || 0,
-          WORK_ORDER: item.workOrderNumber || '',
-          LRNO: item.lrNumber || '',
-          TRANSPORTER: item.transporter || '',
+          CUST_PROFILE: row.ZCUST_PROFILE || '',
+          BRANCH: row.ZBRANCH || '',
+          BRANCH_ZONE: row.ZBRANCH_ZONE || '',
+          TAT_TYPE: row.ZTAT_TYPE || '',
+          TAT: row.ZTAT || '',
+          ETA: row.ZETA || ''
+      };
 
-          SO_NO: item.SONO || '',
-          ODN_NO: item.ODN_NO || '',
+      console.log("🛠 UPDATE RECORD:", updatePayload);
 
-          INV_NUM: formValue.INV_VBELN || this.invoicenumber || '',
-          SALE_PERSON: formValue.SALE_PERSON || '',
-          SEGMENT: formValue.SEGMENT || '',
-          APPTYP: formValue.APPTYP || '',
+      this.spinner.show();
 
-          CUST_PROFILE: formValue.CUST_PROF || '',
-          BRANCH: formValue.BRANCH || '',
-          BRANCH_ZONE: formValue.BRANCH_ZONE || '',
-          TAT_TYPE: formValue.TAT_Type || '',
-          TAT: formValue.TAT_DAYS || '',
-          ETA: formValue.ETA_DATE || ''
-        });
-      });
-    }
-
-    if (saveArray.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        text: 'No records available to save'
-      });
-      return;
-    }
-
-    console.log('✅ Segment SAVE payload:', saveArray);
-
-    this.spinner.show();
-
-    // 🔹 SAP / NON-SAP API selection
-    const apiCall =
-      this.sapType === 'SAP'
-        ? this.service.SegmentInfoOutwardSave({
-          SAVE: saveArray
-        })
-        : this.service.SegmentInfoNonSap({
-          CREATE: saveArray
-        });
-
-
-    apiCall.subscribe(
-      (res: any) => {
-        this.spinner.hide();
-
-        if (res.STATUS === 'true' || res.NUMBER === '200') {
-          Swal.fire({
-            title: 'Success',
-            text: res.MESSAGE || 'Record updated successfully',
-            icon: 'success',
-            confirmButtonText: 'Ok',
-          }).then(() => {
-            row.isEdit = false;
-            delete row._backup;
-            this.onSearchReference();
+      // ✅ IMPORTANT FIX: payload MUST be ARRAY
+      let apiCall =
+        this.sapType === "SAP"
+          ? this.service.SegmentInfoOutwardSave({
+            SAVE: [updatePayload]
+          })
+          : this.service.SegmentInfoNonSap({
+            CREATE: [updatePayload]
           });
-        } else {
+
+          
+
+      apiCall.subscribe(
+        (res: any) => {
+          this.spinner.hide();
+
+          if (res.STATUS === 'true' || res.NUMBER === '200') {
+            Swal.fire({
+              title: 'Success',
+              text: res.MESSAGE || 'Record updated successfully',
+              icon: 'success',
+              confirmButtonText: 'Ok',
+            }).then(() => {
+              row.isEdit = false;
+              delete row._backup;
+              this.onSearchReference();
+            });
+          } else {
+            Swal.fire({
+              title: 'Error',
+              text: res.MESSAGE || 'Failed to update record',
+              icon: 'error',
+              confirmButtonText: 'Ok',
+            });
+          }
+        },
+        (error) => {
+          this.spinner.hide();
+          console.error('❌ Update Error:', error);
           Swal.fire({
-            title: 'Error',
-            text: res.MESSAGE || 'Failed to update record',
+            text: 'Internal Server Error. Please try again later.',
             icon: 'error',
-            confirmButtonText: 'Ok',
           });
         }
-      },
-      (error) => {
-        this.spinner.hide();
-        console.error('❌ Update Error:', error);
-        Swal.fire({
-          text: 'Internal Server Error. Please try again later.',
-          icon: 'error',
-        });
-      }
-    );
+      );
+    });
   }
 
 

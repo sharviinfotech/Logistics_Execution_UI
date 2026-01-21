@@ -449,7 +449,7 @@ export class TransitInfoComponent implements OnInit {
             isEdit: false
           };
 
-          this.searchOptionsList = res.ITEMS.map((item: any) => ({
+          this.itemsList = res.ITEMS.map((item: any) => ({
             ...item,
             isEdit: false
           }));

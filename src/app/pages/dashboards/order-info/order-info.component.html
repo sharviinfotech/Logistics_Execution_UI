@@ -449,7 +449,7 @@
         <ng-container *ngIf="!isSap(); else sapDivision">
           <select formControlName="Division" (change)="onDivisionChange()">
             <option value="">Select Division</option>
-            <option *ngFor="let d of divisionList" [value]="d.DIVISION_DESC">{{ d.DIVISION }} - {{ d.DIVISION_DESC }}
+            <option *ngFor="let d of divisionList" [value]="d.DIVISION_DESC">{{ d.DIVISION_DESC }}
             </option>
           </select>
         </ng-container>

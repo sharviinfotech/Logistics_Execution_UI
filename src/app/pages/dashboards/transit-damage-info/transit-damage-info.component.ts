@@ -118,7 +118,7 @@ export class TransitDamageInfoComponent implements OnInit {
       CUSTOMER: [''],
       CONSIGN_NAME: [''],
       DAMAGE_RMK: [''],
-      SETTLEMENT: [''],
+      SETTLEMENT: ['', Validators.required],
       CLOSING_DT: [''],
       IMAGES: [''],
       ODN_NO: [''],
