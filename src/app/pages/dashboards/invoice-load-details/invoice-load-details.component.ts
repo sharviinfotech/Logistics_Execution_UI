@@ -671,31 +671,54 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
   // Method to update the edited row
 
-  updateSearchRow(row: any): void {
+  updateInvoiceSap(row: any) {
+    if (!row.ZMAPID || !row.VBELN || !row.POSNR || !row.ZLINE_NO) {
+      Swal.fire('Error', 'Primary key missing', 'error');
+      return null;
+    }
 
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to update this record?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, Update',
-      cancelButtonText: 'Cancel'
-    }).then((result) => {
-      if (!result.isConfirmed) return;
+    const payload = [{
+      ZMAPID: row.ZMAPID,
+      VBELN: row.VBELN,
+      POSNR: row.POSNR,
+      ZLINE_NO: row.ZLINE_NO,
+      ZREFNO: row.ZREFNO,
+      ZWORK_ORDER: row.ZWORK_ORDER,
+      ZLRNO: row.ZLRNO,
+      ZTRANSPORTER: row.ZTRANSPORTER,
+      ZSO_NO: row.ZSO_NO,
+      ZODN_NO: row.ZODN_NO,
+      ZTRUC_TYPE: row.ZTRUC_TYPE,
+      ZTRUC_WT: row.ZTRUC_WT,
+      ZACT_LOAD: row.ZACT_LOAD,
+      ZACT_VOL: row.ZACT_VOL,
+      ZLF_VOL: row.ZLF_VOL,
+      ZLF_WT: row.ZLF_WT,
+      ZWEEK_SF: row.ZWEEK_SF,
+      ZEWAYBILL_NO: row.ZEWAYBILL_NO,
+      ZEWAYBILL_DT: row.ZEWAYBILL_DT
+    }];
 
-      // ✅ CLEAN PAYLOAD (UI fields remove)
-      const payload = {
-        ZMAPID: row.ZMAPID || '',
-        VBELN: row.VBELN || '',
-        POSNR: row.POSNR || '10',
+    return this.service.InvoiceloaddetailsSave(payload);
+  }
+  updateInvoiceNonSap(row: any) {
+    if (!row.ZMAPID || !row.VBELN || !row.POSNR || !row.ZLINE_NO) {
+      Swal.fire('Error', 'Primary key missing', 'error');
+      return null;
+    }
 
-        ZREFNO: row.ZREFNO || '',
-        ZWORK_ORDER: row.ZWORK_ORDER || '',
-        ZLRNO: row.ZLRNO || '',
-        ZTRANSPORTER: row.ZTRANSPORTER || '',
-        ZSO_NO: row.ZSO_NO || '',
-        ZODN_NO: row.ZODN_NO || '',
+    const payload = {
+      NSAP_LOAD: [{
+        MANDT: '',
+        ZMAPID: row.ZMAPID,
+        VBELN: row.VBELN,        // 🔑 same
+        POSNR: row.POSNR,        // 🔑 same
+        ZLINE_NO: row.ZLINE_NO,  // 🔑 same
 
+        ZREFNO: row.ZREFNO,
+        ZWORK_ORDER: row.ZWORK_ORDER,
+        ZLRNO: row.ZLRNO,
+        ZTRANSPORTER: row.ZTRANSPORTER,
         ZTRUC_TYPE: row.ZTRUC_TYPE,
         ZTRUC_WT: row.ZTRUC_WT,
         ZACT_LOAD: row.ZACT_LOAD,
@@ -705,35 +728,73 @@ export class InvoiceLoadDetailsComponent implements OnInit {
         ZWEEK_SF: row.ZWEEK_SF,
         ZEWAYBILL_NO: row.ZEWAYBILL_NO,
         ZEWAYBILL_DT: row.ZEWAYBILL_DT
-      };
+      }]
+    };
+
+    return this.service.InvoiceloaddetailsNonSap(payload);
+  }
+  updateInvoiceRow(row: any): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to update this invoice record?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Update',
+      cancelButtonText: 'Cancel'
+    }).then(result => {
+      if (!result.isConfirmed) return;
 
       this.spinner.show();
 
       const api$ =
         this.sapType === 'SAP'
-          ? this.service.InvoiceloaddetailsSave([payload])
-          : this.service.InvoiceloaddetailsNonSap({
-            NSAP_LOAD: [payload]
-          });
+          ? this.updateInvoiceSap(row)
+          : this.updateInvoiceNonSap(row);
 
-      api$.subscribe({
-        next: (res: any) => {
+      if (!api$) {
+        this.spinner.hide();
+        return;
+      }
+
+      api$.subscribe(
+        (res: any) => {
           this.spinner.hide();
 
           if (res?.NUMBER === '200' || res?.STATUS === 'true') {
-            Swal.fire('Success', 'Updated successfully', 'success');
-            row.isEdit = false;   // ✅ just exit edit mode
+            Swal.fire({
+              title: 'Success',
+              text: 'Invoice updated successfully',
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            }).then(() => {
+              row.isEdit = false;
+              delete row._backup;
+              this.onSearchReference?.();
+            });
           } else {
-            Swal.fire('Error', res.MSG || res.MESSAGE || 'Update failed', 'error');
+            Swal.fire({
+              title: 'Error',
+              text: res?.MSG || res?.MESSAGE || 'Update failed',
+              icon: 'error'
+            });
           }
         },
-        error: () => {
+        () => {
           this.spinner.hide();
           Swal.fire('Error', 'Server error', 'error');
         }
-      });
+      );
     });
   }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1301,9 +1362,9 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     if (this.filterStatus === 'Completed') {
       exportSource = this.InvoiceLoadDetailsData; // ⚠️ ShipmentData kakunda HTML data
       fileName = this.sapType === 'SAP'
-        ? 'Shipmentdata_Completed_SAP.pdf'
-        : 'Shipmentdata_Completed_NonSAP.pdf';
-      reportTitle = 'Shipment Data Records (Completed)';
+        ? 'Invoice-load-details_Completed_SAP.pdf'
+        : 'Invoice-load-details_Completed_NonSAP.pdf';
+      reportTitle = 'Invoice Load Details Records (Completed)';
     } else if (this.filterStatus === 'Pending') {
       exportSource = this.dispatchData;
       fileName = this.sapType === 'SAP'

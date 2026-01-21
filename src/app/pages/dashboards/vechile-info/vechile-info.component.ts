@@ -782,7 +782,82 @@ export class VechileInfoComponent implements OnInit {
 
 
   // Method to update the edited row
-  updateSearchRow(row: any): void {
+  updateVehicleSap(row: any) {
+    // PK check
+    if (!row.ZMAPID || !row.POSNR || !row.ZLINE_NO) {
+      Swal.fire('Error', 'Primary key missing', 'error');
+      return null;
+    }
+
+    const payload = [{
+      ZMAPID: row.ZMAPID,
+      POSNR: row.POSNR,
+      ZLINE_NO: row.ZLINE_NO,
+
+      ZREFNO: row.ZREFNO,
+      ZVEH_LINE: row.ZVEH_LINE,
+      ZTRX_TYPE: row.ZTRX_TYPE,
+      ZODN_NO: row.ZODN_NO,
+      ZSONO: row.ZSONO,
+      ZSALE_PERSON: row.ZSALE_PERSON,
+      ZTRANSPORTER: row.ZTRANSPORTER,
+      ZLRNO: row.ZLRNO,
+      ZTRUC_TYPE: row.ZTRUC_TYPE,
+      ZTRUC_WT: row.ZTRUC_WT,
+      ZTRUC_VOL: row.ZTRUC_VOL,
+      ZVEH_NUM: row.ZVEH_NUM,
+      ZNOOFVEH: row.ZNOOFVEH,
+      ZDNAME: row.ZDNAME,
+      ZDNUMBER: row.ZDNUMBER,
+      ZLOCATION: row.ZLOCATION,
+      ZWORK_ORDER: row.ZWORK_ORDER,
+      ZCREATED_DT: row.ZCREATED_DT,
+      ZPLANT: row.ZPLANT,
+      ZDIVISION: row.ZDIVISION,
+      ZVEH_TYPE: row.ZVEH_TYPE
+    }];
+
+    return this.service.VehicleInfosave(payload);  // SAP update API
+  }
+  updateVehicleNonSap(row: any) {
+    // PK check
+    if (!row.ZMAPID || !row.POSNR || !row.ZLINE_NO) {
+      Swal.fire('Error', 'Primary key missing', 'error');
+      return null;
+    }
+
+    const payload = [{
+      MANDT: '100',
+      ZMAPID: row.ZMAPID,
+      POSNR: row.POSNR,
+      ZLINE_NO: row.ZLINE_NO,
+
+      ZREFNO: row.ZREFNO,
+      ZVEH_LINE: row.ZVEH_LINE,
+      ZTRX_TYPE: row.ZTRX_TYPE,
+      ZODN_NO: row.ZODN_NO,
+      ZSONO: row.ZSONO,
+      ZSALE_PERSON: row.ZSALE_PERSON,
+      ZTRANSPORTER: row.ZTRANSPORTER,
+      ZLRNO: row.ZLRNO,
+      ZTRUC_TYPE: row.ZTRUC_TYPE,
+      ZTRUC_WT: row.ZTRUC_WT,
+      ZTRUC_VOL: row.ZTRUC_VOL,
+      ZVEH_NUM: row.ZVEH_NUM,
+      ZNOOFVEH: row.ZNOOFVEH,
+      ZDNAME: row.ZDNAME,
+      ZDNUMBER: row.ZDNUMBER,
+      ZLOCATION: row.ZLOCATION,
+      ZWORK_ORDER: row.ZWORK_ORDER,
+      ZCREATED_DT: row.ZCREATED_DT,
+      ZPLANT: row.ZPLANT,
+      ZDIVISION: row.ZDIVISION,
+      ZVEH_TYPE: row.ZVEH_TYPE
+    }];
+
+    return this.service.VehicleInfoNonSap(payload);  // Non-SAP update API
+  }
+  updateVehicleRow(row: any): void {
     Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to update this record?',
@@ -793,60 +868,50 @@ export class VechileInfoComponent implements OnInit {
     }).then(result => {
       if (!result.isConfirmed) return;
 
-      const vbeln =
-        this.sapType === 'Non-SAP'
-          ? this.VehicleForm.get('VBELN')?.value?.trim()
-          : (this.orderType === 'Inward'
-            ? this.ponumber
-            : this.invoicenumber)?.trim();
+      this.spinner.show();
 
-      if (!vbeln) {
-        Swal.fire('Warning', 'Invoice / PO number is required', 'warning');
+      const api$ =
+        this.sapType === 'SAP'
+          ? this.updateVehicleSap(row)
+          : this.updateVehicleNonSap(row);
+
+      if (!api$) {
+        this.spinner.hide();
         return;
       }
 
-      /** ✅ SAME PAYLOAD AS SAVE */
-      const updatePayload = [{
-        ...row,
-        VBELN: vbeln
-      }];
-
-      console.log('🛠 UPDATE PAYLOAD:', updatePayload);
-
-      this.spinner.show();
-
-      const apiCall =
-        this.sapType === 'SAP'
-          ? this.service.VehicleInfosave(updatePayload)
-          : this.service.VehicleInfoNonSap(updatePayload);
-
-      apiCall.subscribe({
-        next: (res: any) => {
+      api$.subscribe(
+        (res: any) => {
           this.spinner.hide();
 
-          if (res?.NUMBER === '200') {
+          if (res?.NUMBER === '200' || res?.STATUS === 'true') {
             Swal.fire({
               title: 'Success',
-              text: 'Vehicle information updated successfully!',
+              text: 'Vehicle updated successfully',
               icon: 'success',
               confirmButtonText: 'Ok'
             }).then(() => {
               row.isEdit = false;
               delete row._backup;
-              this.onSearchReference(); // refresh list
+              this.onSearchReference?.();
             });
           } else {
-            Swal.fire('Error', res?.MSG || 'Update failed', 'error');
+            Swal.fire({
+              title: 'Error',
+              text: res?.MSG || res?.MESSAGE || 'Update failed',
+              icon: 'error'
+            });
           }
         },
-        error: err => {
+        () => {
           this.spinner.hide();
-          console.error(err);
-          Swal.fire('Error', 'Failed to update vehicle info', 'error');
+          Swal.fire('Error', 'Server error', 'error');
         }
-      });
+      );
     });
   }
+
+
 
 
   deleteRow(row: any, index: number): void {

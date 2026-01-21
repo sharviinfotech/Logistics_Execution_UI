@@ -812,94 +812,151 @@ export class ShipmentDetailsComponent implements OnInit {
     row.isEdit = true;
   }
 
+
   cancelSearchEdit(row: any): void {
     if (row._backup) {
-      Object.assign(row, row._backup); // Restore original values
+      Object.assign(row, row._backup);
       delete row._backup;
     }
     row.isEdit = false;
   }
 
 
+
   // Method to update the edited row
-  updateSearchRow(row: any, index: number): void {
+  updateShipmentSap(row: any) {
+    if (!row.ZMAPID || !row.VBELN || !row.POSNR || !row.ZLINE_NO) {
+      Swal.fire('Error', 'Primary key missing', 'error');
+      return null;
+    }
+
+    const payload = [{
+      ZMAPID: row.ZMAPID,
+      VBELN: row.VBELN,
+      POSNR: row.POSNR,
+      ZLINE_NO: row.ZLINE_NO,
+
+      ZREFNO: row.ZREFNO,
+      ZPRODUCT: row.ZPRODUCT,
+      MTART: row.MTART,
+      MAKTX: row.MAKTX,
+      ZSETS: Number(row.ZSETS) || 0,
+      ZAH: Number(row.ZAH) || 0,
+      ZSHIP_WT: Number(row.ZSHIP_WT) || 0,
+      ZBATCOND: row.ZBATCOND,
+      ZINCO: row.ZINCO,
+      ZINS_SCPOE: row.ZINS_SCPOE,
+      ZKM: Number(row.ZKM) || 0,
+      ZWORK_ORDER: row.ZWORK_ORDER,
+      ZLRNO: row.ZLRNO,
+      ZTRANSPORTER: row.ZTRANSPORTER,
+      ZVEH_TYPE: row.ZVEH_TYPE,
+      ZPLANT: row.ZPLANT,
+      ZDIVISION: row.ZDIVISION
+    }];
+
+    return this.service.ShipmentOutwardSave(payload);
+  }
+  updateShipmentNonSap(row: any) {
+    // 🔑 STRICT PK CHECK
+    if (
+      row.ZMAPID == null ||
+      row.VBELN == null ||
+      row.POSNR == null ||
+      row.ZLINE_NO == null
+    ) {
+      Swal.fire('Error', 'Primary key missing (ZLINE_NO issue)', 'error');
+      return null;
+    }
+
+    // 🚨 VERY IMPORTANT: do NOT modify ZLINE_NO
+    const payload = [{
+      MANDT: '100',                 // 🔑 mandatory
+      ZMAPID: row.ZMAPID,
+      VBELN: String(row.VBELN),
+      POSNR: Number(row.POSNR),
+      ZLINE_NO: Number(row.ZLINE_NO),  // 🔥 SAME AS DB
+
+      ZREFNO: row.ZREFNO,
+      ZPRODUCT: row.ZPRODUCT,
+      MTART: row.MTART,
+      MAKTX: row.MAKTX,
+      ZSETS: Number(row.ZSETS) || 0,
+      ZAH: Number(row.ZAH) || 0,
+      ZSHIP_WT: Number(row.ZSHIP_WT) || 0,
+      ZBATCOND: row.ZBATCOND,
+      ZINCO: row.ZINCO,
+      ZINS_SCPOE: row.ZINS_SCPOE,
+      ZKM: Number(row.ZKM) || 0,
+      ZWORK_ORDER: row.ZWORK_ORDER,
+      ZLRNO: row.ZLRNO,
+      ZTRANSPORTER: row.ZTRANSPORTER,
+      ZVEH_TYPE: row.ZVEH_TYPE,
+      ZPLANT: row.ZPLANT,
+      ZDIVISION: row.ZDIVISION
+    }];
+
+    console.log('🟡 Non-SAP UPDATE payload:', payload);
+
+    return this.service.shipmentdetailsNonSapSave(payload);
+  }
+
+
+  updateSearchRow(row: any): void {
     Swal.fire({
       title: 'Are you sure?',
-      text: 'Do you want to update this record?',
+      text: 'Do you want to update this shipment record?',
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Yes, Update',
       cancelButtonText: 'Cancel'
-    }).then((result) => {
+    }).then(result => {
       if (!result.isConfirmed) return;
-
-
-      const commonFields = {
-        ZINCO: this.ProductInfo.get('ZINCO')?.value || '',
-        ZINS_SCPOE: this.ProductInfo.get('ZINS_SCPOE')?.value || '',
-        ZKM: this.ProductInfo.get('ZKM')?.value ?? 0,
-        VBELN: this.ProductInfo.get('VBELN')?.value || ''
-      };
-
-      const updatePayload = [{
-        ...row,
-
-        ZINS_SCPOE: row.ZINS_SCPOE?.trim() ? row.ZINS_SCPOE : commonFields.ZINS_SCPOE,
-        ZKM: row.ZKM ?? commonFields.ZKM,
-        ZINCO: row.ZINCO?.trim() ? row.ZINCO : commonFields.ZINCO,
-        VBELN: row.VBELN?.trim() ? row.VBELN : commonFields.VBELN,
-        ZLINE_NO: row.ZLINE_NO ?? '',
-        ZSETS: row.ZSETS ?? 0,
-        ZAH: row.ZAH ?? 0,
-        ZSHIP_WT: row.ZSHIP_WT ?? 0
-      }];
-
-      console.log('🛠 UPDATE PAYLOAD (ARRAY):', updatePayload);
-
 
       this.spinner.show();
 
-      const apiCall =
+      const api$ =
         this.sapType === 'SAP'
-          ? this.service.ShipmentOutwardSave(updatePayload)
-          : this.service.shipmentdetailsNonSapSave(updatePayload);
+          ? this.updateShipmentSap(row)
+          : this.updateShipmentNonSap(row);
 
-      apiCall.subscribe(
+      if (!api$) {
+        this.spinner.hide();
+        return;
+      }
+
+      api$.subscribe(
         (res: any) => {
           this.spinner.hide();
 
-          if (res.STATUS === 'true' || res.NUMBER === '200') {
+          if (res?.STATUS === 'true' || res?.NUMBER === '200') {
             Swal.fire({
               title: 'Success',
-              text: res.MESSAGE || res.MSG || 'Record updated successfully',
+              text: 'Shipment updated successfully',
               icon: 'success',
               confirmButtonText: 'Ok'
             }).then(() => {
               row.isEdit = false;
               delete row._backup;
-              this.onSearchReference(); // 🔄 refresh list
+              this.onSearchReference();
             });
           } else {
             Swal.fire({
               title: 'Error',
-              text: res.MESSAGE || res.MSG || 'Failed to update record',
-              icon: 'error',
-              confirmButtonText: 'Ok'
+              text: res?.MSG || res?.MESSAGE || 'Update failed',
+              icon: 'error'
             });
           }
         },
-        (error) => {
+        () => {
           this.spinner.hide();
-          console.error('❌ Update Error:', error);
-          Swal.fire({
-            title: 'Error',
-            text: 'Internal Server Error. Please try again later.',
-            icon: 'error'
-          });
+          Swal.fire('Error', 'Internal Server Error', 'error');
         }
       );
     });
   }
+
+
 
 
 

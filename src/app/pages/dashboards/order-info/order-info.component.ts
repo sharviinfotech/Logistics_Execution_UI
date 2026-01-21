@@ -747,7 +747,7 @@ export class OrderInfoComponent implements OnInit {
   }
 
 
-  // Method to update the edited row
+
   updateSearchRow(row: any, index: number): void {
     Swal.fire({
       title: 'Are you sure?',
@@ -759,7 +759,7 @@ export class OrderInfoComponent implements OnInit {
     }).then((result) => {
       if (!result.isConfirmed) return;
 
-      // ✅ Single record object
+
       const updatePayload = {
         REF_NO: row.ZREFNO || "",
         WORK_ORDER_NO: row.ZWORK_ORDER || "",
@@ -793,7 +793,7 @@ export class OrderInfoComponent implements OnInit {
 
       this.spinner.show();
 
-      // ✅ IMPORTANT FIX: payload MUST be ARRAY
+
       let apiCall =
         this.sapType === "SAP"
           ? this.service.OrderInfoOutwardSave({
@@ -1675,14 +1675,14 @@ export class OrderInfoComponent implements OnInit {
     });
 
 
-    
+
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
     doc.text(reportTitle, doc.internal.pageSize.getWidth() / 2, 12, {
       align: 'center'
     });
 
-    
+
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`Generated on: ${new Date().toLocaleDateString()}`,
