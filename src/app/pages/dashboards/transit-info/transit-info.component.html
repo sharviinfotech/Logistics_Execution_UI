@@ -268,8 +268,8 @@
           <div class="form-field">
             <select [(ngModel)]="filterPlant" (change)="onFilterPlantChange()">
               <option value="">Select Plant</option>
-              <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT">{{ plant.PLANT }} - {{ plant.PLANT_DESC
-                }}
+              <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT_TEXT">
+                {{ plant.PLANT_TEXT }}
               </option>
             </select>
             <label>Plant</label>
@@ -364,102 +364,106 @@
 <div class="card" style="margin-top: 10px;" *ngIf="showTable && headerData">
   <div class="card-body-LE">
     <h5 class="mb-3">Header Details</h5>
-      <div class="table-responsive">
-    <table class="table table-bordered table-striped text-center">
-      <thead>
-        <tr>
-          <th>Ref No</th>
-          <th>Invoice No</th>
-          <th>ODN No</th>
-          <th>SO No</th>
-          <th>Sales Person</th>
-          <th>Physical Arrived</th>
-          <th>Unloading DT</th>
-          <th>POD Scan</th>
-          <th>SIT/SALE</th>
-          <th>Location</th>
-          <th>Action</th>
-        </tr>
-      </thead>
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped text-center">
+        <thead>
+          <tr>
+            <th>Ref No</th>
+            <th>Invoice No</th>
+            <th>ODN No</th>
+            <th>SO No</th>
+            <th>Sales Person</th>
+            <th>Physical Arrived</th>
+            <th>Unloading DT</th>
+            <th>POD Scan</th>
+            <th>SIT/SALE</th>
+            <th>Location</th>
+            <th>Action</th>
+          </tr>
+        </thead>
 
-      <tbody>
-        <tr [class.editing]="headerData.isEdit">
+        <tbody>
+          <tr [class.editing]="headerData.isEdit">
 
-          <td>
-            <input *ngIf="headerData.isEdit"  class="form-control form-control-sm" [(ngModel)]="headerData.ZREFNO">
-            <span *ngIf="!headerData.isEdit">{{ headerData.ZREFNO }}</span>
-          </td>
+            <td>
+              <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZREFNO">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZREFNO }}</span>
+            </td>
 
-          <td>
-            <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZINV_NO">
-            <span *ngIf="!headerData.isEdit">{{ headerData.ZINV_NO }}</span>
-          </td>
+            <td>
+              <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZINV_NO">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZINV_NO }}</span>
+            </td>
 
-          <td>
-            <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZODN_NO">
-            <span *ngIf="!headerData.isEdit">{{ headerData.ZODN_NO }}</span>
-          </td>
+            <td>
+              <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZODN_NO">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZODN_NO }}</span>
+            </td>
 
-          <td>
-            <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZSONO">
-            <span *ngIf="!headerData.isEdit">{{ headerData.ZSONO }}</span>
-          </td>
+            <td>
+              <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZSONO">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZSONO }}</span>
+            </td>
 
-          <td>
-            <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZSALE_PERSON">
-            <span *ngIf="!headerData.isEdit">{{ headerData.ZSALE_PERSON }}</span>
-          </td>
+            <td>
+              <input *ngIf="headerData.isEdit" class="form-control form-control-sm"
+                [(ngModel)]="headerData.ZSALE_PERSON">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZSALE_PERSON }}</span>
+            </td>
 
-          <td>
-            <input *ngIf="headerData.isEdit" type="date" class="form-control form-control-sm"
-              [(ngModel)]="headerData.ZPY_ARRIVED_DEST">
-            <span *ngIf="!headerData.isEdit">
-              {{ headerData.ZPY_ARRIVED_DEST | date:'dd-MM-yyyy' }}
-            </span>
-          </td>
+            <td>
+              <input *ngIf="headerData.isEdit" type="date" class="form-control form-control-sm"
+                [(ngModel)]="headerData.ZPY_ARRIVED_DEST">
+              <span *ngIf="!headerData.isEdit">
+                {{ headerData.ZPY_ARRIVED_DEST | date:'dd-MM-yyyy' }}
+              </span>
+            </td>
 
-          <td>
-            <input *ngIf="headerData.isEdit" class="form-control form-control-sm"
-              [(ngModel)]="headerData.ZUNLOADING_DT">
-            <span *ngIf="!headerData.isEdit">{{ headerData.ZUNLOADING_DT }}</span>
-          </td>
+            <td>
+              <input *ngIf="headerData.isEdit" class="form-control form-control-sm"
+                [(ngModel)]="headerData.ZUNLOADING_DT">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZUNLOADING_DT }}</span>
+            </td>
 
-          <td>
-            <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZPOD_SCAN">
-            <span *ngIf="!headerData.isEdit">{{ headerData.ZPOD_SCAN }}</span>
-          </td>
+            <td>
+              <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZPOD_SCAN">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZPOD_SCAN }}</span>
+            </td>
 
-          <td>
-            <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZSIT_SALE">
-            <span *ngIf="!headerData.isEdit">{{ headerData.ZSIT_SALE }}</span>
-          </td>
+            <td>
+              <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZSIT_SALE">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZSIT_SALE }}</span>
+            </td>
 
-          <td>
-            <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZLOCATION">
-            <span *ngIf="!headerData.isEdit">{{ headerData.ZLOCATION }}</span>
-          </td>
+            <td>
+              <input *ngIf="headerData.isEdit" class="form-control form-control-sm" [(ngModel)]="headerData.ZLOCATION">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZLOCATION }}</span>
+            </td>
 
-          <!-- ACTION -->
-          <td>
-            <div *ngIf="!headerData.isEdit">
-              <button class="btn btn-sm btn-primary" (click)="editRow(headerData)">
-                <i class="fas fa-edit"></i>
-              </button>
-            </div>
+            <!-- ACTION -->
+            <td>
+              <div *ngIf="!headerData.isEdit">
+                <button class="btn btn-sm btn-primary" (click)="editRow(headerData)">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="deleteRow(itemsList, i)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
 
-            <div *ngIf="headerData.isEdit">
-              <button class="btn btn-sm btn-success me-1" (click)="updateRow(headerData)">
-                <i class="fas fa-check"></i>
-              </button>
-              <button class="btn btn-sm btn-secondary" (click)="cancelEdit(headerData)">
-                <i class="fas fa-times"></i>
-              </button>
-            </div>
-          </td>
+              <div *ngIf="headerData.isEdit">
+                <button class="btn btn-sm btn-success me-1" (click)="updateRow(headerData)">
+                  <i class="fas fa-check"></i>
+                </button>
+                <button class="btn btn-sm btn-secondary" (click)="cancelEdit(headerData)">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </td>
 
-        </tr>
-      </tbody>
-    </table>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>

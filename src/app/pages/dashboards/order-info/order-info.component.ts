@@ -839,125 +839,186 @@ export class OrderInfoComponent implements OnInit {
     });
   }
 
-
   deleteRow(row: any, index: number): void {
-    if (row.sapType === 'SAP') {
-      this.DeleteWithSap(row, index);
-    } else {
-      this.DeleteWithoutSap(row, index);
-    }
-  }
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'Do you want to delete this record? This action cannot be undone.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Delete',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#d33'
+  }).then((result) => {
+    if (!result.isConfirmed) return;
 
-  DeleteWithSap(row: any, index: number): void {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to delete this record? This action cannot be undone.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, Delete',
-      cancelButtonText: 'Cancel',
-      confirmButtonColor: '#d33'
-    }).then((result) => {
-      if (!result.isConfirmed) return;
+    // 🔹 Prepare request payload
+    const payload = {
+      DELETE: [
+        {
+          ZREFNO: row.ZREFNO,
+          ZINV_NO: row.ZINV_NO,
+          ZLINE_NO: row.ZLINE_NO
+        }
+      ]
+    };
 
-      // 🔹 Prepare request payload (With SAP format)
-      const payload = {
-        DELETE: [
-          {
-            ZREFNO: row.ZREFNO,
-            ZINV_NO: row.ZINV_NO,
-            ZLINE_NO: row.ZLINE_NO
-          }
-        ]
-      };
+    // 🔹 Choose API based on sapType
+    const apiCall = this.sapType === 'SAP' 
+      ? this.service.OrderInfoDeleteWithSap(payload)
+      : this.service.OrderInfoDeleteWithoutSap(payload);
 
-      // 🔹 Call API
-      this.service.OrderInfoDeleteWithSap(payload).subscribe({
-        next: (res: any) => {
-          if (res?.STATUS === 'TRUE') {
-            // 🔹 Remove row from table only after success
-            this.searchOptionsList.splice(index, 1);
+    // 🔹 Call API
+    apiCall.subscribe({
+      next: (res: any) => {
+        if (res?.STATUS === 'TRUE' || res?.STATUS === true) {
+          // 🔹 Remove row from table only after success
+          this.searchOptionsList.splice(index, 1);
 
-            Swal.fire({
-              title: 'Deleted',
-              text: res.MESSAGE || 'Record deleted successfully',
-              icon: 'success',
-              confirmButtonText: 'Ok'
-            });
-          } else {
-            Swal.fire({
-              title: 'Failed',
-              text: res?.MESSAGE || 'Delete failed',
-              icon: 'error'
-            });
-          }
-        },
-        error: (err) => {
-          console.error(err);
           Swal.fire({
-            title: 'Error',
-            text: 'Something went wrong while deleting',
+            title: 'Deleted',
+            text: res.MESSAGE || 'Record deleted successfully',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          });
+        } else {
+          Swal.fire({
+            title: 'Failed',
+            text: res?.MESSAGE || 'Delete failed',
             icon: 'error'
           });
         }
-      });
+      },
+      error: (err) => {
+        console.error('Delete Error:', err);
+        Swal.fire({
+          title: 'Error',
+          text: err?.error?.MESSAGE || 'Something went wrong while deleting',
+          icon: 'error'
+        });
+      }
     });
-  }
-  DeleteWithoutSap(row: any, index: number): void {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to delete this record? This action cannot be undone.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, Delete',
-      cancelButtonText: 'Cancel',
-      confirmButtonColor: '#d33'
-    }).then((result) => {
-      if (!result.isConfirmed) return;
+  });
+}
 
-      // 🔹 Prepare request payload (With SAP format)
-      const payload = {
-        DELETE: [
-          {
-            ZREFNO: row.ZREFNO,
-            ZINV_NO: row.ZINV_NO,
-            ZLINE_NO: row.ZLINE_NO
-          }
-        ]
-      };
 
-      // 🔹 Call API
-      this.service.OrderInfoDeleteWithoutSap(payload).subscribe({
-        next: (res: any) => {
-          if (res?.STATUS === 'TRUE') {
-            // 🔹 Remove row from table only after success
-            this.searchOptionsList.splice(index, 1);
+  // deleteRow(row: any, index: number): void {
+  //   if (row.sapType === 'SAP') {
+  //     this.DeleteWithSap(row, index);
+  //   } else {
+  //     this.DeleteWithoutSap(row, index);
+  //   }
+  // }
 
-            Swal.fire({
-              title: 'Deleted',
-              text: res.MESSAGE || 'Record deleted successfully',
-              icon: 'success',
-              confirmButtonText: 'Ok'
-            });
-          } else {
-            Swal.fire({
-              title: 'Failed',
-              text: res?.MESSAGE || 'Delete failed',
-              icon: 'error'
-            });
-          }
-        },
-        error: (err) => {
-          console.error(err);
-          Swal.fire({
-            title: 'Error',
-            text: 'Something went wrong while deleting',
-            icon: 'error'
-          });
-        }
-      });
-    });
-  }
+  // DeleteWithSap(row: any, index: number): void {
+  //   Swal.fire({
+  //     title: 'Are you sure?',
+  //     text: 'Do you want to delete this record? This action cannot be undone.',
+  //     icon: 'warning',
+  //     showCancelButton: true,
+  //     confirmButtonText: 'Yes, Delete',
+  //     cancelButtonText: 'Cancel',
+  //     confirmButtonColor: '#d33'
+  //   }).then((result) => {
+  //     if (!result.isConfirmed) return;
+
+     
+  //     const payload = {
+  //       DELETE: [
+  //         {
+  //           ZREFNO: row.ZREFNO,
+  //           ZINV_NO: row.ZINV_NO,
+  //           ZLINE_NO: row.ZLINE_NO
+  //         }
+  //       ]
+  //     };
+
+  //     // 🔹 Call API
+  //     this.service.OrderInfoDeleteWithSap(payload).subscribe({
+  //       next: (res: any) => {
+  //         if (res?.STATUS === 'TRUE') {
+            
+  //           this.searchOptionsList.splice(index, 1);
+
+  //           Swal.fire({
+  //             title: 'Deleted',
+  //             text: res.MESSAGE || 'Record deleted successfully',
+  //             icon: 'success',
+  //             confirmButtonText: 'Ok'
+  //           });
+  //         } else {
+  //           Swal.fire({
+  //             title: 'Failed',
+  //             text: res?.MESSAGE || 'Delete failed',
+  //             icon: 'error'
+  //           });
+  //         }
+  //       },
+  //       error: (err) => {
+  //         console.error(err);
+  //         Swal.fire({
+  //           title: 'Error',
+  //           text: 'Something went wrong while deleting',
+  //           icon: 'error'
+  //         });
+  //       }
+  //     });
+  //   });
+  // }
+  // DeleteWithoutSap(row: any, index: number): void {
+  //   Swal.fire({
+  //     title: 'Are you sure?',
+  //     text: 'Do you want to delete this record? This action cannot be undone.',
+  //     icon: 'warning',
+  //     showCancelButton: true,
+  //     confirmButtonText: 'Yes, Delete',
+  //     cancelButtonText: 'Cancel',
+  //     confirmButtonColor: '#d33'
+  //   }).then((result) => {
+  //     if (!result.isConfirmed) return;
+
+      
+  //     const payload = {
+  //       DELETE: [
+  //         {
+  //           ZREFNO: row.ZREFNO,
+  //           ZINV_NO: row.ZINV_NO,
+  //           ZLINE_NO: row.ZLINE_NO
+  //         }
+  //       ]
+  //     };
+
+    
+  //     this.service.OrderInfoDeleteWithoutSap(payload).subscribe({
+  //       next: (res: any) => {
+  //         if (res?.STATUS === 'TRUE') {
+            
+  //           this.searchOptionsList.splice(index, 1);
+
+  //           Swal.fire({
+  //             title: 'Deleted',
+  //             text: res.MESSAGE || 'Record deleted successfully',
+  //             icon: 'success',
+  //             confirmButtonText: 'Ok'
+  //           });
+  //         } else {
+  //           Swal.fire({
+  //             title: 'Failed',
+  //             text: res?.MESSAGE || 'Delete failed',
+  //             icon: 'error'
+  //           });
+  //         }
+  //       },
+  //       error: (err) => {
+  //         console.error(err);
+  //         Swal.fire({
+  //           title: 'Error',
+  //           text: 'Something went wrong while deleting',
+  //           icon: 'error'
+  //         });
+  //       }
+  //     });
+  //   });
+  // }
 
 
 

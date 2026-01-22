@@ -931,24 +931,24 @@ export class TransitInfoComponent implements OnInit {
     );
   }
 
-  onFilterDivisionChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
-
-    if (plantObj) {
-      this.filterPlant = plantObj.PLANT;
-    } else {
-      this.filterPlant = '';
-    }
-    this.cd.detectChanges();
-  }
-
   onFilterPlantChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.PLANT === this.filterPlant);
+    const plantObj = this.PlantCodeList.find(item => item.PLANT_TEXT === this.filterPlant);  // ✅ Changed
 
     if (plantObj) {
       this.filterDivision = plantObj.DIVISION;
     } else {
       this.filterDivision = '';
+    }
+    this.cd.detectChanges();
+  }
+
+  onFilterDivisionChange(): void {
+    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
+
+    if (plantObj) {
+      this.filterPlant = plantObj.PLANT_TEXT;  // ✅ Set full text
+    } else {
+      this.filterPlant = '';
     }
     this.cd.detectChanges();
   }

@@ -314,7 +314,7 @@
       <br />
 
       <!-- ✅ ITEMS TABLE -->
-      <div *ngIf="showTable" style="overflow:auto;">
+      <div *ngIf="showForm" style="overflow:auto;">
         <form [formGroup]="ItemForm">
           <table class="table table-bordered">
             <thead>
@@ -345,13 +345,13 @@
                     </option>
                   </select>
                 </td>
-                <td><input formControlName="VEH_LINE"></td>
-                <td><input formControlName="VEHICLE"></td>
-                <td><input formControlName="TRUCK_NO"></td>
-                <td><input formControlName="LR_NO"></td>
-                <td><input formControlName="AH"></td>
-                <td><input formControlName="NO_SETS"></td>
-                <td><input formControlName="TRANSPORTER"></td>
+                <td><input type="number" formControlName="VEH_LINE"></td>
+                <td><input type="text" formControlName="VEHICLE"></td>
+                <td><input type="text" formControlName="TRUCK_NO"></td>
+                <td><input type="text" formControlName="LR_NO"></td>
+                <td><input  type="number" formControlName="AH"></td>
+                <td><input type="number" formControlName="NO_SETS"></td>
+                <td><input type="text" formControlName="TRANSPORTER"></td>
 
                 <td>
                   <button type="button" (click)="addItemRow()">+</button>
@@ -445,8 +445,8 @@
           <div class="form-field">
             <select [(ngModel)]="filterPlant" (change)="onFilterPlantChange()">
               <option value="">Select Plant</option>
-              <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT">{{ plant.PLANT }} - {{ plant.PLANT_DESC
-                }}
+              <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT_TEXT">
+                {{ plant.PLANT_TEXT }}
               </option>
             </select>
             <label>Plant</label>
@@ -534,9 +534,267 @@
   </div>
 </div>
 
-<!-- Search Results Table -->
-<div class="card" style="margin-top: 10px;" *ngIf="SavedDataShow">
+<div class="card" style="margin-top: 10px;" *ngIf="showTable && headerData">
   <div class="card-body-LE">
+    <h5 class="mb-3">Header Details</h5>
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped text-center">
+        <thead>
+          <tr>
+            <th>Ref No</th>
+            <th>Line No</th>
+            <th>Invoice No</th>
+            <th>ODN No</th>
+            <th>SO No</th>
+            <th>Fiscal Year</th>
+            <th>Reported Date</th>
+            <th>Claim Reference</th>
+            <th>Invoice Date</th>
+            <th>Base Value</th>
+            <th>Loss Declared</th>
+            <th>Claim Received</th>
+            <th>Salvage Value</th>
+            <th>Customer</th>
+            <th>Location</th>
+            <th>Damage Remarks</th>
+            <th>Claim Info Sent</th>
+            <th>Claim Status</th>
+            <th>Claim Document Status</th>
+            <th>Courier Details</th>
+            <th>Payment Status</th>
+            <th>Payment Info</th>
+            <th>UTR</th>
+            <th>Claim Settlement Date</th>
+            
+            <th>Sales Person</th>
+            <th>Plant</th>
+            <th>Division</th>
+            <th>Created Date</th>
+            <th>Vehicle Type</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr [class.editing]="headerData.isEdit">
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZREFNO">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZREFNO }}</span>
+            </td>
+
+            <td>{{ headerData.ZLINE_NO }}</td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZINV_NO">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZINV_NO }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZODN_NO">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZODN_NO }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZSONO">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZSO_NO }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZFI">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZFI }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="date" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZREP_DATE">
+              <span *ngIf="!headerData.isEdit">
+                {{ headerData.ZREP_DATE | date:'dd-MM-yyyy' }}
+              </span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZCLAIM_REF">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZCLAIM_REF }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZINV_DATE">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZINV_DATE }}</span>
+            </td>
+
+
+              
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZINV_BV">
+              <span *ngIf="!headerData.isEdit">
+                {{ headerData.ZINV_BV }}
+              </span>
+
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm  width-md" 
+                [(ngModel)]="headerData.ZLOSS_DCL">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZLOSS_DCL }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZCLM_RF">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZCLM_RF }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZSOL_VAL">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZSOL_VAL }}</span>
+            </td>
+
+          
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZCUSTOMER">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZCUSTOMER }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZLOCATION">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZLOCATION }}</span>
+            </td>
+
+
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm  width-md"
+                [(ngModel)]="headerData.ZDAMAGE_RMK">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZDAMAGE_RMK }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZCLM_INF">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZCLM_INF }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZCLM_ST">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZCLM_ST }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZCLM_DOC_ST">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZCLM_DOC_ST }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZCOURIER_DET">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZCOURIER_DET }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZPAY_ST">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZPAY_ST }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZPAY_INFO">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZPAY_INFO }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZUTR">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZUTR }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="date" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZCLM_SET_DT">
+              <span *ngIf="!headerData.isEdit">
+                {{ headerData.ZCLM_SET_DT | date:'dd-MM-yyyy' }}
+              </span>
+            </td>
+             
+
+
+
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZSALE_PERSON">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZSALE_PERSON }}</span>
+            </td>
+
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZPLANT">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZPLANT }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZDIVISION">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZDIVISION }}</span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="date" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZCREATED_DT">
+              <span *ngIf="!headerData.isEdit">
+                {{ headerData.ZCREATED_DT | date:'dd-MM-yyyy' }}
+              </span>
+            </td>
+
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZVEH_TYPE">
+              <span *ngIf="!headerData.isEdit">{{ headerData.ZVEH_TYPE }}</span>
+            </td>
+
+            
+            <!-- ACTION -->
+            <td>
+              <div *ngIf="!headerData.isEdit">
+                <button class="btn btn-sm btn-primary" (click)="editSearchRow(headerData)">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="deleteRow(itemsList, i)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+
+              <div *ngIf="headerData.isEdit">
+                <button class="btn btn-sm btn-success me-1" (click)="updateSearchRow(headerData)">
+                  <i class="fas fa-check"></i>
+                </button>
+                <button class="btn btn-sm btn-secondary" (click)="cancelSearchEdit(headerData)">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Search Results Table -->
+<div class="card" style="margin-top: 10px;" *ngIf="showTable && itemsList.length > 0">
+  <div class="card-body-LE">
+   <h5 class="mb-3">Line Items</h5>
     <div class="table-responsive">
 
       <table class="table table-bordered table-striped text-center">
@@ -544,6 +802,7 @@
           <tr>
             <th>Map ID</th>
             <th>Ref No</th>
+            <th>Line No</th>
             <th>Invoice No</th>
             <th>Vehicle Line</th>
             <th>Vehicle Type</th>
@@ -559,7 +818,7 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let item of searchOptionsList" [class.editing]="item.isEdit">
+          <tr *ngFor="let item of itemsList; let i = index" [class.editing]="item.isEdit">
 
             <td>
               <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZMAPID">
@@ -567,74 +826,79 @@
             </td>
 
             <td>
-              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZREFNO">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZREFNO">
               <span *ngIf="!item.isEdit">{{ item.ZREFNO }}</span>
             </td>
 
+            <td>{{ item.ZLINE_NO}}</td>
+
             <td>
-              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZINV_NO">
+              <input *ngIf="item.isEdit" type="text"  class="form-control form-control-sm width-md" [(ngModel)]="item.ZINV_NO">
               <span *ngIf="!item.isEdit">{{ item.ZINV_NO }}</span>
             </td>
 
             <td>
-              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZVEH_LINE">
+              <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md" [(ngModel)]="item.ZVEH_LINE">
               <span *ngIf="!item.isEdit">{{ item.ZVEH_LINE }}</span>
             </td>
 
             <td>
-              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZVEHICLE">
+              <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md" [(ngModel)]="item.ZVEHICLE">
               <span *ngIf="!item.isEdit">{{ item.ZVEHICLE }}</span>
             </td>
 
             <td>
-              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZTRUCK_NO">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZTRUCK_NO">
               <span *ngIf="!item.isEdit">{{ item.ZTRUCK_NO }}</span>
             </td>
 
             <td>
-              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZBILLNO">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZBILLNO">
               <span *ngIf="!item.isEdit">{{ item.ZBILLNO }}</span>
             </td>
 
             <td>
-              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZWORK_ORDER">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZWORK_ORDER">
               <span *ngIf="!item.isEdit">{{ item.ZWORK_ORDER }}</span>
             </td>
 
             <td>
-              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZLRNO">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZLRNO">
               <span *ngIf="!item.isEdit">{{ item.ZLRNO }}</span>
             </td>
 
             <td>
-              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZAH">
+              <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md" [(ngModel)]="item.ZAH">
               <span *ngIf="!item.isEdit">{{ item.ZAH }}</span>
             </td>
 
             <td>
-              <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm" [(ngModel)]="item.ZNO_SETS">
+              <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md" [(ngModel)]="item.ZNO_SETS">
               <span *ngIf="!item.isEdit">{{ item.ZNO_SETS }}</span>
             </td>
 
             <td>
-              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZTRANSPORTER">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZTRANSPORTER">
               <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
             </td>
 
             <!-- ACTION -->
             <td>
               <div *ngIf="!item.isEdit" class="btn-group">
-                <button class="btn btn-sm btn-primary me-1" (click)="editSavedRow(item)">
+                <button class="btn btn-sm btn-primary me-1" (click)="editSearchRow(item)">
                   <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="deleteRow(itemsList, i)">
+                  <i class="fas fa-trash"></i>
                 </button>
               </div>
 
               <div *ngIf="item.isEdit" class="btn-group">
-                <button class="btn btn-sm btn-success me-1" (click)="updateSavedRow(item)">
+                <button class="btn btn-sm btn-success me-1" (click)="updateSearchRow(item)">
                   <i class="fas fa-check"></i>
                 </button>
 
-                <button class="btn btn-sm btn-secondary" (click)="cancelSavedEdit(item)">
+                <button class="btn btn-sm btn-secondary" (click)="cancelSearchEdit(item)">
                   <i class="fas fa-times"></i>
                 </button>
               </div>

@@ -230,6 +230,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     this.searchOptionsList = [];
     this.selectedItems = [];
     this.SavedDataShow = false;
+      this.headerData = null;
+    this.itemsList = [];
 
 
 
@@ -500,112 +502,198 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   }
 
   // Search Functionality
-  onSearchReference(): void {
-    if (!this.searchReference?.trim()) {
-      Swal.fire('Please enter a value', '', 'warning');
-      return;
-    }
+  // onSearchReference(): void {
+  //   if (!this.searchReference?.trim()) {
+  //     Swal.fire('Please enter a value', '', 'warning');
+  //     return;
+  //   }
 
-    this.SavedDataShow = false;
-    this.ShowHeaderForm = false;
+  //   this.SavedDataShow = false;
+  //   this.ShowHeaderForm = false;
 
 
-    if (!this.selectedType) {
-      Swal.fire('Please select a search type', '', 'info');
-      return;
-    }
+  //   if (!this.selectedType) {
+  //     Swal.fire('Please select a search type', '', 'info');
+  //     return;
+  //   }
 
-    let payload1: any = {
-      global: 'INSURANCE CLAIM STATUS',
-      data: {
-        REF_NO: '',
-        INV_NO: '',
-        SO_NO: '',
-        TRANSPORTER: '',
-        LR_NO: '',
-        WORKORDER_NO: '',
-        SALES_PERSON: '',
-        LOCATION: '',
-        ODN_NO: '',
-        VEHICLE_NO: '',
-        FREIGHT_BILLNO: '',
-        PRODUCT: '',
-        ROUTE: '',
-        NATURE_DAMAGE: '',
-        CLAIM_STATUS: ''
-      }
-    };
+  //   let payload1: any = {
+  //     global: 'INSURANCE CLAIM STATUS',
+  //     data: {
+  //       REF_NO: '',
+  //       INV_NO: '',
+  //       SO_NO: '',
+  //       TRANSPORTER: '',
+  //       LR_NO: '',
+  //       WORKORDER_NO: '',
+  //       SALES_PERSON: '',
+  //       LOCATION: '',
+  //       ODN_NO: '',
+  //       VEHICLE_NO: '',
+  //       FREIGHT_BILLNO: '',
+  //       PRODUCT: '',
+  //       ROUTE: '',
+  //       NATURE_DAMAGE: '',
+  //       CLAIM_STATUS: ''
+  //     }
+  //   };
 
-    payload1.data[this.selectedType] = this.searchReference.trim();
+  //   payload1.data[this.selectedType] = this.searchReference.trim();
 
-    console.log('🔍 Payload1:', payload1);
-    this.spinner.show();
-    let apiCall;
+  //   console.log('🔍 Payload1:', payload1);
+  //   this.spinner.show();
+  //   let apiCall;
 
-    if (this.sapType === 'SAP') {
-      apiCall = this.service.global_Fields_SearchOption(payload1); // POST
-    } else {
-      apiCall = this.service.global_Fields_SearchOption_WithoutSap(payload1); // PUT
-    }
+  //   if (this.sapType === 'SAP') {
+  //     apiCall = this.service.global_Fields_SearchOption(payload1); 
+  //   } else {
+  //     apiCall = this.service.global_Fields_SearchOption_WithoutSap(payload1);
+  //   }
 
-    apiCall.subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        console.log('✅ Search Response:', res);
+  //   apiCall.subscribe({
+  //     next: (res: any) => {
+  //       this.spinner.hide();
+  //       console.log('✅ Search Response:', res);
 
-        if (res.NUMBER == '100' && res.STATUS == 'FALSE') {
-          this.searchOptionsList = [];
-          Swal.fire('', res.MESSAGE, 'warning');
-        } else {
-          this.searchOptionsList = (res.ITEMS || []).map((item: any) => ({
-            ...item,
-            isEdit: false,      // 👈 edit enable flag
-            _backup: null       // 👈 optional (for cancel edit)
-          }));
-          this.showForm = false;
-          this.SavedDataShow = true;
-          this.ShowHeaderForm = true;
-          this.showTable = false;
+  //       if (res.NUMBER == '100' && res.STATUS == 'FALSE') {
+  //         this.searchOptionsList = [];
+  //         Swal.fire('', res.MESSAGE, 'warning');
+  //       } else {
+  //         this.searchOptionsList = (res.ITEMS || []).map((item: any) => ({
+  //           ...item,
+  //           isEdit: false,      
+  //           _backup: null       
+  //         }));
+  //         this.showForm = false;
+  //         this.SavedDataShow = true;
+  //         this.ShowHeaderForm = true;
+  //         this.showTable = false;
 
-          const header = res.HEADER?.[0];
-          console.log('HEADER PATCH', header);
+  //         const header = res.HEADER?.[0];
+  //         console.log('HEADER PATCH', header);
 
-          this.HeaderForm.patchValue({
-            INV_NO: header.ZINV_NO,
-            FI: header.ZFI,
-            REP_DATE: header.ZREP_DATE,
-            CLAIM_REF: header.ZCLAIM_REF,
-            INV_DATE: header.ZINV_DATE,
-            INV_BV: header.ZINV_BV,
-            LOSS_DCL: header.ZLOSS_DCL,
-            CLM_RF: header.ZCLM_RF,
-            SOL_VAL: header.ZSOL_VAL,
-            CUSTOMER: header.ZCUSTOMER,
-            SO_NO: header.ZSO_NO,
-            LOCATION: header.ZLOCATION,
-            DAMAGE_RMK: header.ZDAMAGE_RMK,
-            CLM_INF: header.ZCLM_INF,
-            CLM_ST: header.ZCLM_ST,
-            CLM_DOC_ST: header.ZCLM_DOC_ST,
-            COURIER_DET: header.ZCOURIER_DET,
-            PAY_ST: header.ZPAY_ST,
-            PAY_INFO: header.ZPAY_INFO,
-            UTR: header.ZUTR,
-            CLM_SET_DT: header.ZCLM_SET_DT,
-            SALE_PERSON: header.ZSALE_PERSON,
-            REFNO: header.ZREFNO
-          });
+  //         this.HeaderForm.patchValue({
+  //           INV_NO: header.ZINV_NO,
+  //           FI: header.ZFI,
+  //           REP_DATE: header.ZREP_DATE,
+  //           CLAIM_REF: header.ZCLAIM_REF,
+  //           INV_DATE: header.ZINV_DATE,
+  //           INV_BV: header.ZINV_BV,
+  //           LOSS_DCL: header.ZLOSS_DCL,
+  //           CLM_RF: header.ZCLM_RF,
+  //           SOL_VAL: header.ZSOL_VAL,
+  //           CUSTOMER: header.ZCUSTOMER,
+  //           SO_NO: header.ZSO_NO,
+  //           LOCATION: header.ZLOCATION,
+  //           DAMAGE_RMK: header.ZDAMAGE_RMK,
+  //           CLM_INF: header.ZCLM_INF,
+  //           CLM_ST: header.ZCLM_ST,
+  //           CLM_DOC_ST: header.ZCLM_DOC_ST,
+  //           COURIER_DET: header.ZCOURIER_DET,
+  //           PAY_ST: header.ZPAY_ST,
+  //           PAY_INFO: header.ZPAY_INFO,
+  //           UTR: header.ZUTR,
+  //           CLM_SET_DT: header.ZCLM_SET_DT,
+  //           SALE_PERSON: header.ZSALE_PERSON,
+  //           REFNO: header.ZREFNO
+  //         });
 
-          Swal.fire('Data fetched successfully!', '', 'success');
+  //         Swal.fire('Data fetched successfully!', '', 'success');
+  //       }
+  //     },
+  //     error: (err) => {
+  //       this.spinner.hide();
+  //       console.error('❌ Error:', err);
+  //       Swal.fire('Error fetching data', '', 'error');
+  //     }
+  //   });
+  // }
+      onSearchReference() {
+    
+       
+        this.headerData = null;
+        this.itemsList = [];
+        this.showTable = false;
+    
+        if (!this.searchReference?.trim()) {
+          Swal.fire('Please enter a value', '', 'warning');
+          return;
         }
-      },
-      error: (err) => {
-        this.spinner.hide();
-        console.error('❌ Error:', err);
-        Swal.fire('Error fetching data', '', 'error');
+    
+        if (!this.selectedType) {
+          Swal.fire('Please select a search type', '', 'info');
+          return;
+        }
+    
+        let payload1: any = {
+        "global": "INSURANCE CLAIM STATUS",
+        "data": {
+          "REF_NO": "",
+          "INV_NO": "",
+          "SO_NO": "",
+          "TRANSPORTER": "",
+          "LR_NO": "",
+          "WORKORDER_NO": "",
+          "SALES_PERSON": "",
+          "LOCATION": "",
+          "ODN_NO": "",
+          "VEHICLE_NO": "",
+          "FREIGHT_BILLNO": "",
+          "PRODUCT": "",
+          "ROUTE": "",
+          "NATURE_DAMAGE": "",
+          "CLAIM_STATUS": ""
+          }
+        };
+    
+        payload1.data[this.selectedType] = this.searchReference.trim();
+    
+        console.log('🔍 Payload:', payload1);
+        this.spinner.show();
+    
+        let apiCall;
+    
+        if (this.sapType === 'SAP') {
+          apiCall = this.service.global_Fields_SearchOption(payload1); // POST
+        } else {
+          apiCall = this.service.global_Fields_SearchOption_WithoutSap(payload1); // PUT
+        }
+    
+        apiCall.subscribe({
+          next: (res: any) => {
+            this.spinner.hide();
+            console.log('✅ Search Response:', res);
+    
+            if (res.NUMBER === '100' && res.STATUS === 'FALSE') {
+              this.searchOptionsList = [];
+              Swal.fire('', res.MESSAGE, 'warning');
+            } else if (!res.HEADER || res.HEADER.length === 0) {
+              this.searchOptionsList = [];
+              Swal.fire('No records found', '', 'info');
+            } else {
+              this.headerData = {
+                ...res.HEADER[0],
+                isEdit: false
+              };
+    
+              this.itemsList = res.ITEMS.map((item: any) => ({
+                ...item,
+                isEdit: false
+              }));
+    
+              this.showTable = true;
+              this.showForm = false;
+              this.ShowHeaderForm = false
+              Swal.fire('Data fetched successfully!', '', 'success');
+            }
+          },
+          error: (err) => {
+            this.spinner.hide();
+            console.error('❌ Error:', err);
+            Swal.fire('Error fetching data', '', 'error');
+          }
+        });
       }
-    });
-  }
 
   // Input Change
   onInputChange(type: 'purchase' | 'invoice'): void {
@@ -1317,24 +1405,24 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     );
   }
 
-  onFilterDivisionChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
-
-    if (plantObj) {
-      this.filterPlant = plantObj.PLANT;
-    } else {
-      this.filterPlant = '';
-    }
-    this.cd.detectChanges();
-  }
-
   onFilterPlantChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.PLANT === this.filterPlant);
+    const plantObj = this.PlantCodeList.find(item => item.PLANT_TEXT === this.filterPlant);  // ✅ Changed
 
     if (plantObj) {
       this.filterDivision = plantObj.DIVISION;
     } else {
       this.filterDivision = '';
+    }
+    this.cd.detectChanges();
+  }
+
+  onFilterDivisionChange(): void {
+    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
+
+    if (plantObj) {
+      this.filterPlant = plantObj.PLANT_TEXT;  // ✅ Set full text
+    } else {
+      this.filterPlant = '';
     }
     this.cd.detectChanges();
   }

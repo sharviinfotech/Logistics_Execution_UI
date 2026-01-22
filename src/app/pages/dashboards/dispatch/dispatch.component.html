@@ -4,32 +4,32 @@
   <div class="card-body-LE">
 
     <!-- 🔹 Main Mode Selection (Creation / Filter and Download) -->
-    
-      <div class="Creation-radio">
-        <label>
-          <input type="radio" name="mainMode" [(ngModel)]="mainMode" value="creation" (change)="onMainModeChange()" />
-          <div class="icon">
-            <i class="fa fa-plus"></i>
-          </div>
-          <div class="text-content">
-            <span class="title">Creation</span>
-            <span class="description">Create new dispatch entries for inward or outward logistics</span>
-          </div>
-        </label>
 
-        <label>
-          <input type="radio" name="mainMode" [(ngModel)]="mainMode" value="filter" (change)="onMainModeChange()" />
-          <div class="icon" style="border-radius: 8px">
-            <i class="fa fa-file-download"></i>
+    <div class="Creation-radio">
+      <label>
+        <input type="radio" name="mainMode" [(ngModel)]="mainMode" value="creation" (change)="onMainModeChange()" />
+        <div class="icon">
+          <i class="fa fa-plus"></i>
+        </div>
+        <div class="text-content">
+          <span class="title">Creation</span>
+          <span class="description">Create new dispatch entries for inward or outward logistics</span>
+        </div>
+      </label>
 
-          </div>
-          <div class="text-content">
-            <span class="title">Filter & Download</span>
-            <span class="description">Filter records by date, plant, division and export to Excel</span>
-          </div>
-        </label>
-      </div>
-  
+      <label>
+        <input type="radio" name="mainMode" [(ngModel)]="mainMode" value="filter" (change)="onMainModeChange()" />
+        <div class="icon" style="border-radius: 8px">
+          <i class="fa fa-file-download"></i>
+
+        </div>
+        <div class="text-content">
+          <span class="title">Filter & Download</span>
+          <span class="description">Filter records by date, plant, division and export to Excel</span>
+        </div>
+      </label>
+    </div>
+
 
     <br />
 
@@ -97,8 +97,8 @@
       <!-- 📊 Dispatch Form Table -->
       <div class="table-responsive">
         <form [formGroup]="dispatchForm" *ngIf="showForm">
-          
-          <table class="table table-bordered table-striped text-center " >
+
+          <table class="table table-bordered table-striped text-center ">
             <thead>
               <tr>
                 <th>SI.No</th>
@@ -208,14 +208,27 @@
 
       <!-- Save Buttons -->
       <div class="text-right" *ngIf="showForm">
-        <button class="btn btn-md btn-raised btnSave" (click)="isUpdateMode ? onUpdateDispatch() : save()">
-          {{ isUpdateMode ? 'Update' : 'Save' }}
-        </button>
-        <button class="btn btn-md btn-raised btnSave move"
+
+  <!-- Save / Update -->
+  <button class="btn btn-md btn-raised btnSave"
+          (click)="isUpdateMode ? onUpdateDispatch() : save()">
+    {{ isUpdateMode ? 'Update' : 'Save' }}
+    <i class="fas fa-save" *ngIf="!isUpdateMode"></i>
+    <i class="fa fa-edit" *ngIf="isUpdateMode"></i>
+  </button>
+
+  <!-- Save and Next / Update and Next -->
+  <button class="btn btn-md btn-raised btnSave move"
           (click)="isUpdateMode ? onUpdateDispatch('next') : save('next')">
-          {{ isUpdateMode ? 'Update and Next' : 'Save and Next' }}
-        </button>
-      </div>
+    {{ isUpdateMode ? 'Update and Next' : 'Save and Next' }}
+    <i class="fas fa-save" *ngIf="!isUpdateMode"></i>
+    <i class="fas fa-edit" *ngIf="isUpdateMode"></i>
+    <i class="fas fa-arrow-right"></i>
+  </button>
+
+</div>
+
+
 
     </div>
 
@@ -264,7 +277,7 @@
             <select [(ngModel)]="filterPlant" (change)="onFilterPlantChange()">
               <option value="">Select Plant</option>
               <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT_TEXT">
-              {{ plant.PLANT_TEXT }}
+                {{ plant.PLANT_TEXT }}
               </option>
             </select>
             <label>Plant</label>

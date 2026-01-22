@@ -292,6 +292,7 @@ export class TransitDamageInfoComponent implements OnInit {
       this.showTable = false;
       this.ShowHeaderForm = false;
       this.showForm = false;
+      this.searchOptionsList = [];
     }
 
     // ✅ Clear all input fields and data
@@ -302,6 +303,8 @@ export class TransitDamageInfoComponent implements OnInit {
     this.searchOptionsList = [];
     this.selectedItems = [];
     this.SavedDataShow = false;
+      this.headerData = null;
+    this.itemsList = [];
 
 
 
@@ -465,25 +468,128 @@ export class TransitDamageInfoComponent implements OnInit {
   }
 
   // Search functionality
-  onSearchReference() {
-    if (!this.searchReference?.trim()) {
-      Swal.fire('Please enter a value', '', 'warning');
-      return;
-    }
-    this.SavedDataShow = false;
-    this.ShowHeaderForm = false;
+  // onSearchReference() {
+  //   if (!this.searchReference?.trim()) {
+  //     Swal.fire('Please enter a value', '', 'warning');
+  //     return;
+  //   }
+  //   this.SavedDataShow = false;
+  //   this.ShowHeaderForm = false;
 
-    // ✅ Hide invoice table and clear items when searching
-    this.showTable = false;
-    this.showForm = false;
+    
+  //   this.showTable = false;
+  //   this.showForm = false;
 
 
-    if (!this.selectedType) {
-      Swal.fire('Please select a search type', '', 'info');
-      return;
-    }
+  //   if (!this.selectedType) {
+  //     Swal.fire('Please select a search type', '', 'info');
+  //     return;
+  //   }
 
-    let payload1: any = {
+  //   let payload1: any = {
+  //     "global": "TRANSIT DAMAGE INFO",
+  //     "data": {
+  //       "REF_NO": "",
+  //       "INV_NO": "",
+  //       "SO_NO": "",
+  //       "TRANSPORTER": "",
+  //       "LR_NO": "",
+  //       "WORKORDER_NO": "",
+  //       "SALES_PERSON": "",
+  //       "LOCATION": "",
+  //       "ODN_NO": "",
+  //       "VEHICLE_NO": "",
+  //       "FREIGHT_BILLNO": "",
+  //       "PRODUCT": "",
+  //       "ROUTE": "",
+  //       "NATURE_DAMAGE": "",
+  //       "CLAIM_STATUS": ""
+  //     }
+  //   };
+  //   payload1.data[this.selectedType] = this.searchReference.trim();
+
+  //   console.log('🔍 Payload1:', payload1);
+  //   this.spinner.show();
+  //   let apiCall;
+
+  //   if (this.sapType === 'SAP') {
+  //     apiCall = this.service.global_Fields_SearchOption(payload1); 
+  //   } else {
+  //     apiCall = this.service.global_Fields_SearchOption_WithoutSap(payload1); 
+  //   }
+
+  //   apiCall.subscribe({
+  //     next: (res: any) => {
+  //       this.spinner.hide();
+  //       console.log('✅ Search Response:', res);
+
+  //       if (res.NUMBER == "100" && res.STATUS == "FALSE") {
+  //         this.searchOptionsList = [];
+
+
+  //         Swal.fire('', res.MESSAGE, 'warning');
+  //       } else {
+
+  //         this.searchOptionsList = (res.ITEMS || []).map((item: any) => ({
+  //           ...item,
+  //           isEdit: false,      
+  //           _backup: null       
+  //         }));
+  //         this.showForm = false;
+  //         this.SavedDataShow = true;
+  //         this.ShowHeaderForm = true;
+  //         this.showTable = false;
+  //         const header = res.HEADER?.[0];
+  //         console.log("HEADER PATCH", header)
+  //         this.HeaderForm.patchValue({
+  //           INV_NO: header.ZINV_NO,
+  //           INV_DATE: header.ZINV_DATE,
+  //           FSR_RPT_DT: header.ZFSR_RPT_DT,
+  //           BASIC_VALUE: header.ZBASIC_VALUE,
+  //           INC_DATE: header.ZINC_DATE,
+  //           CUSTOMER: header.ZCUSTOMER,
+  //           CONSIGN_NAME: header.ZCONSIGN_NAME,
+  //           DAMAGE_RMK: header.ZDAMAGE_RMK,
+  //           SETTLEMENT: header.ZSETTLEMENT,
+  //           CLOSING_DT: header.ZCLOSING_DT,
+  //           IMAGES: header.ZIMAGES,
+  //           ODN_NO: header.ODN_NO,
+  //           SONO: header.SONO,
+  //           SALE_PERSON: header.ZSALE_PERSON,
+  //           LOCATION: header.ZLOCATION,
+  //           ROUTE: header.ZROUTE,
+  //           REFNO: header.ZREFNO,
+  //         });
+
+  //         Swal.fire('Data fetched successfully!', '', 'success');
+  //       }
+  //     },
+  //     error: (err) => {
+  //       this.spinner.hide();
+  //       console.error('❌ Error:', err);
+  //       Swal.fire('Error fetching data', '', 'error');
+  //     }
+  //   });
+  // }
+
+    onSearchReference() {
+  
+     
+      this.headerData = null;
+      this.itemsList = [];
+      this.showTable = false;
+  
+      if (!this.searchReference?.trim()) {
+        Swal.fire('Please enter a value', '', 'warning');
+        return;
+      }
+  
+      if (!this.selectedType) {
+        Swal.fire('Please select a search type', '', 'info');
+        return;
+      }
+  
+      let payload1: any = {
       "global": "TRANSIT DAMAGE INFO",
       "data": {
         "REF_NO": "",
@@ -501,73 +607,57 @@ export class TransitDamageInfoComponent implements OnInit {
         "ROUTE": "",
         "NATURE_DAMAGE": "",
         "CLAIM_STATUS": ""
-      }
-    };
-    payload1.data[this.selectedType] = this.searchReference.trim();
-
-    console.log('🔍 Payload1:', payload1);
-    this.spinner.show();
-    let apiCall;
-
-    if (this.sapType === 'SAP') {
-      apiCall = this.service.global_Fields_SearchOption(payload1); // POST
-    } else {
-      apiCall = this.service.global_Fields_SearchOption_WithoutSap(payload1); // PUT
-    }
-
-    apiCall.subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        console.log('✅ Search Response:', res);
-
-        if (res.NUMBER == "100" && res.STATUS == "FALSE") {
-          this.searchOptionsList = [];
-
-
-          Swal.fire('', res.MESSAGE, 'warning');
-        } else {
-
-          this.searchOptionsList = (res.ITEMS || []).map((item: any) => ({
-            ...item,
-            isEdit: false,      // 👈 edit enable flag
-            _backup: null       // 👈 optional (for cancel edit)
-          }));
-          this.showForm = false;
-          this.SavedDataShow = true;
-          this.ShowHeaderForm = true;
-          this.showTable = false;
-          const header = res.HEADER?.[0];
-          console.log("HEADER PATCH", header)
-          this.HeaderForm.patchValue({
-            INV_NO: header.ZINV_NO,
-            INV_DATE: header.ZINV_DATE,
-            FSR_RPT_DT: header.ZFSR_RPT_DT,
-            BASIC_VALUE: header.ZBASIC_VALUE,
-            INC_DATE: header.ZINC_DATE,
-            CUSTOMER: header.ZCUSTOMER,
-            CONSIGN_NAME: header.ZCONSIGN_NAME,
-            DAMAGE_RMK: header.ZDAMAGE_RMK,
-            SETTLEMENT: header.ZSETTLEMENT,
-            CLOSING_DT: header.ZCLOSING_DT,
-            IMAGES: header.ZIMAGES,
-            ODN_NO: header.ODN_NO,
-            SONO: header.SONO,
-            SALE_PERSON: header.ZSALE_PERSON,
-            LOCATION: header.ZLOCATION,
-            ROUTE: header.ZROUTE,
-            REFNO: header.ZREFNO,
-          });
-
-          Swal.fire('Data fetched successfully!', '', 'success');
         }
-      },
-      error: (err) => {
-        this.spinner.hide();
-        console.error('❌ Error:', err);
-        Swal.fire('Error fetching data', '', 'error');
+      };
+  
+      payload1.data[this.selectedType] = this.searchReference.trim();
+  
+      console.log('🔍 Payload:', payload1);
+      this.spinner.show();
+  
+      let apiCall;
+  
+      if (this.sapType === 'SAP') {
+        apiCall = this.service.global_Fields_SearchOption(payload1); // POST
+      } else {
+        apiCall = this.service.global_Fields_SearchOption_WithoutSap(payload1); // PUT
       }
-    });
-  }
+  
+      apiCall.subscribe({
+        next: (res: any) => {
+          this.spinner.hide();
+          console.log('✅ Search Response:', res);
+  
+          if (res.NUMBER === '100' && res.STATUS === 'FALSE') {
+            this.searchOptionsList = [];
+            Swal.fire('', res.MESSAGE, 'warning');
+          } else if (!res.HEADER || res.HEADER.length === 0) {
+            this.searchOptionsList = [];
+            Swal.fire('No records found', '', 'info');
+          } else {
+            this.headerData = {
+              ...res.HEADER[0],
+              isEdit: false
+            };
+  
+            this.itemsList = res.ITEMS.map((item: any) => ({
+              ...item,
+              isEdit: false
+            }));
+  
+            this.showTable = true;
+            this.showForm = false;
+            this.ShowHeaderForm = false
+            Swal.fire('Data fetched successfully!', '', 'success');
+          }
+        },
+        error: (err) => {
+          this.spinner.hide();
+          console.error('❌ Error:', err);
+          Swal.fire('Error fetching data', '', 'error');
+        }
+      });
+    }
 
   allSelected(): boolean {
     return this.items.controls.length > 0 &&
@@ -636,8 +726,9 @@ export class TransitDamageInfoComponent implements OnInit {
         // ✅ Hide search results when showing invoice data
         this.SavedDataShow = false;
         this.searchOptionsList = [];
+        this.showTable = false;
 
-        this.showTable = true;
+        
         this.ShowHeaderForm = true;
         this.showForm = true;
 
@@ -922,92 +1013,109 @@ export class TransitDamageInfoComponent implements OnInit {
 
 
   // Method to update the edited row
-  updateSearchRow(row: any, index: number): void {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to update this record?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, Update',
-      cancelButtonText: 'Cancel'
-    }).then(result => {
-      if (!result.isConfirmed) return;
+  // Replace your existing updateSearchRow method with this corrected version:
 
-      /* ---------------- HEADER (Same as SAVE) ---------------- */
-      const headerPayload: any = {
-        INV_NO: row.ZINV_NO || null,
-        INV_DATE: row.ZINV_DATE || null,
-        BASIC_VALUE: row.ZBASIC_VALUE || null,
-        INC_DATE: row.ZINC_DATE || null,
-        CUSTOMER: row.ZCUST_NAME || null,
-        CONSIGN_NAME: row.ZCONSIGN_NAME || null,
-        SALE_PERSON: row.ZSALE_PERSON || null,
-        LOCATION: row.ZLOCATION || null,
-        ROUTE: row.ZROUTE || null,
-        REFNO: row.ZREFNO || null,
-        SETTLEMENT: row.ZSETTLEMENT,
-        CLOSING_DT: row.ZCLOSING_DT
-      };
+updateSearchRow(row: any, index: number): void {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'Do you want to update this record?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Update',
+    cancelButtonText: 'Cancel'
+  }).then(result => {
+    if (!result.isConfirmed) return;
 
-      /* ---------------- ITEM (Single edited row) ---------------- */
-      const itemPayload = {
-        ZMAPID: row.ZMAPID || null,
-        INV_NO: row.ZINV_NO || null,
-        REFNO: row.ZREFNO || null,
-        POSNR: row.ZLINE_NO || null,
-        VEH_LINE: row.ZVEH_LINE || null,
-        TRUCK_NO: row.ZVEH_NUM || null,
-        LR_NO: row.ZLRNO || null,
-        TRANSPORTER: row.ZTRANSPORTER || null,
-        WORK_ORDER: row.ZWORK_ORDER || null,
-        BILLNO: row.ZBILLNO || null,
-        PRODUCT: row.ZPRODUCT || null
-      };
+    /* ---------------- HEADER PAYLOAD ---------------- */
+    const headerPayload: any = {
+      REFNO: row.ZREFNO || null,
+      INV_NO: row.ZINV_NO || null,
+      ODN_NO: row.ZODN_NO || null,
+      SONO: row.ZSONO || null,
+      INV_DATE: row.ZINV_DATE || null,
+      FSR_RPT_DT: row.ZFSR_RPT_DT || null,
+      BASIC_VALUE: row.ZBASIC_VALUE || null,
+      INC_DATE: row.ZINC_DATE || null,
+      CUSTOMER: row.ZCUSTOMER || null,
+      CONSIGN_NAME: row.ZCONSIGN_NAME || null,
+      DAMAGE_RMK: row.ZDAMAGE_RMK || null,
+      SETTLEMENT: row.ZSETTLEMENT || null,
+      CLOSING_DT: row.ZCLOSING_DT || null,
+      IMAGES: row.ZIMAGES || null,
+      SALE_PERSON: row.ZSALE_PERSON || null,
+      LOCATION: row.ZLOCATION || null,
+      ROUTE: row.ZROUTE || null,
+      PLANT: row.ZPLANT || null,
+      DIVISION: row.ZDIVISION || null,
+      VEH_TYPE: row.ZVEH_TYPE || null,
+      CREATED_DT: row.ZCREATED_DT || null
+    };
 
+    /* ---------------- ITEM PAYLOAD ---------------- */
+    const itemPayload = {
+      ZMAPID: row.ZMAPID || null,
+      INV_NO: row.ZINV_NO || null,
+      LINE_NO: row.ZLINE_NO || null,
+      REFNO: row.ZREFNO || null,
+      POSNR: row.ZLINE_NO || null,
+      VEH_LINE: row.ZVEH_LINE || null,
+      TRUCK_NO: row.ZTRUCK_NO || null,
+      LR_NO: row.ZLRNO || null,
+      TRANSPORTER: row.ZTRANSPORTER || null,
+      WORK_ORDER: row.ZWORK_ORDER || null,
+      BILLNO: row.ZBILLNO || null,
+      PRODUCT: row.ZPRODUCT || null
+    };
 
-      const payload = {
-        HEADER: headerPayload,
-        ITEM: [itemPayload]   // ✅ SINGLE RECORD ARRAY
-      };
+    const payload = {
+      HEADER: [headerPayload],
+      ITEM: [itemPayload]
+    };
 
-      console.log('🛠 UPDATE PAYLOAD:', payload);
+    console.log('🛠 UPDATE PAYLOAD:', payload);
 
-      this.spinner.show();
+    this.spinner.show();
 
-      const apiCall =
-        this.sapType === 'SAP'
-          ? this.service.TransitDamageInfoSave(payload)   // ✅ SAME AS SAP SAVE
-          : this.service.withoutsapSave(payload);
+    const apiCall =
+      this.sapType === 'SAP'
+        ? this.service.TransitDamageInfoSave(payload)
+        : this.service.withoutsapSave(payload);
 
-      apiCall.subscribe({
-        next: (res: any) => {
-          this.spinner.hide();
-
-          if (res?.STATUS === 'TRUE' || res?.STATUS === true) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Updated',
-              text: res.MESSAGE || 'Record updated successfully',
-              confirmButtonText: 'OK'
-            }).then(() => {
-              row.isEdit = false;
-              delete row._backup;
-
-              // 🔄 Refresh search table
-              this.onSearchReference();
-            });
-          } else {
-            Swal.fire('Update Failed', res?.MESSAGE || '', 'warning');
-          }
-        },
-        error: (err) => {
-          this.spinner.hide();
-          console.error('❌ Update Error:', err);
-          Swal.fire('Error', 'Update failed', 'error');
-        }
-      });
-    });
-  }
+           apiCall.subscribe(
+             (res: any) => {
+               this.spinner.hide();
+     
+               if (res.STATUS === 'true' || res.NUMBER === '200') {
+                 Swal.fire({
+                   title: 'Success',
+                   text: res.MESSAGE || 'Record updated successfully',
+                   icon: 'success',
+                   confirmButtonText: 'Ok',
+                 }).then(() => {
+                   row.isEdit = false;
+                   delete row._backup;
+                   this.onSearchReference();
+                 });
+               } else {
+                 Swal.fire({
+                   title: 'Error',
+                   text: res.MESSAGE || 'Failed to update record',
+                   icon: 'error',
+                   confirmButtonText: 'Ok',
+                 });
+               }
+             },
+             (error) => {
+               this.spinner.hide();
+               console.error('❌ Update Error:', error);
+               Swal.fire({
+                 text: 'Internal Server Error. Please try again later.',
+                 icon: 'error',
+               });
+             }
+           );
+  });
+}
 
   deleteRow(row: any, index: number): void {
     if (row.SAP_TYPE === 'SAP') {
@@ -1199,24 +1307,24 @@ export class TransitDamageInfoComponent implements OnInit {
     );
   }
 
-  onFilterDivisionChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
-
-    if (plantObj) {
-      this.filterPlant = plantObj.PLANT;
-    } else {
-      this.filterPlant = '';
-    }
-    this.cd.detectChanges();
-  }
-
   onFilterPlantChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.PLANT === this.filterPlant);
+    const plantObj = this.PlantCodeList.find(item => item.PLANT_TEXT === this.filterPlant);  // ✅ Changed
 
     if (plantObj) {
       this.filterDivision = plantObj.DIVISION;
     } else {
       this.filterDivision = '';
+    }
+    this.cd.detectChanges();
+  }
+
+  onFilterDivisionChange(): void {
+    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
+
+    if (plantObj) {
+      this.filterPlant = plantObj.PLANT_TEXT;  // ✅ Set full text
+    } else {
+      this.filterPlant = '';
     }
     this.cd.detectChanges();
   }
