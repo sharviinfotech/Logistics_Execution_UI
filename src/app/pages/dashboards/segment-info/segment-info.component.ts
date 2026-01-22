@@ -660,7 +660,7 @@ export class SegmentInfoComponent implements OnInit {
   //     return;
   //   }
 
-    
+
   //   if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
   //     Swal.fire({
   //       icon: 'warning',
@@ -671,7 +671,7 @@ export class SegmentInfoComponent implements OnInit {
 
   //   const formValue = this.segmentInfo.value;
 
-    
+
   //   const saveArray: any[] = [];
 
   //   if (this.orderType === 'Outward') {
@@ -712,7 +712,7 @@ export class SegmentInfoComponent implements OnInit {
 
   //   this.spinner.show();
 
-    
+
   //   const apiCall =
   //     this.sapType === 'SAP'
   //       ? this.service.SegmentInfoOutwardSave({
@@ -769,57 +769,64 @@ export class SegmentInfoComponent implements OnInit {
     }).then((result) => {
       if (!result.isConfirmed) return;
 
-      
+      // 🔑 Mandatory PK validation
+      if (!row.ZREFNO || !row.ZLINE_NO) {
+        Swal.fire('Error', 'Missing mandatory keys (ZREFNO / ZLINE_NO)', 'error');
+        return;
+      }
 
-      // ✅ Single record object
-      const updatePayload = {
-         REFNO: row.ZREFNO || 0,
-          WORK_ORDER: row.ZWORK_ORDER || '',
-          LRNO: row.ZLRNO || '',
-          TRANSPORTER: row.ZTRANSPORTER || '',
+      const changePayload = {
+        ZREFNO: String(row.ZREFNO),
+        ZLINE_NO: String(row.ZLINE_NO),
+        ZINV_NUM: row.ZINV_NUM || '',
+        ZODN_NO: row.ZODN_NO || '',
+        ZSO_NO: row.ZSO_NO || '',
 
-          SO_NO: row.ZSO_NO || '',
-          ODN_NO: row.ZODN_NO || '',
+        ZSALE_PERSON: row.ZSALE_PERSON || '',
+        ZSEGMENT: row.ZSEGMENT || '',
+        ZAPPTYP: row.ZAPPTYP || '',
 
-          INV_NUM: row.ZINV_NUM || this.invoicenumber || '',
-          SALE_PERSON: row.ZSALE_PERSON || '',
-          SEGMENT: row.ZSEGMENT || '',
-          APPTYP: row.ZAPPTYP || '',
+        ZCUST_PROFILE: row.ZCUST_PROFILE || '',
+        ZBRANCH: row.ZBRANCH || '',
+        ZBRANCH_ZONE: row.ZBRANCH_ZONE || '',
 
-          CUST_PROFILE: row.ZCUST_PROFILE || '',
-          BRANCH: row.ZBRANCH || '',
-          BRANCH_ZONE: row.ZBRANCH_ZONE || '',
-          TAT_TYPE: row.ZTAT_TYPE || '',
-          TAT: row.ZTAT || '',
-          ETA: row.ZETA || ''
+        ZTAT_TYPE: row.ZTAT_TYPE || '',
+        ZTAT: String(row.ZTAT || ''),
+        ZETA: row.ZETA || '',
+
+        ZWORK_ORDER: row.ZWORK_ORDER || '',
+        ZLRNO: row.ZLRNO || '',
+        ZTRANSPORTER: row.ZTRANSPORTER || '',
+
+        ZCREATED_DT: row.ZCREATED_DT || '',
+        ZPLANT: row.ZPLANT || '',
+        ZDIVISION: row.ZDIVISION || '',
+        ZVEH_TYPE: row.ZVEH_TYPE || ''
       };
 
-      console.log("🛠 UPDATE RECORD:", updatePayload);
+      const payload = {
+        CHANGE: [changePayload]
+      };
+
+      console.log('🛠 SEGMENT CHANGE PAYLOAD:', payload);
 
       this.spinner.show();
 
-      // ✅ IMPORTANT FIX: payload MUST be ARRAY
-      let apiCall =
-        this.sapType === "SAP"
-          ? this.service.SegmentInfoOutwardSave({
-            SAVE: [updatePayload]
-          })
-          : this.service.SegmentInfoNonSap({
-            CREATE: [updatePayload]
-          });
+      const api$ =
+        this.sapType === 'SAP'
+          ? this.service.SegmentInfoChangeWithSap(payload)
+          : this.service.SegmentInfoChangeWithoutSap(payload);
 
-          
-
-      apiCall.subscribe(
+      api$.subscribe(
         (res: any) => {
           this.spinner.hide();
 
-          if (res.STATUS === 'true' || res.NUMBER === '200') {
+          if (res.STATUS === 'TRUE' || res.NUMBER === '200') {
             Swal.fire({
               title: 'Success',
-              text: res.MESSAGE || 'Record updated successfully',
+              text: res.MESSAGE || 'Data updated successfully',
               icon: 'success',
-              confirmButtonText: 'Ok',
+              confirmButtonText: 'Ok'
             }).then(() => {
               row.isEdit = false;
               delete row._backup;
@@ -828,23 +835,20 @@ export class SegmentInfoComponent implements OnInit {
           } else {
             Swal.fire({
               title: 'Error',
-              text: res.MESSAGE || 'Failed to update record',
-              icon: 'error',
-              confirmButtonText: 'Ok',
+              text: res.MESSAGE || 'Update failed',
+              icon: 'error'
             });
           }
         },
-        (error) => {
+        () => {
           this.spinner.hide();
-          console.error('❌ Update Error:', error);
-          Swal.fire({
-            text: 'Internal Server Error. Please try again later.',
-            icon: 'error',
-          });
+          Swal.fire('Error', 'Internal Server Error', 'error');
         }
       );
     });
   }
+
+
 
 
 
@@ -1237,24 +1241,24 @@ export class SegmentInfoComponent implements OnInit {
     );
   }
 
-  onFilterDivisionChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
-
-    if (plantObj) {
-      this.filterPlant = plantObj.PLANT;
-    } else {
-      this.filterPlant = '';
-    }
-    this.cd.detectChanges();
-  }
-
   onFilterPlantChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.PLANT === this.filterPlant);
+    const plantObj = this.PlantCodeList.find(item => item.PLANT_TEXT === this.filterPlant);  // ✅ Changed
 
     if (plantObj) {
       this.filterDivision = plantObj.DIVISION;
     } else {
       this.filterDivision = '';
+    }
+    this.cd.detectChanges();
+  }
+
+  onFilterDivisionChange(): void {
+    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
+
+    if (plantObj) {
+      this.filterPlant = plantObj.PLANT_TEXT;  // ✅ Set full text
+    } else {
+      this.filterPlant = '';
     }
     this.cd.detectChanges();
   }

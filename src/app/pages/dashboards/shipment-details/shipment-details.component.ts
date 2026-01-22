@@ -825,81 +825,99 @@ export class ShipmentDetailsComponent implements OnInit {
 
   // Method to update the edited row
   updateShipmentSap(row: any) {
-    if (!row.ZMAPID || !row.VBELN || !row.POSNR || !row.ZLINE_NO) {
+    // 🔑 Mandatory PK check
+    if (!row.ZREFNO || !row.VBELN || !row.POSNR || !row.ZLINE_NO) {
       Swal.fire('Error', 'Primary key missing', 'error');
       return null;
     }
 
-    const payload = [{
-      ZMAPID: row.ZMAPID,
-      VBELN: row.VBELN,
-      POSNR: row.POSNR,
-      ZLINE_NO: row.ZLINE_NO,
+    const payload = {
+      CHANGE: [
+        {
+          ZREFNO: row.ZREFNO,
+          ZLINE_NO: row.ZLINE_NO,
+          VBELN: row.VBELN,
+          POSNR: row.POSNR,
+          ZMAPID: row.ZMAPID,
+          ZSO_NO: row.ZSO_NO,
+          ZODN_NO: row.ZODN_NO,
+          ZPRODUCT: row.ZPRODUCT,
+          MTART: row.MTART,
+          MAKTX: row.MAKTX,
+          ZSETS: row.ZSETS,
+          ZAH: row.ZAH,
+          ZSHIP_WT: row.ZSHIP_WT,
+          ZBATCOND: row.ZBATCOND,
+          ZINCO: row.ZINCO,
+          ZINS_SCPOE: row.ZINS_SCPOE,
+          ZPIN_PLT: row.ZPIN_PLT,
+          ZPIN_STP: row.ZPIN_STP,
+          ZKM: row.ZKM,
+          ZWORK_ORDER: row.ZWORK_ORDER,
+          ZLRNO: row.ZLRNO,
+          ZTRANSPORTER: row.ZTRANSPORTER,
+          ZPLANT: row.ZPLANT,
+          ZDIVISION: row.ZDIVISION,
+          ZCREATED_DT: row.ZCREATED_DT,
+          ZVEH_TYPE: row.ZVEH_TYPE
+        }
+      ]
+    };
 
-      ZREFNO: row.ZREFNO,
-      ZPRODUCT: row.ZPRODUCT,
-      MTART: row.MTART,
-      MAKTX: row.MAKTX,
-      ZSETS: Number(row.ZSETS) || 0,
-      ZAH: Number(row.ZAH) || 0,
-      ZSHIP_WT: Number(row.ZSHIP_WT) || 0,
-      ZBATCOND: row.ZBATCOND,
-      ZINCO: row.ZINCO,
-      ZINS_SCPOE: row.ZINS_SCPOE,
-      ZKM: Number(row.ZKM) || 0,
-      ZWORK_ORDER: row.ZWORK_ORDER,
-      ZLRNO: row.ZLRNO,
-      ZTRANSPORTER: row.ZTRANSPORTER,
-      ZVEH_TYPE: row.ZVEH_TYPE,
-      ZPLANT: row.ZPLANT,
-      ZDIVISION: row.ZDIVISION
-    }];
+    console.log('🟢 SAP CHANGE payload:', payload);
 
-    return this.service.ShipmentOutwardSave(payload);
+    return this.service.Shipmentchangewithsap(payload);
   }
+
   updateShipmentNonSap(row: any) {
     // 🔑 STRICT PK CHECK
     if (
-      row.ZMAPID == null ||
+      row.ZREFNO == null ||
+      row.ZLINE_NO == null ||
       row.VBELN == null ||
-      row.POSNR == null ||
-      row.ZLINE_NO == null
+      row.POSNR == null
     ) {
-      Swal.fire('Error', 'Primary key missing (ZLINE_NO issue)', 'error');
+      Swal.fire('Error', 'Primary key missing', 'error');
       return null;
     }
 
-    // 🚨 VERY IMPORTANT: do NOT modify ZLINE_NO
-    const payload = [{
-      MANDT: '100',                 // 🔑 mandatory
-      ZMAPID: row.ZMAPID,
-      VBELN: String(row.VBELN),
-      POSNR: Number(row.POSNR),
-      ZLINE_NO: Number(row.ZLINE_NO),  // 🔥 SAME AS DB
+    const payload = {
+      CHANGE: [{
+        ZREFNO: row.ZREFNO,
+        ZLINE_NO: row.ZLINE_NO,   // backend expects STRING
+        VBELN: row.VBELN,
+        POSNR: row.POSNR,
+        ZMAPID: row.ZMAPID,
+        ZSO_NO: row.ZSO_NO,
+        ZODN_NO: row.ZODN_NO,
+        ZPRODUCT: row.ZPRODUCT,
+        MTART: row.MTART,
+        MAKTX: row.MAKTX,
+        ZSETS: row.ZSETS,
+        ZAH: row.ZAH,
+        ZSHIP_WT: row.ZSHIP_WT,
+        ZBATCOND: row.ZBATCOND,
+        ZINCO: row.ZINCO,
+        ZINS_SCPOE: row.ZINS_SCPOE,
+        ZKM: row.ZKM,
+        ZWORK_ORDER: row.ZWORK_ORDER,
+        ZLRNO: row.ZLRNO,
+        ZTRANSPORTER: row.ZTRANSPORTER,
+        ZPLANT: row.ZPLANT || '',
+        ZDIVISION: row.ZDIVISION || '',
+        ZCREATED_DT: row.ZCREATED_DT || '',
+        ZVEH_TYPE: row.ZVEH_TYPE || ''
+      }
+      ]
+    };
 
-      ZREFNO: row.ZREFNO,
-      ZPRODUCT: row.ZPRODUCT,
-      MTART: row.MTART,
-      MAKTX: row.MAKTX,
-      ZSETS: Number(row.ZSETS) || 0,
-      ZAH: Number(row.ZAH) || 0,
-      ZSHIP_WT: Number(row.ZSHIP_WT) || 0,
-      ZBATCOND: row.ZBATCOND,
-      ZINCO: row.ZINCO,
-      ZINS_SCPOE: row.ZINS_SCPOE,
-      ZKM: Number(row.ZKM) || 0,
-      ZWORK_ORDER: row.ZWORK_ORDER,
-      ZLRNO: row.ZLRNO,
-      ZTRANSPORTER: row.ZTRANSPORTER,
-      ZVEH_TYPE: row.ZVEH_TYPE,
-      ZPLANT: row.ZPLANT,
-      ZDIVISION: row.ZDIVISION
-    }];
+
 
     console.log('🟡 Non-SAP UPDATE payload:', payload);
 
-    return this.service.shipmentdetailsNonSapSave(payload);
+    return this.service.Shipmentchangewithoutsap(payload);
   }
+
 
 
   updateSearchRow(row: any): void {
@@ -929,12 +947,13 @@ export class ShipmentDetailsComponent implements OnInit {
         (res: any) => {
           this.spinner.hide();
 
-          if (res?.STATUS === 'true' || res?.NUMBER === '200') {
+          if (res.STATUS === 'true' || res.NUMBER === '200') {
+            console.log('✅ Update Response:', res);
             Swal.fire({
               title: 'Success',
-              text: 'Shipment updated successfully',
+              text: res.MESSAGE || 'Record updated successfully',
               icon: 'success',
-              confirmButtonText: 'Ok'
+              confirmButtonText: 'Ok',
             }).then(() => {
               row.isEdit = false;
               delete row._backup;
@@ -963,9 +982,8 @@ export class ShipmentDetailsComponent implements OnInit {
 
   deleteRow(row: any, index: number): void {
     if (row.SAP_TYPE === 'SAP') {
-      this.DeleteWithSap(row, index);
-    }
-    else {
+      this.DeleteWithSap(row, index); // ✅ FIXED
+    } else {
       this.DeleteWithoutSap(row, index);
     }
   }
@@ -973,58 +991,82 @@ export class ShipmentDetailsComponent implements OnInit {
   DeleteWithSap(row: any, index: number): void {
     Swal.fire({
       title: 'Are you sure?',
-      text: 'Do you want to delete this record? This action cannot be undone.',
+      text: 'Do you want to delete this shipment document?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Yes, Delete',
       cancelButtonText: 'Cancel',
       confirmButtonColor: '#d33'
-    }).then((result) => {
+    }).then(result => {
       if (!result.isConfirmed) return;
 
-      // 🔹 Prepare request payload (With SAP format)
+      // ✅ Mandatory fields check - all three are required
+      if (!row.ZREFNO || !row.VBELN || !row.ZLINE_NO) {
+        Swal.fire({
+          title: 'Error',
+          text: 'Missing mandatory keys (ZREFNO, VBELN, ZLINE_NO)',
+          icon: 'error'
+        });
+        return;
+      }
+
+      // ✅ Create payload exactly as per your working Postman format
       const payload = {
         DELETE: [
           {
-            ZREFNO: row.ZREFNO,
-            ZINV_NO: row.ZINV_NO,
-            ZLINE_NO: row.ZLINE_NO
+            ZREFNO: String(row.ZREFNO),
+            ZINV_NO: String(row.VBELN),  // ✅ Using VBELN as ZINV_NO
+            ZLINE_NO: String(row.ZLINE_NO)
           }
         ]
       };
 
-      // 🔹 Call API
+      console.log('🟥 SAP DELETE PAYLOAD:', payload);
+
+      this.spinner.show();
+
       this.service.ShipmentDeleteWithSap(payload).subscribe({
         next: (res: any) => {
-          if (res?.STATUS === 'TRUE') {
-            // 🔹 Remove row from table only after success
+          this.spinner.hide();
+          console.log('✅ SAP DELETE RESPONSE:', res);
+
+          // ✅ Check for success response
+          if (res?.NUMBER === '200' || res?.STATUS === 'TRUE') {
+            // Remove from table after successful deletion
             this.searchOptionsList.splice(index, 1);
 
             Swal.fire({
               title: 'Deleted',
-              text: res.MESSAGE || 'Record deleted successfully',
+              text: res.MSG || res.MESSAGE || 'Data deleted successfully',
               icon: 'success',
               confirmButtonText: 'Ok'
             });
           } else {
             Swal.fire({
               title: 'Failed',
-              text: res?.MESSAGE || 'Delete failed',
+              text: res?.MSG || res?.MESSAGE || 'Delete operation failed',
               icon: 'error'
             });
           }
         },
-        error: (err) => {
-          console.error(err);
+        error: err => {
+          this.spinner.hide();
+          console.error('❌ SAP Delete Error:', err);
           Swal.fire({
             title: 'Error',
-            text: 'Something went wrong while deleting',
+            text: 'Internal Server Error. Please try again later.',
             icon: 'error'
           });
         }
       });
     });
   }
+
+
+
+
+
+
   DeleteWithoutSap(row: any, index: number): void {
     Swal.fire({
       title: 'Are you sure?',

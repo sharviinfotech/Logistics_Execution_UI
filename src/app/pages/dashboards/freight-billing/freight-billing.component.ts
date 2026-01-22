@@ -617,39 +617,60 @@ export class FreightBillingComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Yes, Update',
       cancelButtonText: 'Cancel'
-    }).then((result) => {
+    }).then(result => {
       if (!result.isConfirmed) return;
 
-      // ✅ SAME payload as saveFreightBilling
-      const record = {
-        INV_NO: row.ZINV_NO || '',
-        REFNO: row.ZREFNO || '',
-        BILLNO: row.FreightBillNumber || row.ZBILLNO || '',
-        BILLDATE: row.FreightBillDate || row.ZBILLDATE || '',
-        PHY_DATE: row.FreightBillPhysicalSubmissionDate || row.ZPHY_DATE || '',
-        FRT_CHARGES: row.FreightCharges || row.ZFRT_CHARGES || 0,
-        ORDER_NO: row.WorkOrderNumber || row.ZORDER_NO || '',
-        WORKORDER: row.ZWORK_ORDER || '',
-        LRNO: row.ZLRNO || '',
-        TRANSPORTER: row.ZTRANSPORTER || '',
-        BILL_SUBMISSION: row.BillSubmission || row.ZBILL_SUBMISSION || '',
+
+      if (!row.ZREFNO || !row.ZINV_NO || !row.ZLINE_NO) {
+        Swal.fire('Error', 'Primary key missing', 'error');
+        return;
+      }
+
+      const payload = {
+        CHANGE: [
+          {
+            ZREFNO: row.ZREFNO,
+            ZINV_NO: row.ZINV_NO,
+            ZBILLNO: row.ZBILLNO,
+            ZLINE_NO: row.ZLINE_NO,
+
+            ZODN_NO: row.ZODN_NO,
+            ZSONO: row.ZSONO,
+            ZSALE_PERSON: row.ZSALE_PERSON,
+            ZBILLDATE: row.ZBILLDATE,
+            ZPHY_DATE: row.ZPHY_DATE,
+            ZFRT_CHARGES: row.ZFRT_CHARGES,
+            ZWORKORDER: row.ZWORKORDER,
+            ZBILL_SUBMISSION: row.ZBILL_SUBMISSION,
+            ZWORK_ORDER: row.ZWORK_ORDER,
+            ZLRNO: row.ZLRNO,
+            ZTRANSPORTER: row.ZTRANSPORTER,
+            ZLOCATION: row.ZLOCATION,
+            ZVEH_LINE: row.ZVEH_LINE,
+            ZVEH_NUM: row.ZVEH_NUM,
+            ZCREATED_DT: row.ZCREATED_DT,
+            ZPLANT: row.ZPLANT,
+            ZDIVISION: row.ZDIVISION,
+            ZVEH_TYPE: row.ZVEH_TYPE
+          }
+        ]
       };
 
-      console.log('🛠 FREIGHT BILLING UPDATE PAYLOAD:', record);
+      console.log('🛠 FREIGHT BILLING CHANGE PAYLOAD:', payload);
 
       this.spinner.show();
 
-      // ✅ REPLACED OrderInfo APIs with FreightBilling APIs
-      let request$ =
+
+      const request$ =
         this.sapType === 'SAP'
-          ? this.service.FreightBillingSave({ SAVE: [record] })
-          : this.service.FreightBillingNonSap({ CREATE: [record] });
+          ? this.service.FreightBillingChangeWithSap(payload)
+          : this.service.FreightBillingChangeWithoutSap(payload);
 
       request$.subscribe(
         (res: any) => {
           this.spinner.hide();
 
-          if (res.STATUS === 'true' || res.NUMBER === '200') {
+          if (res?.NUMBER === '200' || res?.STATUS === 'TRUE') {
             Swal.fire({
               icon: 'success',
               text: res.MESSAGE || 'Freight Billing updated successfully',
@@ -657,26 +678,24 @@ export class FreightBillingComponent implements OnInit {
             }).then(() => {
               row.isEdit = false;
               delete row._backup;
-              this.onSearchReference(); // refresh table
+              this.onSearchReference();
             });
           } else {
             Swal.fire({
               icon: 'error',
-              text: res.MESSAGE || 'Failed to update Freight Billing',
+              text: res.MESSAGE || 'Failed to update Freight Billing'
             });
           }
         },
-        (error) => {
+        () => {
           this.spinner.hide();
-          console.error('❌ Freight Billing Update Error:', error);
-          Swal.fire({
-            icon: 'error',
-            text: 'Internal Server Error. Please try again later.'
-          });
+          Swal.fire('Error', 'Server error', 'error');
         }
       );
     });
   }
+
+
 
 
 
@@ -934,24 +953,24 @@ export class FreightBillingComponent implements OnInit {
     );
   }
 
-  onFilterDivisionChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
-
-    if (plantObj) {
-      this.filterPlant = plantObj.PLANT;
-    } else {
-      this.filterPlant = '';
-    }
-    this.cd.detectChanges();
-  }
-
   onFilterPlantChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.PLANT === this.filterPlant);
+    const plantObj = this.PlantCodeList.find(item => item.PLANT_TEXT === this.filterPlant);  // ✅ Changed
 
     if (plantObj) {
       this.filterDivision = plantObj.DIVISION;
     } else {
       this.filterDivision = '';
+    }
+    this.cd.detectChanges();
+  }
+
+  onFilterDivisionChange(): void {
+    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
+
+    if (plantObj) {
+      this.filterPlant = plantObj.PLANT_TEXT;  // ✅ Set full text
+    } else {
+      this.filterPlant = '';
     }
     this.cd.detectChanges();
   }

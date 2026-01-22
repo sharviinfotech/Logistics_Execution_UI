@@ -783,80 +783,95 @@ export class VechileInfoComponent implements OnInit {
 
   // Method to update the edited row
   updateVehicleSap(row: any) {
-    // PK check
-    if (!row.ZMAPID || !row.POSNR || !row.ZLINE_NO) {
+
+    // 🔑 Mandatory PKs for SAP
+    if (!row.ZREFNO || !row.VBELN || !row.POSNR || !row.ZLINE_NO || !row.ZMAPID) {
       Swal.fire('Error', 'Primary key missing', 'error');
       return null;
     }
 
-    const payload = [{
-      ZMAPID: row.ZMAPID,
-      POSNR: row.POSNR,
-      ZLINE_NO: row.ZLINE_NO,
+    const payload = {
+      CHANGE: [
+        {
+          ZREFNO: row.ZREFNO,
+          ZLINE_NO: row.ZLINE_NO,
+          VBELN: row.VBELN,
+          POSNR: row.POSNR,
 
-      ZREFNO: row.ZREFNO,
-      ZVEH_LINE: row.ZVEH_LINE,
-      ZTRX_TYPE: row.ZTRX_TYPE,
-      ZODN_NO: row.ZODN_NO,
-      ZSONO: row.ZSONO,
-      ZSALE_PERSON: row.ZSALE_PERSON,
-      ZTRANSPORTER: row.ZTRANSPORTER,
-      ZLRNO: row.ZLRNO,
-      ZTRUC_TYPE: row.ZTRUC_TYPE,
-      ZTRUC_WT: row.ZTRUC_WT,
-      ZTRUC_VOL: row.ZTRUC_VOL,
-      ZVEH_NUM: row.ZVEH_NUM,
-      ZNOOFVEH: row.ZNOOFVEH,
-      ZDNAME: row.ZDNAME,
-      ZDNUMBER: row.ZDNUMBER,
-      ZLOCATION: row.ZLOCATION,
-      ZWORK_ORDER: row.ZWORK_ORDER,
-      ZCREATED_DT: row.ZCREATED_DT,
-      ZPLANT: row.ZPLANT,
-      ZDIVISION: row.ZDIVISION,
-      ZVEH_TYPE: row.ZVEH_TYPE
-    }];
+          ZVEH_LINE: row.ZVEH_LINE,
+          ZTRX_TYPE: row.ZTRX_TYPE,
+          ZODN_NO: row.ZODN_NO,
+          ZSONO: row.ZSONO,
+          ZSALE_PERSON: row.ZSALE_PERSON,
+          ZTRANSPORTER: row.ZTRANSPORTER,
+          ZLRNO: row.ZLRNO,
+          ZTRUC_TYPE: row.ZTRUC_TYPE,
+          ZTRUC_WT: row.ZTRUC_WT,
+          ZTRUC_VOL: row.ZTRUC_VOL,
+          ZVEH_NUM: row.ZVEH_NUM,
+          ZNOOFVEH: row.ZNOOFVEH,
+          ZDNAME: row.ZDNAME,
+          ZDNUMBER: row.ZDNUMBER,
+          ZLOCATION: row.ZLOCATION,
+          ZWORK_ORDER: row.ZWORK_ORDER,
+          ZMAPID: row.ZMAPID,
+          ZCREATED_DT: row.ZCREATED_DT,
+          ZPLANT: row.ZPLANT,
+          ZDIVISION: row.ZDIVISION,
+          ZVEH_TYPE: row.ZVEH_TYPE
+        }
+      ]
+    };
 
-    return this.service.VehicleInfosave(payload);  // SAP update API
+
+    return this.service.VehicleInfoChangeWithSap(payload);
   }
+
   updateVehicleNonSap(row: any) {
-    // PK check
-    if (!row.ZMAPID || !row.POSNR || !row.ZLINE_NO) {
+
+
+    if (!row.ZREFNO || !row.VBELN || !row.POSNR || !row.ZLINE_NO || !row.ZMAPID) {
       Swal.fire('Error', 'Primary key missing', 'error');
       return null;
     }
 
-    const payload = [{
-      MANDT: '100',
-      ZMAPID: row.ZMAPID,
-      POSNR: row.POSNR,
-      ZLINE_NO: row.ZLINE_NO,
+    const payload = {
+      CHANGE: [
+        {
+          ZREFNO: row.ZREFNO,
+          ZLINE_NO: row.ZLINE_NO,
+          VBELN: row.VBELN,
+          POSNR: row.POSNR,
 
-      ZREFNO: row.ZREFNO,
-      ZVEH_LINE: row.ZVEH_LINE,
-      ZTRX_TYPE: row.ZTRX_TYPE,
-      ZODN_NO: row.ZODN_NO,
-      ZSONO: row.ZSONO,
-      ZSALE_PERSON: row.ZSALE_PERSON,
-      ZTRANSPORTER: row.ZTRANSPORTER,
-      ZLRNO: row.ZLRNO,
-      ZTRUC_TYPE: row.ZTRUC_TYPE,
-      ZTRUC_WT: row.ZTRUC_WT,
-      ZTRUC_VOL: row.ZTRUC_VOL,
-      ZVEH_NUM: row.ZVEH_NUM,
-      ZNOOFVEH: row.ZNOOFVEH,
-      ZDNAME: row.ZDNAME,
-      ZDNUMBER: row.ZDNUMBER,
-      ZLOCATION: row.ZLOCATION,
-      ZWORK_ORDER: row.ZWORK_ORDER,
-      ZCREATED_DT: row.ZCREATED_DT,
-      ZPLANT: row.ZPLANT,
-      ZDIVISION: row.ZDIVISION,
-      ZVEH_TYPE: row.ZVEH_TYPE
-    }];
+          ZVEH_LINE: row.ZVEH_LINE,
+          ZTRX_TYPE: row.ZTRX_TYPE,
+          ZODN_NO: row.ZODN_NO,
+          ZSONO: row.ZSONO,
+          ZSALE_PERSON: row.ZSALE_PERSON,
+          ZTRANSPORTER: row.ZTRANSPORTER,
+          ZLRNO: row.ZLRNO,
+          ZTRUC_TYPE: row.ZTRUC_TYPE,
+          ZTRUC_WT: row.ZTRUC_WT,
+          ZTRUC_VOL: row.ZTRUC_VOL,
+          ZVEH_NUM: row.ZVEH_NUM,
+          ZNOOFVEH: row.ZNOOFVEH,
+          ZDNAME: row.ZDNAME,
+          ZDNUMBER: row.ZDNUMBER,
+          ZLOCATION: row.ZLOCATION,
+          ZWORK_ORDER: row.ZWORK_ORDER,
+          ZMAPID: row.ZMAPID,
+          ZCREATED_DT: row.ZCREATED_DT,
+          ZPLANT: row.ZPLANT,
+          ZDIVISION: row.ZDIVISION,
+          ZVEH_TYPE: row.ZVEH_TYPE
+        }
+      ]
+    };
 
-    return this.service.VehicleInfoNonSap(payload);  // Non-SAP update API
+
+    return this.service.VehicleInfoChangeWithoutSap(payload);
   }
+
   updateVehicleRow(row: any): void {
     Swal.fire({
       title: 'Are you sure?',
@@ -1100,24 +1115,24 @@ export class VechileInfoComponent implements OnInit {
     );
   }
 
-  onFilterDivisionChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
-
-    if (plantObj) {
-      this.filterPlant = plantObj.PLANT;
-    } else {
-      this.filterPlant = '';
-    }
-    this.cd.detectChanges();
-  }
-
   onFilterPlantChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.PLANT === this.filterPlant);
+    const plantObj = this.PlantCodeList.find(item => item.PLANT_TEXT === this.filterPlant);  // ✅ Changed
 
     if (plantObj) {
       this.filterDivision = plantObj.DIVISION;
     } else {
       this.filterDivision = '';
+    }
+    this.cd.detectChanges();
+  }
+
+  onFilterDivisionChange(): void {
+    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
+
+    if (plantObj) {
+      this.filterPlant = plantObj.PLANT_TEXT;  // ✅ Set full text
+    } else {
+      this.filterPlant = '';
     }
     this.cd.detectChanges();
   }

@@ -313,7 +313,7 @@
           <div class="form-field">
             <select [(ngModel)]="filterPlant" (change)="onFilterPlantChange()">
               <option value="">Select Plant</option>
-              <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT_TEXT"> 
+              <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT_TEXT">
                 {{ plant.PLANT_TEXT}}
               </option>
             </select>
@@ -445,7 +445,8 @@
 
           <!-- REF NO -->
           <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZREFNO">
+            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZREFNO">
             <span *ngIf="!item.isEdit">{{ item.ZREFNO }}</span>
           </td>
 
@@ -457,83 +458,97 @@
 
           <!-- ODN -->
           <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZODN_NO">
+            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZODN_NO">
             <span *ngIf="!item.isEdit">{{ item.ZODN_NO }}</span>
           </td>
 
           <!-- SO -->
           <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZSONO">
+            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZSONO">
             <span *ngIf="!item.isEdit">{{ item.ZSONO }}</span>
           </td>
 
           <!-- Shipment -->
           <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZTRX_TYPE">
+            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZTRX_TYPE">
             <span *ngIf="!item.isEdit">{{ item.ZTRX_TYPE }}</span>
           </td>
 
           <!-- Transporter -->
           <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZTRANSPORTER">
+            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZTRANSPORTER">
             <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
           </td>
 
           <!-- LR -->
           <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZLRNO">
+            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZLRNO">
             <span *ngIf="!item.isEdit">{{ item.ZLRNO }}</span>
           </td>
 
           <!-- Vehicle Type -->
           <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZTRUC_TYPE">
+            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZTRUC_TYPE">
             <span *ngIf="!item.isEdit">{{ item.ZTRUC_TYPE }}</span>
           </td>
 
           <!-- Weight -->
           <td>
-            <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md" [(ngModel)]="item.ZTRUC_WT">
+            <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZTRUC_WT">
             <span *ngIf="!item.isEdit">{{ item.ZTRUC_WT }}</span>
           </td>
 
           <!-- Volume -->
           <td>
-            <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md" [(ngModel)]="item.ZTRUC_VOL">
+            <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZTRUC_VOL">
             <span *ngIf="!item.isEdit">{{ item.ZTRUC_VOL }}</span>
           </td>
 
           <!-- Vehicle No -->
           <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZVEH_NUM">
+            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZVEH_NUM">
             <span *ngIf="!item.isEdit">{{ item.ZVEH_NUM }}</span>
           </td>
 
           <!-- No Vehicles -->
           <td>
-            <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md" [(ngModel)]="item.ZNOOFVEH">
+            <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZNOOFVEH">
             <span *ngIf="!item.isEdit">{{ item.ZNOOFVEH }}</span>
           </td>
 
           <!-- Sales -->
           <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZSALE_PERSON">
+            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZSALE_PERSON">
             <span *ngIf="!item.isEdit">{{ item.ZSALE_PERSON }}</span>
           </td>
 
           <!-- Driver -->
           <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZDNAME">
+            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZDNAME">
             <span *ngIf="!item.isEdit">{{ item.ZDNAME }}</span>
           </td>
 
           <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZDNUMBER">
+            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZDNUMBER">
             <span *ngIf="!item.isEdit">{{ item.ZDNUMBER }}</span>
           </td>
 
           <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZWORK_ORDER">
+            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZWORK_ORDER">
             <span *ngIf="!item.isEdit">{{ item.ZWORK_ORDER }}</span>
           </td>
 
@@ -555,7 +570,7 @@
             </div>
 
             <div *ngIf="item.isEdit">
-              <button class="btn btn-sm btn-success me-1" (click)="updateSearchRow(item)">
+              <button class="btn btn-sm btn-success me-1" (click)="updateVehicleRow(item)">
                 <i class="fas fa-check"></i>
               </button>
               <button class="btn btn-sm btn-secondary" (click)="cancelSearchEdit(item)">

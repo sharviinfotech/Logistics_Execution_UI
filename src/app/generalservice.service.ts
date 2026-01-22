@@ -167,11 +167,17 @@ export class GeneralserviceService {
   shipmentdetailsNonSapReports(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/ShipmentDetails/Nonsap/Reports', obj);
   }
+  Shipmentchangewithsap(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/ShipmentDetails/Outward/ChangeWithSap', obj);
+  }
+  Shipmentchangewithoutsap(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/ShipmentDetails/Outward/ChangeWithoutSap', obj);
+  }
   ShipmentDeleteWithSap(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/ShipmentDetails/Outward/ShipmentDeleteWithSap', obj);
   }
   ShipmentDeleteWithoutSap(obj) {
-    return this.http.post(environment.baseUrl + 'api/external/LE/ShipmentDetails/Outward/ShipmentDeleteWithSap', obj);
+    return this.http.post(environment.baseUrl + 'api/external/LE/ShipmentDetails/Outward/ShipmentDeleteWithoutSap', obj);
   }
   SegmentInfoOutwardFetch(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/fetchInvoiceList', obj);
@@ -181,6 +187,12 @@ export class GeneralserviceService {
   }
   SegmentInfoNonSap(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/withoutsap/Save', obj);
+  }
+  SegmentInfoChangeWithSap(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/ChangeWithSap', obj);
+  }
+  SegmentInfoChangeWithoutSap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/ChangeWithoutSap', obj);
   }
   SegmentInfoDeleteWithSap(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/DeleteWithSap', obj);
@@ -219,6 +231,12 @@ export class GeneralserviceService {
   FreightBillingNonSap(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/FreightBilling/Outward/NonSap/Create', obj);
   }
+  FreightBillingChangeWithSap(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/FreightBilling/Outward/ChangeWithSap', obj);
+  }
+  FreightBillingChangeWithoutSap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/FreightBilling/Outward/ChangeWithoutSap', obj);
+  }
   FreightBillingDeleteWithSap(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/FreightBilling/Outward/WithSap/Delete', obj);
   }
@@ -239,6 +257,12 @@ export class GeneralserviceService {
   }
   VehicleInfoMapidForNonsap(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/Vehicleinfo/Outward/WithoutSapMapid', obj);
+  }
+  VehicleInfoChangeWithSap(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/Vehicleinfo/Outward/ChangeWithSap', obj);
+  }
+  VehicleInfoChangeWithoutSap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/Vehicleinfo/Outward/ChangeWithoutSap', obj);
   }
   VehicleInfoDeleteWithSap(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/Vehicleinfo/Outward/DeleteWithSap', obj);
