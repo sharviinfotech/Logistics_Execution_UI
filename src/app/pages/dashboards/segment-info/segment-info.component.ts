@@ -645,118 +645,7 @@ export class SegmentInfoComponent implements OnInit {
   }
 
 
-  // Method to update the edited row
-  // updateSearchRow(row: any, index: number): void {
 
-  //   if (this.segmentInfo.invalid) {
-  //     Swal.fire({
-  //       title: 'Are you sure?',
-  //     text: 'Do you want to update this record?',
-  //     icon: 'question',
-  //     showCancelButton: true,
-  //     confirmButtonText: 'Yes, Update',
-  //     cancelButtonText: 'Cancel'
-  //     });
-  //     return;
-  //   }
-
-
-  //   if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
-  //     Swal.fire({
-  //       icon: 'warning',
-  //       text: 'Please select at least one reference row before saving'
-  //     });
-  //     return;
-  //   }
-
-  //   const formValue = this.segmentInfo.value;
-
-
-  //   const saveArray: any[] = [];
-
-  //   if (this.orderType === 'Outward') {
-  //     this.selectedItems.forEach(item => {
-  //       saveArray.push({
-  //         REFNO: item.referenceNumber || 0,
-  //         WORK_ORDER: item.workOrderNumber || '',
-  //         LRNO: item.lrNumber || '',
-  //         TRANSPORTER: item.transporter || '',
-
-  //         SO_NO: item.SONO || '',
-  //         ODN_NO: item.ODN_NO || '',
-
-  //         INV_NUM: formValue.INV_VBELN || this.invoicenumber || '',
-  //         SALE_PERSON: formValue.SALE_PERSON || '',
-  //         SEGMENT: formValue.SEGMENT || '',
-  //         APPTYP: formValue.APPTYP || '',
-
-  //         CUST_PROFILE: formValue.CUST_PROF || '',
-  //         BRANCH: formValue.BRANCH || '',
-  //         BRANCH_ZONE: formValue.BRANCH_ZONE || '',
-  //         TAT_TYPE: formValue.TAT_Type || '',
-  //         TAT: formValue.TAT_DAYS || '',
-  //         ETA: formValue.ETA_DATE || ''
-  //       });
-  //     });
-  //   }
-
-  //   if (saveArray.length === 0) {
-  //     Swal.fire({
-  //       icon: 'warning',
-  //       text: 'No records available to save'
-  //     });
-  //     return;
-  //   }
-
-  //   console.log('✅ Segment SAVE payload:', saveArray);
-
-  //   this.spinner.show();
-
-
-  //   const apiCall =
-  //     this.sapType === 'SAP'
-  //       ? this.service.SegmentInfoOutwardSave({
-  //         SAVE: saveArray
-  //       })
-  //       : this.service.SegmentInfoNonSap({
-  //         CREATE: saveArray
-  //       });
-
-
-  //   apiCall.subscribe(
-  //     (res: any) => {
-  //       this.spinner.hide();
-
-  //       if (res.STATUS === 'true' || res.NUMBER === '200') {
-  //         Swal.fire({
-  //           title: 'Success',
-  //           text: res.MESSAGE || 'Record updated successfully',
-  //           icon: 'success',
-  //           confirmButtonText: 'Ok',
-  //         }).then(() => {
-  //           row.isEdit = false;
-  //           delete row._backup;
-  //           this.onSearchReference();
-  //         });
-  //       } else {
-  //         Swal.fire({
-  //           title: 'Error',
-  //           text: res.MESSAGE || 'Failed to update record',
-  //           icon: 'error',
-  //           confirmButtonText: 'Ok',
-  //         });
-  //       }
-  //     },
-  //     (error) => {
-  //       this.spinner.hide();
-  //       console.error('❌ Update Error:', error);
-  //       Swal.fire({
-  //         text: 'Internal Server Error. Please try again later.',
-  //         icon: 'error',
-  //       });
-  //     }
-  //   );
-  // }
 
   updateSearchRow(row: any, index: number): void {
     Swal.fire({
@@ -850,19 +739,7 @@ export class SegmentInfoComponent implements OnInit {
 
 
 
-
-
-
-
   deleteRow(row: any, index: number): void {
-    if (row.SAP_TYPE === 'SAP') {
-      this.DeleteWithSap(row, index);
-    } else {
-      this.DeleteWithoutSap(row, index);
-    }
-  }
-
-  DeleteWithSap(row: any, index: number): void {
     Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to delete this record? This action cannot be undone.',
@@ -874,21 +751,26 @@ export class SegmentInfoComponent implements OnInit {
     }).then((result) => {
       if (!result.isConfirmed) return;
 
-      // 🔹 Prepare request payload (With SAP format)
+      // 🔹 Prepare request payload
       const payload = {
         DELETE: [
           {
             ZREFNO: row.ZREFNO,
-            ZINV_NO: row.ZINV_NO,
+            ZINV_NO: row.ZINV_NUM,
             ZLINE_NO: row.ZLINE_NO
           }
         ]
       };
 
+      // 🔹 Choose API based on sapType
+      const apiCall = this.sapType === 'SAP'
+        ? this.service.SegmentInfoDeleteWithSap(payload)
+        : this.service.SegmentInfoDeleteWithoutSap(payload);
+
       // 🔹 Call API
-      this.service.SegmentInfoDeleteWithSap(payload).subscribe({
+      apiCall.subscribe({
         next: (res: any) => {
-          if (res?.STATUS === 'TRUE') {
+          if (res?.STATUS === 'TRUE' || res?.STATUS === true) {
             // 🔹 Remove row from table only after success
             this.searchOptionsList.splice(index, 1);
 
@@ -907,65 +789,10 @@ export class SegmentInfoComponent implements OnInit {
           }
         },
         error: (err) => {
-          console.error(err);
+          console.error('Delete Error:', err);
           Swal.fire({
             title: 'Error',
-            text: 'Something went wrong while deleting',
-            icon: 'error'
-          });
-        }
-      });
-    });
-  }
-  DeleteWithoutSap(row: any, index: number): void {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to delete this record? This action cannot be undone.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, Delete',
-      cancelButtonText: 'Cancel',
-      confirmButtonColor: '#d33'
-    }).then((result) => {
-      if (!result.isConfirmed) return;
-
-      // 🔹 Prepare request payload (With SAP format)
-      const payload = {
-        DELETE: [
-          {
-            ZREFNO: row.ZREFNO,
-            ZINV_NO: row.ZINV_NO,
-            ZLINE_NO: row.ZLINE_NO
-          }
-        ]
-      };
-
-      // 🔹 Call API
-      this.service.SegmentInfoDeleteWithoutSap(payload).subscribe({
-        next: (res: any) => {
-          if (res?.STATUS === 'TRUE') {
-            // 🔹 Remove row from table only after success
-            this.searchOptionsList.splice(index, 1);
-
-            Swal.fire({
-              title: 'Deleted',
-              text: res.MESSAGE || 'Record deleted successfully',
-              icon: 'success',
-              confirmButtonText: 'Ok'
-            });
-          } else {
-            Swal.fire({
-              title: 'Failed',
-              text: res?.MESSAGE || 'Delete failed',
-              icon: 'error'
-            });
-          }
-        },
-        error: (err) => {
-          console.error(err);
-          Swal.fire({
-            title: 'Error',
-            text: 'Something went wrong while deleting',
+            text: err?.error?.MESSAGE || 'Something went wrong while deleting',
             icon: 'error'
           });
         }

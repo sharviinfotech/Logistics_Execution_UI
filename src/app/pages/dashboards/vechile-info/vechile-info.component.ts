@@ -927,17 +927,7 @@ export class VechileInfoComponent implements OnInit {
   }
 
 
-
-
   deleteRow(row: any, index: number): void {
-    if (row.SAP_TYPE === 'SAP') {
-      this.DeleteWithSap(row, index);
-    } else {
-      this.DeleteWithoutSap(row, index);
-    }
-  }
-
-  DeleteWithSap(row: any, index: number): void {
     Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to delete this record? This action cannot be undone.',
@@ -949,98 +939,52 @@ export class VechileInfoComponent implements OnInit {
     }).then((result) => {
       if (!result.isConfirmed) return;
 
-      // 🔹 Prepare request payload (With SAP format)
       const payload = {
         DELETE: [
           {
             ZREFNO: row.ZREFNO,
-            ZINV_NO: row.ZINV_NO,
+            ZINV_NO: row.VBELN,
             ZLINE_NO: row.ZLINE_NO
           }
         ]
       };
 
-      // 🔹 Call API
-      this.service.VehicleInfoDeleteWithSap(payload).subscribe({
+      const apiCall = this.sapType === 'SAP'
+        ? this.service.VehicleInfoDeleteWithSap(payload)
+        : this.service.VehicleInfoDeleteWithoutSap(payload);
+
+      apiCall.subscribe({
         next: (res: any) => {
-          if (res?.STATUS === 'TRUE') {
-            // 🔹 Remove row from table only after success
+
+
+          if (
+            res?.STATUS === 'TRUE' ||
+            res?.STATUS === true ||
+            res?.NUMBER === '200'
+          ) {
+
             this.searchOptionsList.splice(index, 1);
 
             Swal.fire({
               title: 'Deleted',
-              text: res.MESSAGE || 'Record deleted successfully',
+              text: res.MSG || res.MESSAGE || 'Record deleted successfully',
               icon: 'success',
               confirmButtonText: 'Ok'
             });
+
           } else {
             Swal.fire({
               title: 'Failed',
-              text: res?.MESSAGE || 'Delete failed',
+              text: res?.MSG || res?.MESSAGE || 'Delete failed',
               icon: 'error'
             });
           }
         },
         error: (err) => {
-          console.error(err);
+          console.error('Delete Error:', err);
           Swal.fire({
             title: 'Error',
-            text: 'Something went wrong while deleting',
-            icon: 'error'
-          });
-        }
-      });
-    });
-  }
-  DeleteWithoutSap(row: any, index: number): void {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to delete this record? This action cannot be undone.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, Delete',
-      cancelButtonText: 'Cancel',
-      confirmButtonColor: '#d33'
-    }).then((result) => {
-      if (!result.isConfirmed) return;
-
-      // 🔹 Prepare request payload (With SAP format)
-      const payload = {
-        DELETE: [
-          {
-            ZREFNO: row.ZREFNO,
-            ZINV_NO: row.ZINV_NO,
-            ZLINE_NO: row.ZLINE_NO
-          }
-        ]
-      };
-
-      // 🔹 Call API
-      this.service.VehicleInfoDeleteWithoutSap(payload).subscribe({
-        next: (res: any) => {
-          if (res?.STATUS === 'TRUE') {
-            // 🔹 Remove row from table only after success
-            this.searchOptionsList.splice(index, 1);
-
-            Swal.fire({
-              title: 'Deleted',
-              text: res.MESSAGE || 'Record deleted successfully',
-              icon: 'success',
-              confirmButtonText: 'Ok'
-            });
-          } else {
-            Swal.fire({
-              title: 'Failed',
-              text: res?.MESSAGE || 'Delete failed',
-              icon: 'error'
-            });
-          }
-        },
-        error: (err) => {
-          console.error(err);
-          Swal.fire({
-            title: 'Error',
-            text: 'Something went wrong while deleting',
+            text: err?.error?.MESSAGE || 'Something went wrong while deleting',
             icon: 'error'
           });
         }

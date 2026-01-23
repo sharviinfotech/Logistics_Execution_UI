@@ -979,95 +979,7 @@ export class ShipmentDetailsComponent implements OnInit {
 
 
 
-
   deleteRow(row: any, index: number): void {
-    if (row.SAP_TYPE === 'SAP') {
-      this.DeleteWithSap(row, index); // ✅ FIXED
-    } else {
-      this.DeleteWithoutSap(row, index);
-    }
-  }
-
-  DeleteWithSap(row: any, index: number): void {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to delete this shipment document?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, Delete',
-      cancelButtonText: 'Cancel',
-      confirmButtonColor: '#d33'
-    }).then(result => {
-      if (!result.isConfirmed) return;
-
-      // ✅ Mandatory fields check - all three are required
-      if (!row.ZREFNO || !row.VBELN || !row.ZLINE_NO) {
-        Swal.fire({
-          title: 'Error',
-          text: 'Missing mandatory keys (ZREFNO, VBELN, ZLINE_NO)',
-          icon: 'error'
-        });
-        return;
-      }
-
-      // ✅ Create payload exactly as per your working Postman format
-      const payload = {
-        DELETE: [
-          {
-            ZREFNO: String(row.ZREFNO),
-            ZINV_NO: String(row.VBELN),  // ✅ Using VBELN as ZINV_NO
-            ZLINE_NO: String(row.ZLINE_NO)
-          }
-        ]
-      };
-
-      console.log('🟥 SAP DELETE PAYLOAD:', payload);
-
-      this.spinner.show();
-
-      this.service.ShipmentDeleteWithSap(payload).subscribe({
-        next: (res: any) => {
-          this.spinner.hide();
-          console.log('✅ SAP DELETE RESPONSE:', res);
-
-          // ✅ Check for success response
-          if (res?.NUMBER === '200' || res?.STATUS === 'TRUE') {
-            // Remove from table after successful deletion
-            this.searchOptionsList.splice(index, 1);
-
-            Swal.fire({
-              title: 'Deleted',
-              text: res.MSG || res.MESSAGE || 'Data deleted successfully',
-              icon: 'success',
-              confirmButtonText: 'Ok'
-            });
-          } else {
-            Swal.fire({
-              title: 'Failed',
-              text: res?.MSG || res?.MESSAGE || 'Delete operation failed',
-              icon: 'error'
-            });
-          }
-        },
-        error: err => {
-          this.spinner.hide();
-          console.error('❌ SAP Delete Error:', err);
-          Swal.fire({
-            title: 'Error',
-            text: 'Internal Server Error. Please try again later.',
-            icon: 'error'
-          });
-        }
-      });
-    });
-  }
-
-
-
-
-
-
-  DeleteWithoutSap(row: any, index: number): void {
     Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to delete this record? This action cannot be undone.',
@@ -1078,44 +990,45 @@ export class ShipmentDetailsComponent implements OnInit {
       confirmButtonColor: '#d33'
     }).then((result) => {
       if (!result.isConfirmed) return;
-
-      // 🔹 Prepare request payload (With SAP format)
+      // 🔹 Prepare request payload
       const payload = {
         DELETE: [
           {
             ZREFNO: row.ZREFNO,
-            ZINV_NO: row.ZINV_NO,
+            ZINV_NO: row.VBELN,
             ZLINE_NO: row.ZLINE_NO
           }
         ]
       };
-
+      // 🔹 Choose API based on sapType
+      const apiCall = this.sapType === 'SAP'
+        ? this.service.ShipmentDeleteWithSap(payload)
+        : this.service.ShipmentDeleteWithoutSap(payload);
       // 🔹 Call API
-      this.service.ShipmentDeleteWithoutSap(payload).subscribe({
+      apiCall.subscribe({
         next: (res: any) => {
-          if (res?.STATUS === 'TRUE') {
+          if (res?.NUMBER === '200') {
             // 🔹 Remove row from table only after success
             this.searchOptionsList.splice(index, 1);
-
             Swal.fire({
               title: 'Deleted',
-              text: res.MESSAGE || 'Record deleted successfully',
+              text: res.MSG || 'Record deleted successfully',
               icon: 'success',
               confirmButtonText: 'Ok'
             });
           } else {
             Swal.fire({
               title: 'Failed',
-              text: res?.MESSAGE || 'Delete failed',
+              text: res?.MSG || 'Delete failed',
               icon: 'error'
             });
           }
         },
         error: (err) => {
-          console.error(err);
+          console.error('Delete Error:', err);
           Swal.fire({
             title: 'Error',
-            text: 'Something went wrong while deleting',
+            text: err?.error?.MSG || 'Something went wrong while deleting',
             icon: 'error'
           });
         }
