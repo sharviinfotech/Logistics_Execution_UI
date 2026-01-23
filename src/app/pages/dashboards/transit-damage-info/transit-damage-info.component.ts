@@ -1013,119 +1013,128 @@ export class TransitDamageInfoComponent implements OnInit {
 
 
   // Method to update the edited row
-  // Replace your existing updateSearchRow method with this corrected version:
-
-updateSearchRow(row: any, index: number): void {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'Do you want to update this record?',
-    icon: 'question',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, Update',
-    cancelButtonText: 'Cancel'
-  }).then(result => {
-    if (!result.isConfirmed) return;
-
-    /* ---------------- HEADER PAYLOAD ---------------- */
-    const headerPayload: any = {
-      REFNO: row.ZREFNO || null,
-      INV_NO: row.ZINV_NO || null,
-      ODN_NO: row.ZODN_NO || null,
-      SONO: row.ZSONO || null,
-      INV_DATE: row.ZINV_DATE || null,
-      FSR_RPT_DT: row.ZFSR_RPT_DT || null,
-      BASIC_VALUE: row.ZBASIC_VALUE || null,
-      INC_DATE: row.ZINC_DATE || null,
-      CUSTOMER: row.ZCUSTOMER || null,
-      CONSIGN_NAME: row.ZCONSIGN_NAME || null,
-      DAMAGE_RMK: row.ZDAMAGE_RMK || null,
-      SETTLEMENT: row.ZSETTLEMENT || null,
-      CLOSING_DT: row.ZCLOSING_DT || null,
-      IMAGES: row.ZIMAGES || null,
-      SALE_PERSON: row.ZSALE_PERSON || null,
-      LOCATION: row.ZLOCATION || null,
-      ROUTE: row.ZROUTE || null,
-      PLANT: row.ZPLANT || null,
-      DIVISION: row.ZDIVISION || null,
-      VEH_TYPE: row.ZVEH_TYPE || null,
-      CREATED_DT: row.ZCREATED_DT || null
+     updateSearchRow(headerRow: any, itemRows: any[]): void {
+     Swal.fire({
+       title: 'Are you sure?',
+       text: 'Do you want to update this transit record?',
+       icon: 'question',
+       showCancelButton: true,
+       confirmButtonText: 'Yes, Update',
+       cancelButtonText: 'Cancel'
+     }).then((result) => {
+       if (!result.isConfirmed) return;
+   
+       // 🔑 Validate mandatory HEADER fields
+       if (!headerRow.ZREFNO) {
+         Swal.fire('Error', 'Missing mandatory ZREFNO in header', 'error');
+         return;
+       }
+   
+       
+      //  const invalidItems = itemRows.filter(item => !item.ZREFNO);
+      //  if (invalidItems.length > 0) {
+      //    Swal.fire('Error', 'Missing mandatory keys in items (ZREFNO/ZLINE_NO)', 'error');
+      //    return;
+      //  }
+   
+      const headerPayload: any = {
+      ZREFNO: headerRow.ZREFNO || null,
+      ZLINE_NO: headerRow.ZLINE_NO || null,
+      ZINV_NO: headerRow.ZINV_NO || null,
+      ZODN_NO: headerRow.ZODN_NO || null,
+      ZSONO: headerRow.ZSONO || null,
+      ZINV_DATE: headerRow.ZINV_DATE || null,
+      ZFSR_RPT_DT: headerRow.ZFSR_RPT_DT || null,
+      ZBASIC_VALUE: headerRow.ZBASIC_VALUE || null,
+      ZINC_DATE: headerRow.ZINC_DATE || null,
+      ZCUSTOMER: headerRow.ZCUSTOMER || null,
+      ZCONSIGN_NAME: headerRow.ZCONSIGN_NAME || null,
+      ZDAMAGE_RMK: headerRow.ZDAMAGE_RMK || null,
+      ZSETTLEMENT: headerRow.ZSETTLEMENT || null,
+      ZCLOSING_DT: headerRow.ZCLOSING_DT || null,
+      ZIMAGES: headerRow.ZIMAGES || null,
+      ZSALE_PERSON: headerRow.ZSALE_PERSON || null,
+      ZLOCATION: headerRow.ZLOCATION || null,
+      ZROUTE: headerRow.ZROUTE || null,
+      ZPLANT: headerRow.ZPLANT || null,
+      ZDIVISION: headerRow.ZDIVISION || null,
+      ZVEH_TYPE: headerRow.ZVEH_TYPE || null,
+      ZCREATED_DT: headerRow.ZCREATED_DT || null
     };
 
     /* ---------------- ITEM PAYLOAD ---------------- */
-    const itemPayload = {
-      ZMAPID: row.ZMAPID || null,
-      INV_NO: row.ZINV_NO || null,
-      LINE_NO: row.ZLINE_NO || null,
-      REFNO: row.ZREFNO || null,
-      POSNR: row.ZLINE_NO || null,
-      VEH_LINE: row.ZVEH_LINE || null,
-      TRUCK_NO: row.ZTRUCK_NO || null,
-      LR_NO: row.ZLRNO || null,
-      TRANSPORTER: row.ZTRANSPORTER || null,
-      WORK_ORDER: row.ZWORK_ORDER || null,
-      BILLNO: row.ZBILLNO || null,
-      PRODUCT: row.ZPRODUCT || null
-    };
-
-    const payload = {
-      HEADER: [headerPayload],
-      ITEM: [itemPayload]
-    };
-
-    console.log('🛠 UPDATE PAYLOAD:', payload);
-
-    this.spinner.show();
-
-    const apiCall =
-      this.sapType === 'SAP'
-        ? this.service.TransitDamageInfoSave(payload)
-        : this.service.withoutsapSave(payload);
-
-           apiCall.subscribe(
-             (res: any) => {
-               this.spinner.hide();
-     
-               if (res.STATUS === 'true' || res.NUMBER === '200') {
-                 Swal.fire({
-                   title: 'Success',
-                   text: res.MESSAGE || 'Record updated successfully',
-                   icon: 'success',
-                   confirmButtonText: 'Ok',
-                 }).then(() => {
-                   row.isEdit = false;
-                   delete row._backup;
-                   this.onSearchReference();
-                 });
-               } else {
-                 Swal.fire({
-                   title: 'Error',
-                   text: res.MESSAGE || 'Failed to update record',
-                   icon: 'error',
-                   confirmButtonText: 'Ok',
-                 });
-               }
-             },
-             (error) => {
-               this.spinner.hide();
-               console.error('❌ Update Error:', error);
-               Swal.fire({
-                 text: 'Internal Server Error. Please try again later.',
-                 icon: 'error',
+     const itemPayload = itemRows.map(item => ({
+      ZMAPID: item.ZMAPID || null,
+      ZINV_NO: item.ZINV_NO || null,
+      ZREFNO: String(item.ZREFNO),
+      ZLINE_NO: String(item.ZLINE_NO),
+      ZPOSNR: item.ZLINE_NO || null,  
+      ZVEH_LINE: item.ZVEH_LINE || null,
+      ZTRUCK_NO: item.ZTRUCK_NO || null,
+      ZLR_NO: item.ZLRNO || null,
+      ZTRANSPORTER: item.ZTRANSPORTER || null,
+      ZWORK_ORDER: item.ZWORK_ORDER || null,
+      ZBILLNO: item.ZBILLNO || null,
+      ZPRODUCT: item.ZPRODUCT || null
+     }));
+   
+       // 🎯 Final payload with HEADER + ITEM
+       const payload = {
+          HEAD: headerPayload,
+         ITEM: itemPayload
+       };
+   
+       console.log('🛠 TRANSIT INFO CHANGE PAYLOAD:', payload);
+   
+       this.spinner.show();
+   
+       // 🔄 Call correct API based on sapType
+       const api$ =
+         this.sapType === 'SAP'
+           ? this.service.TransitDamageInfoChangeWithSap(payload)
+           : this.service.TransitDamageInfoChangeWithoutSap(payload);
+   
+       api$.subscribe(
+         (res: any) => {
+           this.spinner.hide();
+   
+           if (res.STATUS === 'TRUE' || res.NUMBER === '200') {
+             Swal.fire({
+               title: 'Success',
+               text: res.MESSAGE || 'Transit data updated successfully',
+               icon: 'success',
+               confirmButtonText: 'Ok'
+             }).then(() => {
+               // ✅ Reset edit mode
+               headerRow.isEdit = false;
+               delete headerRow._backup;
+               itemRows.forEach(item => {
+                 item.isEdit = false;
+                 delete item._backup;
                });
-             }
-           );
-  });
-}
+               
+               // 🔄 Refresh data
+               this.onSearchReference();
+             });
+           } else {
+             Swal.fire({
+               title: 'Error',
+               text: res.MESSAGE || 'Update failed',
+               icon: 'error'
+             });
+           }
+         },
+         () => {
+           this.spinner.hide();
+           Swal.fire('Error', 'Internal Server Error', 'error');
+         }
+       );
+     });
+   }
 
-  deleteRow(row: any, index: number): void {
-    if (row.SAP_TYPE === 'SAP') {
-      this.DeleteWithSap(row, index);
-    } else {
-      this.DeleteWithoutSap(row, index);
-    }
-  }
-
-  DeleteWithSap(row: any, index: number): void {
+     deleteRow(array: any[], index: number): void {
+    const row = array[index];
+    
     Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to delete this record? This action cannot be undone.',
@@ -1136,99 +1145,48 @@ updateSearchRow(row: any, index: number): void {
       confirmButtonColor: '#d33'
     }).then((result) => {
       if (!result.isConfirmed) return;
-
-      // 🔹 Prepare request payload (With SAP format)
+  
       const payload = {
         DELETE: [
           {
             ZREFNO: row.ZREFNO,
             ZINV_NO: row.ZINV_NO,
-            ZLINE_NO: row.ZLINE_NO
+            ZLINE_NO: row.ZLINE_NO || ''
           }
         ]
       };
-
-      // 🔹 Call API
-      this.service.TransitDamageInfoDeleteWithSap(payload).subscribe({
+  
+      const apiCall = this.sapType === 'SAP' 
+        ? this.service.TransitDamageInfoDeleteWithSap(payload)
+        : this.service.TransitDamageInfoDeleteWithoutSap(payload);
+  
+      apiCall.subscribe({
         next: (res: any) => {
-          if (res?.STATUS === 'TRUE') {
-            // 🔹 Remove row from table only after success
-            this.searchOptionsList.splice(index, 1);
-
+          if (res?.STATUS === 'TRUE' || res?.STATUS === true || res?.NUMBER === '200') {
+            
+            // ✅ CORRECT: Delete from the passed array parameter
+            array.splice(index, 1);
+  
             Swal.fire({
               title: 'Deleted',
-              text: res.MESSAGE || 'Record deleted successfully',
+              text: res.MSG || res.MESSAGE || 'Record deleted successfully',
               icon: 'success',
               confirmButtonText: 'Ok'
             });
+  
           } else {
             Swal.fire({
               title: 'Failed',
-              text: res?.MESSAGE || 'Delete failed',
+              text: res?.MSG || res?.MESSAGE || 'Delete failed',
               icon: 'error'
             });
           }
         },
         error: (err) => {
-          console.error(err);
+          console.error('Delete Error:', err);
           Swal.fire({
             title: 'Error',
-            text: 'Something went wrong while deleting',
-            icon: 'error'
-          });
-        }
-      });
-    });
-  }
-  DeleteWithoutSap(row: any, index: number): void {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to delete this record? This action cannot be undone.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, Delete',
-      cancelButtonText: 'Cancel',
-      confirmButtonColor: '#d33'
-    }).then((result) => {
-      if (!result.isConfirmed) return;
-
-      // 🔹 Prepare request payload (With SAP format)
-      const payload = {
-        DELETE: [
-          {
-            ZREFNO: row.ZREFNO,
-            ZINV_NO: row.ZINV_NO,
-            ZLINE_NO: row.ZLINE_NO
-          }
-        ]
-      };
-
-      // 🔹 Call API
-      this.service.TransitDamageInfoDeleteWithoutSap(payload).subscribe({
-        next: (res: any) => {
-          if (res?.STATUS === 'TRUE') {
-            // 🔹 Remove row from table only after success
-            this.searchOptionsList.splice(index, 1);
-
-            Swal.fire({
-              title: 'Deleted',
-              text: res.MESSAGE || 'Record deleted successfully',
-              icon: 'success',
-              confirmButtonText: 'Ok'
-            });
-          } else {
-            Swal.fire({
-              title: 'Failed',
-              text: res?.MESSAGE || 'Delete failed',
-              icon: 'error'
-            });
-          }
-        },
-        error: (err) => {
-          console.error(err);
-          Swal.fire({
-            title: 'Error',
-            text: 'Something went wrong while deleting',
+            text: err?.error?.MESSAGE || 'Something went wrong while deleting',
             icon: 'error'
           });
         }

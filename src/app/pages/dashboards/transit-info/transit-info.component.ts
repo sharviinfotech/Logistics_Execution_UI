@@ -635,233 +635,180 @@ export class TransitInfoComponent implements OnInit {
 
 
   // Method to update the edited row
-  updateSearchRow(row: any, index: number): void {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to update this record?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, Update',
-      cancelButtonText: 'Cancel'
-    }).then(result => {
-      if (!result.isConfirmed) return;
+  updateSearchRow(headerRow: any, itemRows: any[]): void {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'Do you want to update this transit record?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Update',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (!result.isConfirmed) return;
 
-      /** -------------------------
-       *  SAME AS SAVE → HEAD
-       * ------------------------- */
-      const HEAD = {
-        REFNO: this.orderType === 'Inward'
-          ? row.ZREFNO || ''
-          : row.ZREFNO || '',
-
-        INV_NO: row.ZINV_NO || '',
-
-        PY_ARRIVED_DEST: row.ZPHY_DISPATCH
-          ? this.formatDate(row.ZPHY_DISPATCH)
-          : '',
-
-        UNLOADING_DT: row.ZSYS_DATE
-          ? this.formatDateTime(row.ZSYS_DATE)
-          : '',
-
-        POD_SCAN: '', // not available in grid → keep empty
-        SIT_SALE: ''  // not available in grid → keep empty
-      };
-
-      /** -------------------------
-       *  SAME AS SAVE → ITEM
-       * ------------------------- */
-      const ITEM = [
-        {
-          REFNO: row.ZREFNO || '',
-          INV_NO: row.ZINV_NO || '',
-          POSNR: row.ZLINE_NO || 10,
-          VEH_LINE: row.ZVEH_LINE || 1,
-          VEH_NUM: row.ZVEH_NUM || '',
-          LRNO: row.ZLRNO || '',
-          WORK_ORDER: row.ZWORK_ORDER || '',
-          TRANSPORTER: row.ZTRANSPORTER || ''
-        }
-      ];
-
-      /** -------------------------
-       *  FINAL PAYLOAD
-       * ------------------------- */
-      const payload = {
-        HEAD,
-        ITEM
-      };
-
-      console.log('🛠 TRANSIT UPDATE PAYLOAD:', payload);
-
-      this.spinner.show();
-
-      /** -------------------------
-       *  API REPLACED ✔
-       * ------------------------- */
-      const apiCall =
-        this.sapType === 'Non-SAP'
-          ? this.service.TransitInfoNonSap(payload)   // ✅ Non-SAP
-          : this.service.TransitInfoSave(payload);    // ✅ SAP
-
-      apiCall.subscribe({
-        next: (res: any) => {
-          this.spinner.hide();
-
-          if (res.STATUS?.toUpperCase() === 'TRUE' || res.NUMBER === '200') {
-            Swal.fire({
-              title: 'Success',
-              text: res.MESSAGE || 'Record updated successfully',
-              icon: 'success',
-              confirmButtonText: 'Ok'
-            }).then(() => {
-              row.isEdit = false;
-              delete row._backup;
-              this.onSearchReference(); // reload grid
-            });
-          } else {
-            Swal.fire({
-              title: 'Error',
-              text: res.MESSAGE || 'Update failed',
-              icon: 'error'
-            });
-          }
-        },
-        error: (err) => {
-          this.spinner.hide();
-          console.error('❌ Update Error:', err);
-          Swal.fire({
-            title: 'Error',
-            text: 'Internal Server Error. Please try again.',
-            icon: 'error'
-          });
-        }
-      });
-    });
-  }
-
-
-
-
-
-  deleteRow(row: any, index: number): void {
-    if (row.SAP_TYPE === 'SAP') {
-      this.DeleteWithSap(row, index);
-    } else {
-      this.DeleteWithoutSap(row, index);
+    // 🔑 Validate mandatory HEADER fields
+    if (!headerRow.ZREFNO) {
+      Swal.fire('Error', 'Missing mandatory ZREFNO in header', 'error');
+      return;
     }
-  }
 
-  DeleteWithSap(row: any, index: number): void {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to delete this record? This action cannot be undone.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, Delete',
-      cancelButtonText: 'Cancel',
-      confirmButtonColor: '#d33'
-    }).then((result) => {
-      if (!result.isConfirmed) return;
+    // 🔑 Validate mandatory ITEM fields
+    const invalidItems = itemRows.filter(item => !item.ZREFNO || !item.ZLINE_NO);
+    if (invalidItems.length > 0) {
+      Swal.fire('Error', 'Missing mandatory keys in items (ZREFNO/ZLINE_NO)', 'error');
+      return;
+    }
 
-      // 🔹 Prepare request payload (With SAP format)
-      const payload = {
-        DELETE: [
-          {
-            ZREFNO: row.ZREFNO,
-            ZINV_NO: row.ZINV_NO,
-            ZLINE_NO: row.ZLINE_NO
-          }
-        ]
-      };
+    // 📦 Build HEADER payload
+    const headerPayload = {
+      ZREFNO: headerRow.ZREFNO,
+      ZINV_NO: headerRow.ZINV_NO || '',
+      ZODN_NO: headerRow.ZODN_NO || '',
+      ZSONO: headerRow.ZSONO || '',
+      ZSALE_PERSON: headerRow.ZSALE_PERSON || '',
+      ZPY_ARRIVED_DEST: headerRow.ZPY_ARRIVED_DEST || '',
+      ZUNLOADING_DT: headerRow.ZUNLOADING_DT || '',
+      ZPOD_SCAN: headerRow.ZPOD_SCAN || '',
+      ZSIT_SALE: headerRow.ZSIT_SALE || '',
+      ZLOCATION: headerRow.ZLOCATION || '',
+      ZCREATED_DT: headerRow.ZCREATED_DT || '',
+      ZPLANT: headerRow.ZPLANT || '',
+      ZDIVISION: headerRow.ZDIVISION || '',
+      ZVEH_TYPE: headerRow.ZVEH_TYPE || ''
+    };
 
-      // 🔹 Call API
-      this.service.TransitInfoDeleteWithSap(payload).subscribe({
-        next: (res: any) => {
-          if (res?.STATUS === 'TRUE') {
-            // 🔹 Remove row from table only after success
-            this.searchOptionsList.splice(index, 1);
+    // 📦 Build ITEM payload (multiple items)
+    const itemPayload = itemRows.map(item => ({
+      ZREFNO: String(item.ZREFNO),
+      ZLINE_NO: String(item.ZLINE_NO),
+      ZINV_NO: item.ZINV_NO || '',
+      POSNR: item.POSNR || '',
+      ZVEH_LINE: item.ZVEH_LINE || '',
+      ZVEH_NUM: item.ZVEH_NUM || '',
+      ZLRNO: item.ZLRNO || '',
+      ZWORK_ORDER: item.ZWORK_ORDER || '',
+      ZTRANSPORTER: item.ZTRANSPORTER || ''
+    }));
 
-            Swal.fire({
-              title: 'Deleted',
-              text: res.MESSAGE || 'Record deleted successfully',
-              icon: 'success',
-              confirmButtonText: 'Ok'
+    // 🎯 Final payload with HEADER + ITEM
+    const payload = {
+      HEADER: headerPayload,
+      ITEM: itemPayload
+    };
+
+    console.log('🛠 TRANSIT INFO CHANGE PAYLOAD:', payload);
+
+    this.spinner.show();
+
+    // 🔄 Call correct API based on sapType
+    const api$ =
+      this.sapType === 'SAP'
+        ? this.service.TransitInfoChangeWithSap(payload)
+        : this.service.TransitInfoChangeWithoutSap(payload);
+
+    api$.subscribe(
+      (res: any) => {
+        this.spinner.hide();
+
+        if (res.STATUS === 'TRUE' || res.NUMBER === '200') {
+          Swal.fire({
+            title: 'Success',
+            text: res.MESSAGE || 'Transit data updated successfully',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          }).then(() => {
+            // ✅ Reset edit mode
+            headerRow.isEdit = false;
+            delete headerRow._backup;
+            itemRows.forEach(item => {
+              item.isEdit = false;
+              delete item._backup;
             });
-          } else {
-            Swal.fire({
-              title: 'Failed',
-              text: res?.MESSAGE || 'Delete failed',
-              icon: 'error'
-            });
-          }
-        },
-        error: (err) => {
-          console.error(err);
+            
+            // 🔄 Refresh data
+            this.onSearchReference();
+          });
+        } else {
           Swal.fire({
             title: 'Error',
-            text: 'Something went wrong while deleting',
+            text: res.MESSAGE || 'Update failed',
             icon: 'error'
           });
         }
-      });
-    });
-  }
-  DeleteWithoutSap(row: any, index: number): void {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to delete this record? This action cannot be undone.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, Delete',
-      cancelButtonText: 'Cancel',
-      confirmButtonColor: '#d33'
-    }).then((result) => {
-      if (!result.isConfirmed) return;
+      },
+      () => {
+        this.spinner.hide();
+        Swal.fire('Error', 'Internal Server Error', 'error');
+      }
+    );
+  });
+}
 
-      // 🔹 Prepare request payload (With SAP format)
-      const payload = {
-        DELETE: [
-          {
-            ZREFNO: row.ZREFNO,
-            ZINV_NO: row.ZINV_NO,
-            ZLINE_NO: row.ZLINE_NO
-          }
-        ]
-      };
 
-      // 🔹 Call API
-      this.service.TransitInfoDeleteWithOutSap(payload).subscribe({
-        next: (res: any) => {
-          if (res?.STATUS === 'TRUE') {
-            // 🔹 Remove row from table only after success
-            this.searchOptionsList.splice(index, 1);
 
-            Swal.fire({
-              title: 'Deleted',
-              text: res.MESSAGE || 'Record deleted successfully',
-              icon: 'success',
-              confirmButtonText: 'Ok'
-            });
-          } else {
-            Swal.fire({
-              title: 'Failed',
-              text: res?.MESSAGE || 'Delete failed',
-              icon: 'error'
-            });
-          }
-        },
-        error: (err) => {
-          console.error(err);
+
+
+   deleteRow(array: any[], index: number): void {
+  const row = array[index];
+  
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'Do you want to delete this record? This action cannot be undone.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Delete',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#d33'
+  }).then((result) => {
+    if (!result.isConfirmed) return;
+
+    const payload = {
+      DELETE: [
+        {
+          ZREFNO: row.ZREFNO,
+          ZINV_NO: row.ZINV_NO,
+          ZLINE_NO: row.ZLINE_NO || ''
+        }
+      ]
+    };
+
+    const apiCall = this.sapType === 'SAP' 
+      ? this.service.TransitInfoDeleteWithSap(payload)
+      : this.service.TransitInfoDeleteWithOutSap(payload);
+
+    apiCall.subscribe({
+      next: (res: any) => {
+        if (res?.STATUS === 'TRUE' || res?.STATUS === true || res?.NUMBER === '200') {
+          
+          // ✅ CORRECT: Delete from the passed array parameter
+          array.splice(index, 1);
+
           Swal.fire({
-            title: 'Error',
-            text: 'Something went wrong while deleting',
+            title: 'Deleted',
+            text: res.MSG || res.MESSAGE || 'Record deleted successfully',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          });
+
+        } else {
+          Swal.fire({
+            title: 'Failed',
+            text: res?.MSG || res?.MESSAGE || 'Delete failed',
             icon: 'error'
           });
         }
-      });
+      },
+      error: (err) => {
+        console.error('Delete Error:', err);
+        Swal.fire({
+          title: 'Error',
+          text: err?.error?.MESSAGE || 'Something went wrong while deleting',
+          icon: 'error'
+        });
+      }
     });
-  }
+  });
+}
 
 
 

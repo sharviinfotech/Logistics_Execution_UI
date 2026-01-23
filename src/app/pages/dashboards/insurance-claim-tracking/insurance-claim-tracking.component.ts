@@ -875,8 +875,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
           Swal.fire({
             text: '✅ Data Saved Successfully!',
             icon: 'success',
-            showConfirmButton: false,
-            timer: 900,
+             confirmButtonText: 'Ok',
             willClose: () => {
               if (action === 'next') {
                 this.router.navigate(['/next-screen']);
@@ -1090,124 +1089,132 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
 
   // Method to update the edited row
-  updateSearchRow(row: any, index: number): void {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to update this record?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, Update',
-      cancelButtonText: 'Cancel'
-    }).then(result => {
-      if (!result.isConfirmed) return;
-
-      /* =====================================================
-         1️⃣ HEADER PAYLOAD  (💯 SAME AS SAVE)
-      ===================================================== */
-      const headerFormValue = this.HeaderForm.value;
-
-      const headerValue: any = {
-        INV_NO: headerFormValue.INV_NO,
-        FI: headerFormValue.FI,
-        REP_DATE: headerFormValue.REP_DATE,
-        CLAIM_REF: headerFormValue.CLAIM_REF,
-        INV_DATE: headerFormValue.INV_DATE,
-        INV_BV: headerFormValue.INV_BV,
-        LOSS_DCL: headerFormValue.LOSS_DCL,
-        CLM_RF: headerFormValue.CLM_RF,
-        SOL_VAL: headerFormValue.SOL_VAL,
-        CUSTOMER: headerFormValue.CUSTOMER,
-        SO_NO: headerFormValue.SO_NO,
-        LOCATION: headerFormValue.LOCATION,
-        DAMAGE_RMK: headerFormValue.DAMAGE_RMK,
-        CLM_INF: headerFormValue.CLM_INF,
-        CLM_ST: headerFormValue.CLM_ST,
-        CLM_DOC_ST: headerFormValue.CLM_DOC_ST,
-        COURIER_DET: headerFormValue.COURIER_DET,
-        PAY_ST: headerFormValue.PAY_ST,
-        PAY_INFO: headerFormValue.PAY_INFO,
-        UTR: headerFormValue.UTR,
-        CLM_SET_DT: headerFormValue.CLM_SET_DT,
+       updateSearchRow(headerRow: any, itemRows: any[]): void {
+       Swal.fire({
+         title: 'Are you sure?',
+         text: 'Do you want to update this transit record?',
+         icon: 'question',
+         showCancelButton: true,
+         confirmButtonText: 'Yes, Update',
+         cancelButtonText: 'Cancel'
+       }).then((result) => {
+         if (!result.isConfirmed) return;
+     
+         // 🔑 Validate mandatory HEADER fields
+         if (!headerRow.ZREFNO) {
+           Swal.fire('Error', 'Missing mandatory ZREFNO in header', 'error');
+           return;
+         }
+     
+         
+        //  const invalidItems = itemRows.filter(item => !item.ZREFNO);
+        //  if (invalidItems.length > 0) {
+        //    Swal.fire('Error', 'Missing mandatory keys in items (ZREFNO/ZLINE_NO)', 'error');
+        //    return;
+        //  }
+     
+        const headerPayload: any = {
+        ZINV_NO: headerRow.ZINV_NO,
+        ZREFNO: headerRow.ZREFNO,
+        ZLINE_NO: headerRow.ZLINE_NO,
+        ZFI: headerRow.ZFI,
+        ZREP_DATE: headerRow.ZREP_DATE,
+        ZCLAIM_REF: headerRow.ZCLAIM_REF,
+        ZINV_DATE: headerRow.ZINV_DATE,
+        ZINV_BV: headerRow.ZINV_BV,
+        ZLOSS_DCL: headerRow.ZLOSS_DCL,
+        ZCLM_RF: headerRow.ZCLM_RF,
+        ZSOL_VAL: headerRow.ZSOL_VAL,
+        ZCUSTOMER: headerRow.ZCUSTOMER,
+        ZSO_NO: headerRow.ZSO_NO,
+        ZLOCATION: headerRow.ZLOCATION,
+        ZDAMAGE_RMK: headerRow.ZDAMAGE_RMK,
+        ZCLM_INF: headerRow.ZCLM_INF,
+        ZCLM_ST: headerRow.ZCLM_ST,
+        ZCLM_DOC_ST: headerRow.ZCLM_DOC_ST,
+        ZCOURIER_DET: headerRow.ZCOURIER_DET,
+        ZPAY_ST: headerRow.ZPAY_ST,
+        ZPAY_INFO: headerRow.ZPAY_INFO,
+        ZUTR: headerRow.ZUTR,
+        ZCLM_SET_DT: headerRow.ZCLM_SET_DT,
 
         // 🔥 IMPORTANT
-        REFNO: headerFormValue.REFNO
+        
       };
-
-      /* =====================================================
-         2️⃣ ITEM PAYLOAD (ONLY ONE ROW – SAME AS SAVE)
-      ===================================================== */
-      const itemPayload = {
-        ZMAPID: row.ZMAPID,
-        INV_NO: headerValue.INV_NO,
-        REFNO: headerValue.REFNO,
-
-        VEH_LINE: row.ZVEH_LINE,
-        VEHICLE: row.ZVEHICLE,
-        TRUCK_NO: row.ZTRUCK_NO,
-        LR_NO: row.ZLRNO,
-        AH: row.ZAH,
-        NO_SETS: row.ZNO_SETS,
-        TRANSPORTER: row.ZTRANSPORTER,
-
-        WORK_ORDER: row.ZWORK_ORDER,
-        ZWORK_ORDER: row.ZWORK_ORDER,
-
-        BILLNO: row.ZBILLNO,
-        ZBILLNO: row.ZBILLNO
-      };
-
-
-      /* =====================================================
-         3️⃣ FINAL PAYLOAD (SAME AS SAVE)
-      ===================================================== */
-      const payload = {
-        HEADER: headerValue,
-        ITEM: [itemPayload] // ✅ SINGLE RECORD ARRAY
-      };
-
-      console.log('🛠 UPDATE PAYLOAD (SAVE FORMAT):', payload);
-
-      /* =====================================================
-         4️⃣ API SELECTION (💯 SAME AS SAVE)
-      ===================================================== */
-      this.spinner.show();
-
-      let apiCall;
-      if (this.sapType === 'SAP') {
-        apiCall = this.service.InsuranceClaimTrackingSave(payload);
-      } else {
-        apiCall = this.service.Nonsapsave(payload);
-      }
-
-      apiCall.subscribe({
-        next: (res: any) => {
-          this.spinner.hide();
-
-          if (res?.STATUS === 'TRUE' || res?.STATUS === true) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Updated',
-              text: res.MESSAGE || 'Record updated successfully',
-              confirmButtonText: 'OK'
-            }).then(() => {
-              row.isEdit = false;
-              delete row._backup;
-
-              // 🔄 Refresh updated search data
-              this.onSearchReference();
-            });
-          } else {
-            Swal.fire('Update Failed', res?.MESSAGE || '', 'warning');
-          }
-        },
-        error: (err) => {
-          this.spinner.hide();
-          console.error('❌ Update Error:', err);
-          Swal.fire('Error', 'Update failed', 'error');
-        }
-      });
-    });
-  }
+  
+      /* ---------------- ITEM PAYLOAD ---------------- */
+       const itemPayload = itemRows.map(item => ({
+        ZMAPID: item.ZMAPID || null,
+        ZINV_NO: item.ZINV_NO || null,
+        ZREFNO: String(item.ZREFNO),
+        ZLINE_NO: String(item.ZLINE_NO),
+        ZPOSNR: item.ZLINE_NO || null,  
+        ZVEH_LINE: item.ZVEH_LINE || null,
+        ZTRUCK_NO: item.ZTRUCK_NO || null,
+        ZVEHICLE: item.ZVEHICLE || null,
+        
+        ZAH: item.ZAH || null,
+        ZNO_SETS: item.ZNO_SETS || null,
+        ZLR_NO: item.ZLRNO || null,
+        ZTRANSPORTER: item.ZTRANSPORTER || null,
+        ZWORK_ORDER: item.ZWORK_ORDER || null,
+        ZBILLNO: item.ZBILLNO || null,
+       
+       }));
+     
+         // 🎯 Final payload with HEADER + ITEM
+         const payload = {
+            HEAD: headerPayload,
+           ITEM: itemPayload
+         };
+     
+         console.log('🛠 TRANSIT INFO CHANGE PAYLOAD:', payload);
+     
+         this.spinner.show();
+     
+         // 🔄 Call correct API based on sapType
+         const api$ =
+           this.sapType === 'SAP'
+             ? this.service.InsuranceClaimTrackingChangeWithSap(payload)
+             : this.service. InsuranceClaimTrackingChangeWithoutSap(payload);
+     
+         api$.subscribe(
+           (res: any) => {
+             this.spinner.hide();
+     
+             if (res.STATUS === 'TRUE' || res.NUMBER === '200') {
+               Swal.fire({
+                 title: 'Success',
+                 text: res.MESSAGE || 'Transit data updated successfully',
+                 icon: 'success',
+                 confirmButtonText: 'Ok'
+               }).then(() => {
+                 // ✅ Reset edit mode
+                 headerRow.isEdit = false;
+                 delete headerRow._backup;
+                 itemRows.forEach(item => {
+                   item.isEdit = false;
+                   delete item._backup;
+                 });
+                 
+                 // 🔄 Refresh data
+                 this.onSearchReference();
+               });
+             } else {
+               Swal.fire({
+                 title: 'Error',
+                 text: res.MESSAGE || 'Update failed',
+                 icon: 'error'
+               });
+             }
+           },
+           () => {
+             this.spinner.hide();
+             Swal.fire('Error', 'Internal Server Error', 'error');
+           }
+         );
+       });
+     }
 
 
 

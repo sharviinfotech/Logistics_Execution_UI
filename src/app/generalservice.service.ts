@@ -223,8 +223,16 @@ export class GeneralserviceService {
     return this.http.post(environment.baseUrl + 'api/external/LE/TransitInfo/Outward/WithSap/Delete', obj);
   }
   TransitInfoDeleteWithOutSap(obj) {
-    return this.http.post(environment.baseUrl + 'api/external/LE/TransitInfo/Outward/WithSap/Delete', obj);
+    return this.http.put(environment.baseUrl + 'api/external/LE/TransitInfo/Outward/WithoutSap/Delete', obj);
   }
+  TransitInfoChangeWithSap(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/TransitInfo/Outward/WithSap/Change', obj);
+  }
+  TransitInfoChangeWithoutSap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/TransitInfo/Outward/WithoutSap/Change', obj);
+  }
+
+
   FreightBillingSave(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/FreightBilling/Outward/WithSap/Save', obj);
   }
@@ -293,7 +301,7 @@ export class GeneralserviceService {
     return this.http.post(environment.baseUrl + 'api/external/LE/InvoiceloadDetails/Outward/DeleteWithsap', obj);
   }
   InvoiceloaddetailsDeleteWithoutsap(obj) {
-    return this.http.put(environment.baseUrl + 'api/external/LE/InvoiceloadDetails/Outward/DeleteWithsap', obj);
+    return this.http.put(environment.baseUrl + 'api/external/LE/InvoiceloadDetails/Outward/DeleteWithoutsap', obj);
   }
   InsuranceClaimTrackingfetch(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/InsuranceClaimTracking/Outward/fetchinvoicelist', obj);
@@ -314,6 +322,13 @@ export class GeneralserviceService {
   InsuranceClaimTrackingDeleteWithoutSap(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/InsuranceClaimTracking/NonSap/DeleteWithoutSap', obj);
   }
+  InsuranceClaimTrackingChangeWithSap(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/InsuranceClaimTracking/Outward/ChangeWithSap', obj);
+  }
+  InsuranceClaimTrackingChangeWithoutSap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/InsuranceClaimTracking/Outward/ChangeWithoutSap', obj);
+  }
+
   TransitDamageInfofetch(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/TransitDamageInfo/Outward/fetchinvoicelist', obj);
   }
@@ -332,6 +347,14 @@ export class GeneralserviceService {
   TransitDamageInfoDeleteWithoutSap(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/TransitDamageInfo/NonSap/DeleteWithoutSap', obj);
   }
+    TransitDamageInfoChangeWithSap(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/TransitDamageInfo/Outward/ChangeWithSap', obj);
+  }
+  TransitDamageInfoChangeWithoutSap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/TransitDamageInfo/Outward/Change/WithoutSap', obj);
+  }
+
+
   DispatchSave(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/Dispatch/Outward/withsap/Save', obj);
   }

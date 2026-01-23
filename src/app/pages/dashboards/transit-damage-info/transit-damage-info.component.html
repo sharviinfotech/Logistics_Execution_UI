@@ -686,7 +686,7 @@
               </div>
 
               <div *ngIf="headerData.isEdit">
-                <button class="btn btn-sm btn-success me-1" (click)="updateSearchRow(headerData)">
+                <button class="btn btn-sm btn-success me-1" (click)="updateSearchRow(headerData, itemsList)">
                   <i class="fas fa-check"></i>
                 </button>
                 <button class="btn btn-sm btn-secondary" (click)="cancelSearchEdit(headerData)">
@@ -803,7 +803,7 @@
               </div>
 
               <div *ngIf="item.isEdit" class="btn-group">
-                <button class="btn btn-sm btn-success me-1" (click)="updateSearchRow(item)">
+                <button class="btn btn-sm btn-success me-1" (click)="updateSearchRow(headerData, itemsList)">
                   <i class="fas fa-check"></i>
                 </button>
                 <button class="btn btn-sm btn-secondary" (click)="cancelSearchEdit(item)">
