@@ -230,7 +230,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     this.searchOptionsList = [];
     this.selectedItems = [];
     this.SavedDataShow = false;
-      this.headerData = null;
+    this.headerData = null;
     this.itemsList = [];
 
 
@@ -608,92 +608,92 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   //     }
   //   });
   // }
-      onSearchReference() {
-    
-       
-        this.headerData = null;
-        this.itemsList = [];
-        this.showTable = false;
-    
-        if (!this.searchReference?.trim()) {
-          Swal.fire('Please enter a value', '', 'warning');
-          return;
-        }
-    
-        if (!this.selectedType) {
-          Swal.fire('Please select a search type', '', 'info');
-          return;
-        }
-    
-        let payload1: any = {
-        "global": "INSURANCE CLAIM STATUS",
-        "data": {
-          "REF_NO": "",
-          "INV_NO": "",
-          "SO_NO": "",
-          "TRANSPORTER": "",
-          "LR_NO": "",
-          "WORKORDER_NO": "",
-          "SALES_PERSON": "",
-          "LOCATION": "",
-          "ODN_NO": "",
-          "VEHICLE_NO": "",
-          "FREIGHT_BILLNO": "",
-          "PRODUCT": "",
-          "ROUTE": "",
-          "NATURE_DAMAGE": "",
-          "CLAIM_STATUS": ""
-          }
-        };
-    
-        payload1.data[this.selectedType] = this.searchReference.trim();
-    
-        console.log('🔍 Payload:', payload1);
-        this.spinner.show();
-    
-        let apiCall;
-    
-        if (this.sapType === 'SAP') {
-          apiCall = this.service.global_Fields_SearchOption(payload1); // POST
-        } else {
-          apiCall = this.service.global_Fields_SearchOption_WithoutSap(payload1); // PUT
-        }
-    
-        apiCall.subscribe({
-          next: (res: any) => {
-            this.spinner.hide();
-            console.log('✅ Search Response:', res);
-    
-            if (res.NUMBER === '100' && res.STATUS === 'FALSE') {
-              this.searchOptionsList = [];
-              Swal.fire('', res.MESSAGE, 'warning');
-            } else if (!res.HEADER || res.HEADER.length === 0) {
-              this.searchOptionsList = [];
-              Swal.fire('No records found', '', 'info');
-            } else {
-              this.headerData = {
-                ...res.HEADER[0],
-                isEdit: false
-              };
-    
-              this.itemsList = res.ITEMS.map((item: any) => ({
-                ...item,
-                isEdit: false
-              }));
-    
-              this.showTable = true;
-              this.showForm = false;
-              this.ShowHeaderForm = false
-              Swal.fire('Data fetched successfully!', '', 'success');
-            }
-          },
-          error: (err) => {
-            this.spinner.hide();
-            console.error('❌ Error:', err);
-            Swal.fire('Error fetching data', '', 'error');
-          }
-        });
+  onSearchReference() {
+
+
+    this.headerData = null;
+    this.itemsList = [];
+    this.showTable = false;
+
+    if (!this.searchReference?.trim()) {
+      Swal.fire('Please enter a value', '', 'warning');
+      return;
+    }
+
+    if (!this.selectedType) {
+      Swal.fire('Please select a search type', '', 'info');
+      return;
+    }
+
+    let payload1: any = {
+      "global": "INSURANCE CLAIM STATUS",
+      "data": {
+        "REF_NO": "",
+        "INV_NO": "",
+        "SO_NO": "",
+        "TRANSPORTER": "",
+        "LR_NO": "",
+        "WORKORDER_NO": "",
+        "SALES_PERSON": "",
+        "LOCATION": "",
+        "ODN_NO": "",
+        "VEHICLE_NO": "",
+        "FREIGHT_BILLNO": "",
+        "PRODUCT": "",
+        "ROUTE": "",
+        "NATURE_DAMAGE": "",
+        "CLAIM_STATUS": ""
       }
+    };
+
+    payload1.data[this.selectedType] = this.searchReference.trim();
+
+    console.log('🔍 Payload:', payload1);
+    this.spinner.show();
+
+    let apiCall;
+
+    if (this.sapType === 'SAP') {
+      apiCall = this.service.global_Fields_SearchOption(payload1); // POST
+    } else {
+      apiCall = this.service.global_Fields_SearchOption_WithoutSap(payload1); // PUT
+    }
+
+    apiCall.subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        console.log('✅ Search Response:', res);
+
+        if (res.NUMBER === '100' && res.STATUS === 'FALSE') {
+          this.searchOptionsList = [];
+          Swal.fire('', res.MESSAGE, 'warning');
+        } else if (!res.HEADER || res.HEADER.length === 0) {
+          this.searchOptionsList = [];
+          Swal.fire('No records found', '', 'info');
+        } else {
+          this.headerData = {
+            ...res.HEADER[0],
+            isEdit: false
+          };
+
+          this.itemsList = res.ITEMS.map((item: any) => ({
+            ...item,
+            isEdit: false
+          }));
+
+          this.showTable = true;
+          this.showForm = false;
+          this.ShowHeaderForm = false
+          Swal.fire('Data fetched successfully!', '', 'success');
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('❌ Error:', err);
+        Swal.fire('Error fetching data', '', 'error');
+      }
+    });
+  }
 
   // Input Change
   onInputChange(type: 'purchase' | 'invoice'): void {
@@ -875,7 +875,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
           Swal.fire({
             text: '✅ Data Saved Successfully!',
             icon: 'success',
-             confirmButtonText: 'Ok',
+            confirmButtonText: 'Ok',
             willClose: () => {
               if (action === 'next') {
                 this.router.navigate(['/next-screen']);
@@ -1089,31 +1089,31 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
 
   // Method to update the edited row
-       updateSearchRow(headerRow: any, itemRows: any[]): void {
-       Swal.fire({
-         title: 'Are you sure?',
-         text: 'Do you want to update this transit record?',
-         icon: 'question',
-         showCancelButton: true,
-         confirmButtonText: 'Yes, Update',
-         cancelButtonText: 'Cancel'
-       }).then((result) => {
-         if (!result.isConfirmed) return;
-     
-         // 🔑 Validate mandatory HEADER fields
-         if (!headerRow.ZREFNO) {
-           Swal.fire('Error', 'Missing mandatory ZREFNO in header', 'error');
-           return;
-         }
-     
-         
-        //  const invalidItems = itemRows.filter(item => !item.ZREFNO);
-        //  if (invalidItems.length > 0) {
-        //    Swal.fire('Error', 'Missing mandatory keys in items (ZREFNO/ZLINE_NO)', 'error');
-        //    return;
-        //  }
-     
-        const headerPayload: any = {
+  updateSearchRow(headerRow: any, itemRows: any[]): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to update this transit record?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Update',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+
+      // 🔑 Validate mandatory HEADER fields
+      if (!headerRow.ZREFNO) {
+        Swal.fire('Error', 'Missing mandatory ZREFNO in header', 'error');
+        return;
+      }
+
+
+      //  const invalidItems = itemRows.filter(item => !item.ZREFNO);
+      //  if (invalidItems.length > 0) {
+      //    Swal.fire('Error', 'Missing mandatory keys in items (ZREFNO/ZLINE_NO)', 'error');
+      //    return;
+      //  }
+
+      const headerPayload: any = {
         ZINV_NO: headerRow.ZINV_NO,
         ZREFNO: headerRow.ZREFNO,
         ZLINE_NO: headerRow.ZLINE_NO,
@@ -1139,151 +1139,86 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         ZCLM_SET_DT: headerRow.ZCLM_SET_DT,
 
         // 🔥 IMPORTANT
-        
+
       };
-  
+
       /* ---------------- ITEM PAYLOAD ---------------- */
-       const itemPayload = itemRows.map(item => ({
+      const itemPayload = itemRows.map(item => ({
         ZMAPID: item.ZMAPID || null,
         ZINV_NO: item.ZINV_NO || null,
         ZREFNO: String(item.ZREFNO),
         ZLINE_NO: String(item.ZLINE_NO),
-        ZPOSNR: item.ZLINE_NO || null,  
+        ZPOSNR: item.ZLINE_NO || null,
         ZVEH_LINE: item.ZVEH_LINE || null,
         ZTRUCK_NO: item.ZTRUCK_NO || null,
         ZVEHICLE: item.ZVEHICLE || null,
-        
+
         ZAH: item.ZAH || null,
         ZNO_SETS: item.ZNO_SETS || null,
         ZLR_NO: item.ZLRNO || null,
         ZTRANSPORTER: item.ZTRANSPORTER || null,
         ZWORK_ORDER: item.ZWORK_ORDER || null,
         ZBILLNO: item.ZBILLNO || null,
-       
-       }));
-     
-         // 🎯 Final payload with HEADER + ITEM
-         const payload = {
-            HEAD: headerPayload,
-           ITEM: itemPayload
-         };
-     
-         console.log('🛠 TRANSIT INFO CHANGE PAYLOAD:', payload);
-     
-         this.spinner.show();
-     
-         // 🔄 Call correct API based on sapType
-         const api$ =
-           this.sapType === 'SAP'
-             ? this.service.InsuranceClaimTrackingChangeWithSap(payload)
-             : this.service. InsuranceClaimTrackingChangeWithoutSap(payload);
-     
-         api$.subscribe(
-           (res: any) => {
-             this.spinner.hide();
-     
-             if (res.STATUS === 'TRUE' || res.NUMBER === '200') {
-               Swal.fire({
-                 title: 'Success',
-                 text: res.MESSAGE || 'Transit data updated successfully',
-                 icon: 'success',
-                 confirmButtonText: 'Ok'
-               }).then(() => {
-                 // ✅ Reset edit mode
-                 headerRow.isEdit = false;
-                 delete headerRow._backup;
-                 itemRows.forEach(item => {
-                   item.isEdit = false;
-                   delete item._backup;
-                 });
-                 
-                 // 🔄 Refresh data
-                 this.onSearchReference();
-               });
-             } else {
-               Swal.fire({
-                 title: 'Error',
-                 text: res.MESSAGE || 'Update failed',
-                 icon: 'error'
-               });
-             }
-           },
-           () => {
-             this.spinner.hide();
-             Swal.fire('Error', 'Internal Server Error', 'error');
-           }
-         );
-       });
-     }
 
+      }));
 
-
-
-
-  deleteRow(row: any, index: number): void {
-    if (row.SAP_TYPE === 'SAP') {
-      this.DeleteWithSap(row, index);
-    } else {
-      this.DeleteWithoutSap(row, index);
-    }
-  }
-
-  DeleteWithSap(row: any, index: number): void {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to delete this record? This action cannot be undone.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, Delete',
-      cancelButtonText: 'Cancel',
-      confirmButtonColor: '#d33'
-    }).then((result) => {
-      if (!result.isConfirmed) return;
-
-      // 🔹 Prepare request payload (With SAP format)
+      // 🎯 Final payload with HEADER + ITEM
       const payload = {
-        DELETE: [
-          {
-            ZREFNO: row.ZREFNO,
-            ZINV_NO: row.ZINV_NO,
-            ZLINE_NO: row.ZLINE_NO
-          }
-        ]
+        HEAD: headerPayload,
+        ITEM: itemPayload
       };
 
-      // 🔹 Call API
-      this.service.InsuranceClaimTrackingDeleteWithSap(payload).subscribe({
-        next: (res: any) => {
-          if (res?.STATUS === 'TRUE') {
-            // 🔹 Remove row from table only after success
-            this.searchOptionsList.splice(index, 1);
+      console.log('🛠 TRANSIT INFO CHANGE PAYLOAD:', payload);
 
+      this.spinner.show();
+
+      // 🔄 Call correct API based on sapType
+      const api$ =
+        this.sapType === 'SAP'
+          ? this.service.InsuranceClaimTrackingChangeWithSap(payload)
+          : this.service.InsuranceClaimTrackingChangeWithoutSap(payload);
+
+      api$.subscribe(
+        (res: any) => {
+          this.spinner.hide();
+
+          if (res.STATUS === 'TRUE' || res.NUMBER === '200') {
             Swal.fire({
-              title: 'Deleted',
-              text: res.MESSAGE || 'Record deleted successfully',
+              title: 'Success',
+              text: res.MESSAGE || 'Transit data updated successfully',
               icon: 'success',
               confirmButtonText: 'Ok'
+            }).then(() => {
+              // ✅ Reset edit mode
+              headerRow.isEdit = false;
+              delete headerRow._backup;
+              itemRows.forEach(item => {
+                item.isEdit = false;
+                delete item._backup;
+              });
+
+              // 🔄 Refresh data
+              this.onSearchReference();
             });
           } else {
             Swal.fire({
-              title: 'Failed',
-              text: res?.MESSAGE || 'Delete failed',
+              title: 'Error',
+              text: res.MESSAGE || 'Update failed',
               icon: 'error'
             });
           }
         },
-        error: (err) => {
-          console.error(err);
-          Swal.fire({
-            title: 'Error',
-            text: 'Something went wrong while deleting',
-            icon: 'error'
-          });
+        () => {
+          this.spinner.hide();
+          Swal.fire('Error', 'Internal Server Error', 'error');
         }
-      });
+      );
     });
   }
-  DeleteWithoutSap(row: any, index: number): void {
+
+  deleteRow(array: any[], index: number): void {
+    const row = array[index];
+
     Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to delete this record? This action cannot be undone.',
@@ -1295,43 +1230,47 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     }).then((result) => {
       if (!result.isConfirmed) return;
 
-      // 🔹 Prepare request payload (With SAP format)
       const payload = {
         DELETE: [
           {
             ZREFNO: row.ZREFNO,
             ZINV_NO: row.ZINV_NO,
-            ZLINE_NO: row.ZLINE_NO
+            ZLINE_NO: row.ZLINE_NO || ''
           }
         ]
       };
 
-      // 🔹 Call API
-      this.service.InsuranceClaimTrackingDeleteWithoutSap(payload).subscribe({
+      const apiCall = this.sapType === 'SAP'
+        ? this.service.InvoiceloaddetailsDeleteWithsap(payload)
+        : this.service.InvoiceloaddetailsDeleteWithoutsap(payload);
+
+      apiCall.subscribe({
         next: (res: any) => {
-          if (res?.STATUS === 'TRUE') {
-            // 🔹 Remove row from table only after success
-            this.searchOptionsList.splice(index, 1);
+          if (res?.STATUS === 'TRUE' || res?.STATUS === true || res?.NUMBER === '200') {
+
+            // ✅ CORRECT: Delete from the passed array parameter
+            array.splice(index, 1);
 
             Swal.fire({
               title: 'Deleted',
-              text: res.MESSAGE || 'Record deleted successfully',
+              text: res.MSG || res.MESSAGE || 'Record deleted successfully',
               icon: 'success',
               confirmButtonText: 'Ok'
             });
+
           } else {
             Swal.fire({
               title: 'Failed',
-              text: res?.MESSAGE || 'Delete failed',
+              text: res?.MSG || res?.MESSAGE || 'Delete failed',
               icon: 'error'
             });
           }
         },
         error: (err) => {
-          console.error(err);
+          console.error('Delete Error:', err);
           Swal.fire({
             title: 'Error',
-            text: 'Something went wrong while deleting',
+            text: err?.error?.MESSAGE || 'Something went wrong while deleting',
             icon: 'error'
           });
         }

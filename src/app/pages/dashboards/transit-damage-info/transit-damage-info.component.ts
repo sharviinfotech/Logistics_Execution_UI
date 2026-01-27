@@ -54,6 +54,9 @@ export class TransitDamageInfoComponent implements OnInit {
   VendorCodeList: any[] = [];
   mainMode: string = 'creation'; // Default to creation mode
 
+  pendingCount: number = 0;
+  completedCount: number = 0;
+
   // Search functionality
   selectedItems: any[] = [];
 
@@ -235,6 +238,7 @@ export class TransitDamageInfoComponent implements OnInit {
   }
 
   onOrderTypeSelection() {
+    
     if (this.previousOrderType !== null && this.previousOrderType !== this.orderType) {
       this.sapType = null;
       this.previousSapType = null;
@@ -249,13 +253,19 @@ export class TransitDamageInfoComponent implements OnInit {
       this.resetConditionalFields();
     }
     this.previousOrderType = this.orderType;
+    
   }
 
   onSapTypeSelection() {
+   
     if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
       this.resetConditionalFields();
+      
     }
     this.previousSapType = this.sapType;
+     if (this.orderType === 'Outward' && this.sapType) {
+    this.fetchPendingAndCompletedCounts();
+  }
     // ✅ Complete reset when SAP mode changes
     this.invoicenumber = '';
     this.ponumber = '';
@@ -284,6 +294,7 @@ export class TransitDamageInfoComponent implements OnInit {
       this.showTable = false;
       this.showForm = false;
     }
+    
   }
 
   resetConditionalFields(): void {
@@ -303,7 +314,7 @@ export class TransitDamageInfoComponent implements OnInit {
     this.searchOptionsList = [];
     this.selectedItems = [];
     this.SavedDataShow = false;
-      this.headerData = null;
+    this.headerData = null;
     this.itemsList = [];
 
 
@@ -476,7 +487,7 @@ export class TransitDamageInfoComponent implements OnInit {
   //   this.SavedDataShow = false;
   //   this.ShowHeaderForm = false;
 
-    
+
   //   this.showTable = false;
   //   this.showForm = false;
 
@@ -572,24 +583,24 @@ export class TransitDamageInfoComponent implements OnInit {
   //   });
   // }
 
-    onSearchReference() {
-  
-     
-      this.headerData = null;
-      this.itemsList = [];
-      this.showTable = false;
-  
-      if (!this.searchReference?.trim()) {
-        Swal.fire('Please enter a value', '', 'warning');
-        return;
-      }
-  
-      if (!this.selectedType) {
-        Swal.fire('Please select a search type', '', 'info');
-        return;
-      }
-  
-      let payload1: any = {
+  onSearchReference() {
+
+
+    this.headerData = null;
+    this.itemsList = [];
+    this.showTable = false;
+
+    if (!this.searchReference?.trim()) {
+      Swal.fire('Please enter a value', '', 'warning');
+      return;
+    }
+
+    if (!this.selectedType) {
+      Swal.fire('Please select a search type', '', 'info');
+      return;
+    }
+
+    let payload1: any = {
       "global": "TRANSIT DAMAGE INFO",
       "data": {
         "REF_NO": "",
@@ -607,57 +618,57 @@ export class TransitDamageInfoComponent implements OnInit {
         "ROUTE": "",
         "NATURE_DAMAGE": "",
         "CLAIM_STATUS": ""
-        }
-      };
-  
-      payload1.data[this.selectedType] = this.searchReference.trim();
-  
-      console.log('🔍 Payload:', payload1);
-      this.spinner.show();
-  
-      let apiCall;
-  
-      if (this.sapType === 'SAP') {
-        apiCall = this.service.global_Fields_SearchOption(payload1); // POST
-      } else {
-        apiCall = this.service.global_Fields_SearchOption_WithoutSap(payload1); // PUT
       }
-  
-      apiCall.subscribe({
-        next: (res: any) => {
-          this.spinner.hide();
-          console.log('✅ Search Response:', res);
-  
-          if (res.NUMBER === '100' && res.STATUS === 'FALSE') {
-            this.searchOptionsList = [];
-            Swal.fire('', res.MESSAGE, 'warning');
-          } else if (!res.HEADER || res.HEADER.length === 0) {
-            this.searchOptionsList = [];
-            Swal.fire('No records found', '', 'info');
-          } else {
-            this.headerData = {
-              ...res.HEADER[0],
-              isEdit: false
-            };
-  
-            this.itemsList = res.ITEMS.map((item: any) => ({
-              ...item,
-              isEdit: false
-            }));
-  
-            this.showTable = true;
-            this.showForm = false;
-            this.ShowHeaderForm = false
-            Swal.fire('Data fetched successfully!', '', 'success');
-          }
-        },
-        error: (err) => {
-          this.spinner.hide();
-          console.error('❌ Error:', err);
-          Swal.fire('Error fetching data', '', 'error');
-        }
-      });
+    };
+
+    payload1.data[this.selectedType] = this.searchReference.trim();
+
+    console.log('🔍 Payload:', payload1);
+    this.spinner.show();
+
+    let apiCall;
+
+    if (this.sapType === 'SAP') {
+      apiCall = this.service.global_Fields_SearchOption(payload1); // POST
+    } else {
+      apiCall = this.service.global_Fields_SearchOption_WithoutSap(payload1); // PUT
     }
+
+    apiCall.subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        console.log('✅ Search Response:', res);
+
+        if (res.NUMBER === '100' && res.STATUS === 'FALSE') {
+          this.searchOptionsList = [];
+          Swal.fire('', res.MESSAGE, 'warning');
+        } else if (!res.HEADER || res.HEADER.length === 0) {
+          this.searchOptionsList = [];
+          Swal.fire('No records found', '', 'info');
+        } else {
+          this.headerData = {
+            ...res.HEADER[0],
+            isEdit: false
+          };
+
+          this.itemsList = res.ITEMS.map((item: any) => ({
+            ...item,
+            isEdit: false
+          }));
+
+          this.showTable = true;
+          this.showForm = false;
+          this.ShowHeaderForm = false
+          Swal.fire('Data fetched successfully!', '', 'success');
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('❌ Error:', err);
+        Swal.fire('Error fetching data', '', 'error');
+      }
+    });
+  }
 
   allSelected(): boolean {
     return this.items.controls.length > 0 &&
@@ -728,7 +739,7 @@ export class TransitDamageInfoComponent implements OnInit {
         this.searchOptionsList = [];
         this.showTable = false;
 
-        
+
         this.ShowHeaderForm = true;
         this.showForm = true;
 
@@ -1013,186 +1024,210 @@ export class TransitDamageInfoComponent implements OnInit {
 
 
   // Method to update the edited row
-     updateSearchRow(headerRow: any, itemRows: any[]): void {
-     Swal.fire({
-       title: 'Are you sure?',
-       text: 'Do you want to update this transit record?',
-       icon: 'question',
-       showCancelButton: true,
-       confirmButtonText: 'Yes, Update',
-       cancelButtonText: 'Cancel'
-     }).then((result) => {
-       if (!result.isConfirmed) return;
-   
-       // 🔑 Validate mandatory HEADER fields
-       if (!headerRow.ZREFNO) {
-         Swal.fire('Error', 'Missing mandatory ZREFNO in header', 'error');
-         return;
-       }
-   
-       
+  updateSearchRow(headerRow: any, itemRows: any[]): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to update this transit record?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Update',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+
+      // 🔑 Validate mandatory HEADER fields
+      if (!headerRow.ZREFNO) {
+        Swal.fire('Error', 'Missing mandatory ZREFNO in header', 'error');
+        return;
+      }
+
+
       //  const invalidItems = itemRows.filter(item => !item.ZREFNO);
       //  if (invalidItems.length > 0) {
       //    Swal.fire('Error', 'Missing mandatory keys in items (ZREFNO/ZLINE_NO)', 'error');
       //    return;
       //  }
-   
+
       const headerPayload: any = {
-      ZREFNO: headerRow.ZREFNO || null,
-      ZLINE_NO: headerRow.ZLINE_NO || null,
-      ZINV_NO: headerRow.ZINV_NO || null,
-      ZODN_NO: headerRow.ZODN_NO || null,
-      ZSONO: headerRow.ZSONO || null,
-      ZINV_DATE: headerRow.ZINV_DATE || null,
-      ZFSR_RPT_DT: headerRow.ZFSR_RPT_DT || null,
-      ZBASIC_VALUE: headerRow.ZBASIC_VALUE || null,
-      ZINC_DATE: headerRow.ZINC_DATE || null,
-      ZCUSTOMER: headerRow.ZCUSTOMER || null,
-      ZCONSIGN_NAME: headerRow.ZCONSIGN_NAME || null,
-      ZDAMAGE_RMK: headerRow.ZDAMAGE_RMK || null,
-      ZSETTLEMENT: headerRow.ZSETTLEMENT || null,
-      ZCLOSING_DT: headerRow.ZCLOSING_DT || null,
-      ZIMAGES: headerRow.ZIMAGES || null,
-      ZSALE_PERSON: headerRow.ZSALE_PERSON || null,
-      ZLOCATION: headerRow.ZLOCATION || null,
-      ZROUTE: headerRow.ZROUTE || null,
-      ZPLANT: headerRow.ZPLANT || null,
-      ZDIVISION: headerRow.ZDIVISION || null,
-      ZVEH_TYPE: headerRow.ZVEH_TYPE || null,
-      ZCREATED_DT: headerRow.ZCREATED_DT || null
-    };
-
-    /* ---------------- ITEM PAYLOAD ---------------- */
-     const itemPayload = itemRows.map(item => ({
-      ZMAPID: item.ZMAPID || null,
-      ZINV_NO: item.ZINV_NO || null,
-      ZREFNO: String(item.ZREFNO),
-      ZLINE_NO: String(item.ZLINE_NO),
-      ZPOSNR: item.ZLINE_NO || null,  
-      ZVEH_LINE: item.ZVEH_LINE || null,
-      ZTRUCK_NO: item.ZTRUCK_NO || null,
-      ZLR_NO: item.ZLRNO || null,
-      ZTRANSPORTER: item.ZTRANSPORTER || null,
-      ZWORK_ORDER: item.ZWORK_ORDER || null,
-      ZBILLNO: item.ZBILLNO || null,
-      ZPRODUCT: item.ZPRODUCT || null
-     }));
-   
-       // 🎯 Final payload with HEADER + ITEM
-       const payload = {
-          HEAD: headerPayload,
-         ITEM: itemPayload
-       };
-   
-       console.log('🛠 TRANSIT INFO CHANGE PAYLOAD:', payload);
-   
-       this.spinner.show();
-   
-       // 🔄 Call correct API based on sapType
-       const api$ =
-         this.sapType === 'SAP'
-           ? this.service.TransitDamageInfoChangeWithSap(payload)
-           : this.service.TransitDamageInfoChangeWithoutSap(payload);
-   
-       api$.subscribe(
-         (res: any) => {
-           this.spinner.hide();
-   
-           if (res.STATUS === 'TRUE' || res.NUMBER === '200') {
-             Swal.fire({
-               title: 'Success',
-               text: res.MESSAGE || 'Transit data updated successfully',
-               icon: 'success',
-               confirmButtonText: 'Ok'
-             }).then(() => {
-               // ✅ Reset edit mode
-               headerRow.isEdit = false;
-               delete headerRow._backup;
-               itemRows.forEach(item => {
-                 item.isEdit = false;
-                 delete item._backup;
-               });
-               
-               // 🔄 Refresh data
-               this.onSearchReference();
-             });
-           } else {
-             Swal.fire({
-               title: 'Error',
-               text: res.MESSAGE || 'Update failed',
-               icon: 'error'
-             });
-           }
-         },
-         () => {
-           this.spinner.hide();
-           Swal.fire('Error', 'Internal Server Error', 'error');
-         }
-       );
-     });
-   }
-
-     deleteRow(array: any[], index: number): void {
-    const row = array[index];
-    
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to delete this record? This action cannot be undone.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, Delete',
-      cancelButtonText: 'Cancel',
-      confirmButtonColor: '#d33'
-    }).then((result) => {
-      if (!result.isConfirmed) return;
-  
-      const payload = {
-        DELETE: [
-          {
-            ZREFNO: row.ZREFNO,
-            ZINV_NO: row.ZINV_NO,
-            ZLINE_NO: row.ZLINE_NO || ''
-          }
-        ]
+        ZREFNO: headerRow.ZREFNO || null,
+        ZLINE_NO: headerRow.ZLINE_NO || null,
+        ZINV_NO: headerRow.ZINV_NO || null,
+        ZODN_NO: headerRow.ZODN_NO || null,
+        ZSONO: headerRow.ZSONO || null,
+        ZINV_DATE: headerRow.ZINV_DATE || null,
+        ZFSR_RPT_DT: headerRow.ZFSR_RPT_DT || null,
+        ZBASIC_VALUE: headerRow.ZBASIC_VALUE || null,
+        ZINC_DATE: headerRow.ZINC_DATE || null,
+        ZCUSTOMER: headerRow.ZCUSTOMER || null,
+        ZCONSIGN_NAME: headerRow.ZCONSIGN_NAME || null,
+        ZDAMAGE_RMK: headerRow.ZDAMAGE_RMK || null,
+        ZSETTLEMENT: headerRow.ZSETTLEMENT || null,
+        ZCLOSING_DT: headerRow.ZCLOSING_DT || null,
+        ZIMAGES: headerRow.ZIMAGES || null,
+        ZSALE_PERSON: headerRow.ZSALE_PERSON || null,
+        ZLOCATION: headerRow.ZLOCATION || null,
+        ZROUTE: headerRow.ZROUTE || null,
+        ZPLANT: headerRow.ZPLANT || null,
+        ZDIVISION: headerRow.ZDIVISION || null,
+        ZVEH_TYPE: headerRow.ZVEH_TYPE || null,
+        ZCREATED_DT: headerRow.ZCREATED_DT || null
       };
-  
-      const apiCall = this.sapType === 'SAP' 
-        ? this.service.TransitDamageInfoDeleteWithSap(payload)
-        : this.service.TransitDamageInfoDeleteWithoutSap(payload);
-  
-      apiCall.subscribe({
-        next: (res: any) => {
-          if (res?.STATUS === 'TRUE' || res?.STATUS === true || res?.NUMBER === '200') {
-            
-            // ✅ CORRECT: Delete from the passed array parameter
-            array.splice(index, 1);
-  
+
+      /* ---------------- ITEM PAYLOAD ---------------- */
+      const itemPayload = itemRows.map(item => ({
+        ZMAPID: item.ZMAPID || null,
+        ZINV_NO: item.ZINV_NO || null,
+        ZREFNO: String(item.ZREFNO),
+        ZLINE_NO: String(item.ZLINE_NO),
+        ZPOSNR: item.ZLINE_NO || null,
+        ZVEH_LINE: item.ZVEH_LINE || null,
+        ZTRUCK_NO: item.ZTRUCK_NO || null,
+        ZLR_NO: item.ZLRNO || null,
+        ZTRANSPORTER: item.ZTRANSPORTER || null,
+        ZWORK_ORDER: item.ZWORK_ORDER || null,
+        ZBILLNO: item.ZBILLNO || null,
+        ZPRODUCT: item.ZPRODUCT || null
+      }));
+
+      // 🎯 Final payload with HEADER + ITEM
+      const payload = {
+        HEAD: headerPayload,
+        ITEM: itemPayload
+      };
+
+      console.log('🛠 TRANSIT INFO CHANGE PAYLOAD:', payload);
+
+      this.spinner.show();
+
+      // 🔄 Call correct API based on sapType
+      const api$ =
+        this.sapType === 'SAP'
+          ? this.service.TransitDamageInfoChangeWithSap(payload)
+          : this.service.TransitDamageInfoChangeWithoutSap(payload);
+
+      api$.subscribe(
+        (res: any) => {
+          this.spinner.hide();
+
+          if (res.STATUS === 'TRUE' || res.NUMBER === '200') {
             Swal.fire({
-              title: 'Deleted',
-              text: res.MSG || res.MESSAGE || 'Record deleted successfully',
+              title: 'Success',
+              text: res.MESSAGE || 'Transit data updated successfully',
               icon: 'success',
               confirmButtonText: 'Ok'
+            }).then(() => {
+              // ✅ Reset edit mode
+              headerRow.isEdit = false;
+              delete headerRow._backup;
+              itemRows.forEach(item => {
+                item.isEdit = false;
+                delete item._backup;
+              });
+
+              // 🔄 Refresh data
+              this.onSearchReference();
             });
-  
           } else {
             Swal.fire({
-              title: 'Failed',
-              text: res?.MSG || res?.MESSAGE || 'Delete failed',
+              title: 'Error',
+              text: res.MESSAGE || 'Update failed',
               icon: 'error'
             });
           }
         },
-        error: (err) => {
-          console.error('Delete Error:', err);
+        () => {
+          this.spinner.hide();
+          Swal.fire('Error', 'Internal Server Error', 'error');
+        }
+      );
+    });
+  }
+
+  // ✅ Simple delete method - works for both header and line items
+deleteRow(row: any): void {
+  
+  // Check if row exists
+  if (!row) {
+    console.error('Row not found');
+    return;
+  }
+
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'Do you want to delete this record?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Delete',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#d33'
+  }).then((result) => {
+    
+    if (!result.isConfirmed) return;
+
+    // Prepare payload
+    const payload = {
+      DELETE: [
+        {
+          ZREFNO: row.ZREFNO,
+          ZINV_NO: row.ZINV_NO,
+          ZLINE_NO: row.ZLINE_NO || ''
+        }
+      ]
+    };
+
+    // Call API based on SAP type
+    const apiCall = this.sapType === 'SAP'
+      ? this.service.TransitDamageInfoDeleteWithSap(payload)
+      : this.service.TransitDamageInfoDeleteWithoutSap(payload);
+
+    apiCall.subscribe({
+      next: (res: any) => {
+        if (res?.STATUS === 'TRUE' || res?.STATUS === true || res?.NUMBER === '200') {
+          
+          // ✅ Remove from itemsList if it exists there
+          const index = this.itemsList.findIndex(item => 
+            item.ZREFNO === row.ZREFNO && 
+            item.ZINV_NO === row.ZINV_NO && 
+            item.ZLINE_NO === row.ZLINE_NO
+          );
+          
+          if (index !== -1) {
+            this.itemsList.splice(index, 1);
+          }
+          
+          // ✅ Clear headerData if deleting header
+          if (this.headerData?.ZREFNO === row.ZREFNO && 
+              this.headerData?.ZINV_NO === row.ZINV_NO) {
+            this.headerData = null;
+            this.showTable = false;
+          }
+
           Swal.fire({
-            title: 'Error',
-            text: err?.error?.MESSAGE || 'Something went wrong while deleting',
+            title: 'Deleted',
+            text: 'Record deleted successfully',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          });
+
+        } else {
+          Swal.fire({
+            title: 'Failed',
+            text: res?.MSG || res?.MESSAGE || 'Delete failed',
             icon: 'error'
           });
         }
-      });
+      },
+      error: (err) => {
+        console.error('Delete Error:', err);
+        Swal.fire({
+          title: 'Error',
+          text: 'Something went wrong while deleting',
+          icon: 'error'
+        });
+      }
     });
-  }
+  });
+}
 
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
@@ -1732,6 +1767,28 @@ export class TransitDamageInfoComponent implements OnInit {
     doc.save(fileName);
     Swal.fire('Success', `PDF file downloaded: ${fileName}`, 'success');
   }
+
+  // Fetch counts from API
+fetchPendingAndCompletedCounts() {
+  const payload = {
+    INOUT: 'OUTWARD',
+    TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
+    SCREEN: 'TRANSIT DAMAGE INFO'
+  };
+
+  this.service.OutwardCountGlobalWithSap(payload).subscribe(
+    (response: any) => {
+      this.pendingCount = response.ZPEND_CNT || 0;
+      this.completedCount = response.ZCONF_CNT || 0;
+    },
+    (error) => {
+      console.error('Error fetching counts:', error);
+      this.pendingCount = 0;
+      this.completedCount = 0;
+     
+    }
+  );
+}
 
 
 }
