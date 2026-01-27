@@ -33,8 +33,11 @@ export class TransitInfoComponent implements OnInit {
   isEditMode: boolean = false;
   mainMode: string = 'creation'; // Default to creation mode
 
+
+
   ponumber: string = '';
-  // Removed: invoicenumber: string = ''; // Property is no longer bound in the main input section
+  pendingCount: number = 0;
+  completedCount: number = 0;
   previousOrderType: string | null = null;
   previousSapType: string | null = null;
 
@@ -179,42 +182,54 @@ export class TransitInfoComponent implements OnInit {
     this.selectedType = '';
   }
 
-  onSapTypeChange(): void {
-    if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
-      this.resetConditionalFields();
-    }
-    this.previousSapType = this.sapType;
-
-    this.transitInfo.reset();
-    this.referenceItems.clear();
-    // 🔥 CLEAR SEARCH TABLE DATA
-    this.headerData = null;
-    this.itemsList = [];
-    this.showTable = false;
-    this.searchReference = '';
-    this.selectedType = '';
-    this.referenceItems.push(this.createReferenceRow());
-
-    // Show form only if both selections are made
-    this.showForm = !!(this.orderType && this.sapType);
-
-    if (this.orderType === 'Inward') {
-      this.transitInfo.get('ponumber')?.setValidators([Validators.required]);
-      this.transitInfo.get('invoicenumber')?.clearValidators();
-    } else if (this.orderType === 'Outward') {
-      // Updated: Removed Validators.required from invoicenumber. Outward validation is now implicit via search results/reference items.
-      this.transitInfo.get('invoicenumber')?.clearValidators();
-      this.transitInfo.get('ponumber')?.clearValidators();
-    } else {
-      this.transitInfo.get('ponumber')?.clearValidators();
-      this.transitInfo.get('invoicenumber')?.clearValidators();
-    }
-
-    this.transitInfo.get('ponumber')?.updateValueAndValidity();
-    this.transitInfo.get('invoicenumber')?.updateValueAndValidity();
-
-    console.log('onSapTypeChange -> sapType:', this.sapType, ' showForm:', this.showForm);
+   onSapTypeChange(): void {
+  // ✅ Show spinner at start
+  this.spinner.show();
+  
+  if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
+    this.resetConditionalFields();
   }
+  
+  this.previousSapType = this.sapType;
+
+  // ✅ Clear old data
+  this.transitInfo.reset();
+  this.referenceItems.clear();
+  this.headerData = null;
+  this.itemsList = [];
+  this.showTable = false;
+  this.searchReference = '';
+  this.selectedType = '';
+  this.referenceItems.push(this.createReferenceRow());
+
+  // ✅ CALL COUNT API for Outward mode
+  if (this.orderType === 'Outward' && this.sapType) {
+    this.fetchPendingAndCompletedCounts(); // This will hide spinner
+  } else {
+    // ✅ Hide spinner if not Outward
+    this.spinner.hide();
+  }
+
+  // Show form only if both selections are made
+  this.showForm = !!(this.orderType && this.sapType);
+
+  // Set validators based on order type
+  if (this.orderType === 'Inward') {
+    this.transitInfo.get('ponumber')?.setValidators([Validators.required]);
+    this.transitInfo.get('invoicenumber')?.clearValidators();
+  } else if (this.orderType === 'Outward') {
+    this.transitInfo.get('invoicenumber')?.clearValidators();
+    this.transitInfo.get('ponumber')?.clearValidators();
+  } else {
+    this.transitInfo.get('ponumber')?.clearValidators();
+    this.transitInfo.get('invoicenumber')?.clearValidators();
+  }
+
+  this.transitInfo.get('ponumber')?.updateValueAndValidity();
+  this.transitInfo.get('invoicenumber')?.updateValueAndValidity();
+
+  console.log('onSapTypeChange -> sapType:', this.sapType, ' showForm:', this.showForm);
+}
 
   resetConditionalFields(): void {
     this.showForm = false;
@@ -1290,6 +1305,36 @@ export class TransitInfoComponent implements OnInit {
     doc.save(fileName);
     Swal.fire('Success', `PDF file downloaded: ${fileName}`, 'success');
   }
+
+   fetchPendingAndCompletedCounts() {
+  const payload = {
+    INOUT: 'OUTWARD',
+    TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
+    SCREEN: 'TRANSIT INFO'
+  };
+
+  // ✅ Spinner already shown in onSapTypeChange()
+  
+  this.service.OutwardCountGlobalWithSap(payload).subscribe(
+    (response: any) => {
+      // ✅ Stop spinner
+      this.spinner.hide();
+      
+      this.pendingCount = response.ZPEND_CNT || 0;
+      this.completedCount = response.ZCONF_CNT || 0;
+      
+      console.log('✅ Counts fetched:', this.pendingCount, this.completedCount);
+    },
+    (error) => {
+      // ✅ Stop spinner on error
+      this.spinner.hide();
+      
+      console.error('Error fetching counts:', error);
+      this.pendingCount = 0;
+      this.completedCount = 0;
+    }
+  );
+}
 
 
 

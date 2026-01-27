@@ -37,7 +37,7 @@
 
       <br />
 
-      <div *ngIf="orderType" class="sap-row" style="display: flex !important; margin-bottom: 10px;">
+            <div *ngIf="orderType" class="sap-row">
         <div class="form-radio optional sap-radio">
           <label>
             <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
@@ -48,7 +48,19 @@
             <span>Without SAP</span>
           </label>
         </div>
-        <br />
+
+        <!-- PENDING & COMPLETED COUNTS (Only for Outward) -->
+        <div *ngIf="orderType === 'Outward' && sapType" class="status-counts-container">
+          <div class="pending-box">
+            <i class="fas fa-clock"></i>
+            <span class="count-text">Pending: {{ pendingCount }}</span>
+          </div>
+
+          <div class="completed-box">
+            <i class="fas fa-check-circle"></i>
+            <span class="count-text">Completed: {{ completedCount }}</span>
+          </div>
+        </div>
       </div>
 
       <div class="input-row" *ngIf="sapType">

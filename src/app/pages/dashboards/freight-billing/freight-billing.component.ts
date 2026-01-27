@@ -42,6 +42,8 @@ export class FreightBillingComponent implements OnInit {
   showForm = false;
   freightDetails: FreightDetails;
   totalFreight: number = 0;
+  pendingCount: number = 0;
+  completedCount: number = 0;
 
   previousOrderType: string | null = null;
   previousSapType: string | null = null;
@@ -236,14 +238,19 @@ export class FreightBillingComponent implements OnInit {
   }
 
   onSapTypeChange(): void {
+    
     if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
       this.resetConditionalFields();
     }
     this.previousSapType = this.sapType;
 
+
     this.FreightBilling.reset();
     this.referenceItems.clear();
     this.referenceItems.push(this.createReferenceRow());
+     if (this.orderType === 'Outward' && this.sapType) {
+    this.fetchPendingAndCompletedCounts();
+  }
 
     this.showForm = !!(this.orderType && this.sapType);
 
@@ -1297,6 +1304,27 @@ export class FreightBillingComponent implements OnInit {
     doc.save(fileName);
     Swal.fire('Success', `PDF file downloaded: ${fileName}`, 'success');
   }
+
+  fetchPendingAndCompletedCounts() {
+  const payload = {
+    INOUT: 'OUTWARD',
+    TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
+    SCREEN: 'FREIGHT BILLING'
+  };
+ 
+  this.service.OutwardCountGlobalWithSap(payload).subscribe(
+    (response: any) => {
+      this.pendingCount = response.ZPEND_CNT || 0;
+      this.completedCount = response.ZCONF_CNT || 0;
+    },
+    (error) => {
+      console.error('Error fetching counts:', error);
+      this.pendingCount = 0;
+      this.completedCount = 0;
+     
+    }
+  );
+}
 
 
 }

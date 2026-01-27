@@ -53,6 +53,9 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   VendorCodeList: any[] = [];
   mainMode: string = 'creation'; // Default to creation mode
 
+  pendingCount: number = 0;
+  completedCount: number = 0;
+
   // Search functionality
   selectedItems: any[] = [];
   searchReference = '';
@@ -296,6 +299,9 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       this.resetConditionalFields();
     }
     this.previousSapType = this.sapType;
+    if (this.orderType === 'Outward' && this.sapType) {
+    this.fetchPendingAndCompletedCounts();
+  }
     // ✅ Complete reset when SAP mode changes
     this.invoicenumber = '';
     this.ponumber = '';
@@ -1803,4 +1809,24 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     doc.save(fileName);
     Swal.fire('Success', `PDF file downloaded: ${fileName}`, 'success');
   }
+  fetchPendingAndCompletedCounts() {
+  const payload = {
+    INOUT: 'OUTWARD',
+    TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
+    SCREEN: 'INSURANCE CLAIM STATUS'
+  };
+ 
+  this.service.OutwardCountGlobalWithSap(payload).subscribe(
+    (response: any) => {
+      this.pendingCount = response.ZPEND_CNT || 0;
+      this.completedCount = response.ZCONF_CNT || 0;
+    },
+    (error) => {
+      console.error('Error fetching counts:', error);
+      this.pendingCount = 0;
+      this.completedCount = 0;
+     
+    }
+  );
+}
 }

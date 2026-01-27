@@ -40,7 +40,8 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   dispatchData: any[] = [];
 
   mainMode: string = 'creation'; // Default to creation mode
-
+  pendingCount: number = 0;
+  completedCount: number = 0;
 
   // Search functionality
   selectedItems: any[] = [];
@@ -220,6 +221,9 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       this.resetConditionalFields();
     }
     this.previousSapType = this.sapType;
+    if (this.orderType === 'Outward' && this.sapType) {
+    this.fetchPendingAndCompletedCounts();
+  }
 
     this.invoices.clear();
     this.addRow();
@@ -1477,6 +1481,27 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     doc.save(fileName);
     Swal.fire('Success', `PDF file downloaded: ${fileName}`, 'success');
   }
+
+  fetchPendingAndCompletedCounts() {
+  const payload = {
+    INOUT: 'OUTWARD',
+    TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
+    SCREEN: 'INVOICE LOAD DETAILS'
+  };
+ 
+  this.service.OutwardCountGlobalWithSap(payload).subscribe(
+    (response: any) => {
+      this.pendingCount = response.ZPEND_CNT || 0;
+      this.completedCount = response.ZCONF_CNT || 0;
+    },
+    (error) => {
+      console.error('Error fetching counts:', error);
+      this.pendingCount = 0;
+      this.completedCount = 0;
+     
+    }
+  );
+}
 
 
 }

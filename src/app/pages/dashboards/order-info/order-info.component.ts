@@ -39,6 +39,8 @@ export class OrderInfoComponent implements OnInit {
   customerList: any;
   customerGroup: string = '';
   showFiscalFields: boolean = false;
+  pendingCount: number = 0;
+  completedCount: number = 0;
 
   initialFormValues: any = {};
   selectedItems: any[] = [];
@@ -394,6 +396,10 @@ export class OrderInfoComponent implements OnInit {
 
     this.previousSapType = this.sapType;
     this.setConditionalValidators();
+    if (this.orderType === 'Outward' && this.sapType) {
+    this.fetchPendingAndCompletedCounts();
+  }
+ 
 
     console.log("sapType", this.sapType);
 
@@ -1891,6 +1897,26 @@ export class OrderInfoComponent implements OnInit {
     doc.save(fileName);
     Swal.fire('Success', `PDF file downloaded: ${fileName}`, 'success');
   }
+  fetchPendingAndCompletedCounts() {
+  const payload = {
+    INOUT: 'OUTWARD',
+    TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
+    SCREEN: 'ORDER INFO'
+  };
+ 
+  this.service.OutwardCountGlobalWithSap(payload).subscribe(
+    (response: any) => {
+      this.pendingCount = response.ZPEND_CNT || 0;
+      this.completedCount = response.ZCONF_CNT || 0;
+    },
+    (error) => {
+      console.error('Error fetching counts:', error);
+      this.pendingCount = 0;
+      this.completedCount = 0;
+     
+    }
+  );
+}
 
 
 
