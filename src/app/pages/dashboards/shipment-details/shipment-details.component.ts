@@ -1000,15 +1000,15 @@ export class ShipmentDetailsComponent implements OnInit {
           }
         ]
       };
-      // 🔹 Choose API based on sapType
+
       const apiCall = this.sapType === 'SAP'
         ? this.service.ShipmentDeleteWithSap(payload)
         : this.service.ShipmentDeleteWithoutSap(payload);
-      // 🔹 Call API
+
       apiCall.subscribe({
         next: (res: any) => {
           if (res?.NUMBER === '200') {
-            // 🔹 Remove row from table only after success
+
             this.searchOptionsList.splice(index, 1);
             Swal.fire({
               title: 'Deleted',
