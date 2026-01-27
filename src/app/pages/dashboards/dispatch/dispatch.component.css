@@ -1,35 +1,4 @@
 
-.action-btns {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
-  height: 100%;
-}
-
-
-.btn-add,
-.btn-remove {
-  border: none;
-  padding: 6px 10px;
-  border-radius: 4px;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.btn-add {
-  background-color: #4caf50;
-  color: white;
-}
-
-.btn-remove {
-  background-color: #e53935;
-  color: white;
-}
 
 
 .sap-search-container {

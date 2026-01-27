@@ -664,6 +664,7 @@ export class OrderInfoComponent implements OnInit {
               } else if (action === 'previous') {
                 this.router.navigate(['/dispatch']);
               } else {
+                this.resetConditionalFields();
                 this.OrderInfo.reset();
                 this.showForm = false;
               }
@@ -706,6 +707,7 @@ export class OrderInfoComponent implements OnInit {
               } else if (action === 'previous') {
                 this.router.navigate(['/dispatch']);
               } else {
+                this.resetConditionalFields();
                 this.OrderInfo.reset();
                 this.showForm = false;
               }
@@ -1091,6 +1093,7 @@ export class OrderInfoComponent implements OnInit {
 
   resetExtraFields(): void {
     this.OrderInfo.reset();
+    
   }
 
   fetchpdb(): void {

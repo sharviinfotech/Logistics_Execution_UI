@@ -808,15 +808,12 @@ export class SegmentInfoComponent implements OnInit {
 
   TatTypeChange(): void {
     const formValue = this.segmentInfo.value;
-    const vbeln = this.ponumber || this.invoicenumber || formValue.INV_VBELN;
+    const invNo = this.invoicenumber || formValue.INV_VBELN || 'NA';
 
-    if (!vbeln || !formValue.BRANCH || !formValue.BRANCH_ZONE || !formValue.TAT_Type) {
-      console.log('❌ Missing required fields for TAT fetch');
-      return;
-    }
+    
 
     const obj = {
-      VBELN: vbeln,
+      INV_NO: invNo,
       BRANCH: formValue.BRANCH,
       BRANCH_ZONE: formValue.BRANCH_ZONE,
       TAT_TYPE: formValue.TAT_Type
