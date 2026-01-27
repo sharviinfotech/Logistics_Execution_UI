@@ -511,18 +511,13 @@
           <tr *ngFor="let item of searchOptionsList; let i = index" [class.editing]="item.isEdit">
 
             <!-- Ref No -->
-            <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="item.ZREFNO">
-              <span *ngIf="!item.isEdit">{{ item.ZREFNO }}</span>
-            </td>
+
+            <td>{{ item.ZREFNO }}</td>
 
             <!-- Invoice -->
-            <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="item.ZINV_NUM">
-              <span *ngIf="!item.isEdit">{{ item.ZINV_NUM }}</span>
-            </td>
+
+            <td>{{ item.ZINV_NUM }}</td>
+
 
             <!-- Line No -->
             <td>{{ item.ZLINE_NO }}</td>

@@ -266,9 +266,9 @@
                 <td><input type="number" formControlName="ZNOOFVEH" min="1" /></td>
                 <td><input type="text" formControlName="ZDNAME" /></td>
                 <td><input type="text" formControlName="ZDNUMBER" /></td>
-                <td class="d-flex">
-                  <button type="button" (click)="addRow()">+</button>
-                  <button type="button" (click)="removeRow(i)" [disabled]="vehicles.length === 1">✖</button>
+                <td class="action-btns">
+                  <button type="button" class="btn-add" (click)="addRow()">+</button>
+                  <button type="button" class="btn-remove" [disabled]="vehicles.length === 1">✖</button>
                 </td>
               </tr>
             </tbody>
@@ -425,6 +425,8 @@
           <th>Map ID</th>
           <th>Ref No</th>
           <th>Invoice No</th>
+          <th>Line No</th>
+          <th>POSNR</th>
           <th>Vehicle Line</th>
           <th>ODN No</th>
           <th>SO NO</th>
@@ -456,15 +458,14 @@
           <td>{{ item.ZMAPID }}</td>
 
           <!-- REF NO -->
-          <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZREFNO">
-            <span *ngIf="!item.isEdit">{{ item.ZREFNO }}</span>
-          </td>
+
+          <td>{{ item.ZREFNO }}</td>
 
           <!-- Invoice -->
           <td>{{ item.VBELN }}</td>
           <td>{{ item.ZLINE_NO }}</td>
+
+          <td>{{ item.POSNR }}</td>
 
           <!-- Vehicle Line -->
           <td>{{ item.ZVEH_LINE }}</td>
@@ -565,11 +566,43 @@
             <span *ngIf="!item.isEdit">{{ item.ZWORK_ORDER }}</span>
           </td>
 
-          <td>{{ item.ZLOCATION }}</td>
-          <td>{{ item.ZPLANT }}</td>
-          <td>{{ item.ZDIVISION }}</td>
-          <td>{{ item.ZCREATED_DT }}</td>
-          <td>{{ item.ZVEH_TYPE }}</td>
+
+          <td>
+            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZLOCATION">
+            <span *ngIf="!item.isEdit">{{ item.ZLOCATION }}</span>
+          </td>
+
+
+
+          <td>
+            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZPLANT">
+            <span *ngIf="!item.isEdit">{{ item.ZPLANT }}</span>
+          </td>
+
+
+          <td>
+            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZDIVISION">
+            <span *ngIf="!item.isEdit">{{ item.ZDIVISION }}</span>
+          </td>
+
+
+
+          <td>
+            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZCREATED_DT">
+            <span *ngIf="!item.isEdit">{{ item.ZCREATED_DT }}</span>
+          </td>
+
+
+          <td>
+            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZVEH_TYPE">
+            <span *ngIf="!item.isEdit">{{ item.ZVEH_TYPE }}</span>
+          </td>
+
 
           <!-- ACTION -->
           <td>

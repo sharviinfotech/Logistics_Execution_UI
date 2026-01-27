@@ -43,7 +43,7 @@
       <br />
 
       <!-- SAP TYPE -->
-                   <div *ngIf="orderType" class="sap-row">
+      <div *ngIf="orderType" class="sap-row">
         <div class="form-radio optional sap-radio">
           <label>
             <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
@@ -368,6 +368,7 @@
           <tr>
             <th>Ref No</th>
             <th>Invoice No</th>
+            <th>Line No</th>
             <th>ODN No</th>
             <th>SO NO</th>
             <th>Sale Person</th>
@@ -390,17 +391,15 @@
         <tbody>
           <tr *ngFor="let item of searchOptionsList; let i = index" [class.editing]="item.isEdit">
 
-            <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="item.ZREFNO">
-              <span *ngIf="!item.isEdit">{{ item.ZREFNO }}</span>
-            </td>
 
-            <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="item.ZINV_NO">
-              <span *ngIf="!item.isEdit">{{ item.ZINV_NO }}</span>
-            </td>
+            <td>{{ item.ZREFNO }}</td>
+
+
+            <td>{{ item.ZINV_NO }}</td>
+
+            <td>{{ item.ZLINE_NO }}</td>
+
+
 
             <td>
               <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"

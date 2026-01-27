@@ -340,8 +340,8 @@
                       </select>
                     </td>
 
-                    <td class="d-flex">
-                      <button type="button" class="form-field" (click)="addRow()">+</button>
+                    <td class="action-btns">
+                      <button type="button" class="btn-add" (click)="addRow()">+</button>
                       <button type="button" class="btn-remove" (click)="removeRow(i)" [disabled]="items.length === 1">
                         ✖
                       </button>
@@ -508,53 +508,50 @@
 <div *ngIf="searchOptionsList?.length > 0" class="table-responsive mt-3">
   <table class="table table-bordered table-striped text-center">
     <thead>
-      <tr>
-        <th>Map ID</th>
-        <th>Ref No</th>
-        <th>Invoice No</th>
-        <th>ODN No</th>
-        <th>LINE NO</th>
-        <th>SO No</th>
-        <th>Product</th>
-        <th>Material Type</th>
-        <th>Material Description</th>
-        <th>No of Sets</th>
-        <th>Ah Loaded</th>
-        <th>Shipment Weight</th>
-        <th>Battery Condition</th>
-        <th>Incoterms</th>
-        <th>Insurance Scope</th>
-        <th>Kilometres</th>
-        <th>Plant</th>
-        <th>Division</th>
-        <th>Work Order</th>
-        <th>LR No</th>
-        <th>Transporter</th>
-        <th>Created Date</th>
-        <th>Vehicle Type</th>
-        <th>Action</th>
-      </tr>
+      <th>Map ID</th>
+      <th>Ref No</th>
+      <th>Invoice No</th>
+      <th>Line No</th>
+      <th>POSNR</th>
+      <th>ODN No</th>
+      <th>SO No</th>
+      <th>Product</th>
+      <th>Material Type</th>
+      <th>Material Description</th>
+      <th>No of Sets</th>
+      <th>Ah Loaded</th>
+      <th>Shipment Weight</th>
+      <th>Battery Condition</th>
+      <th>Incoterms</th>
+      <th>Insurance Scope</th>
+      <th>Kilometres</th>
+      <th>Plant</th>
+      <th>Division</th>
+      <th>Work Order</th>
+      <th>LR No</th>
+      <th>Transporter</th>
+      <th>Created Date</th>
+      <th>Vehicle Type</th>
+      <th>Action</th>
     </thead>
 
     <tbody>
       <tr *ngFor="let item of searchOptionsList; let i = index" [class.editing]="item.isEdit">
 
         <!-- Map ID (readonly) -->
-        <td>{{ item.ZMAPID || '-' }}</td>
+        <td>{{ item.ZMAPID }}</td>
 
         <!-- Ref No -->
-        <td>
-          <input *ngIf="item.isEdit" [(ngModel)]="item.ZREFNO" type="text"
-            class="form-control form-control-sm width-md" />
-          <span *ngIf="!item.isEdit">{{ item.ZREFNO || '-' }}</span>
-        </td>
+
+        <td>{{ item.ZREFNO }}</td>
 
         <!-- Invoice No -->
-        <td>
-          <input *ngIf="item.isEdit" [(ngModel)]="item.VBELN" type="text"
-            class="form-control form-control-sm width-md" />
-          <span *ngIf="!item.isEdit">{{ item.VBELN || '-' }}</span>
-        </td>
+
+        <td>{{ item.VBELN }}</td>
+
+        <td>{{ item.ZLINE_NO }}</td>
+
+        <td>{{ item.POSNR }}</td>
 
         <!-- ODN No -->
         <td>
@@ -562,7 +559,7 @@
             class="form-control form-control-sm width-md" />
           <span *ngIf="!item.isEdit">{{ item.ZODN_NO || '-' }}</span>
         </td>
-        <td>{{ item.ZLINE_NO || '-' }}</td>
+
         <!-- SO No -->
         <td>
           <input *ngIf="item.isEdit" [(ngModel)]="item.ZSO_NO" type="text"
@@ -571,25 +568,45 @@
         </td>
 
         <!-- Product -->
-        <td>{{ item.ZPRODUCT || '-' }}</td>
+
+        <td>
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZPRODUCT " type="text"
+            class="form-control form-control-sm width-md" />
+          <span *ngIf="!item.isEdit">{{ item.ZPRODUCT }}</span>
+        </td>
+
+
 
         <!-- Material Type -->
-        <td>{{ item.MTART || '-' }}</td>
+
+        <td>
+          <input *ngIf="item.isEdit" [(ngModel)]="item.MTART " type="text"
+            class="form-control form-control-sm width-md" />
+          <span *ngIf="!item.isEdit">{{ item.MTART }}</span>
+        </td>
+
 
         <!-- Material Description -->
-        <td>{{ item.MAKTX || '-' }}</td>
+
+
+        <td>
+          <input *ngIf="item.isEdit" [(ngModel)]="item.MAKTX " type="text"
+            class="form-control form-control-sm width-md" />
+          <span *ngIf="!item.isEdit">{{ item.MAKTX }}</span>
+        </td>
 
         <!-- Sets -->
         <td>
           <input *ngIf="item.isEdit" type="number" [(ngModel)]="item.ZSETS"
             class="form-control form-control-sm width-md" />
-          <span *ngIf="!item.isEdit">{{ item.ZSETS || '-' }}</span>
+          <span *ngIf="!item.isEdit">{{ item.ZSETS }}</span>
         </td>
 
         <!-- AH -->
         <td>
-          <input *ngIf="item.isEdit" type="number" [(ngModel)]="item.ZAH" class="form-control form-control-sm" />
-          <span *ngIf="!item.isEdit">{{ item.ZAH || '-' }}</span>
+          <input *ngIf="item.isEdit" type="number" [(ngModel)]="item.ZAH"
+            class="form-control form-control-sm width-md" />
+          <span *ngIf="!item.isEdit">{{ item.ZAH }}</span>
         </td>
 
         <!-- Shipment Weight -->
@@ -621,15 +638,26 @@
 
         <!-- KM -->
         <td>
-          <input *ngIf="item.isEdit" type="number" [(ngModel)]="item.ZKM" class="form-control form-control-sm" />
+          <input *ngIf="item.isEdit" type="number" [(ngModel)]="item.ZKM"
+            class="form-control form-control-sm width-md" />
           <span *ngIf="!item.isEdit">{{ item.ZKM }}</span>
         </td>
 
         <!-- Plant -->
-        <td>{{ item.ZPLANT || '-' }}</td>
+
+        <td>
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZPLANT" type="text"
+            class="form-control form-control-sm width-md" />
+          <span *ngIf="!item.isEdit">{{ item.ZPLANT }}</span>
+        </td>
 
         <!-- Division -->
-        <td>{{ item.ZDIVISION || '-' }}</td>
+
+        <td>
+          <input *ngIf="item.isEdit" [(ngModel)]="item.ZDIVISION" type="text"
+            class="form-control form-control-sm width-md" />
+          <span *ngIf="!item.isEdit">{{ item.ZDIVISION }}</span>
+        </td>
 
         <!-- Work Order -->
         <td>

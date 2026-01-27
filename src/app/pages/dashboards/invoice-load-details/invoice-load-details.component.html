@@ -279,9 +279,9 @@
                 <td><input type="text" formControlName="ZEWAYBILL_NO" /></td>
                 <td><input type="date" formControlName="ZEWAYBILL_DT" /></td>
 
-                <td class="d-flex">
-                  <button type="button" (click)="addRow()">+</button>
-                  <button type="button" (click)="removeRow(i)" [disabled]="invoices.length === 1">✖</button>
+                <td class="action-btns">
+                  <button type="button" class="btn-add" (click)="addRow()">+</button>
+                  <button type="button" class="btn-remove" [disabled]="invoices.length === 1">✖</button>
                 </td>
               </tr>
             </tbody>
@@ -439,6 +439,8 @@
         <th>Map ID</th>
         <th>Ref No</th>
         <th>Invoice No</th>
+        <th>Line No</th>
+        <th>POSNR</th>
         <th>ODN No</th>
         <th>SO No</th>
         <th>Truck Type</th>
@@ -462,16 +464,14 @@
 
         <td>{{ item.ZMAPID }}</td>
 
-        <td>
-          <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-            [(ngModel)]="item.ZREFNO">
-          <span *ngIf="!item.isEdit">{{ item.ZREFNO }}</span>
-        </td>
+        <td>{{ item.ZREFNO }}</td>
 
-        <td>
-          <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.VBELN">
-          <span *ngIf="!item.isEdit">{{ item.VBELN }}</span>
-        </td>
+        <td>{{ item.VBELN }}</td>
+
+
+        <td>{{ item.ZLINE_NO }}</td>
+
+        <td>{{ item.POSNR }}</td>
 
         <td>
           <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
@@ -484,6 +484,8 @@
             [(ngModel)]="item.ZSO_NO">
           <span *ngIf="!item.isEdit">{{ item.ZSO_NO }}</span>
         </td>
+
+
 
         <td>
           <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"

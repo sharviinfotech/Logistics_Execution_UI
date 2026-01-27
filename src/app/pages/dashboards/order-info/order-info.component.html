@@ -598,6 +598,8 @@
               <th>Work Order</th>
               <th>LR No</th>
               <th>Transporter</th>
+              <th>Created date</th>
+              <th>Vehicle Type</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -606,23 +608,10 @@
             <tr *ngFor="let item of searchOptionsList; let i = index" [class.editing]="item.isEdit">
 
               <!-- Reusable pattern -->
-              <td>
-                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-                  [(ngModel)]="item.ZREFNO">
-                <span *ngIf="!item.isEdit">{{ item.ZREFNO }}</span>
-              </td>
+              <td>{{ item.ZREFNO }}</td>
+              <td>{{ item.ZINV_NO }}</td>
 
-              <td>
-                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-                  [(ngModel)]="item.ZINV_NO">
-                <span *ngIf="!item.isEdit">{{ item.ZINV_NO }}</span>
-              </td>
-
-              <td>
-                <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-sm"
-                  [(ngModel)]="item.ZLINE_NO">
-                <span *ngIf="!item.isEdit">{{ item.ZLINE_NO }}</span>
-              </td>
+              <td>{{ item.ZLINE_NO }}</td>
 
               <td>
                 <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
@@ -764,6 +753,13 @@
                 <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm"
                   [(ngModel)]="item.ZTRANSPORTER">
                 <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
+              </td>
+              <td>{{ item.ZCREATED_DT }}</td>
+
+              <td>
+                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZVEH_TYPE">
+                <span *ngIf="!item.isEdit">{{ item.ZVEH_TYPE}}</span>
               </td>
 
               <!-- ACTION -->
