@@ -408,6 +408,12 @@ export class GeneralserviceService {
     return this.http.put(environment.baseUrl + 'api/external/LE/Global/Outward/Filter_Creation_NonSap', obj);
   }
 
+    OutwardCountGlobalWithSap(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/Outward/GlobalScreen/CountWithSap', obj);
+  }
+
+  
+
 
 
 }

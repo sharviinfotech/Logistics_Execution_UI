@@ -89,10 +89,7 @@ input[type="radio"] {
         gap: 15px;
     }
 
-    /* .sap-row {
-    flex-direction: column;
-    align-items: stretch;
-  } */
+
     ::ng-deep .sap-row {
         /* CHANGE/ADD these lines to make contents display in a row */
         display: flex !important;
@@ -125,51 +122,7 @@ input[type="radio"] {
 
 
 
-/* .form-field input,
-.form-field select {
-    padding: 12px;
-    font-size: 18px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    outline: none;
-    background: #ffffff;
-    transition: border-color 0.3s ease;
-    width: 100%;
-    box-sizing: border-box;
-    height: 48px;
-    color: #333;
-} */
-/* .shipment-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-}
 
-.shipment-table th,
-.shipment-table td {
-    text-align: center;
-    vertical-align: middle;
-    padding: 8px 10px;
-}
-
-.shipment-table input,
-.shipment-table select {
-    width: 100%;
-    min-width: 130px;
-    height: 38px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-.shipment-table input:focus,
-.shipment-table select:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 4px rgba(0, 123, 255, 0.3);
-} */
 
 .btn-add {
     background: #28a745;
@@ -229,65 +182,8 @@ input[type="radio"] {
 }
 
 
-
-/* Make table header and input same width */
-/* .table.table-bordered {
-    table-layout: fixed !important;
-    width: 100% !important;
-}
-
-.table.table-bordered th,
-.table.table-bordered td {
-    width: auto !important;
-    text-align: center;
-    padding: 6px 8px;
-}
+/* SAP Row - Flex container */
 
 
-.table.table-bordered td input {
-    width: 100% !important;
-    min-width: 0 !important;
-    box-sizing: border-box;
-}
 
 
-.table.table-bordered th:first-child,
-.table.table-bordered td:first-child {
-    width: 60px !important;
-    
-}
-
-.table.table-bordered th:last-child,
-.table.table-bordered td:last-child {
-    width: 90px !important;
-}
-
-
-.table.table-bordered {
-    table-layout: auto !important;
-} */
-
-/* .upload-field {
-    position: relative;
-}
-
-.custom-file-input {
-    width: 100%;
-    height: 48px;
-    
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    background: #fff;
-    font-size: 14px;
-}
-
-.upload-field .floating-label {
-    position: absolute;
-    top: -10px;
-    left: 10px;
-    background: #fff;
-    padding: 0 4px;
-    font-size: 13px;
-    color: #4a90e2;
-} */
