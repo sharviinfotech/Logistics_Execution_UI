@@ -152,37 +152,42 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
   //   this.menuItems = MENU;
   //   console.log("this.menuItems",this.menuItems)
   // }
+  ACTIVITY_ROUTE_MAP: { [key: string]: string } = {
+  'Outward-Dashboard': '/dashboard',
+  'Outward-Dispatch': '/dispatch',
+  'Outward-OrderInfo': '/order-info',
+  'Outward-ShipmentDetails': '/shipment-details',
+  'Outward-InvoiceLoadDetails': '/invoice-load-details',
+  'Outward-SegmentInfo': '/segment-info',
+   'Outward-VehicleInfo': '/vechile-info',                     
+  'Outward-TransitInfo': '/transit-info',
+  'Outward-FreightBilling': '/freight-billing',
+  'Outward-TransitDamageInfo': '/transit-damage-info',
+  'Outward-InsuranceClaimTracking': '/insurance-claim-tracking',
+
+  
+};
 
   initialize(): void {
-    console.log("Original MENU:", MENU);
+  console.log('Original MENU:', MENU);
+  console.log('Login data:', this.loginData);
 
-    // if (!this.loginData?.data?.userActivity) {
-    //     console.log("No user activity found!");
-    //     return;
-    // }
+  // 1️⃣ Extract allowed routes from loginData
+  const allowedRoutes = this.loginData.ACTIVITIES
+    .map((a: any) => this.ACTIVITY_ROUTE_MAP[a.ACTIVITY])
+    .filter(Boolean); // removes undefined
 
-    // const userActivity = this.loginData.data.userActivity;
+  console.log('Allowed routes:', allowedRoutes);
 
-    // Define access rules
-    // const accessMap = {
-    //     'ADMIN': MENU, // Admin gets all components
-    //     'MD': [
-    //         { id: 2, label: "Dashboard", link: "/dashboard", parentId: 2, icon: "bx-home-circle" },
-    //         { id: 6, label: "Invoice Decision", link: "/InvoiceDecision", parentId: 1, icon: "bx-sync" },
-    //         { id: 7, label: "Invoice Reports", link: "/InvoiceReports", parentId: 1, icon: "bx bx-spreadsheet" }
-    //     ],
-    //     'ACCOUNTS': [
-    //       { id: 2, label: "Dashboard", link: "/dashboard", parentId: 2, icon: "bx-home-circle" },
-    //       { id: 6, label: "Invoice Decision", link: "/InvoiceDecision", parentId: 1, icon: "bx-sync" },
-    //       { id: 7, label: "Invoice Reports", link: "/InvoiceReports", parentId: 1, icon: "bx bx-spreadsheet" }
-    //     ]
-    // };
+  // 2️⃣ Filter MENU based on allowed routes
+  this.menuItems = MENU.filter(menu =>
+    menu.link === '/dashboard' || // always allow dashboard
+    allowedRoutes.includes(menu.link)
+  );
 
-    // Assign the allowed menu items based on user role
-    this.menuItems = MENU
-
-    console.log("Filtered menuItems:", this.menuItems);
+  console.log('Filtered menuItems:', this.menuItems);
 }
+
 
 
 

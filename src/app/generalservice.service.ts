@@ -412,6 +412,12 @@ export class GeneralserviceService {
     return this.http.post(environment.baseUrl + 'api/external/LE/Outward/GlobalScreen/CountWithSap', obj);
   }
 
+  GlobalUserAuth(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/GlobalUserAuth', obj);
+  }
+
+
+
   
 
 

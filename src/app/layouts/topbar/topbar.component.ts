@@ -133,13 +133,8 @@ toggleCurrentPasswordFieldTextType() {
   if (this.loginData == undefined) {
     this.router.navigate(['/auth/login-2']);
   }
-  console.log("this.loginData?.data.userActivity",this.loginData?.data.userActivity)
- if(this.loginData){
-  setInterval(() => 
-   
-    this.fetchData(), 600000
-); 
- }
+  console.log("this.loginData?.data.userActivity",this.loginData?.data.TYUSER)
+
   
 }
 
@@ -361,7 +356,7 @@ closeResetPasswordModal() {
     this.notificationService.getAllNotification().subscribe((response: any) => {
       console.log("topbar", response, response.data?.length, this.data?.length);
       
-      if(this.loginData?.data.userActivity == 'ADMIN'){
+      if(this.loginData?.data.TYUSER == 'ADMIN'){
         const newCount = response.adminNotificationCount || 0; // Ensure count is always a number
         console.log("newCount Admin",newCount,this.previousNotificationCount)
         if (newCount > this.previousNotificationCount) { // Play sound only if count increased

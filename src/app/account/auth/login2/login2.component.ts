@@ -93,23 +93,23 @@ export class Login2Component implements OnInit {
    * Form submit
    */
   // dynamic login below 
-  // onSubmit() {
+  onSubmit() {
  
-  //   if(this.loginForm.invalid == true){
-  //     this.submitted = true;
-  //   }else{
-  //     const userName = this.f['userName'].value; // Get the username from the form
-  //     const password = this.f['password'].value; // Get the password from the form
+    if(this.loginForm.invalid == true){
+      this.submitted = true;
+    }else{
+      const userName = this.f['userName'].value; // Get the username from the form
+      const password = this.f['password'].value; // Get the password from the form
  
-  //     // Login Api
-  //     // this.store.dispatch(login({ userName: userName, password: password }));
+      // Login Api
+      // this.store.dispatch(login({ userName: userName, password: password }));
    
-  //     this.login(userName, password)
-  //   }
+      this.login(userName, password)
+    }
    
  
    
-  // }
+  }
   showForgotPasswordScreen() {
     this.showForgotPassword = true; 
     this.successMessage = '';
@@ -165,46 +165,46 @@ export class Login2Component implements OnInit {
  
 
   // local login without API
-  onSubmit() {
+  // onSubmit() {
  
-    if(this.loginForm.invalid == true){
-      this.submitted = true;
-    }else{
-      const userName = this.f['userName'].value; // Get the username from the form
-      const password = this.f['password'].value; // Get the password from the form
+  //   if(this.loginForm.invalid == true){
+  //     this.submitted = true;
+  //   }else{
+  //     const userName = this.f['userName'].value; // Get the username from the form
+  //     const password = this.f['password'].value; // Get the password from the form
  
-      // Login Api
-      // this.store.dispatch(login({ userName: userName, password: password }));
-     this.fullscreen()
-        const  response   ={
-            "message": "Login Successful",
-            "status": 200,
-            "data": {
-                "userName": "1919",
-                "userEmail": "sunil@gmail.com",
-                "userUniqueId": 50,
-                "userStatus": true,
-                "isValid": true,
-                "userActivity": "admin"
-            },
-            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YTA3NzJiMDg1ZjM5ODNkYWQ3N2Y1MyIsInVzZXJOYW1lIjoiMTkxOSIsImlhdCI6MTczODY1MzQyMiwiZXhwIjoxNzM4NjU3MDIyfQ.eljCCW-80W4gWJt0GhJPayd76Xmi7EZOFoOh3SRCP2I"
-        }
-          this.service.setLoginResponse(response);
-          localStorage.setItem('currentUser', JSON.stringify(response || { token: response.token }));
-          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-          this.router.navigate([returnUrl], { skipLocationChange: true });
-       setTimeout(() => {
-              const menuButton = document.getElementById('vertical-menu-btn');
-              if (menuButton) {
-                menuButton.click(); // simulate toggle
-              }
-            }, 500); // wait a second for layout to render
-      // this.login(userName, password)
-    }
+  //     // Login Api
+  //     // this.store.dispatch(login({ userName: userName, password: password }));
+  //    this.fullscreen()
+  //       const  response   ={
+  //           "message": "Login Successful",
+  //           "status": 200,
+  //           "data": {
+  //               "userName": "1919",
+  //               "userEmail": "sunil@gmail.com",
+  //               "userUniqueId": 50,
+  //               "userStatus": true,
+  //               "isValid": true,
+  //               "userActivity": "admin"
+  //           },
+  //           "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YTA3NzJiMDg1ZjM5ODNkYWQ3N2Y1MyIsInVzZXJOYW1lIjoiMTkxOSIsImlhdCI6MTczODY1MzQyMiwiZXhwIjoxNzM4NjU3MDIyfQ.eljCCW-80W4gWJt0GhJPayd76Xmi7EZOFoOh3SRCP2I"
+  //       }
+  //         this.service.setLoginResponse(response);
+  //         localStorage.setItem('currentUser', JSON.stringify(response || { token: response.token }));
+  //         const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+  //         this.router.navigate([returnUrl], { skipLocationChange: true });
+  //      setTimeout(() => {
+  //             const menuButton = document.getElementById('vertical-menu-btn');
+  //             if (menuButton) {
+  //               menuButton.click(); // simulate toggle
+  //             }
+  //           }, 500); // wait a second for layout to render
+  //     // this.login(userName, password)
+  //   }
    
  
    
-  }
+  // }
   // goBackToLogin() {
   //   this.showForgotPassword = false;
   //   this.successMessage = '';
@@ -271,74 +271,79 @@ export class Login2Component implements OnInit {
 
 
   login(userName, password) {
-    this.spinner.show();
-    this.submitted = true;
-  
-    if (this.loginForm.invalid) {
-      this.spinner.hide();
-      return;
-    }
-  this.fullscreen()
-    const loginPayload = {
-      userName: userName,
-      userPassword: password
-    };
-  
-    this.service.submitLogin(loginPayload).subscribe(
-      (res: any) => {
-        const response = res;
-  
-        // First, stop the spinner
-        this.spinner.hide();
-  
-        // Ensure UI update completes before showing Swal
-        setTimeout(() => {
-          if (response.status === 200 && response.data.isValid) {
-            const menuButton = document.getElementById('vertical-menu-btn');
-              if (menuButton) {
-                menuButton.click(); // simulate toggle
-              }
-            localStorage.setItem('currentUser', JSON.stringify(response || { token: response.token }));
-            const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-            this.router.navigate([returnUrl], { skipLocationChange: true });
-            this.service.setLoginResponse(response);
-  
-            // Swal.fire(response.message, `Welcome ${response.data.userFirstName} ${response.data.userLastName}`, 'success');
-            Swal.fire({
-              title: response.message,
-              text: `Welcome ${response.data.userFirstName} ${response.data.userLastName}`,
-              icon: 'success',
-              timer: 5000, // 10 seconds
-              timerProgressBar: true, // Shows a progress bar
-            });
-            setTimeout(() => {
-              const menuButton = document.getElementById('vertical-menu-btn');
-              if (menuButton) {
-                menuButton.click(); // simulate toggle
-              }
-            }, 1000); // wait a second for layout to render
-            
-          } 
-          else if (response.status === 200 && response.data.isValid === false) {
-            Swal.fire('Login Failed', `${response.message}`, 'error');
-          } 
-          else {
-            Swal.fire('', 'Invalid login credentials!', 'error');
-          }
-  
-          this.submitted = false;
-        }, 0); // Delay ensures UI updates before modal appears
-      },
-      (error) => {
-        this.spinner.hide();
-  
-        setTimeout(() => {
-          console.log('error', error);
-          this.toaster.error(error);
-        }, 0);
-      }
-    );
+  this.spinner.show();
+  this.submitted = true;
+
+  if (this.loginForm.invalid) {
+    this.spinner.hide();
+    return;
   }
+
+  this.fullscreen();
+  
+  // ✅ CORRECT payload structure
+  const loginPayload = {
+    LOGIN: {
+      USER: userName,
+      PASSWORD: password
+    }
+  };
+
+  this.service.GlobalUserAuth(loginPayload).subscribe(
+    (res: any) => {
+      const response = res;
+
+      // Stop the spinner
+      this.spinner.hide();
+
+      // Ensure UI update completes before showing Swal
+      setTimeout(() => {
+        // ✅ CORRECT: Check if USER exists and STATUS is Active
+        if (response.USER && response.STATUS === 'Active') {
+          
+          localStorage.setItem('currentUser', JSON.stringify(response));
+          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+          this.router.navigate([returnUrl], { skipLocationChange: true });
+          this.service.setLoginResponse(response);
+
+          // ✅ CORRECT: Use WARNMSG, FIRST_NAME, LAST_NAME
+          Swal.fire({
+            title: response.WARNMSG || 'Login Successful',
+            text: `Welcome ${response.FIRST_NAME} ${response.LAST_NAME}`,
+            icon: 'success',
+            timer: 5000,
+            timerProgressBar: true,
+          });
+          
+          setTimeout(() => {
+            const menuButton = document.getElementById('vertical-menu-btn');
+            if (menuButton) {
+              menuButton.click();
+            }
+          }, 1000);
+          
+        } 
+        else if (response.USER && response.STATUS === 'Inactive') {
+          Swal.fire('Login Failed', 'Your account is inactive', 'error');
+        } 
+        else {
+          Swal.fire('', 'Invalid login credentials!', 'error');
+        }
+
+        this.submitted = false;
+      }, 0);
+    },
+    (error) => {
+      this.spinner.hide();
+
+      setTimeout(() => {
+        console.log('error', error);
+        Swal.fire('Error', 'Login failed. Please try again.', 'error');
+        this.toaster.error('Login failed');
+      }, 0);
+    }
+  );
+}
 fullscreen() {
   const elem = document.documentElement; // or document.body
 
