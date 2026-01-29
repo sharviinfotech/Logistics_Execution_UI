@@ -90,6 +90,13 @@ export const MENU: MenuItem[] = [
         parentId: 2,
         icon: 'bx-shield',
     },
+    {
+        id: 2,
+        label: 'User Creation',
+        link: '/user-creation',
+        parentId: 2,
+        icon: 'bx-user-plus',
+    },
     //   {
     //     id: 2,
     //     label: 'Production Order Confirmation',

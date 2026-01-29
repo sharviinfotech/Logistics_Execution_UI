@@ -1,0 +1,268 @@
+<div class="user-management-container">
+    <!-- Header Section -->
+    <div class="header-section">
+        <h1 class="page-title">User Management</h1>
+        <button class="btn-create-user" (click)="openModal()">
+            <span class="btn-icon">+</span>
+            Create New User
+        </button>
+    </div>
+
+    <!-- User Table -->
+    <div class="table-container">
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>Employee Code</th>
+                    <th>In/Out</th>
+                    <th>Category</th>
+                    <th>Roles</th>
+                    <th>Status</th>
+                    <th>Plants</th>
+                    <th>Divisions</th>
+                    <th>Activities</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of users; let i = index">
+                    <td>{{ user.USER }}</td>
+                    <td>{{ user.FIRST_NAME }}</td>
+                    <td>{{ user.LAST_NAME }}</td>
+                    <td>{{ user.EMAIL }}</td>
+                    <td>{{ user.CONTACT }}</td>
+                    <td>{{ user.EMP_CODE }}</td>
+                    <td>{{ user.INOUT_TYPE }}</td>
+                    <td>{{ user.CATEGORY }}</td>
+                    <td>{{ user.ROLES }}</td>
+                    <td>
+                        <span class="status-badge" [class.active]="user.STATUS === 'Active'"
+                            [class.inactive]="user.STATUS === 'Inactive'">
+                            {{ user.STATUS }}
+                        </span>
+                    </td>
+                    <td>
+                        <span *ngFor="let plant of user.PLANTS; let idx = index">
+                            {{ plant.WERKS }}<span *ngIf="idx < user.PLANTS.length - 1">, </span>
+                        </span>
+                    </td>
+                    <td>
+                        <span *ngFor="let div of user.DIVISIONS; let idx = index">
+                            {{ div.WERKS }}-{{ div.DIVISIONS }}<span *ngIf="idx < user.DIVISIONS.length - 1">, </span>
+                        </span>
+                    </td>
+                    <td>
+                        <span *ngFor="let act of user.ACTIVITIES; let idx = index">
+                            {{ act.ACT }}<span *ngIf="idx < user.ACTIVITIES.length - 1">, </span>
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn-action btn-edit" (click)="editUser(user, i)">✎</button>
+                        <button class="btn-action btn-danger" (click)="deleteUser(i)">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- Items per page -->
+    <div class="pagination-info">
+        Items per page: <span class="items-count">{{ users.length }}</span>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+        <div class="modal-container" (click)="$event.stopPropagation()">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h2 class="modal-title">Create New User</h2>
+                <button class="btn-close" (click)="closeModal()">×</button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+
+                <form class="user-form" [formGroup]="userForm">
+
+                    <!-- Row 1 -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Username<span class="required">*</span></label>
+                            <input class="form-input" formControlName="USER" placeholder="Enter username">
+                            <span class="error-message"
+                                *ngIf="userForm.get('USER')?.touched && userForm.get('USER')?.invalid">
+                                Username is required
+                            </span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">First Name<span class="required">*</span></label>
+                            <input class="form-input" formControlName="FIRST_NAME" placeholder="Enter first name">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input class="form-input" formControlName="LAST_NAME" placeholder="Enter last name">
+                        </div>
+                    </div>
+
+                    <!-- Row 2 -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Contact<span class="required">*</span></label>
+                            <input class="form-input" formControlName="CONTACT" placeholder="Enter contact number">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Email<span class="required">*</span></label>
+                            <input class="form-input" formControlName="EMAIL" placeholder="Enter email address">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" formControlName="CATEGORY">
+                                <option value="Internal">Internal</option>
+                                <option value="External">External</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Row 3 -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Password<span class="required">*</span></label>
+                            <input class="form-input" type="password" formControlName="PASSWORD"
+                                placeholder="Enter password">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Employee Code<span class="required">*</span></label>
+                            <input class="form-input" formControlName="EMP_CODE" placeholder="Enter employee code">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">In/Out Type<span class="required">*</span></label>
+                            <input class="form-input" formControlName="INOUT_TYPE" placeholder="Enter type">
+                        </div>
+                    </div>
+
+                    <!-- Row 4 -->
+                    <div class="form-row">
+                        <!-- Plant -->
+                        <div class="form-group">
+                            <label class="form-label">Plant</label>
+                            <select class="form-select" formControlName="PLANT">
+                                <option value="">Select Plant</option>
+                                <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT">
+                                    {{ plant.PLANT }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Division -->
+                        <div class="form-group">
+                            <label class="form-label">Division</label>
+                            <select class="form-select" formControlName="DIVISION">
+                                <option value="">Select Division</option>
+                                <option *ngFor="let div of DivisionList" [value]="div.DIVISION">
+                                    {{ div.DIVISION }}
+                                </option>
+                            </select>
+
+                        </div>
+
+                        <!-- Role -->
+                        <div class="form-group">
+                            <label class="form-label">Role</label>
+                            <select class="form-select" formControlName="ROLES">
+                                <option value="">Select role</option>
+                                <option *ngFor="let role of availableRoles" [value]="role.name">
+                                    {{ role.name }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Activities Section -->
+                    <div class="form-group full-width">
+                        <label class="form-label">Activities (Screens)</label>
+
+                        <div class="activities-header">
+                            <button type="button" class="btn-select-activities" (click)="toggleActivityCard()">
+                                Select Screens ({{ activitiesFormArray.length }})
+                            </button>
+                        </div>
+
+                        <div class="activity-card" *ngIf="showActivityCard">
+                            <div class="activity-card-header">
+                                <span>Screens</span>
+                                <button type="button" class="close-card" (click)="toggleActivityCard()">×</button>
+                            </div>
+
+                            <div class="activity-card-body">
+                                <div *ngFor="let activity of availableActivities" class="activity-item"
+                                    [class.selected]="isActivitySelected(activity)" (click)="selectActivity(activity)">
+
+                                    {{ activity }}
+                                    <span *ngIf="isActivitySelected(activity)">✔</span>
+
+                                </div>
+                            </div>
+
+                            <div class="activity-card-footer">
+                                <button type="button" class="btn-create" (click)="toggleActivityCard()">
+                                    Done
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <!-- Status -->
+                    <div class="form-group full-width">
+                        <label class="form-label">Status</label>
+
+                        <div class="status-toggle-group">
+                            <button type="button" class="btn-status"
+                                [class.active]="userForm.value.STATUS === 'Inactive'" (click)="setStatus('Inactive')">
+                                Inactive
+                            </button>
+
+                            <label class="toggle-switch">
+                                <input type="checkbox" [checked]="userForm.value.STATUS === 'Active'" (change)="setStatus(
+               userForm.value.STATUS === 'Active' ? 'Inactive' : 'Active'
+             )">
+                                <span class="toggle-slider"></span>
+                            </label>
+
+                            <button type="button" class="btn-status" [class.active]="userForm.value.STATUS === 'Active'"
+                                (click)="setStatus('Active')">
+                                Active
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <!-- Footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn-create" (click)="createUser()">
+                            Create
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>

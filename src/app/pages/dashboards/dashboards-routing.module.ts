@@ -27,6 +27,7 @@ import { FreightBillingComponent } from './freight-billing/freight-billing.compo
 import { TransitDamageInfoComponent } from './transit-damage-info/transit-damage-info.component';
 import { InsuranceClaimTrackingComponent } from './insurance-claim-tracking/insurance-claim-tracking.component';
 import { DispatchComponent } from './dispatch/dispatch.component';
+import { UserCreationComponent } from './user-creation/user-creation.component';
 
 // import { CooisComponent } from './coois/coois.component';
 // import { Co11Component } from './co11/co11.component';
@@ -91,19 +92,19 @@ const routes: Routes = [
         path: 'ReviewNotification',
         component: ReviewNotificationComponent
     },
-     {
+    {
         path: 'sectorwise',
         component: SectorWiseComponent
     },
-     {
+    {
         path: 'dispatch',
         component: DispatchComponent
     },
-       {
+    {
         path: 'order-info',
         component: OrderInfoComponent
     },
-     {
+    {
         path: 'shipment-details',
         component: ShipmentDetailsComponent
     },
@@ -123,7 +124,7 @@ const routes: Routes = [
         path: 'transit-info',
         component: TransitInfoComponent
     },
-     {
+    {
         path: 'freight-billing',
         component: FreightBillingComponent
     },
@@ -135,34 +136,38 @@ const routes: Routes = [
         path: 'insurance-claim-tracking',
         component: InsuranceClaimTrackingComponent
     },
+    {
+        path: 'user-creation',
+        component: UserCreationComponent
+    },
     // {
     //     path: 'co11',
     //     component: Co11Component
     // },
-   
+
     //     {
     //     path: 'coois',
     //     component: CooisComponent
     // },
 
-   
-    
-    
-    
-    
-   
-  
-    
-  
-  
-   
-   
-    
-   
 
-   
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // {
     //     path: 'saas',
     //     component: SaasComponent
@@ -185,4 +190,4 @@ const routes: Routes = [
     imports: [RouterModule.forChild(routes)],
     exports: [RouterModule]
 })
-export class DashboardsRoutingModule {}
+export class DashboardsRoutingModule { }
