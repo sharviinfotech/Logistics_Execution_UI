@@ -1,4 +1,4 @@
-<div class="user-management-container">
+<div class="card-body-LE">
     <!-- Header Section -->
     <div class="header-section">
         <h1 class="page-title">User Management</h1>
@@ -29,8 +29,10 @@
                     <th>Actions</th>
                 </tr>
             </thead>
+
             <tbody>
                 <tr *ngFor="let user of users; let i = index">
+
                     <td>{{ user.USER }}</td>
                     <td>{{ user.FIRST_NAME }}</td>
                     <td>{{ user.LAST_NAME }}</td>
@@ -40,39 +42,79 @@
                     <td>{{ user.INOUT_TYPE }}</td>
                     <td>{{ user.CATEGORY }}</td>
                     <td>{{ user.ROLES }}</td>
+
                     <td>
                         <span class="status-badge" [class.active]="user.STATUS === 'Active'"
                             [class.inactive]="user.STATUS === 'Inactive'">
                             {{ user.STATUS }}
                         </span>
                     </td>
+
+                    <!-- ✅ PLANTS -->
                     <td>
-                        <span *ngFor="let plant of user.PLANTS; let idx = index">
-                            {{ plant.WERKS }}<span *ngIf="idx < user.PLANTS.length - 1">, </span>
+                        <span class="count-badge">
+                            {{ user.PLANTS.length }} Plants
                         </span>
-                    </td>
-                    <td>
-                        <span *ngFor="let div of user.DIVISIONS; let idx = index">
-                            {{ div.WERKS }}-{{ div.DIVISION }}
-                            <span *ngIf="idx < user.DIVISIONS.length - 1">, </span>
-                        </span>
+
+                        <button *ngIf="user.PLANTS?.length" class="btn-view" (click)="openPlantCard(user.PLANTS)">
+                            View
+                        </button>
                     </td>
 
+                    <!-- ✅ DIVISIONS -->
                     <td>
-                        <span *ngFor="let act of user.ACTIVITIES; let idx = index">
-                            {{ act.ACT }}<span *ngIf="idx < user.ACTIVITIES.length - 1">, </span>
+                        <span class="count-badge">
+                            {{ user.DIVISIONS.length }} Divisions
                         </span>
+
+                        <button *ngIf="user.DIVISIONS?.length" class="btn-view"
+                            (click)="openDivisionCard(user.DIVISIONS)">
+                            View
+                        </button>
                     </td>
+
+                    <!-- Activities -->
+                    <td>
+                        <ng-container *ngIf="user.ACTIVITIES?.length; else noActs">
+                            <span *ngFor="let act of user.ACTIVITIES; let idx = index">
+                                {{ act.ACT }}<span *ngIf="idx < user.ACTIVITIES.length - 1">, </span>
+                            </span>
+                        </ng-container>
+                        <ng-template #noActs>-</ng-template>
+                    </td>
+
                     <td>
                         <button class="btn-action btn-edit" (click)="editUser(user, i)">✎</button>
                         <button class="btn-action btn-danger" (click)="deleteUser(i)">
                             <i class="fa fa-trash"></i>
                         </button>
                     </td>
+
                 </tr>
             </tbody>
         </table>
+
     </div>
+
+    <!-- View List Card -->
+    <div class="view-card-overlay" *ngIf="showViewCard" (click)="closeViewCard()">
+        <div class="view-card" (click)="$event.stopPropagation()">
+
+            <div class="view-card-header">
+                <h3>{{ viewCardTitle }}</h3>
+                <button class="btn-close" (click)="closeViewCard()">×</button>
+            </div>
+
+            <div class="view-card-body">
+                <div *ngFor="let item of viewCardData" class="view-item">
+                    {{ item }}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
 
 
     <!-- Items per page -->
@@ -194,65 +236,47 @@
                         </div>
                     </div>
 
-                    <!-- Activities Section -->
-                    <div class="form-group full-width">
-                        <label class="form-label">Activities (Screens)</label>
+                    <!-- Row for Activities + Status -->
+                    <div class="form-row">
 
-                        <div class="activities-header">
-                            <button type="button" class="btn-select-activities" (click)="toggleActivityCard()">
-                                Select Screens ({{ activitiesFormArray.length }})
-                            </button>
-                        </div>
+                        <!-- Activities -->
+                        <div class="form-group full-width">
+                            <label class="form-label">Activities (Screens)</label>
 
-                        <div class="activity-card" *ngIf="showActivityCard">
-                            <div class="activity-card-header">
-                                <span>Screens</span>
-                                <button type="button" class="close-card" (click)="toggleActivityCard()">×</button>
-                            </div>
-
-                            <div class="activity-card-body">
-                                <div *ngFor="let activity of availableActivities" class="activity-item"
-                                    [class.selected]="isActivitySelected(activity)" (click)="selectActivity(activity)">
-
-                                    {{ activity }}
-                                    <span *ngIf="isActivitySelected(activity)">✔</span>
-
-                                </div>
-                            </div>
-
-                            <div class="activity-card-footer">
-                                <button type="button" class="btn-create" (click)="toggleActivityCard()">
-                                    Done
+                            <div class="activities-header">
+                                <button type="button" class="btn-select-activities" (click)="toggleActivityModal()">
+                                    Select Screens ({{ activitiesFormArray.length }})
                                 </button>
                             </div>
                         </div>
-                    </div>
 
+                        <!-- Status -->
+                        <div class="form-group" style="flex: 1;">
+                            <label class="form-label">Status</label>
 
+                            <div class="status-toggle-group">
+                                <button type="button" class="btn-status"
+                                    [class.active]="userForm.value.STATUS === 'Inactive'"
+                                    (click)="setStatus('Inactive')">
+                                    Inactive
+                                </button>
 
-                    <!-- Status -->
-                    <div class="form-group full-width">
-                        <label class="form-label">Status</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" [checked]="userForm.value.STATUS === 'Active'" (change)="setStatus(
+                         userForm.value.STATUS === 'Active' ? 'Inactive' : 'Active'
+                       )">
+                                    <span class="toggle-slider"></span>
+                                </label>
 
-                        <div class="status-toggle-group">
-                            <button type="button" class="btn-status"
-                                [class.active]="userForm.value.STATUS === 'Inactive'" (click)="setStatus('Inactive')">
-                                Inactive
-                            </button>
-
-                            <label class="toggle-switch">
-                                <input type="checkbox" [checked]="userForm.value.STATUS === 'Active'" (change)="setStatus(
-               userForm.value.STATUS === 'Active' ? 'Inactive' : 'Active'
-             )">
-                                <span class="toggle-slider"></span>
-                            </label>
-
-                            <button type="button" class="btn-status" [class.active]="userForm.value.STATUS === 'Active'"
-                                (click)="setStatus('Active')">
-                                Active
-                            </button>
+                                <button type="button" class="btn-status"
+                                    [class.active]="userForm.value.STATUS === 'Active'" (click)="setStatus('Active')">
+                                    Active
+                                </button>
+                            </div>
                         </div>
+
                     </div>
+
 
 
                     <!-- Footer -->

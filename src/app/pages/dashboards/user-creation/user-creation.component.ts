@@ -66,30 +66,28 @@ export class UserCreationComponent implements OnInit {
   // ===== F4 Data =====
   PlantCodeList: Plant[] = [];
   DivisionList: { DIVISION: string }[] = [];
+  showActivityModal = false;
+
+
 
 
   plantInput = '';
   divisionInputName = '';
   selectedPlantForDivision = '';
+  showPlantPopup = false;
+  showDivisionPopup = false;
+
+  selectedPlantsPopup: any[] = [];
+  selectedDivisionsPopup: any[] = [];
+  showViewCard = false;
+  viewCardTitle = '';
+  viewCardData: string[] = [];
+
+
+
 
   // ===== Table Data =====
   users: User[] = [
-    {
-      USER: '10004',
-      FIRST_NAME: 'John',
-      LAST_NAME: 'Doe',
-      EMAIL: 'john@example.com',
-      CONTACT: '1234567890',
-      PASSWORD: '******',
-      EMP_CODE: 'EMP001',
-      INOUT_TYPE: 'IN',
-      CATEGORY: 'Internal',
-      ROLES: 'ADMIN',
-      STATUS: 'Active',
-      PLANTS: [],
-      DIVISIONS: [],
-      ACTIVITIES: []
-    }
   ];
 
   availableRoles: Role[] = [
@@ -97,15 +95,18 @@ export class UserCreationComponent implements OnInit {
   ];
 
   availableActivities: string[] = [
-    'ORDER INFO',
-    'SHIPMENT DETAILS',
-    'SEGMENT INFO',
-    'INVOICE LOAD DETAILS',
-    'VEHICLE INFO',
-    'TRANSIT INFO',
-    'FREIGHT BILLING',
-    'TRANSIT DAMAGE INFO',
-    'INSURANCE CLAIM STATUS'
+    'Outward-Dashboard',
+    'Outward-Dispatch',
+    'Outward-OrderInfo',
+    'Outward-ShipmentDetails',
+    'Outward-InvoiceLoadDetails',
+    'Outward-SegmentInfo',
+    'Outward-VehicleInfo',
+    'Outward-TransitInfo',
+    'Outward-FreightBilling',
+    'Outward-TransitDamageInfo',
+    'Outward-InsuranceClaimTracking',
+    'Outward-UserCreation'
   ];
 
   // ===== Non-form arrays (kept same for Plant/Division) =====
@@ -149,9 +150,7 @@ export class UserCreationComponent implements OnInit {
     return this.userForm.get('ACTIVITIES') as FormArray;
   }
 
-  toggleActivityCard() {
-    this.showActivityCard = !this.showActivityCard;
-  }
+
 
   isActivitySelected(activity: string): boolean {
     return this.activitiesFormArray.value.includes(activity);
@@ -166,6 +165,42 @@ export class UserCreationComponent implements OnInit {
       this.activitiesFormArray.push(this.fb.control(activity));
     }
   }
+  selectAllActivities() {
+    this.activitiesFormArray.clear();
+    this.availableActivities.forEach(activity => {
+      this.activitiesFormArray.push(this.fb.control(activity));
+    });
+  }
+
+  deselectAllActivities() {
+    this.activitiesFormArray.clear();
+  }
+
+  toggleActivityModal() {
+    this.showActivityModal = !this.showActivityModal;
+  }
+
+  openPlantCard(plants: { WERKS: string }[]) {
+    this.viewCardTitle = 'Selected Plants';
+    this.viewCardData = plants.map(p => p.WERKS);
+    this.showViewCard = true;
+  }
+
+  openDivisionCard(divisions: { WERKS: string; DIVISION: string }[]) {
+    this.viewCardTitle = 'Selected Divisions';
+    this.viewCardData = divisions.map(d =>
+      `${d.WERKS} - ${d.DIVISION || '-'}`
+    );
+    this.showViewCard = true;
+  }
+
+  closeViewCard() {
+    this.showViewCard = false;
+    this.viewCardTitle = '';
+    this.viewCardData = [];
+  }
+
+
 
   // ================= Helpers =================
   getEmptyUser(): User {
@@ -315,53 +350,53 @@ export class UserCreationComponent implements OnInit {
     this.service.UserCreationDisplayTable().subscribe(
       (res: any[]) => {
         this.spinner.hide();
-        console.log('🟢 DisplayTable API Response:', res);
+        console.log('🟢 API Response:', res);
 
-        if (Array.isArray(res)) {
-          this.users = res.map(u => ({
-            USER: u.USER,
-            FIRST_NAME: u.FIRST_NAME,
-            LAST_NAME: u.LAST_NAME,
-            EMAIL: u.EMAIL,
-            CONTACT: u.CONTACT,
-            PASSWORD: u.PASSWORD,
-            EMP_CODE: String(u.EMP_CODE),
-            INOUT_TYPE: u.INOUT_TYPE,
-            CATEGORY: u.CATEGORY,
-            STATUS: u.STATUS === 'ACTIVE' ? 'Active' : u.STATUS,
-
-            // ✅ Map TYUSER → ROLES
-            ROLES: u.TYUSER,
-
-            // ✅ Plants
-            PLANTS: (u.PLANTS || []).map((p: any) => ({
-              WERKS: p.WERKS
-            })),
-
-            // ✅ Divisions (API uses DIVISION)
-            DIVISIONS: (u.DIVISIONS || []).map((d: any) => ({
-              WERKS: d.WERKS,
-              DIVISION: d.DIVISION   // ✅
-            })),
-
-
-
-            // ✅ Map ACTIVITY → ACTIVITIES
-            ACTIVITIES: (u.ACTIVITY || []).map((a: any) => ({
-              ACT: a.ACT
-            }))
-          }));
-        } else {
+        if (!Array.isArray(res)) {
           this.users = [];
+          return;
         }
+
+        this.users = res.map(u => ({
+          USER: u.USER,
+          FIRST_NAME: u.FIRST_NAME,
+          LAST_NAME: u.LAST_NAME,
+          EMAIL: u.EMAIL,
+          CONTACT: u.CONTACT,
+          PASSWORD: u.PASSWORD,
+          EMP_CODE: String(u.EMP_CODE),
+          INOUT_TYPE: u.INOUT_TYPE,
+          CATEGORY: u.CATEGORY,
+          STATUS: u.STATUS === 'ACTIVE' ? 'Active' : u.STATUS,
+
+          // ✅ ROLE
+          ROLES: u.TYUSER,
+
+          // ✅ PLANTS (SAFE)
+          PLANTS: (u.PLANTS || []).map((p: any) => ({
+            WERKS: p.WERKS
+          })),
+
+          // ✅ DIVISIONS (SAFE + CORRECT)
+          DIVISIONS: (u.DIVISIONS || []).map((d: any) => ({
+            WERKS: d.WERKS,
+            DIVISION: d.DIVISION || '-'
+          })),
+
+          // ✅ ACTIVITIES
+          ACTIVITIES: (u.ACTIVITY || []).map((a: any) => ({
+            ACT: a.ACT
+          }))
+        }));
       },
       error => {
         this.spinner.hide();
-        console.error('🔴 DisplayTable API Error:', error);
-        Swal.fire('Error', 'Failed to load users table', 'error');
+        console.error('❌ Display Error:', error);
+        Swal.fire('Error', 'Failed to load users', 'error');
       }
     );
   }
+
 
 
   // ================= Create / Edit =================
@@ -374,7 +409,6 @@ export class UserCreationComponent implements OnInit {
 
     const formValue = this.userForm.value;
 
-    // ✅ Final API Payload
     const payload = {
       CREATE: {
         USER: formValue.USER,
@@ -386,43 +420,35 @@ export class UserCreationComponent implements OnInit {
         EMP_CODE: formValue.EMP_CODE,
         INOUT_TYPE: formValue.INOUT_TYPE,
         CATEGORY: formValue.CATEGORY,
-
         TYUSER: formValue.ROLES,
         STATUS: formValue.STATUS,
 
-        PLANTS: this.newUser.PLANTS.map(p => ({ WERKS: p.WERKS })),
+        // Send plants
+        PLANTS: this.newUser.PLANTS,
+
+        // Send divisions - SIMPLE FIX
         DIVISIONS: this.newUser.DIVISIONS.map(d => ({
           WERKS: d.WERKS,
-          DIVISIONS: this.newUser.DIVISIONS.map(d => ({
-            WERKS: d.WERKS,
-            DIVISIONS: d.DIVISION   // ✅ BACKEND KEY
-          }))
-
+          DIVISIONS: d.DIVISION  // Backend expects "DIVISIONS" not "DIVISION"
         })),
 
-
+        // Send activities
         ACTIVITY: formValue.ACTIVITIES.map((a: string) => ({ ACT: a }))
       }
     };
 
+    console.log('📤 Sending Payload:', payload);
 
-    console.log('🟢 GlobalUserAuth Payload:', payload);
-
-    // ================= API CALL =================
     this.spinner.show();
 
     this.service.GlobalUserAuth(payload).subscribe(
       (res: any) => {
         this.spinner.hide();
+        console.log('📥 Response:', res);
 
-        console.log('🟢 GlobalUserAuth Response:', res);
-
-        if (res && res.SUCCESS) {
+        if (res && res.STATUS === 'TRUE') {
           Swal.fire('Success', 'User created successfully', 'success');
-
-          // Optional: update local table
-          this.users.push(JSON.parse(JSON.stringify(payload)));
-
+          this.fetchUsers();
           this.closeModal();
         } else {
           Swal.fire('Failed', res?.MESSAGE || 'User creation failed', 'error');
@@ -430,11 +456,12 @@ export class UserCreationComponent implements OnInit {
       },
       (error) => {
         this.spinner.hide();
-        console.error('🔴 GlobalUserAuth Error:', error);
-        Swal.fire('Error', 'API Error while creating user', 'error');
+        console.error('❌ Error:', error);
+        Swal.fire('Error', 'API Error', 'error');
       }
     );
   }
+
 
 
   editUser(user: User, index: number) {
@@ -501,7 +528,6 @@ export class UserCreationComponent implements OnInit {
 
     const formValue = this.userForm.value;
 
-    // 🔥 EXACT BACKEND FORMAT
     const payload = {
       EDIT: {
         USER: formValue.USER,
@@ -513,59 +539,48 @@ export class UserCreationComponent implements OnInit {
         STATUS: formValue.STATUS,
         EMP_CODE: formValue.EMP_CODE,
         INOUT_TYPE: formValue.INOUT_TYPE,
-
-        // Backend expects TYUSER (not ROLES)
         TYUSER: formValue.ROLES,
-
         CATEGORY: formValue.CATEGORY,
 
-        // Plants
-        PLANTS: this.newUser.PLANTS.map(p => ({
-          WERKS: p.WERKS
-        })),
+        // Send plants
+        PLANTS: this.newUser.PLANTS,
 
-        // Divisions (uses DIVISIONS key)
+        // Send divisions - SIMPLE FIX
         DIVISIONS: this.newUser.DIVISIONS.map(d => ({
           WERKS: d.WERKS,
-          DIVISIONS: d.DIVISION   // ✅ BACKEND KEY
+          DIVISIONS: d.DIVISION
         })),
 
-
-
-        // Backend expects ACTIVITY (not ACTIVITIES)
-        ACTIVITY: this.activitiesFormArray.value.map((a: string) => ({
-          ACT: a
-        }))
+        // Send activities
+        ACTIVITY: this.activitiesFormArray.value.map((a: string) => ({ ACT: a }))
       }
     };
 
-    console.log('🟢 User Edit Payload:', payload);
+    console.log('📤 Update Payload:', payload);
 
     this.spinner.show();
 
     this.service.GlobalUserAuth(payload).subscribe(
       (res: any) => {
         this.spinner.hide();
-        console.log('🟢 User Edit Response:', res);
+        console.log('📥 Response:', res);
 
         if (res?.STATUS === 'TRUE') {
-          Swal.fire('Success', res.MESSAGE || 'User updated successfully', 'success');
-
-          // 🔥 Always refresh from backend
+          Swal.fire('Success', 'User updated successfully', 'success');
           this.fetchUsers();
-
           this.closeModal();
         } else {
-          Swal.fire('Failed', res?.MESSAGE || 'User update failed', 'error');
+          Swal.fire('Failed', res?.MESSAGE || 'Update failed', 'error');
         }
       },
-      error => {
+      (error) => {
         this.spinner.hide();
-        console.error('🔴 User Edit Error:', error);
-        Swal.fire('Error', 'API Error while updating user', 'error');
+        console.error('❌ Error:', error);
+        Swal.fire('Error', 'API Error', 'error');
       }
     );
   }
+
 
 
   deleteUser(index: number) {
