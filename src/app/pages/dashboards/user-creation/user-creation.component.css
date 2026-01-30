@@ -827,6 +827,68 @@
     }
 }
 
+/* HARD STOP for width expansion */
+.dropdown-input {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    /* VERY IMPORTANT for grid/flex */
+    height: 40px;
+    line-height: 20px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+}
+
+
+.multi-select-dropdown {
+    margin-top: 6px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    max-height: 180px;
+    overflow-y: auto;
+    padding: 8px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 20;
+}
+
+.dropdown-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.dropdown-option:hover {
+    background: #f1f5f9;
+    border-radius: 6px;
+}
+
+/* Fix multi-select input height */
+.dropdown-input {
+    height: 40px;
+    /* FIXED HEIGHT */
+    line-height: 20px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.form-group {
+    min-height: 85px;
+    /* prevents layout jump */
+}
+
+
 
 
 

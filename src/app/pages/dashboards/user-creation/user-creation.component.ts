@@ -65,7 +65,7 @@ export class UserCreationComponent implements OnInit {
 
   // ===== F4 Data =====
   PlantCodeList: Plant[] = [];
-  DivisionList: { DIVISION: string }[] = [];
+  DivisionList: { DIVISION: string; PLANT: string }[] = [];
   showActivityModal = false;
 
 
@@ -82,6 +82,11 @@ export class UserCreationComponent implements OnInit {
   showViewCard = false;
   viewCardTitle = '';
   viewCardData: string[] = [];
+  showPlantDropdown = false;
+  showDivisionDropdown = false;
+
+  selectedPlants: string[] = [];
+  selectedDivisions: string[] = [];
 
 
 
@@ -194,11 +199,91 @@ export class UserCreationComponent implements OnInit {
     this.showViewCard = true;
   }
 
+  openActivityCard(activities: Activity[]) {
+    this.viewCardTitle = 'Selected Activities';
+    this.viewCardData = activities.map(a => a.ACT);
+    this.showViewCard = true;
+  }
+
   closeViewCard() {
     this.showViewCard = false;
     this.viewCardTitle = '';
     this.viewCardData = [];
   }
+
+  // ================= Plant / Division Multi-select =================
+  togglePlantDropdown() {
+    this.showPlantDropdown = !this.showPlantDropdown;
+  }
+  updateDivisionsForSelectedPlants() {
+    const selected = this.selectedPlants;
+
+    this.DivisionList = this.PlantCodeList
+      .filter(p => selected.includes(p.PLANT))
+      .map(p => ({
+        DIVISION: p.DIVISION,
+        PLANT: p.PLANT
+      }));
+  }
+
+
+  onPlantToggle(plant: string, event: any) {
+    if (event.target.checked) {
+      if (!this.selectedPlants.includes(plant)) {
+        this.selectedPlants.push(plant);
+      }
+    } else {
+      this.selectedPlants = this.selectedPlants.filter(p => p !== plant);
+
+      // Also remove divisions of unselected plant
+      this.selectedDivisions = this.selectedDivisions.filter(div => {
+        return this.PlantCodeList.some(
+          p => p.PLANT !== plant && p.DIVISION === div
+        );
+      });
+    }
+
+    // 🔥 VERY IMPORTANT
+    this.updateDivisionsForSelectedPlants();
+  }
+
+
+  isPlantSelected(plant: string): boolean {
+    return this.selectedPlants.includes(plant);
+  }
+
+  getSelectedPlantsText(): string {
+    return this.selectedPlants.length
+      ? this.selectedPlants.join(', ')
+      : 'Select Plants';
+  }
+
+
+  /* ---------- DIVISIONS ---------- */
+  toggleDivisionDropdown() {
+    this.showDivisionDropdown = !this.showDivisionDropdown;
+  }
+
+  onDivisionToggle(division: string, event: any) {
+    if (event.target.checked) {
+      if (!this.selectedDivisions.includes(division)) {
+        this.selectedDivisions.push(division);
+      }
+    } else {
+      this.selectedDivisions = this.selectedDivisions.filter(d => d !== division);
+    }
+  }
+
+  isDivisionSelected(division: string): boolean {
+    return this.selectedDivisions.includes(division);
+  }
+
+  getSelectedDivisionsText(): string {
+    return this.selectedDivisions.length
+      ? this.selectedDivisions.join(', ')
+      : 'Select Divisions';
+  }
+
 
 
 
@@ -262,27 +347,16 @@ export class UserCreationComponent implements OnInit {
   // ================= Plant / Division (UNCHANGED) =================
   fetchPlantCodeList(): void {
     this.spinner.show();
-
     this.service.fetchVendorCode().subscribe(
       (res: any) => {
         if (res && res[0]?.PLANT) {
           this.PlantCodeList = res[0].PLANT;
-
-
-          const allDivisions = this.PlantCodeList.map(p => p.DIVISION);
-          console.log('🟢 PlantCodeList:', this.PlantCodeList);
-
-          const uniqueDivisions = Array.from(new Set(allDivisions));
-
+          const uniqueDivisions = Array.from(new Set(this.PlantCodeList.map(p => p.DIVISION)));
           this.DivisionList = uniqueDivisions.map(div => ({
-            DIVISION: div
+            DIVISION: div,
+            PLANT: this.PlantCodeList.find(p => p.DIVISION === div)?.PLANT || ''
           }));
-          console.log('🟠 Final DivisionList for Dropdown:', this.DivisionList);
-
-        } else {
-          Swal.fire('No Plant Found', '', 'warning');
-        }
-
+        } else Swal.fire('No Plant Found', '', 'warning');
         this.spinner.hide();
       },
       error => {
@@ -292,23 +366,17 @@ export class UserCreationComponent implements OnInit {
     );
   }
 
-
   onPlantChange() {
     const plant = this.userForm.value.PLANT;
+    if (!plant) return;
 
-    if (plant) {
-      const exists = this.newUser.PLANTS.some(p => p.WERKS === plant);
-      if (!exists) {
-        this.newUser.PLANTS.push({ WERKS: plant });
-      }
+    if (!this.newUser.PLANTS.some(p => p.WERKS === plant)) this.newUser.PLANTS.push({ WERKS: plant });
 
-      // Filter divisions for selected plant
-      this.DivisionList = this.PlantCodeList
-        .filter(p => p.PLANT === plant)
-        .map(p => ({ DIVISION: p.DIVISION }));
+    this.DivisionList = this.PlantCodeList
+      .filter(p => p.PLANT === plant)
+      .map(p => ({ DIVISION: p.DIVISION, PLANT: p.PLANT }));
 
-      this.userForm.patchValue({ DIVISION: '' });
-    }
+    this.userForm.patchValue({ DIVISION: '' });
   }
 
   onDivisionChange() {
@@ -466,55 +534,33 @@ export class UserCreationComponent implements OnInit {
 
   editUser(user: User, index: number) {
     this.editingIndex = index;
-
     this.userForm.patchValue({
-      USER: user.USER,
-      FIRST_NAME: user.FIRST_NAME,
-      LAST_NAME: user.LAST_NAME,
-      EMAIL: user.EMAIL,
-      CONTACT: user.CONTACT,
-      PASSWORD: user.PASSWORD,
-      EMP_CODE: user.EMP_CODE,
-      INOUT_TYPE: user.INOUT_TYPE,
-      CATEGORY: user.CATEGORY,
-      ROLES: user.ROLES,
-      STATUS: user.STATUS
+      USER: user.USER, FIRST_NAME: user.FIRST_NAME, LAST_NAME: user.LAST_NAME, EMAIL: user.EMAIL,
+      CONTACT: user.CONTACT, PASSWORD: user.PASSWORD, EMP_CODE: user.EMP_CODE, INOUT_TYPE: user.INOUT_TYPE,
+      CATEGORY: user.CATEGORY, ROLES: user.ROLES, STATUS: user.STATUS
     });
 
-    // ===== Activities =====
     this.activitiesFormArray.clear();
-    user.ACTIVITIES.forEach(a => {
-      this.activitiesFormArray.push(this.fb.control(a.ACT));
-    });
+    user.ACTIVITIES.forEach(a => this.activitiesFormArray.push(this.fb.control(a.ACT)));
 
-    // ===== Plants & Divisions =====
     this.newUser.PLANTS = [...user.PLANTS];
     this.newUser.DIVISIONS = [...user.DIVISIONS];
 
     this.showModal = true;
-
-    // 🔥 Load plants FIRST
     this.fetchPlantCodeList();
 
-    // 🔥 After small delay, set plant & rebuild divisions
     setTimeout(() => {
       if (this.newUser.PLANTS.length > 0) {
         const selectedPlant = this.newUser.PLANTS[0].WERKS;
-
         this.userForm.patchValue({ PLANT: selectedPlant });
-
         this.DivisionList = this.PlantCodeList
           .filter(p => p.PLANT === selectedPlant)
-          .map(p => ({ DIVISION: p.DIVISION }));
+          .map(p => ({ DIVISION: p.DIVISION, PLANT: p.PLANT }));
 
-        // 🔥 ALSO SET FIRST DIVISION (if exists)
-        if (this.newUser.DIVISIONS.length > 0) {
-          const selectedDivision = this.newUser.DIVISIONS[0].DIVISION;
-          this.userForm.patchValue({ DIVISION: selectedDivision });
-        }
+        if (this.newUser.DIVISIONS.length > 0)
+          this.userForm.patchValue({ DIVISION: this.newUser.DIVISIONS[0].DIVISION });
       }
     }, 300);
-
   }
 
 
