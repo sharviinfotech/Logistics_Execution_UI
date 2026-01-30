@@ -347,7 +347,7 @@ export class GeneralserviceService {
   TransitDamageInfoDeleteWithoutSap(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/TransitDamageInfo/NonSap/DeleteWithoutSap', obj);
   }
-    TransitDamageInfoChangeWithSap(obj) {
+  TransitDamageInfoChangeWithSap(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/TransitDamageInfo/Outward/ChangeWithSap', obj);
   }
   TransitDamageInfoChangeWithoutSap(obj) {
@@ -408,17 +408,22 @@ export class GeneralserviceService {
     return this.http.put(environment.baseUrl + 'api/external/LE/Global/Outward/Filter_Creation_NonSap', obj);
   }
 
-    OutwardCountGlobalWithSap(obj) {
+  OutwardCountGlobalWithSap(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/Outward/GlobalScreen/CountWithSap', obj);
   }
 
   GlobalUserAuth(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/GlobalUserAuth', obj);
   }
+  UserCreationDisplayTable() {
+    return this.http.get(environment.baseUrl + 'api/external/LE/UserCreation/DisplayTable');
+  }
 
 
 
-  
+
+
+
 
 
 

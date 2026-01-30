@@ -53,9 +53,11 @@
                     </td>
                     <td>
                         <span *ngFor="let div of user.DIVISIONS; let idx = index">
-                            {{ div.WERKS }}-{{ div.DIVISIONS }}<span *ngIf="idx < user.DIVISIONS.length - 1">, </span>
+                            {{ div.WERKS }}-{{ div.DIVISION }}
+                            <span *ngIf="idx < user.DIVISIONS.length - 1">, </span>
                         </span>
                     </td>
+
                     <td>
                         <span *ngFor="let act of user.ACTIVITIES; let idx = index">
                             {{ act.ACT }}<span *ngIf="idx < user.ACTIVITIES.length - 1">, </span>
@@ -160,7 +162,8 @@
                         <!-- Plant -->
                         <div class="form-group">
                             <label class="form-label">Plant</label>
-                            <select class="form-select" formControlName="PLANT">
+                            <select class="form-select" formControlName="PLANT" (change)="onPlantChange()">
+
                                 <option value="">Select Plant</option>
                                 <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT">
                                     {{ plant.PLANT }}
@@ -171,8 +174,7 @@
                         <!-- Division -->
                         <div class="form-group">
                             <label class="form-label">Division</label>
-                            <select class="form-select" formControlName="DIVISION">
-                                <option value="">Select Division</option>
+                            <select class="form-select" formControlName="DIVISION" (change)="onDivisionChange()">
                                 <option *ngFor="let div of DivisionList" [value]="div.DIVISION">
                                     {{ div.DIVISION }}
                                 </option>
@@ -255,9 +257,11 @@
 
                     <!-- Footer -->
                     <div class="modal-footer">
-                        <button type="button" class="btn-create" (click)="createUser()">
-                            Create
+                        <button type="button" class="btn-create"
+                            (click)="editingIndex !== null ? updateUser() : createUser()">
+                            {{ editingIndex !== null ? 'Update' : 'Create' }}
                         </button>
+
                     </div>
 
                 </form>
