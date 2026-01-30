@@ -11,15 +11,22 @@
         <div class="icon">
           <i class="fa fa-plus"></i>
         </div>
-        <span>Creation</span>
+        <div class="text-content">
+          <span class="title">Creation</span>
+          <span class="description">Create new Freight Billing entries for inward or outward logistics</span>
+        </div>
       </label>
+
       <label>
         <input type="radio" name="mainMode" [(ngModel)]="mainMode" value="filter" (change)="onMainModeChange()" />
-        <div class="icon red">
-          <i class="fa fa-file"></i>
-        </div>
-        <span>Filter and Download</span>
+        <div class="icon" style="border-radius: 8px">
+          <i class="fa fa-file-download"></i>
 
+        </div>
+        <div class="text-content">
+          <span class="title">Filter & Download</span>
+          <span class="description">Filter records by date, plant, division and export to Excel</span>
+        </div>
       </label>
     </div>
 

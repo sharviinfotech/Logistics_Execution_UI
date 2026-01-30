@@ -164,6 +164,8 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
   'Outward-FreightBilling': '/freight-billing',
   'Outward-TransitDamageInfo': '/transit-damage-info',
   'Outward-InsuranceClaimTracking': '/insurance-claim-tracking',
+  'Outward-UserCreation': '/user-creation',
+
 
   
 };

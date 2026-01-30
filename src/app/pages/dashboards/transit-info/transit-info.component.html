@@ -8,15 +8,22 @@
         <div class="icon">
           <i class="fa fa-plus"></i>
         </div>
-        <span>Creation</span>
+        <div class="text-content">
+          <span class="title">Creation</span>
+          <span class="description">Create new Transit Info entries for inward or outward logistics</span>
+        </div>
       </label>
+
       <label>
         <input type="radio" name="mainMode" [(ngModel)]="mainMode" value="filter" (change)="onMainModeChange()" />
-        <div class="icon red">
-          <i class="fa fa-file"></i>
-        </div>
-        <span>Filter and Download</span>
+        <div class="icon" style="border-radius: 8px">
+          <i class="fa fa-file-download"></i>
 
+        </div>
+        <div class="text-content">
+          <span class="title">Filter & Download</span>
+          <span class="description">Filter records by date, plant, division and export to Excel</span>
+        </div>
       </label>
     </div>
 
@@ -37,7 +44,7 @@
 
       <br />
 
-            <div *ngIf="orderType" class="sap-row">
+      <div *ngIf="orderType" class="sap-row">
         <div class="form-radio optional sap-radio">
           <label>
             <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
@@ -402,22 +409,26 @@
           <tr [class.editing]="headerData.isEdit">
 
             <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZREFNO">
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZREFNO">
               <span *ngIf="!headerData.isEdit">{{ headerData.ZREFNO }}</span>
             </td>
 
             <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZINV_NO">
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZINV_NO">
               <span *ngIf="!headerData.isEdit">{{ headerData.ZINV_NO }}</span>
             </td>
 
-            <td> 
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZODN_NO">
+            <td>
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZODN_NO">
               <span *ngIf="!headerData.isEdit">{{ headerData.ZODN_NO }}</span>
             </td>
 
             <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZSONO">
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZSONO">
               <span *ngIf="!headerData.isEdit">{{ headerData.ZSONO }}</span>
             </td>
 
@@ -442,37 +453,44 @@
             </td>
 
             <td>
-              <input *ngIf="headerData.isEdit" type="datetime-local" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZPOD_SCAN">
+              <input *ngIf="headerData.isEdit" type="datetime-local" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZPOD_SCAN">
               <span *ngIf="!headerData.isEdit">{{ headerData.ZPOD_SCAN }}</span>
             </td>
 
             <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZSIT_SALE">
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZSIT_SALE">
               <span *ngIf="!headerData.isEdit">{{ headerData.ZSIT_SALE }}</span>
             </td>
 
             <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZLOCATION">
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZLOCATION">
               <span *ngIf="!headerData.isEdit">{{ headerData.ZLOCATION }}</span>
             </td>
 
             <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZPLANT">
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZPLANT">
               <span *ngIf="!headerData.isEdit">{{ headerData.ZPLANT }}</span>
             </td>
 
             <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZDIVISION">
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZDIVISION">
               <span *ngIf="!headerData.isEdit">{{ headerData.ZDIVISION }}</span>
             </td>
 
             <td>
-              <input *ngIf="headerData.isEdit" type="date" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZCREATED_DT">
+              <input *ngIf="headerData.isEdit" type="date" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZCREATED_DT">
               <span *ngIf="!headerData.isEdit">{{ headerData.ZCREATED_DT | date:'dd-MM-yyyy' }}</span>
             </td>
 
             <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZVEH_TYPE">
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZVEH_TYPE">
               <span *ngIf="!headerData.isEdit">{{ headerData.ZVEH_TYPE }}</span>
             </td>
 
@@ -531,39 +549,46 @@
           <tr *ngFor="let item of itemsList; let i = index" [class.editing]="item.isEdit">
 
             <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZREFNO">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="item.ZREFNO">
               <span *ngIf="!item.isEdit">{{ item.ZREFNO }}</span>
             </td>
 
             <td>{{ item.ZLINE_NO}}</td>
 
             <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZINV_NO">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="item.ZINV_NO">
               <span *ngIf="!item.isEdit">{{ item.ZINV_NO }}</span>
             </td>
 
             <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZVEH_NUM">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="item.ZVEH_NUM">
               <span *ngIf="!item.isEdit">{{ item.ZVEH_NUM }}</span>
             </td>
 
             <td>
-              <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md" [(ngModel)]="item.ZVEH_LINE">
+              <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md"
+                [(ngModel)]="item.ZVEH_LINE">
               <span *ngIf="!item.isEdit">{{ item.ZVEH_LINE }}</span>
             </td>
 
             <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZWORK_ORDER">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="item.ZWORK_ORDER">
               <span *ngIf="!item.isEdit">{{ item.ZWORK_ORDER }}</span>
             </td>
 
             <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZLRNO">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="item.ZLRNO">
               <span *ngIf="!item.isEdit">{{ item.ZLRNO }}</span>
             </td>
 
             <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZTRANSPORTER">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="item.ZTRANSPORTER">
               <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
             </td>
 

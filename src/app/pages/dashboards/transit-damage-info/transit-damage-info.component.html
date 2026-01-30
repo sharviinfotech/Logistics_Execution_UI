@@ -9,15 +9,22 @@
         <div class="icon">
           <i class="fa fa-plus"></i>
         </div>
-        <span>Creation</span>
+        <div class="text-content">
+          <span class="title">Creation</span>
+          <span class="description">Create new Transit Damage Info entries for inward or outward logistics</span>
+        </div>
       </label>
+
       <label>
         <input type="radio" name="mainMode" [(ngModel)]="mainMode" value="filter" (change)="onMainModeChange()" />
-        <div class="icon red">
-          <i class="fa fa-file"></i>
-        </div>
-        <span>Filter and Download</span>
+        <div class="icon" style="border-radius: 8px">
+          <i class="fa fa-file-download"></i>
 
+        </div>
+        <div class="text-content">
+          <span class="title">Filter & Download</span>
+          <span class="description">Filter records by date, plant, division and export to Excel</span>
+        </div>
       </label>
     </div>
 
@@ -42,32 +49,32 @@
       <br />
 
       <!-- SAP TYPE -->
-      
-<div *ngIf="orderType" class="sap-row">
-  <div class="form-radio optional sap-radio">
-    <label>
-      <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeSelection()" />
-      <span>With SAP</span>
-    </label>
-    <label>
-      <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeSelection()" />
-      <span>Without SAP</span>
-    </label>
-  </div>
-  
-  <!-- PENDING & COMPLETED COUNTS (Only for Outward) -->
-   <div *ngIf="orderType === 'Outward' && sapType" class="status-counts-container">
-    <div class="pending-box">
-      <i class="fas fa-clock"></i>
-      <span class="count-text">Pending: {{ pendingCount }}</span>
-    </div>
-    
-    <div class="completed-box">
-      <i class="fas fa-check-circle"></i>
-      <span class="count-text">Completed: {{ completedCount }}</span>
-    </div>
-   </div>
-</div>
+
+      <div *ngIf="orderType" class="sap-row">
+        <div class="form-radio optional sap-radio">
+          <label>
+            <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeSelection()" />
+            <span>With SAP</span>
+          </label>
+          <label>
+            <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeSelection()" />
+            <span>Without SAP</span>
+          </label>
+        </div>
+
+        <!-- PENDING & COMPLETED COUNTS (Only for Outward) -->
+        <div *ngIf="orderType === 'Outward' && sapType" class="status-counts-container">
+          <div class="pending-box">
+            <i class="fas fa-clock"></i>
+            <span class="count-text">Pending: {{ pendingCount }}</span>
+          </div>
+
+          <div class="completed-box">
+            <i class="fas fa-check-circle"></i>
+            <span class="count-text">Completed: {{ completedCount }}</span>
+          </div>
+        </div>
+      </div>
 
       <!-- Input Section -->
       <div class="input-row" *ngIf="sapType">
@@ -301,6 +308,27 @@
 
           <input type="file" formControlName="IMAGES" id="imagesuploading" accept=".jpg,.jpeg,.png,.pdf" />
           <label>Images</label>
+        </div>
+
+        <div class="form-field ">
+
+          <input type="file" formControlName="FSRREPORT" id="imagesuploading"
+            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx" />
+          <label>FSR Report</label>
+        </div>
+
+        <div class="form-field ">
+
+          <input type="file" formControlName="FIRREPORT" id="imagesuploading"
+            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx" />
+          <label>FIR Report</label>
+        </div>
+
+        <div class="form-field ">
+
+          <input type="file" formControlName="COF" id="imagesuploading"
+            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx" />
+          <label>COF</label>
         </div>
 
       </form>
@@ -555,32 +583,37 @@
           <tr [class.editing]="headerData.isEdit">
 
             <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZREFNO">
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZREFNO">
               <span *ngIf="!headerData.isEdit">{{ headerData.ZREFNO }}</span>
             </td>
 
             <td>{{ headerData.ZLINE_NO }}</td>
 
             <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZINV_NO">
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZINV_NO">
               <span *ngIf="!headerData.isEdit">{{ headerData.ZINV_NO }}</span>
             </td>
 
             <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZODN_NO">
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZODN_NO">
               <span *ngIf="!headerData.isEdit">{{ headerData.ZODN_NO }}</span>
             </td>
 
             <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZSONO">
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZSONO">
               <span *ngIf="!headerData.isEdit">{{ headerData.ZSONO }}</span>
             </td>
 
             <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="headerData.ZINV_DATE">
+              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="headerData.ZINV_DATE">
               <span *ngIf="!headerData.isEdit">{{ headerData.ZINV_DATE }}</span>
             </td>
-              
+
             <td>
               <input *ngIf="headerData.isEdit" type="date" class="form-control form-control-sm width-md"
                 [(ngModel)]="headerData.ZFSR_RPT_DT">
@@ -686,7 +719,7 @@
               <span *ngIf="!headerData.isEdit">{{ headerData.ZVEH_TYPE }}</span>
             </td>
 
-            
+
             <!-- ACTION -->
             <td>
               <div *ngIf="!headerData.isEdit">
@@ -744,13 +777,14 @@
 
             <!-- MAP ID -->
             <td>
-              <input *ngIf="item.isEdit"  class="form-control form-control-sm" [(ngModel)]="item.ZMAPID">
+              <input *ngIf="item.isEdit" class="form-control form-control-sm" [(ngModel)]="item.ZMAPID">
               <span *ngIf="!item.isEdit">{{ item.ZMAPID }}</span>
             </td>
 
             <!-- REF NO -->
             <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZREFNO">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="item.ZREFNO">
               <span *ngIf="!item.isEdit">{{ item.ZREFNO }}</span>
             </td>
 
@@ -758,49 +792,57 @@
 
             <!-- INV NO -->
             <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZINV_NO">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="item.ZINV_NO">
               <span *ngIf="!item.isEdit">{{ item.ZINV_NO }}</span>
             </td>
 
             <!-- VEH LINE -->
             <td>
-              <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md" [(ngModel)]="item.ZVEH_LINE">
+              <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md"
+                [(ngModel)]="item.ZVEH_LINE">
               <span *ngIf="!item.isEdit">{{ item.ZVEH_LINE }}</span>
             </td>
 
             <!-- VEH NUMBER / TRUCK -->
             <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZTRUCK_NO">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="item.ZTRUCK_NO">
               <span *ngIf="!item.isEdit">{{ item.ZTRUCK_NO }}</span>
             </td>
 
             <!-- BILL NO -->
             <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZBILLNO">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="item.ZBILLNO">
               <span *ngIf="!item.isEdit">{{ item.ZBILLNO }}</span>
             </td>
 
             <!-- PRODUCT -->
             <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZPRODUCT">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="item.ZPRODUCT">
               <span *ngIf="!item.isEdit">{{ item.ZPRODUCT }}</span>
             </td>
 
             <!-- WORK ORDER -->
             <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZWORK_ORDER">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="item.ZWORK_ORDER">
               <span *ngIf="!item.isEdit">{{ item.ZWORK_ORDER }}</span>
             </td>
 
             <!-- LR NO -->
             <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZLRNO">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="item.ZLRNO">
               <span *ngIf="!item.isEdit">{{ item.ZLRNO }}</span>
             </td>
 
             <!-- TRANSPORTER -->
             <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md" [(ngModel)]="item.ZTRANSPORTER">
+              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                [(ngModel)]="item.ZTRANSPORTER">
               <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
             </td>
 

@@ -117,7 +117,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       REFNO: [''],
       SALE_PERSON: [''],
       ODN_NO: [''],
-      FI: [''],
+      FI: ['',],
       REP_DATE: [''],
       CLAIM_REF: [''],
       INV_DATE: [''],
@@ -137,6 +137,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       PAY_INFO: [''],
       UTR: [''],
       CLM_SET_DT: [''],
+      SupportingDocuments: [''],
+      ApproveDocuments: [''],
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
   }
