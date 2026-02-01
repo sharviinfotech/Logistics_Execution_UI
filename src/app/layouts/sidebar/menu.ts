@@ -6,13 +6,13 @@ export const MENU: MenuItem[] = [
     //     label: 'MENUITEMS.DASHBOARDS.TEXT',
     //     icon: 'bx-home-circle',
     //     subItems: [
-    {
-        id: 2,
-        label: 'Dashboard',
-        link: '/dashboard',
-        parentId: 2,
-        icon: 'bxs-dashboard',
-    },
+    // {
+    //     id: 2,
+    //     label: 'Dashboard',
+    //     link: '/dashboard',
+    //     parentId: 2,
+    //     icon: 'bxs-dashboard',
+    // },
     {
         id: 2,
         label: 'Dispatch',

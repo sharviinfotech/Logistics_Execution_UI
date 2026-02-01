@@ -197,13 +197,18 @@
 
                         <div class="form-group">
                             <label class="form-label">In/Out Type<span class="required">*</span></label>
-                            <input class="form-input" formControlName="INOUT_TYPE" placeholder="Enter type">
+                            <select class="form-input" formControlName="INOUT_TYPE">
+                                <option value="">Select Type</option>
+                                <option value="inward">Inward</option>
+                                <option value="outward">Outward</option>
+                            </select>
+
                         </div>
                     </div>
 
                     <!-- Row 4 -->
                     <div class="form-row">
-                        <!-- Plant -->
+
                         <!-- Plant -->
                         <div class="form-group">
                             <label class="form-label">Plants</label>
@@ -261,10 +266,12 @@
                         </div>
                     </div>
 
+
                     <!-- Row for Activities + Status -->
                     <div class="form-row">
 
-                        <div class="form-group full-width">
+                        <!-- Activities -->
+                        <div class="form-group">
                             <label class="form-label">Activities (Screens)</label>
 
                             <div class="activities-header">
@@ -282,8 +289,10 @@
                                 <div class="activity-modal-header">
                                     <div class="activities-header-new">
                                         <h3 class="modal-title">Screen Permissions</h3>
-                                        <div class="activity-count">{{ activitiesFormArray.length }} of {{
-                                            availableActivities.length }} assigned</div>
+                                        <div class="activity-count">
+                                            {{ activitiesFormArray.length }} of {{ availableActivities.length }}
+                                            assigned
+                                        </div>
                                     </div>
                                     <button type="button" class="btn-close-modal"
                                         (click)="toggleActivityModal()">×</button>
@@ -338,7 +347,7 @@
 
                                 <label class="toggle-switch">
                                     <input type="checkbox" [checked]="userForm.value.STATUS === 'Active'" (change)="setStatus(
-                         userForm.value.STATUS === 'Active' ? 'Inactive' : 'Active'
+                           userForm.value.STATUS === 'Active' ? 'Inactive' : 'Active'
                        )">
                                     <span class="toggle-slider"></span>
                                 </label>
@@ -351,6 +360,7 @@
                         </div>
 
                     </div>
+
 
 
 

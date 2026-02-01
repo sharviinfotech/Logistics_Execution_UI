@@ -96,7 +96,9 @@ export class UserCreationComponent implements OnInit {
   ];
 
   availableRoles: Role[] = [
-    { name: 'ADMIN' }
+    { name: 'ADMIN' },
+    { name: 'USER' },
+    { name: 'TRANSPORTER' }
   ];
 
   availableActivities: string[] = [
@@ -216,10 +218,13 @@ export class UserCreationComponent implements OnInit {
     this.showPlantDropdown = !this.showPlantDropdown;
   }
   updateDivisionsForSelectedPlants() {
-    const selected = this.selectedPlants;
+    if (this.selectedPlants.length === 0) {
+      this.DivisionList = [];
+      return;
+    }
 
     this.DivisionList = this.PlantCodeList
-      .filter(p => selected.includes(p.PLANT))
+      .filter(p => this.selectedPlants.includes(p.PLANT))
       .map(p => ({
         DIVISION: p.DIVISION,
         PLANT: p.PLANT
@@ -227,23 +232,29 @@ export class UserCreationComponent implements OnInit {
   }
 
 
+
   onPlantToggle(plant: string, event: any) {
     if (event.target.checked) {
-      if (!this.selectedPlants.includes(plant)) {
-        this.selectedPlants.push(plant);
+      if (!this.selectedPlants.includes(plant)) this.selectedPlants.push(plant);
+
+      // Add to newUser.PLANTS if not already
+      if (!this.newUser.PLANTS.some(p => p.WERKS === plant)) {
+        this.newUser.PLANTS.push({ WERKS: plant });
       }
     } else {
       this.selectedPlants = this.selectedPlants.filter(p => p !== plant);
 
+      // Remove from newUser.PLANTS
+      this.newUser.PLANTS = this.newUser.PLANTS.filter(p => p.WERKS !== plant);
+
       // Also remove divisions of unselected plant
       this.selectedDivisions = this.selectedDivisions.filter(div => {
-        return this.PlantCodeList.some(
-          p => p.PLANT !== plant && p.DIVISION === div
-        );
+        return this.newUser.DIVISIONS.some(d => d.DIVISION !== div || d.WERKS !== plant);
       });
+
+      this.newUser.DIVISIONS = this.newUser.DIVISIONS.filter(d => d.WERKS !== plant);
     }
 
-    // 🔥 VERY IMPORTANT
     this.updateDivisionsForSelectedPlants();
   }
 
@@ -264,15 +275,62 @@ export class UserCreationComponent implements OnInit {
     this.showDivisionDropdown = !this.showDivisionDropdown;
   }
 
-  onDivisionToggle(division: string, event: any) {
+  onDivisionToggle(division: string, event: any, plant?: string) {
+
+    // Find correct plant for this division
+    const mapping = this.DivisionList.find(
+      d => d.DIVISION === division
+    );
+
+    const plantCode = mapping?.PLANT;
+
     if (event.target.checked) {
+
+      // ===== ADD DIVISION (MULTI) =====
       if (!this.selectedDivisions.includes(division)) {
         this.selectedDivisions.push(division);
       }
+
+      if (plantCode) {
+        // Add division object
+        if (!this.newUser.DIVISIONS.some(d => d.WERKS === plantCode && d.DIVISION === division)) {
+          this.newUser.DIVISIONS.push({ WERKS: plantCode, DIVISION: division });
+        }
+
+        // ===== AUTO ADD PLANT (MULTI) =====
+        if (!this.selectedPlants.includes(plantCode)) {
+          this.selectedPlants.push(plantCode);
+        }
+
+        if (!this.newUser.PLANTS.some(p => p.WERKS === plantCode)) {
+          this.newUser.PLANTS.push({ WERKS: plantCode });
+        }
+      }
+
     } else {
+
+      // ===== REMOVE DIVISION =====
       this.selectedDivisions = this.selectedDivisions.filter(d => d !== division);
+
+      if (plantCode) {
+        this.newUser.DIVISIONS = this.newUser.DIVISIONS.filter(
+          d => !(d.WERKS === plantCode && d.DIVISION === division)
+        );
+
+        // ===== REMOVE PLANT ONLY IF NO DIVISIONS LEFT FOR IT =====
+        const stillHas = this.newUser.DIVISIONS.some(d => d.WERKS === plantCode);
+
+        if (!stillHas) {
+          this.selectedPlants = this.selectedPlants.filter(p => p !== plantCode);
+          this.newUser.PLANTS = this.newUser.PLANTS.filter(p => p.WERKS !== plantCode);
+        }
+      }
     }
+
+    // DO NOT RESET DivisionList HERE ❌
   }
+
+
 
   isDivisionSelected(division: string): boolean {
     return this.selectedDivisions.includes(division);
@@ -310,17 +368,29 @@ export class UserCreationComponent implements OnInit {
   resetForm() {
     this.userForm.reset({
       CATEGORY: 'Internal',
-      STATUS: 'Active'
+      STATUS: 'Active',
+      PLANT: '',
+      DIVISION: ''
     });
 
     this.activitiesFormArray.clear();
 
+    // Clear selections
     this.newUser = this.getEmptyUser();
+    this.selectedPlants = [];
+    this.selectedDivisions = [];
+
     this.plantInput = '';
     this.selectedPlantForDivision = '';
     this.divisionInputName = '';
     this.usernameError = false;
+
+    // ✅ Close dropdowns
+    this.showPlantDropdown = false;
+    this.showDivisionDropdown = false;
   }
+
+
 
   onUsernameChange() {
     this.usernameError = this.userForm.get('USER')?.invalid || false;
@@ -328,16 +398,25 @@ export class UserCreationComponent implements OnInit {
 
   // ================= Modal =================
   openModal() {
+    this.resetForm(); // reset everything
     this.showModal = true;
-    this.usernameError = false;
+
+    // Fetch plant list if needed
     this.fetchPlantCodeList();
+
+    // Make sure dropdowns are closed
+    this.showPlantDropdown = false;
+    this.showDivisionDropdown = false;
   }
+
+
 
   closeModal() {
     this.showModal = false;
     this.resetForm();
     this.editingIndex = null;
   }
+
 
   // ================= Status =================
   setStatus(status: string) {
@@ -477,6 +556,7 @@ export class UserCreationComponent implements OnInit {
 
     const formValue = this.userForm.value;
 
+    // Prepare payload
     const payload = {
       CREATE: {
         USER: formValue.USER,
@@ -494,10 +574,10 @@ export class UserCreationComponent implements OnInit {
         // Send plants
         PLANTS: this.newUser.PLANTS,
 
-        // Send divisions - SIMPLE FIX
+        // Send divisions in backend expected format
         DIVISIONS: this.newUser.DIVISIONS.map(d => ({
           WERKS: d.WERKS,
-          DIVISIONS: d.DIVISION  // Backend expects "DIVISIONS" not "DIVISION"
+          DIVISIONS: d.DIVISION
         })),
 
         // Send activities
@@ -508,23 +588,19 @@ export class UserCreationComponent implements OnInit {
     console.log('📤 Sending Payload:', payload);
 
     this.spinner.show();
-
     this.service.GlobalUserAuth(payload).subscribe(
       (res: any) => {
         this.spinner.hide();
-        console.log('📥 Response:', res);
-
-        if (res && res.STATUS === 'TRUE') {
+        if (res?.STATUS === 'TRUE') {
           Swal.fire('Success', 'User created successfully', 'success');
-          this.fetchUsers();
-          this.closeModal();
+          this.fetchUsers();      // refresh table
+          this.closeModal();      // close modal
         } else {
           Swal.fire('Failed', res?.MESSAGE || 'User creation failed', 'error');
         }
       },
       (error) => {
         this.spinner.hide();
-        console.error('❌ Error:', error);
         Swal.fire('Error', 'API Error', 'error');
       }
     );
@@ -532,19 +608,31 @@ export class UserCreationComponent implements OnInit {
 
 
 
+
   editUser(user: User, index: number) {
     this.editingIndex = index;
     this.userForm.patchValue({
-      USER: user.USER, FIRST_NAME: user.FIRST_NAME, LAST_NAME: user.LAST_NAME, EMAIL: user.EMAIL,
-      CONTACT: user.CONTACT, PASSWORD: user.PASSWORD, EMP_CODE: user.EMP_CODE, INOUT_TYPE: user.INOUT_TYPE,
-      CATEGORY: user.CATEGORY, ROLES: user.ROLES, STATUS: user.STATUS
+      USER: user.USER,
+      FIRST_NAME: user.FIRST_NAME,
+      LAST_NAME: user.LAST_NAME,
+      EMAIL: user.EMAIL,
+      CONTACT: user.CONTACT,
+      PASSWORD: user.PASSWORD,
+      EMP_CODE: user.EMP_CODE,
+      INOUT_TYPE: user.INOUT_TYPE,
+      CATEGORY: user.CATEGORY,
+      ROLES: user.ROLES,
+      STATUS: user.STATUS
     });
 
     this.activitiesFormArray.clear();
     user.ACTIVITIES.forEach(a => this.activitiesFormArray.push(this.fb.control(a.ACT)));
 
+    // Populate plants/divisions
     this.newUser.PLANTS = [...user.PLANTS];
     this.newUser.DIVISIONS = [...user.DIVISIONS];
+    this.selectedPlants = user.PLANTS.map(p => p.WERKS);
+    this.selectedDivisions = user.DIVISIONS.map(d => d.DIVISION);
 
     this.showModal = true;
     this.fetchPlantCodeList();
@@ -554,14 +642,12 @@ export class UserCreationComponent implements OnInit {
         const selectedPlant = this.newUser.PLANTS[0].WERKS;
         this.userForm.patchValue({ PLANT: selectedPlant });
         this.DivisionList = this.PlantCodeList
-          .filter(p => p.PLANT === selectedPlant)
+          .filter(p => this.selectedPlants.includes(p.PLANT))
           .map(p => ({ DIVISION: p.DIVISION, PLANT: p.PLANT }));
-
-        if (this.newUser.DIVISIONS.length > 0)
-          this.userForm.patchValue({ DIVISION: this.newUser.DIVISIONS[0].DIVISION });
       }
     }, 300);
   }
+
 
 
 
@@ -591,7 +677,7 @@ export class UserCreationComponent implements OnInit {
         // Send plants
         PLANTS: this.newUser.PLANTS,
 
-        // Send divisions - SIMPLE FIX
+        // Send divisions
         DIVISIONS: this.newUser.DIVISIONS.map(d => ({
           WERKS: d.WERKS,
           DIVISIONS: d.DIVISION
@@ -605,23 +691,19 @@ export class UserCreationComponent implements OnInit {
     console.log('📤 Update Payload:', payload);
 
     this.spinner.show();
-
     this.service.GlobalUserAuth(payload).subscribe(
       (res: any) => {
         this.spinner.hide();
-        console.log('📥 Response:', res);
-
         if (res?.STATUS === 'TRUE') {
           Swal.fire('Success', 'User updated successfully', 'success');
-          this.fetchUsers();
-          this.closeModal();
+          this.fetchUsers(); // refresh table
+          this.closeModal(); // close modal
         } else {
           Swal.fire('Failed', res?.MESSAGE || 'Update failed', 'error');
         }
       },
       (error) => {
         this.spinner.hide();
-        console.error('❌ Error:', error);
         Swal.fire('Error', 'API Error', 'error');
       }
     );
