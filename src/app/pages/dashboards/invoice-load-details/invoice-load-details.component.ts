@@ -1503,5 +1503,48 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   );
 }
 
+refreshScreen() {
+
+  
+  // Reset order type and SAP type
+  this.orderType = '';
+  this.sapType = '';
+  this.showForm = false;
+  this.isUpdateMode = false;
+  
+  // Reset search fields
+   this.searchReference = '';
+  this.selectedType = '';
+  
+  this.searchOptionsList = [];
+  this.dropdownOpen = false;
+  
+  
+  // Reset filter fields
+  this.filterFromDate = '';
+  this.filterToDate = '';
+  this.filterPlant = '';
+  this.filterDivision = '';
+  this.filterTransporter = '';
+  this.filterSapType = '';
+  this.filterVehicleType = '';
+  this.filteredData = [];
+  this.filterApplied = false;
+  
+  // Reset form
+
+  
+  // Show success message
+  Swal.fire({
+    text: 'Screen refreshed successfully',
+    icon: 'success',
+   
+     confirmButtonText: 'Ok',
+    timer: 4000
+  });
+  
+  this.cd.detectChanges();
+}
+
 
 }

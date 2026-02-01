@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -1041,6 +1042,45 @@ onFilterDivisionChange(): void {
 
   doc.save('Dispatch_Records.pdf');
    Swal.fire('Success', `PDF file downloaded: Dispatch_Records.pdf  `, 'success');
+}
+refreshScreen() {
+ 
+  // Reset order type and SAP type
+  this.orderType = '';
+  this.sapType = '';
+  this.showForm = false;
+  this.isUpdateMode = false;
+  
+  // Reset search fields
+  this.searchReference = '';
+  this.selectedType = '';
+  this.searchValue = '';
+  this.searchPlaceholder = 'Select search type';
+  
+  // Reset filter fields
+  this.filterFromDate = '';
+  this.filterToDate = '';
+  this.filterPlant = '';
+  this.filterDivision = '';
+  this.filterTransporter = '';
+  this.filterSapType = '';
+  this.filterVehicleType = '';
+  this.filteredData = [];
+  this.filterApplied = false;
+  
+  // Reset form
+  this.resetAll();
+  
+  // Show success message
+  Swal.fire({
+    text: 'Screen refreshed successfully',
+    icon: 'success',
+   
+     confirmButtonText: 'Ok',
+    timer: 4000
+  });
+  
+  this.cd.detectChanges();
 }
 
 }

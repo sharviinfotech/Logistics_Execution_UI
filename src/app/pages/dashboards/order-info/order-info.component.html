@@ -5,7 +5,7 @@
   <div class="card-body-LE">
 
     <!-- 🔹 Main Mode Selection (Creation / Filter and Download) -->
-        <div class="Creation-radio">
+    <div class="Creation-radio">
       <label>
         <input type="radio" name="mainMode" [(ngModel)]="mainMode" value="creation" (change)="onMainModeChange()" />
         <div class="icon">
@@ -30,6 +30,12 @@
       </label>
     </div>
 
+    <div class="text-right" style="margin-top: 10px;">
+      <button class="btn btn-md btn-raised btn-refresh" (click)="refreshScreen()">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+    </div>
+
     <br />
 
     <!-- CREATION MODE -->
@@ -38,11 +44,11 @@
       <!-- Order Type with Processing Badge -->
       <div class="order-type-wrapper">
         <div class="form-radio optional" *ngIf="!orderType">
-          <label>
+          <!-- <label>
             <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward"
               (change)="onOrderTypeChange()" />
             <span>Inward</span>
-          </label>
+          </label> -->
           <label>
             <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward"
               (change)="onOrderTypeChange()" />
@@ -135,19 +141,19 @@
                     <td>{{ i + 1 }}</td>
 
                     <td>
-                      <input type="text" formControlName="referenceNumber" placeholder="Enter Ref. No."
+                      <input type="text" formControlName="referenceNumber" class="width-le" placeholder="Enter Ref. No."
                         (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
                         (keydown.tab)="onFieldBlur(i, 'REF_NO')" [readonly]="i !== 0" />
                     </td>
 
                     <td>
-                      <input type="text" formControlName="workOrderNumber" placeholder="Enter Work Order No."
+                      <input type="text" formControlName="workOrderNumber" class="width-le" placeholder="Enter Work Order No."
                         (blur)="onFieldBlur(i, 'WORK_ORDER_NO')" (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
                         (keydown.tab)="onFieldBlur(i, 'WORK_ORDER_NO')" [readonly]="i !== 0" />
                     </td>
 
                     <td>
-                      <input type="text" formControlName="lrNumber" placeholder="Enter LR No."
+                      <input type="text" formControlName="lrNumber" class="width-le" placeholder="Enter LR No."
                         (blur)="onFieldBlur(i, 'LR_NO')" (keydown.enter)="onFieldBlur(i, 'LR_NO')"
                         (keydown.tab)="onFieldBlur(i, 'LR_NO')" [readonly]="i !== 0" />
                     </td>

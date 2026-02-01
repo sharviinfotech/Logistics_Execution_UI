@@ -27,17 +27,24 @@
       </label>
     </div>
 
+    <div class="text-right" style="margin-top: 10px;">
+      <button class="btn btn-md btn-raised btn-refresh" (click)="refreshScreen()">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+    </div>
+
+
     <br />
 
     <div *ngIf="mainMode === 'creation'">
 
       <!-- Order Type -->
       <div class="form-radio optional">
-        <label>
+        <!-- <label>
           <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward"
             (change)="onOrderTypeSelection()" />
           <span>Inward</span>
-        </label>
+        </label> -->
 
         <label>
           <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward"
@@ -122,23 +129,23 @@
 
                     <td>{{ i + 1 }}</td>
                     <td>
-                      <input type="text" formControlName="MAPID" placeholder="Enter Map ID" readonly>
+                      <input type="text" formControlName="MAPID" class="width-le" placeholder="Enter Map ID" readonly>
                     </td>
 
                     <td>
-                      <input type="text" formControlName="referenceNumber" placeholder="Enter Ref. No."
+                      <input type="text" formControlName="referenceNumber" class="width-le" placeholder="Enter Ref. No."
                         (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
                         (keydown.tab)="onFieldBlur(i, 'REF_NO')" [readonly]="i !== 0" />
                     </td>
 
                     <td>
-                      <input type="text" formControlName="workOrderNumber" placeholder="Enter Work Order No."
+                      <input type="text" formControlName="workOrderNumber" class="width-le" placeholder="Enter Work Order No."
                         (blur)="onFieldBlur(i, 'WORK_ORDER_NO')" (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
                         (keydown.tab)="onFieldBlur(i, 'WORK_ORDER_NO')" [readonly]="i !== 0" />
                     </td>
 
                     <td>
-                      <input type="text" formControlName="lrNumber" placeholder="Enter LR No."
+                      <input type="text" formControlName="lrNumber" class="width-le" placeholder="Enter LR No."
                         (blur)="onFieldBlur(i, 'LR_NO')" (keydown.enter)="onFieldBlur(i, 'LR_NO')"
                         (keydown.tab)="onFieldBlur(i, 'LR_NO')" [readonly]="i !== 0" />
                     </td>
@@ -241,9 +248,12 @@
                 <th>SI.No</th>
                 <th>Map ID</th>
                 <th>Truck Type</th>
-                <th>Passing Weight (Tons)</th>
-                <th>Actual Load (Tons)</th>
-                <th>Loading factor% (w.r.t weight)</th>
+                <th>Passing Weight<br>
+                (Tons)</th>
+                <th>Actual Load<br>
+                  (Tons)</th>
+                <th>Loading factor%<br>
+                  (w.r.t weight)</th>
                 <th>Actual Volume Occupied</th>
                 <th>Loading Factor w.r.t Volume</th>
                 <th>Week Wise Shipment Flow</th>
@@ -277,18 +287,19 @@
                   </select>
                 </td>
 
-                <td><input type="text" formControlName="ZTRUC_WT" /></td>
-                <td><input type="number" formControlName="ZACT_LOAD" /></td>
-                <td><input type="text" formControlName="ZLF_WT" /></td>
-                <td><input type="text" formControlName="ZACT_VOL" (change)="onTruckTypeChange(i)" /></td>
-                <td><input type="text" formControlName="ZLF_VOL" /></td>
-                <td><input type="text" formControlName="ZWEEK_SF" /></td>
+                <td><input type="text" formControlName="ZTRUC_WT" class="width-le"/></td>
+                <td><input type="number" formControlName="ZACT_LOAD" class="width-le" /></td>
+                <td><input type="text" formControlName="ZLF_WT" class="width-le" /></td>
+                <td><input type="text" formControlName="ZACT_VOL" (change)="onTruckTypeChange(i)"  /></td>
+                <td><input type="text" formControlName="ZLF_VOL"  /></td>
+                <td><input type="text" formControlName="ZWEEK_SF"  /></td>
                 <td><input type="text" formControlName="ZEWAYBILL_NO" /></td>
                 <td><input type="date" formControlName="ZEWAYBILL_DT" /></td>
 
                 <td class="action-btns">
                   <button type="button" class="btn-add" (click)="addRow()">+</button>
-                  <button type="button" class="btn-remove" [disabled]="invoices.length === 1">✖</button>
+                  <button type="button" class="btn-remove" (click)="removeRow(i)"
+                    [disabled]="invoices.length === 1">✖</button>
                 </td>
               </tr>
             </tbody>

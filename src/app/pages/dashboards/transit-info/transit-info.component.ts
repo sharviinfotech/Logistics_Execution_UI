@@ -100,6 +100,7 @@ export class TransitInfoComponent implements OnInit {
       unloadingdateandtime: [''],
       podscanreceiveddateandtime: [''],
       sit: [''],
+      PODSCAN: [''],
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
   }
@@ -1336,6 +1337,67 @@ export class TransitInfoComponent implements OnInit {
   );
 }
 
+
+refreshScreen() {
+  
+  
+  // Reset order type and SAP type
+  this.orderType = '';
+  this.sapType = '';
+  this.showForm = false;
+  this.isUpdateMode = false;
+   this.isEditMode = false;
+
+  // Reset previous state trackers
+  this.previousOrderType = null;
+  this.previousSapType = null;
+  
+  // Reset search fields
+  this.searchReference = '';
+  this.selectedType = '';
+  this.searchOptionsList = [];
+  this.dropdownOpen = false;
+  
+  // Reset table display
+  this.showTable = false;
+  this.headerData = null;
+  this.itemsList = [];
+  
+  
+  // Reset filter fields
+  this.filterFromDate = '';
+  this.filterToDate = '';
+  this.filterPlant = '';
+  this.filterDivision = '';
+  this.filterTransporter = '';
+  this.filterSapType = '';
+  this.filterVehicleType = '';
+  this.filteredData = [];
+  this.filterApplied = false;
+
+   // Reset data arrays
+  this.TransitInfoHeader = [];
+  this.TransitInfoItems = [];
+  this.dispatchData = [];
+  this.selectedItems = [];
+  
+  // Reset transit response
+  this.transitResponse = {};
+  
+  // Reset form
+
+  
+  // Show success message
+  Swal.fire({
+    text: 'Screen refreshed successfully',
+    icon: 'success',
+   
+     confirmButtonText: 'Ok',
+    timer: 4000
+  });
+  
+  this.cd.detectChanges();
+}
 
 
 

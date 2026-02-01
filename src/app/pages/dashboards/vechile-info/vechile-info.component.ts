@@ -1541,4 +1541,76 @@ export class VechileInfoComponent implements OnInit {
   );
 }
 
+refreshScreen() {
+ 
+  
+  // Reset order type and SAP type
+  this.orderType = '';
+  this.sapType = '';
+  this.showForm = false;
+  this.isUpdateMode = false;
+  
+  // Reset previous state trackers
+  this.previousOrderType = null;
+  this.previousSapType = null;
+  
+  // Reset invoice/PO numbers
+  this.invoicenumber = '';
+  this.ponumber = '';
+  
+  // Reset shipment type
+  this.shipmentType = '';
+  
+  // Reset search fields
+  this.searchReference = '';
+  this.selectedType = '';
+  this.searchOptionsList = [];
+  this.dropdownOpen = false;
+  
+  // Reset table display flags
+  this.showTable = false;
+  
+  // Reset filter fields
+  this.filterFromDate = '';
+  this.filterToDate = '';
+  this.filterPlant = '';
+  this.filterDivision = '';
+  this.filterTransporter = '';
+  this.filterSapType = '';
+  this.filterVehicleType = '';
+  this.filterStatus = '';
+  this.filteredData = [];
+  this.filterApplied = false;
+  
+  // Reset data arrays
+  this.VehicleInfoData = [];
+  this.dispatchData = [];
+  this.selectedItems = [];
+  
+  // Reset counts
+  this.pendingCount = 0;
+  this.completedCount = 0;
+  
+  // Reset checkbox state
+  this.isAllSelected = false;
+  
+  // Reset Vehicle Form
+  this.VehicleForm.reset();
+  
+
+  
+  // Show success message
+  Swal.fire({
+    text: 'Screen refreshed successfully',
+    icon: 'success',
+    confirmButtonText: 'Ok',
+    timer: 4000,
+   
+  });
+  
+  // Trigger change detection
+  this.cd.detectChanges();
+}
+
+
 }

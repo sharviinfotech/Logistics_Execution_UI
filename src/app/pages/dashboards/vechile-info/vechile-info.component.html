@@ -28,16 +28,22 @@
       </label>
     </div>
 
+        <div class="text-right" style="margin-top: 10px;">
+      <button class="btn btn-md btn-raised btn-refresh" (click)="refreshScreen()">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+    </div>
+
     <br />
 
     <div *ngIf="mainMode === 'creation'">
       <!-- Order Type -->
       <div class="form-radio optional">
-        <label>
+        <!-- <label>
           <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward"
             (change)="onOrderTypeSelection()" />
           <span>Inward</span>
-        </label>
+        </label> -->
 
         <label>
           <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward"
@@ -120,23 +126,23 @@
 
                     <td>{{ i + 1 }}</td>
                     <td>
-                      <input type="text" formControlName="MAPID" placeholder="Enter Map ID" readonly>
+                      <input type="text" formControlName="MAPID" class="width-le" placeholder="Enter Map ID" readonly>
                     </td>
 
                     <td>
-                      <input type="text" formControlName="referenceNumber" placeholder="Enter Ref. No."
+                      <input type="text" formControlName="referenceNumber" class="width-le" placeholder="Enter Ref. No."
                         (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
                         (keydown.tab)="onFieldBlur(i, 'REF_NO')" [readonly]="i !== 0" />
                     </td>
 
                     <td>
-                      <input type="text" formControlName="workOrderNumber" placeholder="Enter Work Order No."
+                      <input type="text" formControlName="workOrderNumber" class="width-le" placeholder="Enter Work Order No."
                         (blur)="onFieldBlur(i, 'WORK_ORDER_NO')" (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
                         (keydown.tab)="onFieldBlur(i, 'WORK_ORDER_NO')" [readonly]="i !== 0" />
                     </td>
 
                     <td>
-                      <input type="text" formControlName="lrNumber" placeholder="Enter LR No."
+                      <input type="text" formControlName="lrNumber" class="width-le" placeholder="Enter LR No."
                         (blur)="onFieldBlur(i, 'LR_NO')" (keydown.enter)="onFieldBlur(i, 'LR_NO')"
                         (keydown.tab)="onFieldBlur(i, 'LR_NO')" [readonly]="i !== 0" />
                     </td>
@@ -242,7 +248,8 @@
                 <th>Type of transporter</th>
                 <th>LR No</th>
                 <th>Type of Vehicle</th>
-                <th>Passing Weight (Tons)</th>
+                <th>Passing Weight<br>
+                   (Tons)</th>
                 <th>Volume of Truck</th>
                 <th>Vehicle Number</th>
                 <th>No of Vehicles</th>
@@ -265,17 +272,17 @@
                 </td>
                 <td><input type="text" formControlName="ZTRX_TYPE" /></td>
                 <td><input type="text" formControlName="ZTRANSPORTER" /></td>
-                <td><input type="text" formControlName="ZLRNO" /></td>
+                <td><input type="text" formControlName="ZLRNO" class="width-le"/></td>
                 <td><input type="text" formControlName="ZTRUC_TYPE" /></td>
-                <td><input type="text" formControlName="ZTRUC_WT" /></td>
-                <td><input type="number" formControlName="ZTRUC_VOL" /></td>
-                <td><input type="text" formControlName="ZVEH_NUM" /></td>
-                <td><input type="number" formControlName="ZNOOFVEH" min="1" /></td>
+                <td><input type="text" formControlName="ZTRUC_WT" class="width-le"/></td>
+                <td><input type="number" formControlName="ZTRUC_VOL" class="width-le"/></td>
+                <td><input type="text" formControlName="ZVEH_NUM" class="width-le"/></td>
+                <td><input type="number" formControlName="ZNOOFVEH" min="1" class="width-le"/></td>
                 <td><input type="text" formControlName="ZDNAME" /></td>
-                <td><input type="text" formControlName="ZDNUMBER" /></td>
+                <td><input type="text" formControlName="ZDNUMBER" class="width-le"/></td>
                 <td class="action-btns">
                   <button type="button" class="btn-add" (click)="addRow()">+</button>
-                  <button type="button" class="btn-remove" [disabled]="vehicles.length === 1">✖</button>
+                  <button type="button" class="btn-remove" (click)="removeRow(i)" [disabled]="vehicles.length === 1">✖</button>
                 </td>
               </tr>
             </tbody>
