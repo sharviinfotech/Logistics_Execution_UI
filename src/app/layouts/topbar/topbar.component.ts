@@ -133,7 +133,11 @@ toggleCurrentPasswordFieldTextType() {
   if (this.loginData == undefined) {
     this.router.navigate(['/auth/login-2']);
   }
-  console.log("this.loginData?.data.userActivity",this.loginData?.data.TYUSER)
+  if (this.loginData?.data) {
+    console.log("this.loginData?.data.userActivity", this.loginData.data.TYUSER);
+  } else {
+    console.log("Login data or data property is undefined");
+  }
 
   
 }

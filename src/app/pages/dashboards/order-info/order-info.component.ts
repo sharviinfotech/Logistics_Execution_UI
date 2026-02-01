@@ -1921,6 +1921,85 @@ export class OrderInfoComponent implements OnInit {
   );
 }
 
+refreshScreen() {
+ 
+  
+  // Reset order type and SAP type
+  this.orderType = '';
+  this.sapType = '';
+  this.showForm = false;
+  this.isUpdateMode = false;
+  this.isEditMode = false;
+  this.isProcessing = false;
+  
+  // Reset previous state trackers
+  this.previousOrderType = null;
+  this.previousSapType = null;
+  
+  // Reset invoice/PO numbers
+  this.ponumber = '';
+  this.invoicenumber = '';
+  
+  // Reset search fields
+  this.searchReference = '';
+  this.selectedType = '';
+  this.searchValue = '';
+  this.searchOptionsList = [];
+  this.dropdownOpen = false;
+  
+  // Reset table display flags
+  this.showOrderInfoTable = false;
+  this.showDispatchTable = false;
+  
+  // Reset filter fields
+  this.filterFromDate = '';
+  this.filterToDate = '';
+  this.filterPlant = '';
+  this.filterDivision = '';
+  this.filterTransporter = '';
+  this.filterSapType = '';
+  this.filterVehicleType = '';
+  this.filterStatus = '';
+  this.filteredData = [];
+  this.filterApplied = false;
+  
+  // Reset data arrays
+  this.orderInfoData = [];
+  this.dispatchData = [];
+  this.selectedItems = [];
+  
+  // Reset customer/fiscal fields
+  this.customerGroup = '';
+  this.showFiscalFields = false;
+  
+  // Reset counts
+  this.pendingCount = 0;
+  this.completedCount = 0;
+  
+  // Reset Order Info Form
+  this.OrderInfo.reset(this.initialFormValues);
+  
+  // Clear and reset the items FormArray to have one empty row
+  this.items.clear();
+  this.items.push(this.createItemRow());
+  
+
+  
+ 
+  
+  // Show success message
+  Swal.fire({
+    text: 'Screen refreshed successfully',
+    icon: 'success',
+    confirmButtonText: 'Ok',
+    timer: 4000,
+    
+  });
+  
+  // Trigger change detection
+  this.cd.detectChanges();
+}
+
 
 
 

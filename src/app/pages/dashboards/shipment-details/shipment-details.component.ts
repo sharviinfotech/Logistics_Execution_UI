@@ -630,6 +630,7 @@ export class ShipmentDetailsComponent implements OnInit {
         });
 
         this.showForm = true;
+         Swal.fire('Success', 'Invoice details loaded successfully', 'success');
         this.searchOptionsList = [];
         this.spinner.hide();
       },
@@ -1597,6 +1598,82 @@ export class ShipmentDetailsComponent implements OnInit {
      
     }
   );
+}
+
+refreshScreen() {
+  
+  
+  // Reset order type and SAP type
+  this.orderType = '';
+  this.sapType = '';
+  this.showForm = false;
+  this.isUpdateMode = false;
+  this.isEditMode = false;
+  this.isAllSelected = false;
+  
+  // Reset search fields
+   this.searchReference = '';
+  this.selectedType = '';
+  this.searchValue = '';
+  this.searchOptionsList = [];
+  this.dropdownOpen = false;
+  
+  // Reset previous state trackers
+  this.previousOrderType = null;
+  this.previousSapType = null;
+  
+  // Reset invoice/PO numbers
+  this.ponumber = '';
+  this.invoicenumber = '';
+  
+  
+  // Reset filter fields
+  this.filterFromDate = '';
+  this.filterToDate = '';
+  this.filterPlant = '';
+  this.filterDivision = '';
+  this.filterTransporter = '';
+  this.filterSapType = '';
+  this.filterVehicleType = '';
+  this.filterStatus = '';
+  this.filteredData = [];
+  this.filterApplied = false;
+  
+  // Reset data arrays
+  this.ShipmentData = [];
+  this.dispatchData = [];
+  this.selectedItems = [];
+  
+  // Reset table display flags
+  this.showOrderInfoTable = false;
+  this.showDispatchTable = false;
+  
+  // Reset counts
+  this.pendingCount = 0;
+  this.completedCount = 0;
+  
+  // Reset form
+  this.ProductInfo.reset();
+  
+  // Clear and reset the FormArrays to have one empty row each
+  this.items.clear();
+  this.items.push(this.createItemRow());
+  
+  this.referenceItems.clear();
+  this.referenceItems.push(this.createReferenceRow());
+  
+
+  
+  // Show success message
+  Swal.fire({
+    text: 'Screen refreshed successfully',
+    icon: 'success',
+   
+     confirmButtonText: 'Ok',
+    timer: 4000
+  });
+  
+  this.cd.detectChanges();
 }
 
 

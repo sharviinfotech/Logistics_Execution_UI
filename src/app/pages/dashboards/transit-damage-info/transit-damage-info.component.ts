@@ -1793,5 +1793,84 @@ fetchPendingAndCompletedCounts() {
   );
 }
 
+refreshScreen() {
+  // Reset main mode
+  
+  
+  // Reset order type and SAP type
+  this.orderType = '';
+  this.sapType = '';
+  this.showForm = false;
+  this.isUpdateMode = false;
+  this.isEditMode = false;
+  
+  // Reset previous state trackers
+  this.previousOrderType = null;
+  this.previousSapType = null;
+  
+  // Reset invoice/PO numbers
+  this.invoicenumber = '';
+  this.ponumber = '';
+  
+  // Reset search fields
+  this.searchReference = '';
+  this.selectedType = '';
+  this.searchOptionsList = [];
+  this.dropdownOpen = false;
+  
+  // Reset table display flags
+  this.showTable = false;
+  this.ShowHeaderForm = false;
+  this.SavedDataShow = false;
+  this.headerData = null;
+  this.itemsList = [];
+  
+  // Reset filter fields
+  this.filterFromDate = '';
+  this.filterToDate = '';
+  this.filterPlant = '';
+  this.filterDivision = '';
+  this.filterTransporter = '';
+  this.filterSapType = '';
+  this.filterVehicleType = '';
+  this.filterStatus = '';
+  this.filteredData = [];
+  this.filterApplied = false;
+  
+  // Reset data arrays
+  this.TransitDamageInfoHeader = [];
+  this.TransitDamageInfoItems = [];
+  this.dispatchData = [];
+  this.selectedItems = [];
+  this.TransitdamageInfoData = [];
+  
+  // Reset transit response
+  this.transitResponse = {};
+  
+  // Reset counts
+  this.pendingCount = 0;
+  this.completedCount = 0;
+  
+  // Reset checkbox state
+  this.isAllSelected = false;
+  
+  // Reset Header Form
+  this.HeaderForm.reset();
+  
+
+  
+  // Show success message
+  Swal.fire({
+    text: 'Screen refreshed successfully',
+    icon: 'success',
+    confirmButtonText: 'Ok',
+    timer: 4000,
+    
+  });
+  
+  // Trigger change detection
+  this.cd.detectChanges();
+}
+
 
 }

@@ -30,6 +30,12 @@
       </label>
     </div>
 
+    <div class="text-right" style="margin-top: 10px;">
+      <button class="btn btn-md btn-raised btn-refresh" (click)="refreshScreen()">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+    </div>
+
 
     <br />
 
@@ -38,10 +44,10 @@
 
       <!-- 🔹 Order Type (Inward / Outward) -->
       <div class="form-radio optional">
-        <label>
+        <!-- <label>
           <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
           <span>Inward</span>
-        </label>
+        </label> -->
         <label>
           <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
           <span>Outward</span>
@@ -138,13 +144,13 @@
 
                 <td>
                   <input *ngIf="row.get('VehicleType')?.value === 'Full Truck Load'" type="text"
-                    formControlName="workorder" />
+                    formControlName="workorder" class="width-le" />
                   <span *ngIf="row.get('VehicleType')?.value !== 'Full Truck Load'">
                   </span>
                 </td>
 
-                <td><input type="text" formControlName="NoOfTrucks"></td>
-                <td><input type="text" formControlName="NoOfInvoices"></td>
+                <td><input type="text" formControlName="NoOfTrucks" class="width-lg"></td>
+                <td><input type="text" formControlName="NoOfInvoices" class="width-lg"></td>
                 <td>
                   <div class="d-flex align-items-center">
                     <select formControlName="VendorCode" (change)="onchangeVendorCode(i)">
@@ -191,10 +197,10 @@
                     </select>
                   </div>
                 </td>
-                <td><input type="text" formControlName="NoOfLRs"></td>
-                <td><input type="text" formControlName="LRNumber"></td>
-                <td><input type="text" formControlName="LoadingPoints"></td>
-                <td><input type="text" formControlName="UnLoadingPoints"></td>
+                <td><input type="text" formControlName="NoOfLRs" class="width-lg"></td>
+                <td><input type="text" formControlName="LRNumber" class="width-le"></td>
+                <td><input type="text" formControlName="LoadingPoints" class="width-lg"></td>
+                <td><input type="text" formControlName="UnLoadingPoints" class="width-lg"></td>
 
                 <td class="action-btns" *ngIf="showActionColumn">
                   <button type="button" class="btn-add" (click)="addRow()">+</button>
@@ -219,8 +225,8 @@
         <!-- Save & Next / Update & Next -->
         <button class="btn btn-md btn-raised btnSave move"
           (click)="isUpdateMode ? onUpdateDispatch('next') : save('next')">
-          <i  *ngIf="!isUpdateMode" class="fa fa-save"></i>
-          <i  *ngIf="isUpdateMode" class="fa fa-edit"></i>
+          <i *ngIf="!isUpdateMode" class="fa fa-save"></i>
+          <i *ngIf="isUpdateMode" class="fa fa-edit"></i>
           <i class="fa fa-arrow-right ml-1"></i>
           {{ isUpdateMode ? 'Update and Next' : 'Save and Next' }}
         </button>

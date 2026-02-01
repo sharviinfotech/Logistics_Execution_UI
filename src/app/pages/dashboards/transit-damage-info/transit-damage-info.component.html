@@ -28,16 +28,22 @@
       </label>
     </div>
 
+        <div class="text-right" style="margin-top: 10px;">
+      <button class="btn btn-md btn-raised btn-refresh" (click)="refreshScreen()">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+    </div>
+
     <br />
 
     <div *ngIf="mainMode === 'creation'">
       <!-- ORDER TYPE -->
       <div class="form-radio optional">
-        <label>
+        <!-- <label>
           <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward"
             (change)="onOrderTypeSelection()" />
           <span>Inward</span>
-        </label>
+        </label> -->
 
         <label>
           <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward"
@@ -121,23 +127,23 @@
 
                     <td>{{ i + 1 }}</td>
                     <td>
-                      <input type="text" formControlName="MAPID" placeholder="Enter Map ID" readonly>
+                      <input type="text" formControlName="MAPID" class="width-le" placeholder="Enter Map ID" readonly>
                     </td>
 
                     <td>
-                      <input type="text" formControlName="referenceNumber" placeholder="Enter Ref. No."
+                      <input type="text" formControlName="referenceNumber" class="width-le" placeholder="Enter Ref. No."
                         (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
                         (keydown.tab)="onFieldBlur(i, 'REF_NO')" [readonly]="i !== 0" />
                     </td>
 
                     <td>
-                      <input type="text" formControlName="workOrderNumber" placeholder="Enter Work Order No."
+                      <input type="text" formControlName="workOrderNumber" class="width-le" placeholder="Enter Work Order No."
                         (blur)="onFieldBlur(i, 'WORK_ORDER_NO')" (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
                         (keydown.tab)="onFieldBlur(i, 'WORK_ORDER_NO')" [readonly]="i !== 0" />
                     </td>
 
                     <td>
-                      <input type="text" formControlName="lrNumber" placeholder="Enter LR No."
+                      <input type="text" formControlName="lrNumber" class="width-le" placeholder="Enter LR No."
                         (blur)="onFieldBlur(i, 'LR_NO')" (keydown.enter)="onFieldBlur(i, 'LR_NO')"
                         (keydown.tab)="onFieldBlur(i, 'LR_NO')" [readonly]="i !== 0" />
                     </td>
@@ -344,7 +350,7 @@
                 <th><input type="checkbox" (change)="toggleAllSelection($event)" [checked]="isAllSelected" /></th>
                 <th>SI.No</th>
                 <th>Map ID</th>
-                <th>Vehicle Line</th>
+                <!-- <th>Vehicle Line</th> -->
                 <th>Vehicle Number</th>
                 <th>LR Number</th>
                 <th>Transporter</th>
@@ -364,9 +370,9 @@
                     </option>
                   </select>
                 </td>
-                <td><input type="text" formControlName="VEH_LINE"></td>
-                <td><input type="text" formControlName="TRUCK_NO"></td>
-                <td><input type="text" formControlName="LR_NO"></td>
+                <!-- <td><input type="text" formControlName="VEH_LINE"></td> -->
+                <td><input type="text" formControlName="TRUCK_NO" class="width-le"></td>
+                <td><input type="text" formControlName="LR_NO" class="width-le"></td>
                 <td><input type="text" formControlName="TRANSPORTER"></td>
 
                 <td class="action-btns">
@@ -761,7 +767,7 @@
             <th>Ref No</th>
             <th>Line No</th>
             <th>Invoice No</th>
-            <th>Vehicle Line</th>
+            <!-- <th>Vehicle Line</th> -->
             <th>Vehicle Number</th>
             <th>Bill NO</th>
             <th>Product</th>
@@ -798,11 +804,11 @@
             </td>
 
             <!-- VEH LINE -->
-            <td>
+            <!-- <td>
               <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md"
                 [(ngModel)]="item.ZVEH_LINE">
               <span *ngIf="!item.isEdit">{{ item.ZVEH_LINE }}</span>
-            </td>
+            </td> -->
 
             <!-- VEH NUMBER / TRUCK -->
             <td>
@@ -955,7 +961,7 @@
             <th>REFNO</th>
             <th>Invoice No</th>
             <!-- <th>Line No</th> -->
-            <th>Vehicle Line</th>
+            <!-- <th>Vehicle Line</th> -->
             <th>Vehicle Number</th>
             <th>LR No</th>
             <th>work Order Number</th>
@@ -972,7 +978,7 @@
             <td>{{ item.ZMAPID }}</td>
             <td>{{ item.ZREFNO }}</td>
             <td>{{ item.ZINV_NO }}</td>
-            <td>{{ item.ZVEH_LINE}}</td>
+            <!-- <td>{{ item.ZVEH_LINE}}</td> -->
 
             <td>{{ item.ZTRUCK_NO }}</td>
             <td>{{ item.ZLRNO }}</td>
