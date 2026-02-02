@@ -76,6 +76,8 @@ export class TransitInfoComponent implements OnInit {
   dispatchData: any[] = [];
   TransitInfoData: any[] = [];
   filterSapType: string = '';
+  invoiceF4List: string[] = [];
+
 
   constructor(
     private fb: FormBuilder,
@@ -183,54 +185,54 @@ export class TransitInfoComponent implements OnInit {
     this.selectedType = '';
   }
 
-   onSapTypeChange(): void {
-  // ✅ Show spinner at start
-  this.spinner.show();
-  
-  if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
-    this.resetConditionalFields();
+  onSapTypeChange(): void {
+    // ✅ Show spinner at start
+    this.spinner.show();
+
+    if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
+      this.resetConditionalFields();
+    }
+
+    this.previousSapType = this.sapType;
+
+    // ✅ Clear old data
+    this.transitInfo.reset();
+    this.referenceItems.clear();
+    this.headerData = null;
+    this.itemsList = [];
+    this.showTable = false;
+    this.searchReference = '';
+    this.selectedType = '';
+    this.referenceItems.push(this.createReferenceRow());
+
+    // ✅ CALL COUNT API for Outward mode
+    if (this.orderType === 'Outward' && this.sapType) {
+      this.fetchPendingAndCompletedCounts(); // This will hide spinner
+    } else {
+      // ✅ Hide spinner if not Outward
+      this.spinner.hide();
+    }
+
+    // Show form only if both selections are made
+    this.showForm = !!(this.orderType && this.sapType);
+
+    // Set validators based on order type
+    if (this.orderType === 'Inward') {
+      this.transitInfo.get('ponumber')?.setValidators([Validators.required]);
+      this.transitInfo.get('invoicenumber')?.clearValidators();
+    } else if (this.orderType === 'Outward') {
+      this.transitInfo.get('invoicenumber')?.clearValidators();
+      this.transitInfo.get('ponumber')?.clearValidators();
+    } else {
+      this.transitInfo.get('ponumber')?.clearValidators();
+      this.transitInfo.get('invoicenumber')?.clearValidators();
+    }
+
+    this.transitInfo.get('ponumber')?.updateValueAndValidity();
+    this.transitInfo.get('invoicenumber')?.updateValueAndValidity();
+
+    console.log('onSapTypeChange -> sapType:', this.sapType, ' showForm:', this.showForm);
   }
-  
-  this.previousSapType = this.sapType;
-
-  // ✅ Clear old data
-  this.transitInfo.reset();
-  this.referenceItems.clear();
-  this.headerData = null;
-  this.itemsList = [];
-  this.showTable = false;
-  this.searchReference = '';
-  this.selectedType = '';
-  this.referenceItems.push(this.createReferenceRow());
-
-  // ✅ CALL COUNT API for Outward mode
-  if (this.orderType === 'Outward' && this.sapType) {
-    this.fetchPendingAndCompletedCounts(); // This will hide spinner
-  } else {
-    // ✅ Hide spinner if not Outward
-    this.spinner.hide();
-  }
-
-  // Show form only if both selections are made
-  this.showForm = !!(this.orderType && this.sapType);
-
-  // Set validators based on order type
-  if (this.orderType === 'Inward') {
-    this.transitInfo.get('ponumber')?.setValidators([Validators.required]);
-    this.transitInfo.get('invoicenumber')?.clearValidators();
-  } else if (this.orderType === 'Outward') {
-    this.transitInfo.get('invoicenumber')?.clearValidators();
-    this.transitInfo.get('ponumber')?.clearValidators();
-  } else {
-    this.transitInfo.get('ponumber')?.clearValidators();
-    this.transitInfo.get('invoicenumber')?.clearValidators();
-  }
-
-  this.transitInfo.get('ponumber')?.updateValueAndValidity();
-  this.transitInfo.get('invoicenumber')?.updateValueAndValidity();
-
-  console.log('onSapTypeChange -> sapType:', this.sapType, ' showForm:', this.showForm);
-}
 
   resetConditionalFields(): void {
     this.showForm = false;
@@ -295,11 +297,45 @@ export class TransitInfoComponent implements OnInit {
       }
     });
   }
+  // populateReferenceRows(data: any[]): void {
+  //   this.referenceItems.clear();
+
+  //   if (data && data.length > 0) {
+  //     data.forEach(d => {
+  //       this.referenceItems.push(
+  //         this.fb.group({
+  //           referenceNumber: [d.REF_NO || ''],
+  //           workOrderNumber: [d.WORK_ORDER_NO || ''],
+  //           lrNumber: [d.LR_NO || ''],
+  //           transporter: [d.TRANSPORTER || ''],
+  //           vehicleNo: [d.VEH_NUM || ''],
+  //           vehicleLine: [d.VEH_LINE || '']
+  //         })
+  //       );
+  //     });
+  //   } else {
+  //     Swal.fire({ icon: 'info', title: 'No Records Found', timer: 1500, showConfirmButton: false });
+  //     this.referenceItems.push(this.createReferenceRow());
+  //   }
+  // }
+
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
+    this.invoiceF4List = [];   // 🔥 RESET F4 LIST
 
     if (data && data.length > 0) {
       data.forEach(d => {
+
+        // ✅ EXTRACT INVOICE NUMBERS FOR F4
+        if (d.INV_NO && Array.isArray(d.INV_NO)) {
+          d.INV_NO.forEach((inv: any) => {
+            if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+              this.invoiceF4List.push(inv.VBELN);
+            }
+          });
+        }
+
+        // ✅ EXISTING ROW PUSH
         this.referenceItems.push(
           this.fb.group({
             referenceNumber: [d.REF_NO || ''],
@@ -311,11 +347,17 @@ export class TransitInfoComponent implements OnInit {
           })
         );
       });
+
+      console.log('🟢 Invoice F4 List:', this.invoiceF4List);
+
     } else {
       Swal.fire({ icon: 'info', title: 'No Records Found', timer: 1500, showConfirmButton: false });
       this.referenceItems.push(this.createReferenceRow());
     }
   }
+
+
+
 
   removeReferenceRow(index: number): void {
     const rowValue = (this.referenceItems.at(index) as FormGroup).value;
@@ -652,179 +694,179 @@ export class TransitInfoComponent implements OnInit {
 
   // Method to update the edited row
   updateSearchRow(headerRow: any, itemRows: any[]): void {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'Do you want to update this transit record?',
-    icon: 'question',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, Update',
-    cancelButtonText: 'Cancel'
-  }).then((result) => {
-    if (!result.isConfirmed) return;
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to update this transit record?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Update',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
 
-    // 🔑 Validate mandatory HEADER fields
-    if (!headerRow.ZREFNO) {
-      Swal.fire('Error', 'Missing mandatory ZREFNO in header', 'error');
-      return;
-    }
+      // 🔑 Validate mandatory HEADER fields
+      if (!headerRow.ZREFNO) {
+        Swal.fire('Error', 'Missing mandatory ZREFNO in header', 'error');
+        return;
+      }
 
-    // 🔑 Validate mandatory ITEM fields
-    const invalidItems = itemRows.filter(item => !item.ZREFNO || !item.ZLINE_NO);
-    if (invalidItems.length > 0) {
-      Swal.fire('Error', 'Missing mandatory keys in items (ZREFNO/ZLINE_NO)', 'error');
-      return;
-    }
+      // 🔑 Validate mandatory ITEM fields
+      const invalidItems = itemRows.filter(item => !item.ZREFNO || !item.ZLINE_NO);
+      if (invalidItems.length > 0) {
+        Swal.fire('Error', 'Missing mandatory keys in items (ZREFNO/ZLINE_NO)', 'error');
+        return;
+      }
 
-    // 📦 Build HEADER payload
-    const headerPayload = {
-      ZREFNO: headerRow.ZREFNO,
-      ZINV_NO: headerRow.ZINV_NO || '',
-      ZODN_NO: headerRow.ZODN_NO || '',
-      ZSONO: headerRow.ZSONO || '',
-      ZSALE_PERSON: headerRow.ZSALE_PERSON || '',
-      ZPY_ARRIVED_DEST: headerRow.ZPY_ARRIVED_DEST || '',
-      ZUNLOADING_DT: headerRow.ZUNLOADING_DT || '',
-      ZPOD_SCAN: headerRow.ZPOD_SCAN || '',
-      ZSIT_SALE: headerRow.ZSIT_SALE || '',
-      ZLOCATION: headerRow.ZLOCATION || '',
-      ZCREATED_DT: headerRow.ZCREATED_DT || '',
-      ZPLANT: headerRow.ZPLANT || '',
-      ZDIVISION: headerRow.ZDIVISION || '',
-      ZVEH_TYPE: headerRow.ZVEH_TYPE || ''
-    };
+      // 📦 Build HEADER payload
+      const headerPayload = {
+        ZREFNO: headerRow.ZREFNO,
+        ZINV_NO: headerRow.ZINV_NO || '',
+        ZODN_NO: headerRow.ZODN_NO || '',
+        ZSONO: headerRow.ZSONO || '',
+        ZSALE_PERSON: headerRow.ZSALE_PERSON || '',
+        ZPY_ARRIVED_DEST: headerRow.ZPY_ARRIVED_DEST || '',
+        ZUNLOADING_DT: headerRow.ZUNLOADING_DT || '',
+        ZPOD_SCAN: headerRow.ZPOD_SCAN || '',
+        ZSIT_SALE: headerRow.ZSIT_SALE || '',
+        ZLOCATION: headerRow.ZLOCATION || '',
+        ZCREATED_DT: headerRow.ZCREATED_DT || '',
+        ZPLANT: headerRow.ZPLANT || '',
+        ZDIVISION: headerRow.ZDIVISION || '',
+        ZVEH_TYPE: headerRow.ZVEH_TYPE || ''
+      };
 
-    // 📦 Build ITEM payload (multiple items)
-    const itemPayload = itemRows.map(item => ({
-      ZREFNO: String(item.ZREFNO),
-      ZLINE_NO: String(item.ZLINE_NO),
-      ZINV_NO: item.ZINV_NO || '',
-      POSNR: item.POSNR || '',
-      ZVEH_LINE: item.ZVEH_LINE || '',
-      ZVEH_NUM: item.ZVEH_NUM || '',
-      ZLRNO: item.ZLRNO || '',
-      ZWORK_ORDER: item.ZWORK_ORDER || '',
-      ZTRANSPORTER: item.ZTRANSPORTER || ''
-    }));
+      // 📦 Build ITEM payload (multiple items)
+      const itemPayload = itemRows.map(item => ({
+        ZREFNO: String(item.ZREFNO),
+        ZLINE_NO: String(item.ZLINE_NO),
+        ZINV_NO: item.ZINV_NO || '',
+        POSNR: item.POSNR || '',
+        ZVEH_LINE: item.ZVEH_LINE || '',
+        ZVEH_NUM: item.ZVEH_NUM || '',
+        ZLRNO: item.ZLRNO || '',
+        ZWORK_ORDER: item.ZWORK_ORDER || '',
+        ZTRANSPORTER: item.ZTRANSPORTER || ''
+      }));
 
-    // 🎯 Final payload with HEADER + ITEM
-    const payload = {
-      HEADER: headerPayload,
-      ITEM: itemPayload
-    };
+      // 🎯 Final payload with HEADER + ITEM
+      const payload = {
+        HEADER: headerPayload,
+        ITEM: itemPayload
+      };
 
-    console.log('🛠 TRANSIT INFO CHANGE PAYLOAD:', payload);
+      console.log('🛠 TRANSIT INFO CHANGE PAYLOAD:', payload);
 
-    this.spinner.show();
+      this.spinner.show();
 
-    // 🔄 Call correct API based on sapType
-    const api$ =
-      this.sapType === 'SAP'
-        ? this.service.TransitInfoChangeWithSap(payload)
-        : this.service.TransitInfoChangeWithoutSap(payload);
+      // 🔄 Call correct API based on sapType
+      const api$ =
+        this.sapType === 'SAP'
+          ? this.service.TransitInfoChangeWithSap(payload)
+          : this.service.TransitInfoChangeWithoutSap(payload);
 
-    api$.subscribe(
-      (res: any) => {
-        this.spinner.hide();
+      api$.subscribe(
+        (res: any) => {
+          this.spinner.hide();
 
-        if (res.STATUS === 'TRUE' || res.NUMBER === '200') {
-          Swal.fire({
-            title: 'Success',
-            text: res.MESSAGE || 'Transit data updated successfully',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-          }).then(() => {
-            // ✅ Reset edit mode
-            headerRow.isEdit = false;
-            delete headerRow._backup;
-            itemRows.forEach(item => {
-              item.isEdit = false;
-              delete item._backup;
+          if (res.STATUS === 'TRUE' || res.NUMBER === '200') {
+            Swal.fire({
+              title: 'Success',
+              text: res.MESSAGE || 'Transit data updated successfully',
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            }).then(() => {
+              // ✅ Reset edit mode
+              headerRow.isEdit = false;
+              delete headerRow._backup;
+              itemRows.forEach(item => {
+                item.isEdit = false;
+                delete item._backup;
+              });
+
+              // 🔄 Refresh data
+              this.onSearchReference();
             });
-            
-            // 🔄 Refresh data
-            this.onSearchReference();
-          });
-        } else {
+          } else {
+            Swal.fire({
+              title: 'Error',
+              text: res.MESSAGE || 'Update failed',
+              icon: 'error'
+            });
+          }
+        },
+        () => {
+          this.spinner.hide();
+          Swal.fire('Error', 'Internal Server Error', 'error');
+        }
+      );
+    });
+  }
+
+
+
+
+
+  deleteRow(array: any[], index: number): void {
+    const row = array[index];
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this record? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+
+      const payload = {
+        DELETE: [
+          {
+            ZREFNO: row.ZREFNO,
+            ZINV_NO: row.ZINV_NO,
+            ZLINE_NO: row.ZLINE_NO || ''
+          }
+        ]
+      };
+
+      const apiCall = this.sapType === 'SAP'
+        ? this.service.TransitInfoDeleteWithSap(payload)
+        : this.service.TransitInfoDeleteWithOutSap(payload);
+
+      apiCall.subscribe({
+        next: (res: any) => {
+          if (res?.STATUS === 'TRUE' || res?.STATUS === true || res?.NUMBER === '200') {
+
+            // ✅ CORRECT: Delete from the passed array parameter
+            array.splice(index, 1);
+
+            Swal.fire({
+              title: 'Deleted',
+              text: res.MSG || res.MESSAGE || 'Record deleted successfully',
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            });
+
+          } else {
+            Swal.fire({
+              title: 'Failed',
+              text: res?.MSG || res?.MESSAGE || 'Delete failed',
+              icon: 'error'
+            });
+          }
+        },
+        error: (err) => {
+          console.error('Delete Error:', err);
           Swal.fire({
             title: 'Error',
-            text: res.MESSAGE || 'Update failed',
+            text: err?.error?.MESSAGE || 'Something went wrong while deleting',
             icon: 'error'
           });
         }
-      },
-      () => {
-        this.spinner.hide();
-        Swal.fire('Error', 'Internal Server Error', 'error');
-      }
-    );
-  });
-}
-
-
-
-
-
-   deleteRow(array: any[], index: number): void {
-  const row = array[index];
-  
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'Do you want to delete this record? This action cannot be undone.',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, Delete',
-    cancelButtonText: 'Cancel',
-    confirmButtonColor: '#d33'
-  }).then((result) => {
-    if (!result.isConfirmed) return;
-
-    const payload = {
-      DELETE: [
-        {
-          ZREFNO: row.ZREFNO,
-          ZINV_NO: row.ZINV_NO,
-          ZLINE_NO: row.ZLINE_NO || ''
-        }
-      ]
-    };
-
-    const apiCall = this.sapType === 'SAP' 
-      ? this.service.TransitInfoDeleteWithSap(payload)
-      : this.service.TransitInfoDeleteWithOutSap(payload);
-
-    apiCall.subscribe({
-      next: (res: any) => {
-        if (res?.STATUS === 'TRUE' || res?.STATUS === true || res?.NUMBER === '200') {
-          
-          // ✅ CORRECT: Delete from the passed array parameter
-          array.splice(index, 1);
-
-          Swal.fire({
-            title: 'Deleted',
-            text: res.MSG || res.MESSAGE || 'Record deleted successfully',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-          });
-
-        } else {
-          Swal.fire({
-            title: 'Failed',
-            text: res?.MSG || res?.MESSAGE || 'Delete failed',
-            icon: 'error'
-          });
-        }
-      },
-      error: (err) => {
-        console.error('Delete Error:', err);
-        Swal.fire({
-          title: 'Error',
-          text: err?.error?.MESSAGE || 'Something went wrong while deleting',
-          icon: 'error'
-        });
-      }
+      });
     });
-  });
-}
+  }
 
 
 
@@ -1307,97 +1349,97 @@ export class TransitInfoComponent implements OnInit {
     Swal.fire('Success', `PDF file downloaded: ${fileName}`, 'success');
   }
 
-   fetchPendingAndCompletedCounts() {
-  const payload = {
-    INOUT: 'OUTWARD',
-    TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
-    SCREEN: 'TRANSIT INFO'
-  };
+  fetchPendingAndCompletedCounts() {
+    const payload = {
+      INOUT: 'OUTWARD',
+      TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
+      SCREEN: 'TRANSIT INFO'
+    };
 
-  // ✅ Spinner already shown in onSapTypeChange()
-  
-  this.service.OutwardCountGlobalWithSap(payload).subscribe(
-    (response: any) => {
-      // ✅ Stop spinner
-      this.spinner.hide();
-      
-      this.pendingCount = response.ZPEND_CNT || 0;
-      this.completedCount = response.ZCONF_CNT || 0;
-      
-      console.log('✅ Counts fetched:', this.pendingCount, this.completedCount);
-    },
-    (error) => {
-      // ✅ Stop spinner on error
-      this.spinner.hide();
-      
-      console.error('Error fetching counts:', error);
-      this.pendingCount = 0;
-      this.completedCount = 0;
-    }
-  );
-}
+    // ✅ Spinner already shown in onSapTypeChange()
+
+    this.service.OutwardCountGlobalWithSap(payload).subscribe(
+      (response: any) => {
+        // ✅ Stop spinner
+        this.spinner.hide();
+
+        this.pendingCount = response.ZPEND_CNT || 0;
+        this.completedCount = response.ZCONF_CNT || 0;
+
+        console.log('✅ Counts fetched:', this.pendingCount, this.completedCount);
+      },
+      (error) => {
+        // ✅ Stop spinner on error
+        this.spinner.hide();
+
+        console.error('Error fetching counts:', error);
+        this.pendingCount = 0;
+        this.completedCount = 0;
+      }
+    );
+  }
 
 
-refreshScreen() {
-  
-  
-  // Reset order type and SAP type
-  this.orderType = '';
-  this.sapType = '';
-  this.showForm = false;
-  this.isUpdateMode = false;
-   this.isEditMode = false;
+  refreshScreen() {
 
-  // Reset previous state trackers
-  this.previousOrderType = null;
-  this.previousSapType = null;
-  
-  // Reset search fields
-  this.searchReference = '';
-  this.selectedType = '';
-  this.searchOptionsList = [];
-  this.dropdownOpen = false;
-  
-  // Reset table display
-  this.showTable = false;
-  this.headerData = null;
-  this.itemsList = [];
-  
-  
-  // Reset filter fields
-  this.filterFromDate = '';
-  this.filterToDate = '';
-  this.filterPlant = '';
-  this.filterDivision = '';
-  this.filterTransporter = '';
-  this.filterSapType = '';
-  this.filterVehicleType = '';
-  this.filteredData = [];
-  this.filterApplied = false;
 
-   // Reset data arrays
-  this.TransitInfoHeader = [];
-  this.TransitInfoItems = [];
-  this.dispatchData = [];
-  this.selectedItems = [];
-  
-  // Reset transit response
-  this.transitResponse = {};
-  
-  // Reset form
+    // Reset order type and SAP type
+    this.orderType = '';
+    this.sapType = '';
+    this.showForm = false;
+    this.isUpdateMode = false;
+    this.isEditMode = false;
 
-  
-  // Show success message
-  Swal.fire({
-    text: 'Screen refreshed successfully',
-    icon: 'success',
-   
-     confirmButtonText: 'Ok',
-    timer: 4000
-  });
-  
-  this.cd.detectChanges();
-}
+    // Reset previous state trackers
+    this.previousOrderType = null;
+    this.previousSapType = null;
+
+    // Reset search fields
+    this.searchReference = '';
+    this.selectedType = '';
+    this.searchOptionsList = [];
+    this.dropdownOpen = false;
+
+    // Reset table display
+    this.showTable = false;
+    this.headerData = null;
+    this.itemsList = [];
+
+
+    // Reset filter fields
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterSapType = '';
+    this.filterVehicleType = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+
+    // Reset data arrays
+    this.TransitInfoHeader = [];
+    this.TransitInfoItems = [];
+    this.dispatchData = [];
+    this.selectedItems = [];
+
+    // Reset transit response
+    this.transitResponse = {};
+
+    // Reset form
+
+
+    // Show success message
+    Swal.fire({
+      text: 'Screen refreshed successfully',
+      icon: 'success',
+
+      confirmButtonText: 'Ok',
+      timer: 4000
+    });
+
+    this.cd.detectChanges();
+  }
 
 
 

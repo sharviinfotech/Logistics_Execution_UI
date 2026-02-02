@@ -139,8 +139,9 @@
                     </td>
 
                     <td>
-                      <input type="text" formControlName="workOrderNumber" class="width-le" placeholder="Enter Work Order No."
-                        (blur)="onFieldBlur(i, 'WORK_ORDER_NO')" (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
+                      <input type="text" formControlName="workOrderNumber" class="width-le"
+                        placeholder="Enter Work Order No." (blur)="onFieldBlur(i, 'WORK_ORDER_NO')"
+                        (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
                         (keydown.tab)="onFieldBlur(i, 'WORK_ORDER_NO')" [readonly]="i !== 0" />
                     </td>
 
@@ -171,8 +172,16 @@
           <!-- SAP → Invoice + Search -->
           <div class="input-row input-flex" *ngIf="sapType === 'SAP'">
             <div class="form-field flex-1">
-              <input type="text" name="invoicenumber" [(ngModel)]="invoicenumber" placeholder=" "
-                (input)="onInputChange('invoice')" />
+              <select class="form-control" name="invoicenumber" [(ngModel)]="invoicenumber"
+                (change)="onInputChange('invoice')">
+
+                <option value="" disabled selected>Select Invoice</option>
+
+                <option *ngFor="let inv of invoiceF4List" [value]="inv">
+                  {{ inv }}
+                </option>
+
+              </select>
               <label>Invoice Number</label>
             </div>
 
@@ -230,7 +239,14 @@
         <div class="form-grid">
 
           <div class="form-field" *ngIf="sapType === 'Non-SAP'">
-            <input type="text" formControlName="INV_VBELN" placeholder=" " />
+            <select class="form-control" formControlName="INV_VBELN">
+              <option value="" disabled>Select DC Reference</option>
+
+              <option *ngFor="let inv of invoiceF4List" [value]="inv">
+                {{ inv }}
+              </option>
+            </select>
+
             <label>DC Reference Number</label>
           </div>
 
@@ -249,7 +265,7 @@
                 <th>Map ID</th>
                 <th>Truck Type</th>
                 <th>Passing Weight<br>
-                (Tons)</th>
+                  (Tons)</th>
                 <th>Actual Load<br>
                   (Tons)</th>
                 <th>Loading factor%<br>
@@ -287,12 +303,12 @@
                   </select>
                 </td>
 
-                <td><input type="text" formControlName="ZTRUC_WT" class="width-le"/></td>
+                <td><input type="text" formControlName="ZTRUC_WT" class="width-le" /></td>
                 <td><input type="number" formControlName="ZACT_LOAD" class="width-le" /></td>
                 <td><input type="text" formControlName="ZLF_WT" class="width-le" /></td>
-                <td><input type="text" formControlName="ZACT_VOL" (change)="onTruckTypeChange(i)"  /></td>
-                <td><input type="text" formControlName="ZLF_VOL"  /></td>
-                <td><input type="text" formControlName="ZWEEK_SF"  /></td>
+                <td><input type="text" formControlName="ZACT_VOL" (change)="onTruckTypeChange(i)" /></td>
+                <td><input type="text" formControlName="ZLF_VOL" /></td>
+                <td><input type="text" formControlName="ZWEEK_SF" /></td>
                 <td><input type="text" formControlName="ZEWAYBILL_NO" /></td>
                 <td><input type="date" formControlName="ZEWAYBILL_DT" /></td>
 

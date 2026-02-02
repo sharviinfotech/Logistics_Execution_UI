@@ -28,7 +28,7 @@
       </label>
     </div>
 
-        <div class="text-right" style="margin-top: 10px;">
+    <div class="text-right" style="margin-top: 10px;">
       <button class="btn btn-md btn-raised btn-refresh" (click)="refreshScreen()">
         <i class="fas fa-sync-alt"></i> Refresh
       </button>
@@ -137,8 +137,9 @@
                     </td>
 
                     <td>
-                      <input type="text" formControlName="workOrderNumber" class="width-le" placeholder="Enter Work Order No."
-                        (blur)="onFieldBlur(i, 'WORK_ORDER_NO')" (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
+                      <input type="text" formControlName="workOrderNumber" class="width-le"
+                        placeholder="Enter Work Order No." (blur)="onFieldBlur(i, 'WORK_ORDER_NO')"
+                        (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
                         (keydown.tab)="onFieldBlur(i, 'WORK_ORDER_NO')" [readonly]="i !== 0" />
                     </td>
 
@@ -168,8 +169,16 @@
           <!-- SAP → Invoice + Search -->
           <div class="input-row input-flex" *ngIf="sapType === 'SAP'">
             <div class="form-field flex-1">
-              <input type="text" name="invoicenumber" [(ngModel)]="invoicenumber" placeholder=" "
-                (input)="onInputChange('invoice')" />
+              <select class="form-control" name="invoicenumber" [(ngModel)]="invoicenumber"
+                (change)="onInputChange('invoice')">
+
+                <option value="" disabled selected>Select Invoice</option>
+
+                <option *ngFor="let inv of invoiceF4List" [value]="inv">
+                  {{ inv }}
+                </option>
+
+              </select>
               <label>Invoice Number</label>
             </div>
 
@@ -230,13 +239,24 @@
       <form [formGroup]="HeaderForm" *ngIf="ShowHeaderForm" class="form-grid">
 
         <!-- DC Reference Number → ONLY FOR NON-SAP -->
-        <div class="form-field" *ngIf="sapType === 'Non-SAP'">
+        <!-- <div class="form-field" *ngIf="sapType === 'Non-SAP'">
           <input type="text" [(ngModel)]="invoicenumber" name="dcRefNo" placeholder=" "
             (keyup.enter)="fetchInvoiceDetailsNonSap($event)" />
           <label>DC Reference Number</label>
+        </div> -->
+
+        <div class="form-field" *ngIf="sapType === 'Non-SAP'">
+          <select class="form-control" formControlName="VBELN" (change)="fetchInvoiceDetailsNonSap()">
+
+            <option value="" disabled>Select DC Reference</option>
+
+            <option *ngFor="let inv of invoiceF4List" [value]="inv">
+              {{ inv }}
+            </option>
+          </select>
+
+          <label>DC Reference Number</label>
         </div>
-
-
 
 
 

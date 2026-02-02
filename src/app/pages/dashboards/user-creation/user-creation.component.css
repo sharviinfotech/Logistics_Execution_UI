@@ -828,11 +828,10 @@
 }
 
 /* HARD STOP for width expansion */
-.dropdown-input {
+/* .dropdown-input {
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    /* VERY IMPORTANT for grid/flex */
     height: 40px;
     line-height: 20px;
     display: flex;
@@ -841,7 +840,7 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     box-sizing: border-box;
-}
+} */
 
 
 .multi-select-dropdown {
@@ -872,27 +871,21 @@
 }
 
 /* Fix multi-select input height */
-.dropdown-input {
+/* .dropdown-input {
     height: 40px;
-    /* FIXED HEIGHT */
+  
     line-height: 20px;
     display: flex;
     align-items: center;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-}
+} */
 
 .form-group {
     min-height: 85px;
     /* prevents layout jump */
 }
-
-
-
-
-
-
 
 .close-card {
     background: none;
@@ -1039,4 +1032,41 @@
     padding: 6px;
     border-bottom: 1px solid #f0f0f0;
     font-size: 13px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.dropdown-input {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+
+    padding: 6px 10px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+
+    white-space: nowrap;
+    overflow-x: auto;
+    /* scroll works */
+    overflow-y: hidden;
+
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE / Edge */
+
+    box-sizing: border-box;
+}
+
+/* Chrome / Edge / Safari */
+.dropdown-input::-webkit-scrollbar {
+    display: none;
 }

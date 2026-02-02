@@ -94,6 +94,7 @@ export class TransitDamageInfoComponent implements OnInit {
   dispatchData: any[] = [];
   TransitdamageInfoData: any[] = [];
   filterSapType: string = '';
+  invoiceF4List: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -241,7 +242,7 @@ export class TransitDamageInfoComponent implements OnInit {
   }
 
   onOrderTypeSelection() {
-    
+
     if (this.previousOrderType !== null && this.previousOrderType !== this.orderType) {
       this.sapType = null;
       this.previousSapType = null;
@@ -256,19 +257,19 @@ export class TransitDamageInfoComponent implements OnInit {
       this.resetConditionalFields();
     }
     this.previousOrderType = this.orderType;
-    
+
   }
 
   onSapTypeSelection() {
-   
+
     if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
       this.resetConditionalFields();
-      
+
     }
     this.previousSapType = this.sapType;
-     if (this.orderType === 'Outward' && this.sapType) {
-    this.fetchPendingAndCompletedCounts();
-  }
+    if (this.orderType === 'Outward' && this.sapType) {
+      this.fetchPendingAndCompletedCounts();
+    }
     // ✅ Complete reset when SAP mode changes
     this.invoicenumber = '';
     this.ponumber = '';
@@ -297,7 +298,7 @@ export class TransitDamageInfoComponent implements OnInit {
       this.showTable = false;
       this.showForm = false;
     }
-    
+
   }
 
   resetConditionalFields(): void {
@@ -381,11 +382,51 @@ export class TransitDamageInfoComponent implements OnInit {
     });
   }
 
+  // populateReferenceRows(data: any[]): void {
+  //   this.referenceItems.clear();
+
+  //   if (data && data.length > 0) {
+  //     data.forEach(d => {
+  //       this.referenceItems.push(
+  //         this.fb.group({
+  //           MAPID: [d.MAPID || ''],
+  //           referenceNumber: [d.REF_NO || d.referenceNumber || ''],
+  //           workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
+  //           lrNumber: [d.LR_NO || d.lrNumber || ''],
+  //           transporter: [d.TRANSPORTER || d.transporter || '']
+  //         })
+  //       );
+  //     });
+  //   } else {
+  //     Swal.fire({
+  //       icon: 'info',
+  //       title: 'No Records Found',
+  //       text: 'No matching reference details were found.',
+  //       timer: 1500,
+  //       showConfirmButton: false,
+  //       width: '300px'
+  //     });
+  //     this.referenceItems.push(this.createReferenceRow());
+  //   }
+  // }
+
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
+    this.invoiceF4List = [];   // 🔑 Reset F4 list
 
     if (data && data.length > 0) {
       data.forEach(d => {
+
+        // ✅ EXTRACT INVOICE NUMBERS FOR F4
+        if (d.INV_NO && Array.isArray(d.INV_NO)) {
+          d.INV_NO.forEach((inv: any) => {
+            if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+              this.invoiceF4List.push(inv.VBELN);
+            }
+          });
+        }
+
+        // ✅ EXISTING LOGIC (UNCHANGED)
         this.referenceItems.push(
           this.fb.group({
             MAPID: [d.MAPID || ''],
@@ -396,6 +437,9 @@ export class TransitDamageInfoComponent implements OnInit {
           })
         );
       });
+
+      console.log('🟢 Invoice F4 List:', this.invoiceF4List);
+
     } else {
       Swal.fire({
         icon: 'info',
@@ -874,17 +918,95 @@ export class TransitDamageInfoComponent implements OnInit {
     });
   }
 
-  fetchInvoiceDetailsNonSap(event?: any) {
+  // fetchInvoiceDetailsNonSap(event?: any) {
+
+  //   if (this.sapType !== 'Non-SAP') {
+  //     return;
+  //   }
+
+  //   // 🔴 IMPORTANT FIX
+  //   const dcRefNo = event?.target?.value || this.invoicenumber;
+
+  //   if (!dcRefNo || !dcRefNo.toString().trim()) {
+  //     Swal.fire('Warning', 'Please enter DC Reference Number', 'warning');
+  //     return;
+  //   }
+
+  //   const payload = {
+  //     VBELN: dcRefNo.toString().trim()
+  //   };
+
+  //   console.log('📤 Non-SAP Fetch Payload:', payload);
+
+  //   this.spinner.show();
+
+  //   this.service.fetchinvoicelistnonsapwosp(payload).subscribe({
+  //     next: (res: any[]) => {
+  //       this.spinner.hide();
+
+  //       if (!res || res.length === 0) {
+  //         Swal.fire('No data found', '', 'info');
+  //         return;
+  //       }
+
+  //       const header = res[0].HEADER;
+  //       const items = res[0].ITEM;
+
+  //       this.showTable = true;
+  //       this.ShowHeaderForm = true;
+  //       this.showForm = true;
+
+  //       this.HeaderForm.patchValue({
+  //         INV_NO: dcRefNo,
+  //         INV_DATE: header.INV_DATE,
+  //         FSR_RPT_DT: header.FSR_RPT_DT,
+  //         BASIC_VALUE: header.BASIC_VALUE,
+  //         INC_DATE: header.INC_DATE,
+  //         CUSTOMER: header.CUSTOMER,
+  //         CONSIGN_NAME: header.CONSIGN_NAME,
+  //         DAMAGE_RMK: header.DAMAGE_RMK,
+  //         SETTLEMENT: header.SETTLEMENT,
+  //         CLOSING_DT: header.CLOSING_DT,
+  //         IMAGES: header.IMAGES
+  //       });
+
+  //       this.items.clear();
+
+  //       items.forEach((x: any) => {
+  //         this.items.push(this.fb.group({
+  //           selected: [false],
+  //           ZMAPID: [x.ZMAPID],
+  //           REFNO: [x.REFNO],
+  //           INV_NO: [dcRefNo],
+  //           POSNR: [x.POSNR],
+  //           VEH_LINE: [x.VEH_LINE],
+  //           TRUCK_NO: [x.TRUCK_NO],
+  //           LR_NO: [x.LR_NO],
+  //           TRANSPORTER: [x.TRANSPORTER],
+  //           BILLNO: [x.BILLNO],
+  //           PRODUCT: [x.PRODUCT],
+  //           WORK_ORDER: [x.WORK_ORDER]
+  //         }));
+  //       });
+  //     },
+  //     error: () => {
+  //       this.spinner.hide();
+  //       Swal.fire('Error fetching Non-SAP data', '', 'error');
+  //     }
+  //   });
+  // }
+
+  fetchInvoiceDetailsNonSap() {
 
     if (this.sapType !== 'Non-SAP') {
       return;
     }
 
-    // 🔴 IMPORTANT FIX
-    const dcRefNo = event?.target?.value || this.invoicenumber;
+    // ✅ Get from HeaderForm
+    const dcRefNo = this.HeaderForm.get('VBELN')?.value;
 
     if (!dcRefNo || !dcRefNo.toString().trim()) {
-      Swal.fire('Warning', 'Please enter DC Reference Number', 'warning');
+      Swal.fire('Warning', 'Please select DC Reference Number', 'warning');
       return;
     }
 
@@ -896,7 +1018,7 @@ export class TransitDamageInfoComponent implements OnInit {
 
     this.spinner.show();
 
-    this.service.fetchinvoicelistnonsapwosp(payload).subscribe({
+    this.service.fetchinvoicelistnonsap(payload).subscribe({
       next: (res: any[]) => {
         this.spinner.hide();
 
@@ -942,8 +1064,10 @@ export class TransitDamageInfoComponent implements OnInit {
             BILLNO: [x.BILLNO],
             PRODUCT: [x.PRODUCT],
             WORK_ORDER: [x.WORK_ORDER]
+
           }));
         });
+
       },
       error: () => {
         this.spinner.hide();
@@ -951,7 +1075,6 @@ export class TransitDamageInfoComponent implements OnInit {
       }
     });
   }
-
 
 
 
@@ -1147,90 +1270,90 @@ export class TransitDamageInfoComponent implements OnInit {
   }
 
   // ✅ Simple delete method - works for both header and line items
-deleteRow(row: any): void {
-  
-  // Check if row exists
-  if (!row) {
-    console.error('Row not found');
-    return;
-  }
+  deleteRow(row: any): void {
 
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'Do you want to delete this record?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, Delete',
-    cancelButtonText: 'Cancel',
-    confirmButtonColor: '#d33'
-  }).then((result) => {
-    
-    if (!result.isConfirmed) return;
+    // Check if row exists
+    if (!row) {
+      console.error('Row not found');
+      return;
+    }
 
-    // Prepare payload
-    const payload = {
-      DELETE: [
-        {
-          ZREFNO: row.ZREFNO,
-          ZINV_NO: row.ZINV_NO,
-          ZLINE_NO: row.ZLINE_NO || ''
-        }
-      ]
-    };
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this record?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
 
-    // Call API based on SAP type
-    const apiCall = this.sapType === 'SAP'
-      ? this.service.TransitDamageInfoDeleteWithSap(payload)
-      : this.service.TransitDamageInfoDeleteWithoutSap(payload);
+      if (!result.isConfirmed) return;
 
-    apiCall.subscribe({
-      next: (res: any) => {
-        if (res?.STATUS === 'TRUE' || res?.STATUS === true || res?.NUMBER === '200') {
-          
-          // ✅ Remove from itemsList if it exists there
-          const index = this.itemsList.findIndex(item => 
-            item.ZREFNO === row.ZREFNO && 
-            item.ZINV_NO === row.ZINV_NO && 
-            item.ZLINE_NO === row.ZLINE_NO
-          );
-          
-          if (index !== -1) {
-            this.itemsList.splice(index, 1);
+      // Prepare payload
+      const payload = {
+        DELETE: [
+          {
+            ZREFNO: row.ZREFNO,
+            ZINV_NO: row.ZINV_NO,
+            ZLINE_NO: row.ZLINE_NO || ''
           }
-          
-          // ✅ Clear headerData if deleting header
-          if (this.headerData?.ZREFNO === row.ZREFNO && 
+        ]
+      };
+
+      // Call API based on SAP type
+      const apiCall = this.sapType === 'SAP'
+        ? this.service.TransitDamageInfoDeleteWithSap(payload)
+        : this.service.TransitDamageInfoDeleteWithoutSap(payload);
+
+      apiCall.subscribe({
+        next: (res: any) => {
+          if (res?.STATUS === 'TRUE' || res?.STATUS === true || res?.NUMBER === '200') {
+
+            // ✅ Remove from itemsList if it exists there
+            const index = this.itemsList.findIndex(item =>
+              item.ZREFNO === row.ZREFNO &&
+              item.ZINV_NO === row.ZINV_NO &&
+              item.ZLINE_NO === row.ZLINE_NO
+            );
+
+            if (index !== -1) {
+              this.itemsList.splice(index, 1);
+            }
+
+            // ✅ Clear headerData if deleting header
+            if (this.headerData?.ZREFNO === row.ZREFNO &&
               this.headerData?.ZINV_NO === row.ZINV_NO) {
-            this.headerData = null;
-            this.showTable = false;
+              this.headerData = null;
+              this.showTable = false;
+            }
+
+            Swal.fire({
+              title: 'Deleted',
+              text: 'Record deleted successfully',
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            });
+
+          } else {
+            Swal.fire({
+              title: 'Failed',
+              text: res?.MSG || res?.MESSAGE || 'Delete failed',
+              icon: 'error'
+            });
           }
-
+        },
+        error: (err) => {
+          console.error('Delete Error:', err);
           Swal.fire({
-            title: 'Deleted',
-            text: 'Record deleted successfully',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-          });
-
-        } else {
-          Swal.fire({
-            title: 'Failed',
-            text: res?.MSG || res?.MESSAGE || 'Delete failed',
+            title: 'Error',
+            text: 'Something went wrong while deleting',
             icon: 'error'
           });
         }
-      },
-      error: (err) => {
-        console.error('Delete Error:', err);
-        Swal.fire({
-          title: 'Error',
-          text: 'Something went wrong while deleting',
-          icon: 'error'
-        });
-      }
+      });
     });
-  });
-}
+  }
 
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
@@ -1772,105 +1895,105 @@ deleteRow(row: any): void {
   }
 
   // Fetch counts from API
-fetchPendingAndCompletedCounts() {
-  const payload = {
-    INOUT: 'OUTWARD',
-    TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
-    SCREEN: 'TRANSIT DAMAGE INFO'
-  };
+  fetchPendingAndCompletedCounts() {
+    const payload = {
+      INOUT: 'OUTWARD',
+      TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
+      SCREEN: 'TRANSIT DAMAGE INFO'
+    };
 
-  this.service.OutwardCountGlobalWithSap(payload).subscribe(
-    (response: any) => {
-      this.pendingCount = response.ZPEND_CNT || 0;
-      this.completedCount = response.ZCONF_CNT || 0;
-    },
-    (error) => {
-      console.error('Error fetching counts:', error);
-      this.pendingCount = 0;
-      this.completedCount = 0;
-     
-    }
-  );
-}
+    this.service.OutwardCountGlobalWithSap(payload).subscribe(
+      (response: any) => {
+        this.pendingCount = response.ZPEND_CNT || 0;
+        this.completedCount = response.ZCONF_CNT || 0;
+      },
+      (error) => {
+        console.error('Error fetching counts:', error);
+        this.pendingCount = 0;
+        this.completedCount = 0;
 
-refreshScreen() {
-  // Reset main mode
-  
-  
-  // Reset order type and SAP type
-  this.orderType = '';
-  this.sapType = '';
-  this.showForm = false;
-  this.isUpdateMode = false;
-  this.isEditMode = false;
-  
-  // Reset previous state trackers
-  this.previousOrderType = null;
-  this.previousSapType = null;
-  
-  // Reset invoice/PO numbers
-  this.invoicenumber = '';
-  this.ponumber = '';
-  
-  // Reset search fields
-  this.searchReference = '';
-  this.selectedType = '';
-  this.searchOptionsList = [];
-  this.dropdownOpen = false;
-  
-  // Reset table display flags
-  this.showTable = false;
-  this.ShowHeaderForm = false;
-  this.SavedDataShow = false;
-  this.headerData = null;
-  this.itemsList = [];
-  
-  // Reset filter fields
-  this.filterFromDate = '';
-  this.filterToDate = '';
-  this.filterPlant = '';
-  this.filterDivision = '';
-  this.filterTransporter = '';
-  this.filterSapType = '';
-  this.filterVehicleType = '';
-  this.filterStatus = '';
-  this.filteredData = [];
-  this.filterApplied = false;
-  
-  // Reset data arrays
-  this.TransitDamageInfoHeader = [];
-  this.TransitDamageInfoItems = [];
-  this.dispatchData = [];
-  this.selectedItems = [];
-  this.TransitdamageInfoData = [];
-  
-  // Reset transit response
-  this.transitResponse = {};
-  
-  // Reset counts
-  this.pendingCount = 0;
-  this.completedCount = 0;
-  
-  // Reset checkbox state
-  this.isAllSelected = false;
-  
-  // Reset Header Form
-  this.HeaderForm.reset();
-  
+      }
+    );
+  }
 
-  
-  // Show success message
-  Swal.fire({
-    text: 'Screen refreshed successfully',
-    icon: 'success',
-    confirmButtonText: 'Ok',
-    timer: 4000,
-    
-  });
-  
-  // Trigger change detection
-  this.cd.detectChanges();
-}
+  refreshScreen() {
+    // Reset main mode
+
+
+    // Reset order type and SAP type
+    this.orderType = '';
+    this.sapType = '';
+    this.showForm = false;
+    this.isUpdateMode = false;
+    this.isEditMode = false;
+
+    // Reset previous state trackers
+    this.previousOrderType = null;
+    this.previousSapType = null;
+
+    // Reset invoice/PO numbers
+    this.invoicenumber = '';
+    this.ponumber = '';
+
+    // Reset search fields
+    this.searchReference = '';
+    this.selectedType = '';
+    this.searchOptionsList = [];
+    this.dropdownOpen = false;
+
+    // Reset table display flags
+    this.showTable = false;
+    this.ShowHeaderForm = false;
+    this.SavedDataShow = false;
+    this.headerData = null;
+    this.itemsList = [];
+
+    // Reset filter fields
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterSapType = '';
+    this.filterVehicleType = '';
+    this.filterStatus = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+
+    // Reset data arrays
+    this.TransitDamageInfoHeader = [];
+    this.TransitDamageInfoItems = [];
+    this.dispatchData = [];
+    this.selectedItems = [];
+    this.TransitdamageInfoData = [];
+
+    // Reset transit response
+    this.transitResponse = {};
+
+    // Reset counts
+    this.pendingCount = 0;
+    this.completedCount = 0;
+
+    // Reset checkbox state
+    this.isAllSelected = false;
+
+    // Reset Header Form
+    this.HeaderForm.reset();
+
+
+
+    // Show success message
+    Swal.fire({
+      text: 'Screen refreshed successfully',
+      icon: 'success',
+      confirmButtonText: 'Ok',
+      timer: 4000,
+
+    });
+
+    // Trigger change detection
+    this.cd.detectChanges();
+  }
 
 
 }

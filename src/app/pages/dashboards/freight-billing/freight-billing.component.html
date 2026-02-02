@@ -30,7 +30,7 @@
       </label>
     </div>
 
-        <div class="text-right" style="margin-top: 10px;">
+    <div class="text-right" style="margin-top: 10px;">
       <button class="btn btn-md btn-raised btn-refresh" (click)="refreshScreen()">
         <i class="fas fa-sync-alt"></i> Refresh
       </button>
@@ -116,9 +116,10 @@
                   </td>
 
                   <td>
-                    <input type="text" formControlName="workOrderNumber" class="width-le" placeholder="Enter Work Order No."
-                      (blur)="onFieldBlur(i, 'WORK_ORDER_NO')" (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
-                      (keydown.tab)="onFieldBlur(i, 'WORK_ORDER_NO')" [readonly]="i !== 0" />
+                    <input type="text" formControlName="workOrderNumber" class="width-le"
+                      placeholder="Enter Work Order No." (blur)="onFieldBlur(i, 'WORK_ORDER_NO')"
+                      (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')" (keydown.tab)="onFieldBlur(i, 'WORK_ORDER_NO')"
+                      [readonly]="i !== 0" />
                   </td>
 
                   <td>
@@ -176,8 +177,19 @@
           <label>PO Number</label>
         </div>
 
-        <div *ngIf="orderType === 'Outward'" class="form-field">
+        <!-- <div *ngIf="orderType === 'Outward'" class="form-field">
           <input type="text" formControlName="invoicenumber" placeholder=" " />
+          <label>Invoice Number</label>
+        </div> -->
+        <div *ngIf="orderType === 'Outward'" class="form-field">
+          <select class="form-control" formControlName="invoicenumber">
+            <option value="" disabled>Select Invoice Number</option>
+
+            <option *ngFor="let inv of invoiceF4List" [value]="inv">
+              {{ inv }}
+            </option>
+          </select>
+
           <label>Invoice Number</label>
         </div>
 

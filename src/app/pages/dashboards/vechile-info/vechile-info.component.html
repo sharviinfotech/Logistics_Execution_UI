@@ -28,7 +28,7 @@
       </label>
     </div>
 
-        <div class="text-right" style="margin-top: 10px;">
+    <div class="text-right" style="margin-top: 10px;">
       <button class="btn btn-md btn-raised btn-refresh" (click)="refreshScreen()">
         <i class="fas fa-sync-alt"></i> Refresh
       </button>
@@ -136,8 +136,9 @@
                     </td>
 
                     <td>
-                      <input type="text" formControlName="workOrderNumber" class="width-le" placeholder="Enter Work Order No."
-                        (blur)="onFieldBlur(i, 'WORK_ORDER_NO')" (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
+                      <input type="text" formControlName="workOrderNumber" class="width-le"
+                        placeholder="Enter Work Order No." (blur)="onFieldBlur(i, 'WORK_ORDER_NO')"
+                        (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
                         (keydown.tab)="onFieldBlur(i, 'WORK_ORDER_NO')" [readonly]="i !== 0" />
                     </td>
 
@@ -166,11 +167,26 @@
 
           <!-- SAP → Invoice + Search -->
           <div class="input-row input-flex" *ngIf="sapType === 'SAP'">
-            <div class="form-field flex-1">
+            <!-- <div class="form-field flex-1">
               <input type="text" name="invoicenumber" [(ngModel)]="invoicenumber" placeholder=" "
                 (input)="onInputChange('invoice')" />
               <label>Invoice Number</label>
+            </div> -->
+
+            <div class="form-field flex-1">
+              <select class="form-control" name="invoicenumber" [(ngModel)]="invoicenumber"
+                (change)="onInputChange('invoice')">
+
+                <option value="" disabled selected>Select Invoice</option>
+
+                <option *ngFor="let inv of invoiceF4List" [value]="inv">
+                  {{ inv }}
+                </option>
+              </select>
+
+              <label>Invoice Number</label>
             </div>
+
 
             <button type="button" class="btn-get" (click)="getForm('invoice')"
               [disabled]="!invoicenumber || invoicenumber.trim() === ''">
@@ -225,10 +241,22 @@
 
       <form [formGroup]="VehicleForm">
         <div class="form-grid">
-          <div class="form-field" [hidden]="sapType !== 'Non-SAP'">
+          <!-- <div class="form-field" [hidden]="sapType !== 'Non-SAP'">
             <input type="text" formControlName="VBELN" (keydown.enter)="fetchDCReferenceNo()"
               (blur)="fetchDCReferenceNo()" />
             <label>Invoice Number</label>
+          </div> -->
+
+          <div class="form-field" *ngIf="sapType === 'Non-SAP'">
+            <select class="form-control" formControlName="VBELN" (change)="fetchDCReferenceNo()">
+
+              <option value="" disabled>Select DC Reference</option>
+              <option *ngFor="let inv of invoiceF4List" [value]="inv">
+                {{ inv }}
+              </option>
+            </select>
+
+            <label>DC Reference Number</label>
           </div>
         </div>
       </form>
@@ -249,7 +277,7 @@
                 <th>LR No</th>
                 <th>Type of Vehicle</th>
                 <th>Passing Weight<br>
-                   (Tons)</th>
+                  (Tons)</th>
                 <th>Volume of Truck</th>
                 <th>Vehicle Number</th>
                 <th>No of Vehicles</th>
@@ -272,17 +300,18 @@
                 </td>
                 <td><input type="text" formControlName="ZTRX_TYPE" /></td>
                 <td><input type="text" formControlName="ZTRANSPORTER" /></td>
-                <td><input type="text" formControlName="ZLRNO" class="width-le"/></td>
+                <td><input type="text" formControlName="ZLRNO" class="width-le" /></td>
                 <td><input type="text" formControlName="ZTRUC_TYPE" /></td>
-                <td><input type="text" formControlName="ZTRUC_WT" class="width-le"/></td>
-                <td><input type="number" formControlName="ZTRUC_VOL" class="width-le"/></td>
-                <td><input type="text" formControlName="ZVEH_NUM" class="width-le"/></td>
-                <td><input type="number" formControlName="ZNOOFVEH" min="1" class="width-le"/></td>
+                <td><input type="text" formControlName="ZTRUC_WT" class="width-le" /></td>
+                <td><input type="number" formControlName="ZTRUC_VOL" class="width-le" /></td>
+                <td><input type="text" formControlName="ZVEH_NUM" class="width-le" /></td>
+                <td><input type="number" formControlName="ZNOOFVEH" min="1" class="width-le" /></td>
                 <td><input type="text" formControlName="ZDNAME" /></td>
-                <td><input type="text" formControlName="ZDNUMBER" class="width-le"/></td>
+                <td><input type="text" formControlName="ZDNUMBER" class="width-le" /></td>
                 <td class="action-btns">
                   <button type="button" class="btn-add" (click)="addRow()">+</button>
-                  <button type="button" class="btn-remove" (click)="removeRow(i)" [disabled]="vehicles.length === 1">✖</button>
+                  <button type="button" class="btn-remove" (click)="removeRow(i)"
+                    [disabled]="vehicles.length === 1">✖</button>
                 </td>
               </tr>
             </tbody>

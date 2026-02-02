@@ -71,6 +71,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   previousOrderType: string | null = null;
   previousSapType: string | null = null;
   showForm: boolean = false;
+  invoiceF4List: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -111,6 +112,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       ZTRUC_TYPE: [data?.ZTRUC_TYPE || '', Validators.required],
       ZTRUC_WT: [data?.ZTRUC_WT || '', Validators.required],
       ZACT_LOAD: [data?.ZACT_LOAD || '', Validators.required],
+      ZTRUCK_LINE: [data?.ZTRUCK_LINE || ''],
       ZACT_VOL: [data?.ZACT_VOL || '', Validators.required],
       ZLF_VOL: [data?.ZLF_VOL || '', Validators.required],
       ZLF_WT: [data?.ZLF_WT || '', Validators.required],
@@ -222,8 +224,8 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     }
     this.previousSapType = this.sapType;
     if (this.orderType === 'Outward' && this.sapType) {
-    this.fetchPendingAndCompletedCounts();
-  }
+      this.fetchPendingAndCompletedCounts();
+    }
 
     this.invoices.clear();
     this.addRow();
@@ -316,23 +318,70 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     });
   }
 
+  // populateReferenceRows(data: any[]): void {
+  //   this.referenceItems.clear();
+
+  //   if (data && data.length > 0) {
+  //     data.forEach(d => {
+  //       this.referenceItems.push(
+  //         this.fb.group({
+  //           MAPID: [d.MAPID || ''],
+  //           referenceNumber: [d.REF_NO || d.referenceNumber || ''],
+  //           workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
+  //           lrNumber: [d.LR_NO || d.lrNumber || ''],
+  //           transporter: [d.TRANSPORTER || d.transporter || ''],
+  //           soNumber: [d.SO_NO || d.soNumber || ''],
+  //           odnNumber: [d.ODN_NO || d.odnNumber || ''],
+  //         })
+  //       );
+  //     });
+  //   } else {
+  //     Swal.fire({
+  //       icon: 'info',
+  //       title: 'No Records Found',
+  //       text: 'No matching reference details were found.',
+  //       timer: 1500,
+  //       showConfirmButton: false,
+  //       width: '300px'
+  //     });
+  //     this.referenceItems.push(this.createReferenceRow());
+  //   }
+  // }
+
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
+    this.invoiceF4List = [];   // ✅ RESET F4 LIST
 
     if (data && data.length > 0) {
       data.forEach(d => {
+
+        // ✅ PUSH FORM ROW
         this.referenceItems.push(
           this.fb.group({
             MAPID: [d.MAPID || ''],
-            referenceNumber: [d.REF_NO || d.referenceNumber || ''],
-            workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
-            lrNumber: [d.LR_NO || d.lrNumber || ''],
-            transporter: [d.TRANSPORTER || d.transporter || ''],
-            soNumber: [d.SO_NO || d.soNumber || ''],
-            odnNumber: [d.ODN_NO || d.odnNumber || ''],
+            referenceNumber: [d.REF_NO || ''],
+            workOrderNumber: [d.WORK_ORDER_NO || ''],
+            lrNumber: [d.LR_NO || ''],
+            transporter: [d.TRANSPORTER || ''],
+            soNumber: [''],
+            odnNumber: [''],
+            ZNO_TRUCKS: [d.ZNO_TRUCKS],
+            INV_NO_LIST: [d.INV_NO || []]
           })
         );
+
+        // ✅ EXTRACT INVOICE NUMBERS FOR F4
+        if (Array.isArray(d.INV_NO)) {
+          d.INV_NO.forEach((inv: any) => {
+            if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+              this.invoiceF4List.push(inv.VBELN);
+            }
+          });
+        }
       });
+
+      console.log('✅ Invoice F4 List:', this.invoiceF4List);
+
     } else {
       Swal.fire({
         icon: 'info',
@@ -342,10 +391,10 @@ export class InvoiceLoadDetailsComponent implements OnInit {
         showConfirmButton: false,
         width: '300px'
       });
+
       this.referenceItems.push(this.createReferenceRow());
     }
   }
-
   onCheckboxChange(event: Event, index: number): void {
     const checkbox = event.target as HTMLInputElement;
     const rowValue = (this.referenceItems.at(index) as FormGroup).value;
@@ -407,11 +456,49 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   }
 
   // ✅ FETCH INVOICE API
+  // fetchInvoiceDetails(): void {
+  //   const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+
+  //   if (!referenceNumber?.trim()) {
+  //     Swal.fire('Warning', `Please enter ${this.orderType === 'Inward' ? 'PO' : 'invoice'} number`, 'warning');
+  //     return;
+  //   }
+
+  //   const payload = { INV_GET: referenceNumber.trim() };
+
+  //   this.spinner.show();
+
+  //   this.service.Invoiceloaddetailsfetch(payload).subscribe({
+  //     next: (res: any) => {
+  //       this.spinner.hide();
+
+  //       if (Array.isArray(res) && res.length > 0) {
+  //         this.invoices.clear();
+  //         res.forEach((item: any) => this.addRow(item));
+  //         this.showForm = true;
+  //         this.searchOptionsList = [];
+
+  //         Swal.fire('Success', 'Invoice details loaded', 'success');
+  //       } else {
+  //         Swal.fire('Info', 'No records found', 'info');
+  //       }
+  //     },
+  //     error: (err) => {
+  //       this.spinner.hide();
+  //       Swal.fire('Error', 'Fetch failed', 'error');
+  //     }
+  //   });
+  // }
   fetchInvoiceDetails(): void {
-    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+    const referenceNumber =
+      this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
 
     if (!referenceNumber?.trim()) {
-      Swal.fire('Warning', `Please enter ${this.orderType === 'Inward' ? 'PO' : 'invoice'} number`, 'warning');
+      Swal.fire(
+        'Warning',
+        `Please enter ${this.orderType === 'Inward' ? 'PO' : 'invoice'} number`,
+        'warning'
+      );
       return;
     }
 
@@ -423,23 +510,57 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       next: (res: any) => {
         this.spinner.hide();
 
+        // Even if invoice API returns 1 row,
+        // we will generate rows from referenceItems
         if (Array.isArray(res) && res.length > 0) {
           this.invoices.clear();
-          res.forEach((item: any) => this.addRow(item));
+
+          console.log('🔎 Reference Items:', this.referenceItems.value);
+
+          // 🔥 LOOP REFERENCE ITEMS (SOURCE OF TRUTH)
+          this.referenceItems.value.forEach((ref: any) => {
+            const truckCount = Number(ref.ZNO_TRUCKS) || 1;
+
+            for (let i = 0; i < truckCount; i++) {
+              this.addRow({
+                VBELN: referenceNumber,
+
+                // Map from reference table
+                ZMAPID: ref.MAPID || '',
+                ZREFNO: ref.referenceNumber || '',
+                ZWORK_ORDER: ref.workOrderNumber || '',
+                ZLRNO: ref.lrNumber || '',
+                ZTRANSPORTER: ref.transporter || '',
+
+                // Optional tracking
+                ZTRUCK_LINE: i + 1
+              });
+            }
+          });
+
           this.showForm = true;
           this.searchOptionsList = [];
 
-          Swal.fire('Success', 'Invoice details loaded', 'success');
+          console.log('✅ Total Invoice Rows Created:', this.invoices.length);
+
+          Swal.fire(
+            'Success',
+            `Invoice details loaded (Truck-wise: ${this.invoices.length} rows)`,
+            'success'
+          );
         } else {
-          Swal.fire('Info', 'No records found', 'info');
+          Swal.fire('Info', 'No records found for this invoice', 'info');
         }
       },
       error: (err) => {
         this.spinner.hide();
         Swal.fire('Error', 'Fetch failed', 'error');
+        console.error(err);
       }
     });
   }
+
+
 
   onInputChange(type: 'purchase' | 'invoice'): void {
     const value = type === 'purchase' ? this.ponumber : this.invoicenumber;
@@ -1483,68 +1604,68 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   }
 
   fetchPendingAndCompletedCounts() {
-  const payload = {
-    INOUT: 'OUTWARD',
-    TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
-    SCREEN: 'INVOICE LOAD DETAILS'
-  };
- 
-  this.service.OutwardCountGlobalWithSap(payload).subscribe(
-    (response: any) => {
-      this.pendingCount = response.ZPEND_CNT || 0;
-      this.completedCount = response.ZCONF_CNT || 0;
-    },
-    (error) => {
-      console.error('Error fetching counts:', error);
-      this.pendingCount = 0;
-      this.completedCount = 0;
-     
-    }
-  );
-}
+    const payload = {
+      INOUT: 'OUTWARD',
+      TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
+      SCREEN: 'INVOICE LOAD DETAILS'
+    };
 
-refreshScreen() {
+    this.service.OutwardCountGlobalWithSap(payload).subscribe(
+      (response: any) => {
+        this.pendingCount = response.ZPEND_CNT || 0;
+        this.completedCount = response.ZCONF_CNT || 0;
+      },
+      (error) => {
+        console.error('Error fetching counts:', error);
+        this.pendingCount = 0;
+        this.completedCount = 0;
 
-  
-  // Reset order type and SAP type
-  this.orderType = '';
-  this.sapType = '';
-  this.showForm = false;
-  this.isUpdateMode = false;
-  
-  // Reset search fields
-   this.searchReference = '';
-  this.selectedType = '';
-  
-  this.searchOptionsList = [];
-  this.dropdownOpen = false;
-  
-  
-  // Reset filter fields
-  this.filterFromDate = '';
-  this.filterToDate = '';
-  this.filterPlant = '';
-  this.filterDivision = '';
-  this.filterTransporter = '';
-  this.filterSapType = '';
-  this.filterVehicleType = '';
-  this.filteredData = [];
-  this.filterApplied = false;
-  
-  // Reset form
+      }
+    );
+  }
 
-  
-  // Show success message
-  Swal.fire({
-    text: 'Screen refreshed successfully',
-    icon: 'success',
-   
-     confirmButtonText: 'Ok',
-    timer: 4000
-  });
-  
-  this.cd.detectChanges();
-}
+  refreshScreen() {
+
+
+    // Reset order type and SAP type
+    this.orderType = '';
+    this.sapType = '';
+    this.showForm = false;
+    this.isUpdateMode = false;
+
+    // Reset search fields
+    this.searchReference = '';
+    this.selectedType = '';
+
+    this.searchOptionsList = [];
+    this.dropdownOpen = false;
+
+
+    // Reset filter fields
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterSapType = '';
+    this.filterVehicleType = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+
+    // Reset form
+
+
+    // Show success message
+    Swal.fire({
+      text: 'Screen refreshed successfully',
+      icon: 'success',
+
+      confirmButtonText: 'Ok',
+      timer: 4000
+    });
+
+    this.cd.detectChanges();
+  }
 
 
 }

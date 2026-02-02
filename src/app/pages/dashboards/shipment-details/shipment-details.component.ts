@@ -79,6 +79,7 @@ export class ShipmentDetailsComponent implements OnInit {
   filterSapType: string = '';
   showOrderInfoTable = false;
   showDispatchTable = false;
+  invoiceF4List: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -201,9 +202,9 @@ export class ShipmentDetailsComponent implements OnInit {
       this.resetConditionalFields();
     }
     this.previousSapType = this.sapType;
-     if (this.orderType === 'Outward' && this.sapType) {
-    this.fetchPendingAndCompletedCounts();
-  }
+    if (this.orderType === 'Outward' && this.sapType) {
+      this.fetchPendingAndCompletedCounts();
+    }
 
     if (this.sapType === 'SAP') {
       this.showForm = false;
@@ -315,11 +316,56 @@ export class ShipmentDetailsComponent implements OnInit {
     });
   }
 
+  // populateReferenceRows(data: any[]): void {
+  //   this.referenceItems.clear();
+
+  //   if (data && data.length > 0) {
+  //     data.forEach(d => {
+  //       this.referenceItems.push(
+  //         this.fb.group({
+  //           MAPID: [d.MAPID],
+  //           referenceNumber: [d.REF_NO || d.referenceNumber || ''],
+  //           workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
+  //           lrNumber: [d.LR_NO || d.lrNumber || ''],
+  //           transporter: [d.TRANSPORTER || d.transporter || ''],
+  //           soNumber: [d.SO_NO || d.soNumber || ''],        // Sales Order Number
+  //           odnNumber: [d.ODN_NO || d.odnNumber || ''],     // ODN Number
+  //           materialType: [d.MTART || d.materialType || ''], // Material Type
+  //           plantCode: [d.PLANT_CODE || d.ZPIN_PLT || d.plantCode || ''],  // Plant Code
+  //           shippingPoint: [d.SHIPPING_POINT || d.ZPIN_STP || d.shippingPoint || '']  // Shipping Point
+  //         })
+  //       );
+  //     });
+  //   } else {
+  //     Swal.fire({
+  //       icon: 'info',
+  //       title: 'No Records Found',
+  //       text: 'No matching reference details were found.',
+  //       timer: 1500,
+  //       showConfirmButton: false,
+  //       width: '300px'
+  //     });
+  //     this.referenceItems.push(this.createReferenceRow());
+  //   }
+  // }
+
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
+    this.invoiceF4List = [];   // 🔑 Reset F4 list
 
     if (data && data.length > 0) {
       data.forEach(d => {
+
+        // ✅ EXTRACT INVOICE NUMBERS FOR F4
+        if (d.INV_NO && Array.isArray(d.INV_NO)) {
+          d.INV_NO.forEach((inv: any) => {
+            if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+              this.invoiceF4List.push(inv.VBELN);
+            }
+          });
+        }
+
+        // ✅ EXISTING LOGIC (UNCHANGED)
         this.referenceItems.push(
           this.fb.group({
             MAPID: [d.MAPID],
@@ -327,14 +373,18 @@ export class ShipmentDetailsComponent implements OnInit {
             workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
             lrNumber: [d.LR_NO || d.lrNumber || ''],
             transporter: [d.TRANSPORTER || d.transporter || ''],
-            soNumber: [d.SO_NO || d.soNumber || ''],        // Sales Order Number
-            odnNumber: [d.ODN_NO || d.odnNumber || ''],     // ODN Number
-            materialType: [d.MTART || d.materialType || ''], // Material Type
-            plantCode: [d.PLANT_CODE || d.ZPIN_PLT || d.plantCode || ''],  // Plant Code
-            shippingPoint: [d.SHIPPING_POINT || d.ZPIN_STP || d.shippingPoint || '']  // Shipping Point
+            soNumber: [d.SO_NO || d.soNumber || ''],
+            odnNumber: [d.ODN_NO || d.odnNumber || ''],
+            materialType: [d.MTART || d.materialType || ''],
+            plantCode: [d.PLANT_CODE || d.ZPIN_PLT || d.plantCode || ''],
+            shippingPoint: [d.SHIPPING_POINT || d.ZPIN_STP || d.shippingPoint || '']
           })
         );
       });
+
+      console.log('🟢 Invoice F4 List:', this.invoiceF4List);
+
+
     } else {
       Swal.fire({
         icon: 'info',
@@ -347,6 +397,7 @@ export class ShipmentDetailsComponent implements OnInit {
       this.referenceItems.push(this.createReferenceRow());
     }
   }
+
 
   onchangeMAPID(index: number) {
     const rowForm = this.items.at(index) as FormGroup;
@@ -630,7 +681,7 @@ export class ShipmentDetailsComponent implements OnInit {
         });
 
         this.showForm = true;
-         Swal.fire('Success', 'Invoice details loaded successfully', 'success');
+        Swal.fire('Success', 'Invoice details loaded successfully', 'success');
         this.searchOptionsList = [];
         this.spinner.hide();
       },
@@ -1580,101 +1631,101 @@ export class ShipmentDetailsComponent implements OnInit {
   }
 
   fetchPendingAndCompletedCounts() {
-  const payload = {
-    INOUT: 'OUTWARD',
-    TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
-    SCREEN: 'SHIPMENT DETAILS'
-  };
- 
-  this.service.OutwardCountGlobalWithSap(payload).subscribe(
-    (response: any) => {
-      this.pendingCount = response.ZPEND_CNT || 0;
-      this.completedCount = response.ZCONF_CNT || 0;
-    },
-    (error) => {
-      console.error('Error fetching counts:', error);
-      this.pendingCount = 0;
-      this.completedCount = 0;
-     
-    }
-  );
-}
+    const payload = {
+      INOUT: 'OUTWARD',
+      TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
+      SCREEN: 'SHIPMENT DETAILS'
+    };
 
-refreshScreen() {
-  
-  
-  // Reset order type and SAP type
-  this.orderType = '';
-  this.sapType = '';
-  this.showForm = false;
-  this.isUpdateMode = false;
-  this.isEditMode = false;
-  this.isAllSelected = false;
-  
-  // Reset search fields
-   this.searchReference = '';
-  this.selectedType = '';
-  this.searchValue = '';
-  this.searchOptionsList = [];
-  this.dropdownOpen = false;
-  
-  // Reset previous state trackers
-  this.previousOrderType = null;
-  this.previousSapType = null;
-  
-  // Reset invoice/PO numbers
-  this.ponumber = '';
-  this.invoicenumber = '';
-  
-  
-  // Reset filter fields
-  this.filterFromDate = '';
-  this.filterToDate = '';
-  this.filterPlant = '';
-  this.filterDivision = '';
-  this.filterTransporter = '';
-  this.filterSapType = '';
-  this.filterVehicleType = '';
-  this.filterStatus = '';
-  this.filteredData = [];
-  this.filterApplied = false;
-  
-  // Reset data arrays
-  this.ShipmentData = [];
-  this.dispatchData = [];
-  this.selectedItems = [];
-  
-  // Reset table display flags
-  this.showOrderInfoTable = false;
-  this.showDispatchTable = false;
-  
-  // Reset counts
-  this.pendingCount = 0;
-  this.completedCount = 0;
-  
-  // Reset form
-  this.ProductInfo.reset();
-  
-  // Clear and reset the FormArrays to have one empty row each
-  this.items.clear();
-  this.items.push(this.createItemRow());
-  
-  this.referenceItems.clear();
-  this.referenceItems.push(this.createReferenceRow());
-  
+    this.service.OutwardCountGlobalWithSap(payload).subscribe(
+      (response: any) => {
+        this.pendingCount = response.ZPEND_CNT || 0;
+        this.completedCount = response.ZCONF_CNT || 0;
+      },
+      (error) => {
+        console.error('Error fetching counts:', error);
+        this.pendingCount = 0;
+        this.completedCount = 0;
 
-  
-  // Show success message
-  Swal.fire({
-    text: 'Screen refreshed successfully',
-    icon: 'success',
-   
-     confirmButtonText: 'Ok',
-    timer: 4000
-  });
-  
-  this.cd.detectChanges();
-}
+      }
+    );
+  }
+
+  refreshScreen() {
+
+
+    // Reset order type and SAP type
+    this.orderType = '';
+    this.sapType = '';
+    this.showForm = false;
+    this.isUpdateMode = false;
+    this.isEditMode = false;
+    this.isAllSelected = false;
+
+    // Reset search fields
+    this.searchReference = '';
+    this.selectedType = '';
+    this.searchValue = '';
+    this.searchOptionsList = [];
+    this.dropdownOpen = false;
+
+    // Reset previous state trackers
+    this.previousOrderType = null;
+    this.previousSapType = null;
+
+    // Reset invoice/PO numbers
+    this.ponumber = '';
+    this.invoicenumber = '';
+
+
+    // Reset filter fields
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterSapType = '';
+    this.filterVehicleType = '';
+    this.filterStatus = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+
+    // Reset data arrays
+    this.ShipmentData = [];
+    this.dispatchData = [];
+    this.selectedItems = [];
+
+    // Reset table display flags
+    this.showOrderInfoTable = false;
+    this.showDispatchTable = false;
+
+    // Reset counts
+    this.pendingCount = 0;
+    this.completedCount = 0;
+
+    // Reset form
+    this.ProductInfo.reset();
+
+    // Clear and reset the FormArrays to have one empty row each
+    this.items.clear();
+    this.items.push(this.createItemRow());
+
+    this.referenceItems.clear();
+    this.referenceItems.push(this.createReferenceRow());
+
+
+
+    // Show success message
+    Swal.fire({
+      text: 'Screen refreshed successfully',
+      icon: 'success',
+
+      confirmButtonText: 'Ok',
+      timer: 4000
+    });
+
+    this.cd.detectChanges();
+  }
 
 
 

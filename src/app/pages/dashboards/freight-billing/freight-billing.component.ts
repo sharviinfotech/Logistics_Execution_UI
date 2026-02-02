@@ -82,6 +82,7 @@ export class FreightBillingComponent implements OnInit {
   FreightBillingData: any[] = [];
   dispatchData: any[] = [];
   filterSapType: string = '';
+  invoiceF4List: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -238,7 +239,7 @@ export class FreightBillingComponent implements OnInit {
   }
 
   onSapTypeChange(): void {
-    
+
     if (this.previousSapType !== null && this.previousSapType !== this.sapType) {
       this.resetConditionalFields();
     }
@@ -248,9 +249,9 @@ export class FreightBillingComponent implements OnInit {
     this.FreightBilling.reset();
     this.referenceItems.clear();
     this.referenceItems.push(this.createReferenceRow());
-     if (this.orderType === 'Outward' && this.sapType) {
-    this.fetchPendingAndCompletedCounts();
-  }
+    if (this.orderType === 'Outward' && this.sapType) {
+      this.fetchPendingAndCompletedCounts();
+    }
 
     this.showForm = !!(this.orderType && this.sapType);
 
@@ -328,29 +329,66 @@ export class FreightBillingComponent implements OnInit {
     });
   }
 
+  // populateReferenceRows(data: any[]): void {
+  //   this.referenceItems.clear();
+
+  //   if (data && data.length > 0) {
+  //     data.forEach(d => {
+  //       this.referenceItems.push(
+  //         this.fb.group({
+  //           referenceNumber: [d.REF_NO || ''],
+  //           workOrderNumber: [d.WORK_ORDER_NO || ''],
+  //           lrNumber: [d.LR_NO || ''],
+  //           transporter: [d.TRANSPORTER || '']
+  //         })
+  //       );
+  //     });
+  //   } else {
+  //     Swal.fire({
+  //       icon: 'info',
+  //       title: 'No Records Found',
+  //       text: 'No matching reference details were found.',
+  //       timer: 1500,
+  //       showConfirmButton: false,
+  //       width: '300px'
+  //     });
+  //     this.referenceItems.push(this.createReferenceRow());
+  //   }
+  // }
+
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
+    this.invoiceF4List = [];
 
     if (data && data.length > 0) {
       data.forEach(d => {
+
+        // ✅ EXTRACT INVOICE NUMBERS FOR F4
+        if (d.INV_NO && Array.isArray(d.INV_NO)) {
+          d.INV_NO.forEach((inv: any) => {
+            if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+              this.invoiceF4List.push(inv.VBELN);
+            }
+          });
+        }
+
+        // ✅ EXISTING ROW PUSH
         this.referenceItems.push(
           this.fb.group({
             referenceNumber: [d.REF_NO || ''],
             workOrderNumber: [d.WORK_ORDER_NO || ''],
             lrNumber: [d.LR_NO || ''],
-            transporter: [d.TRANSPORTER || '']
+            transporter: [d.TRANSPORTER || ''],
+            vehicleNo: [d.VEH_NUM || ''],
+            vehicleLine: [d.VEH_LINE || '']
           })
         );
       });
+
+      console.log('🟢 Invoice F4 List:', this.invoiceF4List);
+
     } else {
-      Swal.fire({
-        icon: 'info',
-        title: 'No Records Found',
-        text: 'No matching reference details were found.',
-        timer: 1500,
-        showConfirmButton: false,
-        width: '300px'
-      });
+      Swal.fire({ icon: 'info', title: 'No Records Found', timer: 1500, showConfirmButton: false });
       this.referenceItems.push(this.createReferenceRow());
     }
   }
@@ -1306,68 +1344,68 @@ export class FreightBillingComponent implements OnInit {
   }
 
   fetchPendingAndCompletedCounts() {
-  const payload = {
-    INOUT: 'OUTWARD',
-    TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
-    SCREEN: 'FREIGHT BILLING'
-  };
- 
-  this.service.OutwardCountGlobalWithSap(payload).subscribe(
-    (response: any) => {
-      this.pendingCount = response.ZPEND_CNT || 0;
-      this.completedCount = response.ZCONF_CNT || 0;
-    },
-    (error) => {
-      console.error('Error fetching counts:', error);
-      this.pendingCount = 0;
-      this.completedCount = 0;
-     
-    }
-  );
-}
+    const payload = {
+      INOUT: 'OUTWARD',
+      TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
+      SCREEN: 'FREIGHT BILLING'
+    };
 
-refreshScreen() {
- 
-  
-  // Reset order type and SAP type
-  this.orderType = '';
-  this.sapType = '';
-  this.showForm = false;
-  this.isUpdateMode = false;
-  
-  // Reset search fields
-   this.searchReference = '';
-  this.selectedType = '';
-  
-  this.searchOptionsList = [];
-  this.dropdownOpen = false;
-  
-  
-  // Reset filter fields
-  this.filterFromDate = '';
-  this.filterToDate = '';
-  this.filterPlant = '';
-  this.filterDivision = '';
-  this.filterTransporter = '';
-  this.filterSapType = '';
-  this.filterVehicleType = '';
-  this.filteredData = [];
-  this.filterApplied = false;
-  
-  // Reset form
+    this.service.OutwardCountGlobalWithSap(payload).subscribe(
+      (response: any) => {
+        this.pendingCount = response.ZPEND_CNT || 0;
+        this.completedCount = response.ZCONF_CNT || 0;
+      },
+      (error) => {
+        console.error('Error fetching counts:', error);
+        this.pendingCount = 0;
+        this.completedCount = 0;
 
-  
-  // Show success message
-  Swal.fire({
-    text: 'Screen refreshed successfully',
-    icon: 'success',
-   
-     confirmButtonText: 'Ok',
-    timer: 4000
-  });
-  
-  this.cd.detectChanges();
-}
+      }
+    );
+  }
+
+  refreshScreen() {
+
+
+    // Reset order type and SAP type
+    this.orderType = '';
+    this.sapType = '';
+    this.showForm = false;
+    this.isUpdateMode = false;
+
+    // Reset search fields
+    this.searchReference = '';
+    this.selectedType = '';
+
+    this.searchOptionsList = [];
+    this.dropdownOpen = false;
+
+
+    // Reset filter fields
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterSapType = '';
+    this.filterVehicleType = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+
+    // Reset form
+
+
+    // Show success message
+    Swal.fire({
+      text: 'Screen refreshed successfully',
+      icon: 'success',
+
+      confirmButtonText: 'Ok',
+      timer: 4000
+    });
+
+    this.cd.detectChanges();
+  }
 
 
 }

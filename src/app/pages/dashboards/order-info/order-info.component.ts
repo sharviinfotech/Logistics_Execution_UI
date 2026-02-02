@@ -397,9 +397,9 @@ export class OrderInfoComponent implements OnInit {
     this.previousSapType = this.sapType;
     this.setConditionalValidators();
     if (this.orderType === 'Outward' && this.sapType) {
-    this.fetchPendingAndCompletedCounts();
-  }
- 
+      this.fetchPendingAndCompletedCounts();
+    }
+
 
     console.log("sapType", this.sapType);
 
@@ -666,6 +666,9 @@ export class OrderInfoComponent implements OnInit {
               } else {
                 this.resetConditionalFields();
                 this.OrderInfo.reset();
+                this.items.clear();
+                this.items.push(this.createItemRow());
+                this.selectedItems = [];
                 this.showForm = false;
               }
             });
@@ -709,6 +712,9 @@ export class OrderInfoComponent implements OnInit {
               } else {
                 this.resetConditionalFields();
                 this.OrderInfo.reset();
+                this.items.clear();
+                this.items.push(this.createItemRow());
+                this.selectedItems = [];
                 this.showForm = false;
               }
             });
@@ -848,65 +854,65 @@ export class OrderInfoComponent implements OnInit {
   }
 
   deleteRow(row: any, index: number): void {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'Do you want to delete this record? This action cannot be undone.',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, Delete',
-    cancelButtonText: 'Cancel',
-    confirmButtonColor: '#d33'
-  }).then((result) => {
-    if (!result.isConfirmed) return;
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this record? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
 
-    // 🔹 Prepare request payload
-    const payload = {
-      DELETE: [
-        {
-          ZREFNO: row.ZREFNO,
-          ZINV_NO: row.ZINV_NO,
-          ZLINE_NO: row.ZLINE_NO
-        }
-      ]
-    };
+      // 🔹 Prepare request payload
+      const payload = {
+        DELETE: [
+          {
+            ZREFNO: row.ZREFNO,
+            ZINV_NO: row.ZINV_NO,
+            ZLINE_NO: row.ZLINE_NO
+          }
+        ]
+      };
 
-    // 🔹 Choose API based on sapType
-    const apiCall = this.sapType === 'SAP' 
-      ? this.service.OrderInfoDeleteWithSap(payload)
-      : this.service.OrderInfoDeleteWithoutSap(payload);
+      // 🔹 Choose API based on sapType
+      const apiCall = this.sapType === 'SAP'
+        ? this.service.OrderInfoDeleteWithSap(payload)
+        : this.service.OrderInfoDeleteWithoutSap(payload);
 
-    // 🔹 Call API
-    apiCall.subscribe({
-      next: (res: any) => {
-        if (res?.STATUS === 'TRUE' || res?.STATUS === true) {
-          // 🔹 Remove row from table only after success
-          this.searchOptionsList.splice(index, 1);
+      // 🔹 Call API
+      apiCall.subscribe({
+        next: (res: any) => {
+          if (res?.STATUS === 'TRUE' || res?.STATUS === true) {
+            // 🔹 Remove row from table only after success
+            this.searchOptionsList.splice(index, 1);
 
+            Swal.fire({
+              title: 'Deleted',
+              text: res.MESSAGE || 'Record deleted successfully',
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            });
+          } else {
+            Swal.fire({
+              title: 'Failed',
+              text: res?.MESSAGE || 'Delete failed',
+              icon: 'error'
+            });
+          }
+        },
+        error: (err) => {
+          console.error('Delete Error:', err);
           Swal.fire({
-            title: 'Deleted',
-            text: res.MESSAGE || 'Record deleted successfully',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-          });
-        } else {
-          Swal.fire({
-            title: 'Failed',
-            text: res?.MESSAGE || 'Delete failed',
+            title: 'Error',
+            text: err?.error?.MESSAGE || 'Something went wrong while deleting',
             icon: 'error'
           });
         }
-      },
-      error: (err) => {
-        console.error('Delete Error:', err);
-        Swal.fire({
-          title: 'Error',
-          text: err?.error?.MESSAGE || 'Something went wrong while deleting',
-          icon: 'error'
-        });
-      }
+      });
     });
-  });
-}
+  }
 
 
   // deleteRow(row: any, index: number): void {
@@ -929,7 +935,7 @@ export class OrderInfoComponent implements OnInit {
   //   }).then((result) => {
   //     if (!result.isConfirmed) return;
 
-     
+
   //     const payload = {
   //       DELETE: [
   //         {
@@ -944,7 +950,7 @@ export class OrderInfoComponent implements OnInit {
   //     this.service.OrderInfoDeleteWithSap(payload).subscribe({
   //       next: (res: any) => {
   //         if (res?.STATUS === 'TRUE') {
-            
+
   //           this.searchOptionsList.splice(index, 1);
 
   //           Swal.fire({
@@ -984,7 +990,7 @@ export class OrderInfoComponent implements OnInit {
   //   }).then((result) => {
   //     if (!result.isConfirmed) return;
 
-      
+
   //     const payload = {
   //       DELETE: [
   //         {
@@ -995,11 +1001,11 @@ export class OrderInfoComponent implements OnInit {
   //       ]
   //     };
 
-    
+
   //     this.service.OrderInfoDeleteWithoutSap(payload).subscribe({
   //       next: (res: any) => {
   //         if (res?.STATUS === 'TRUE') {
-            
+
   //           this.searchOptionsList.splice(index, 1);
 
   //           Swal.fire({
@@ -1093,7 +1099,7 @@ export class OrderInfoComponent implements OnInit {
 
   resetExtraFields(): void {
     this.OrderInfo.reset();
-    
+
   }
 
   fetchpdb(): void {
@@ -1901,104 +1907,104 @@ export class OrderInfoComponent implements OnInit {
     Swal.fire('Success', `PDF file downloaded: ${fileName}`, 'success');
   }
   fetchPendingAndCompletedCounts() {
-  const payload = {
-    INOUT: 'OUTWARD',
-    TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
-    SCREEN: 'ORDER INFO'
-  };
- 
-  this.service.OutwardCountGlobalWithSap(payload).subscribe(
-    (response: any) => {
-      this.pendingCount = response.ZPEND_CNT || 0;
-      this.completedCount = response.ZCONF_CNT || 0;
-    },
-    (error) => {
-      console.error('Error fetching counts:', error);
-      this.pendingCount = 0;
-      this.completedCount = 0;
-     
-    }
-  );
-}
+    const payload = {
+      INOUT: 'OUTWARD',
+      TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
+      SCREEN: 'ORDER INFO'
+    };
 
-refreshScreen() {
- 
-  
-  // Reset order type and SAP type
-  this.orderType = '';
-  this.sapType = '';
-  this.showForm = false;
-  this.isUpdateMode = false;
-  this.isEditMode = false;
-  this.isProcessing = false;
-  
-  // Reset previous state trackers
-  this.previousOrderType = null;
-  this.previousSapType = null;
-  
-  // Reset invoice/PO numbers
-  this.ponumber = '';
-  this.invoicenumber = '';
-  
-  // Reset search fields
-  this.searchReference = '';
-  this.selectedType = '';
-  this.searchValue = '';
-  this.searchOptionsList = [];
-  this.dropdownOpen = false;
-  
-  // Reset table display flags
-  this.showOrderInfoTable = false;
-  this.showDispatchTable = false;
-  
-  // Reset filter fields
-  this.filterFromDate = '';
-  this.filterToDate = '';
-  this.filterPlant = '';
-  this.filterDivision = '';
-  this.filterTransporter = '';
-  this.filterSapType = '';
-  this.filterVehicleType = '';
-  this.filterStatus = '';
-  this.filteredData = [];
-  this.filterApplied = false;
-  
-  // Reset data arrays
-  this.orderInfoData = [];
-  this.dispatchData = [];
-  this.selectedItems = [];
-  
-  // Reset customer/fiscal fields
-  this.customerGroup = '';
-  this.showFiscalFields = false;
-  
-  // Reset counts
-  this.pendingCount = 0;
-  this.completedCount = 0;
-  
-  // Reset Order Info Form
-  this.OrderInfo.reset(this.initialFormValues);
-  
-  // Clear and reset the items FormArray to have one empty row
-  this.items.clear();
-  this.items.push(this.createItemRow());
-  
+    this.service.OutwardCountGlobalWithSap(payload).subscribe(
+      (response: any) => {
+        this.pendingCount = response.ZPEND_CNT || 0;
+        this.completedCount = response.ZCONF_CNT || 0;
+      },
+      (error) => {
+        console.error('Error fetching counts:', error);
+        this.pendingCount = 0;
+        this.completedCount = 0;
 
-  
- 
-  
-  // Show success message
-  Swal.fire({
-    text: 'Screen refreshed successfully',
-    icon: 'success',
-    confirmButtonText: 'Ok',
-    timer: 4000,
-    
-  });
-  
-  // Trigger change detection
-  this.cd.detectChanges();
-}
+      }
+    );
+  }
+
+  refreshScreen() {
+
+
+    // Reset order type and SAP type
+    this.orderType = '';
+    this.sapType = '';
+    this.showForm = false;
+    this.isUpdateMode = false;
+    this.isEditMode = false;
+    this.isProcessing = false;
+
+    // Reset previous state trackers
+    this.previousOrderType = null;
+    this.previousSapType = null;
+
+    // Reset invoice/PO numbers
+    this.ponumber = '';
+    this.invoicenumber = '';
+
+    // Reset search fields
+    this.searchReference = '';
+    this.selectedType = '';
+    this.searchValue = '';
+    this.searchOptionsList = [];
+    this.dropdownOpen = false;
+
+    // Reset table display flags
+    this.showOrderInfoTable = false;
+    this.showDispatchTable = false;
+
+    // Reset filter fields
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterSapType = '';
+    this.filterVehicleType = '';
+    this.filterStatus = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+
+    // Reset data arrays
+    this.orderInfoData = [];
+    this.dispatchData = [];
+    this.selectedItems = [];
+
+    // Reset customer/fiscal fields
+    this.customerGroup = '';
+    this.showFiscalFields = false;
+
+    // Reset counts
+    this.pendingCount = 0;
+    this.completedCount = 0;
+
+    // Reset Order Info Form
+    this.OrderInfo.reset(this.initialFormValues);
+
+    // Clear and reset the items FormArray to have one empty row
+    this.items.clear();
+    this.items.push(this.createItemRow());
+
+
+
+
+
+    // Show success message
+    Swal.fire({
+      text: 'Screen refreshed successfully',
+      icon: 'success',
+      confirmButtonText: 'Ok',
+      timer: 4000,
+
+    });
+
+    // Trigger change detection
+    this.cd.detectChanges();
+  }
 
 
 

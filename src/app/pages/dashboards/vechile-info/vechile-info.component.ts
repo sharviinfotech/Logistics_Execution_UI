@@ -33,7 +33,7 @@ export class VechileInfoComponent implements OnInit {
   previousSapType: string | null = null;
   mainMode: string = 'creation'; // Default to creation mode
 
-   pendingCount: number = 0;
+  pendingCount: number = 0;
   completedCount: number = 0;
 
 
@@ -72,7 +72,8 @@ export class VechileInfoComponent implements OnInit {
   dispatchData: any[] = [];
   filterSapType: string = '';
   shipmentType: string = '';
-
+  invoiceF4List: string[] = [];
+  vehicleApiData: any[] = [];
 
 
   constructor(
@@ -119,6 +120,7 @@ export class VechileInfoComponent implements OnInit {
       ZLRNO: [data?.ZLRNO || '', Validators.required],
       ZTRUC_TYPE: [data?.ZTRUC_TYPE || '', Validators.required],
       ZTRUC_WT: [data?.ZTRUC_WT || '', Validators.required],
+      ZTRUCK_LINE: [data?.ZTRUCK_LINE || ''],
       ZTRUC_VOL: [data?.ZTRUC_VOL || '', [Validators.required, Validators.min(0)]],
       ZVEH_NUM: [data?.ZVEH_NUM || '', Validators.required],
       ZNOOFVEH: [data?.ZNOOFVEH || '', [Validators.required, Validators.min(1)]],
@@ -144,6 +146,7 @@ export class VechileInfoComponent implements OnInit {
       transporter: [''],
       soNumber: [''],
       odnNumber: [''],
+
     });
   }
 
@@ -184,7 +187,7 @@ export class VechileInfoComponent implements OnInit {
       this.resetConditionalFields();
     }
     this.previousOrderType = this.orderType;
-    
+
   }
 
   onOrderTypeSelection(): void {
@@ -236,8 +239,8 @@ export class VechileInfoComponent implements OnInit {
     }
     this.previousSapType = this.sapType;
     if (this.orderType === 'Outward' && this.sapType) {
-    this.fetchPendingAndCompletedCounts();
-  }
+      this.fetchPendingAndCompletedCounts();
+    }
 
     this.vehicles.clear();
     this.showTable = false;
@@ -402,23 +405,70 @@ export class VechileInfoComponent implements OnInit {
     });
   }
 
+  // populateReferenceRows(data: any[]): void {
+  //   this.referenceItems.clear();
+
+  //   if (data && data.length > 0) {
+  //     data.forEach(d => {
+  //       this.referenceItems.push(
+  //         this.fb.group({
+  //           MAPID: [d.MAPID || ''],
+  //           referenceNumber: [d.REF_NO || d.referenceNumber || ''],
+  //           workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
+  //           lrNumber: [d.LR_NO || d.lrNumber || ''],
+  //           transporter: [d.TRANSPORTER || d.transporter || ''],
+  //           soNumber: [d.SO_NO || d.soNumber || ''],
+  //           odnNumber: [d.ODN_NO || d.odnNumber || ''],
+  //         })
+  //       );
+  //     });
+  //   } else {
+  //     Swal.fire({
+  //       icon: 'info',
+  //       title: 'No Records Found',
+  //       text: 'No matching reference details were found.',
+  //       timer: 1500,
+  //       showConfirmButton: false,
+  //       width: '300px'
+  //     });
+  //     this.referenceItems.push(this.createReferenceRow());
+  //   }
+  // }
+
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
+    this.invoiceF4List = [];   // ✅ RESET F4 LIST
 
     if (data && data.length > 0) {
       data.forEach(d => {
+
+        // ✅ PUSH FORM ROW
         this.referenceItems.push(
           this.fb.group({
             MAPID: [d.MAPID || ''],
-            referenceNumber: [d.REF_NO || d.referenceNumber || ''],
-            workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
-            lrNumber: [d.LR_NO || d.lrNumber || ''],
-            transporter: [d.TRANSPORTER || d.transporter || ''],
-            soNumber: [d.SO_NO || d.soNumber || ''],
-            odnNumber: [d.ODN_NO || d.odnNumber || ''],
+            referenceNumber: [d.REF_NO || ''],
+            workOrderNumber: [d.WORK_ORDER_NO || ''],
+            lrNumber: [d.LR_NO || ''],
+            transporter: [d.TRANSPORTER || ''],
+            soNumber: [''],
+            odnNumber: [''],
+            ZNO_TRUCKS: [d.ZNO_TRUCKS],
+            INV_NO_LIST: [d.INV_NO || []]
           })
         );
+
+        // ✅ EXTRACT INVOICE NUMBERS FOR F4
+        if (Array.isArray(d.INV_NO)) {
+          d.INV_NO.forEach((inv: any) => {
+            if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+              this.invoiceF4List.push(inv.VBELN);
+            }
+          });
+        }
       });
+
+      console.log('✅ Invoice F4 List:', this.invoiceF4List);
+
     } else {
       Swal.fire({
         icon: 'info',
@@ -428,9 +478,11 @@ export class VechileInfoComponent implements OnInit {
         showConfirmButton: false,
         width: '300px'
       });
+
       this.referenceItems.push(this.createReferenceRow());
     }
   }
+
 
   removeReferenceRow(index: number): void {
     const rowValue = (this.referenceItems.at(index) as FormGroup).value;
@@ -608,63 +660,128 @@ export class VechileInfoComponent implements OnInit {
 
 
 
-  fetchVehicleDetails(): void {
-    if (this.sapType !== 'SAP') {
-      Swal.fire('Info', 'Please select "With SAP" first.', 'info');
-      return;
-    }
+  // fetchVehicleDetails(): void {
+  //   if (this.sapType !== 'SAP') {
+  //     Swal.fire('Info', 'Please select "With SAP" first.', 'info');
+  //     return;
+  //   }
 
+  //   const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+
+  //   if (!referenceNumber?.trim()) {
+  //     Swal.fire('Warning', `Please enter ${this.orderType === 'Inward' ? 'PO' : 'invoice'} number.`, 'warning');
+  //     return;
+  //   }
+
+  //   this.searchOptionsList = [];
+  //   this.searchReference = '';
+  //   this.selectedType = '';
+
+
+  //   const selectedMapId = this.selectedItems?.[0]?.MAPID || "";
+  //   const selectedRefNo = this.selectedItems?.[0]?.referenceNumber || '';
+
+  //   const reqBody: any = {
+  //     INV_GET: referenceNumber.trim(),
+  //     refno: selectedRefNo
+  //   };
+
+  //   if (selectedMapId) {
+  //     reqBody.MAPID = selectedMapId;
+  //   }
+
+  //   console.log("🚀 Final Vehicle Fetch Payload:", reqBody);
+
+  //   this.spinner.show();
+  //   this.service.VehicleInfofetch(reqBody).subscribe({
+  //     next: (res: any) => {
+  //       this.spinner.hide();
+  //       this.vehicles.clear();
+
+  //       if (Array.isArray(res) && res.length > 0) {
+  //         this.showTable = true;
+  //         res.forEach((item: any) => {
+  //           this.vehicles.push(this.createVehicleRow(item));
+  //         });
+  //         Swal.fire('Success', 'Vehicle details loaded successfully.', 'success');
+  //       } else {
+  //         this.showTable = false;
+
+  //         Swal.fire('Info', 'No data found.', 'info');
+  //       }
+  //     },
+  //     error: (err) => {
+  //       this.spinner.hide();
+  //       console.error('API Error:', err);
+  //       Swal.fire('Error', 'Failed to fetch vehicle details.', 'error');
+  //     }
+  //   });
+  // }
+  fetchVehicleDetails(): void {
     const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
 
     if (!referenceNumber?.trim()) {
-      Swal.fire('Warning', `Please enter ${this.orderType === 'Inward' ? 'PO' : 'invoice'} number.`, 'warning');
+      Swal.fire(
+        'Warning',
+        `Please enter ${this.orderType === 'Inward' ? 'PO' : 'invoice'} number`,
+        'warning'
+      );
       return;
     }
 
-    this.searchOptionsList = [];
-    this.searchReference = '';
-    this.selectedType = '';
-
-
-    const selectedMapId = this.selectedItems?.[0]?.MAPID || "";
-    const selectedRefNo = this.selectedItems?.[0]?.referenceNumber || '';
-
-    const reqBody: any = {
-      INV_GET: referenceNumber.trim(),
-      refno: selectedRefNo
-    };
-
-    if (selectedMapId) {
-      reqBody.MAPID = selectedMapId;
-    }
-
-    console.log("🚀 Final Vehicle Fetch Payload:", reqBody);
+    const payload = { INV_GET: referenceNumber.trim() };
 
     this.spinner.show();
-    this.service.VehicleInfofetch(reqBody).subscribe({
+
+    this.service.Invoiceloaddetailsfetch(payload).subscribe({
       next: (res: any) => {
         this.spinner.hide();
-        this.vehicles.clear();
 
         if (Array.isArray(res) && res.length > 0) {
-          this.showTable = true;
-          res.forEach((item: any) => {
-            this.vehicles.push(this.createVehicleRow(item));
-          });
-          Swal.fire('Success', 'Vehicle details loaded successfully.', 'success');
-        } else {
-          this.showTable = false;
+          this.vehicles.clear(); // clear existing vehicle rows
 
-          Swal.fire('Info', 'No data found.', 'info');
+          console.log('🔎 Reference Items:', this.referenceItems.value);
+
+          // 🔥 LOOP THROUGH REFERENCE ITEMS (SOURCE OF TRUTH)
+          this.referenceItems.value.forEach((ref: any) => {
+            const truckCount = Number(ref.ZNO_TRUCKS) || 1;
+
+            for (let i = 0; i < truckCount; i++) {
+              this.vehicles.push(this.createVehicleRow({
+                VBELN: referenceNumber,
+                ZMAPID: ref.MAPID || '',
+                ZREFNO: ref.referenceNumber || '',
+                ZWORK_ORDER: ref.workOrderNumber || '',
+                ZLRNO: ref.lrNumber || '',
+                ZTRANSPORTER: ref.transporter || '',
+                ZTRUCK_LINE: i + 1
+              }));
+            }
+          });
+
+          this.showTable = true;
+          this.searchOptionsList = [];
+
+          console.log('✅ Total Vehicle Rows Created:', this.vehicles.length);
+
+          Swal.fire(
+            'Success',
+            `Invoice details loaded (Truck-wise: ${this.vehicles.length} rows)`,
+            'success'
+          );
+        } else {
+          Swal.fire('Info', 'No records found for this invoice', 'info');
         }
       },
       error: (err) => {
         this.spinner.hide();
-        console.error('API Error:', err);
-        Swal.fire('Error', 'Failed to fetch vehicle details.', 'error');
+        Swal.fire('Error', 'Failed to fetch invoice details', 'error');
+        console.error(err);
       }
     });
   }
+
+
 
 
   saveVehicleInfo(action: 'stay' | 'next' | 'previous' = 'stay'): void {
@@ -1193,17 +1310,53 @@ export class VechileInfoComponent implements OnInit {
     });
   }
 
+  // fetchDCReferenceNo(): void {
+
+  //   if (this.sapType !== 'Non-SAP') return;
+
+  //   const invoiceNo = this.VehicleForm.get('VBELN')?.value;
+  //   if (!invoiceNo) {
+  //     Swal.fire('Warning', 'Invoice number is required', 'warning');
+  //     return;
+  //   }
+
+  //   const payload = { INV_NO: invoiceNo };
+
+  //   this.spinner.show();
+
+  //   this.service.DCReferenceNo(payload).subscribe({
+  //     next: (res: any) => {
+  //       this.spinner.hide();
+  //       console.log('✅ DC Response:', res);
+
+  //       if (res?.ZTRANS_TYPE) {
+
+  //         // 🔥 STORE GLOBALLY
+  //         this.shipmentType = res.ZTRANS_TYPE;
+
+  //         // 🔥 APPLY TO ALL EXISTING ROWS
+  //         this.applyShipmentTypeToAllRows();
+  //       }
+  //     },
+  //     error: () => {
+  //       this.spinner.hide();
+  //       Swal.fire('Error', 'Failed to fetch DC Reference', 'error');
+  //     }
+  //   });
+  // }
+
   fetchDCReferenceNo(): void {
 
     if (this.sapType !== 'Non-SAP') return;
 
     const invoiceNo = this.VehicleForm.get('VBELN')?.value;
+
     if (!invoiceNo) {
       Swal.fire('Warning', 'Invoice number is required', 'warning');
       return;
     }
 
-    const payload = { INV_NO: invoiceNo };
+    const payload = { VBELN: invoiceNo };  // ✅ confirm with backend
 
     this.spinner.show();
 
@@ -1213,11 +1366,7 @@ export class VechileInfoComponent implements OnInit {
         console.log('✅ DC Response:', res);
 
         if (res?.ZTRANS_TYPE) {
-
-          // 🔥 STORE GLOBALLY
           this.shipmentType = res.ZTRANS_TYPE;
-
-          // 🔥 APPLY TO ALL EXISTING ROWS
           this.applyShipmentTypeToAllRows();
         }
       },
@@ -1521,96 +1670,96 @@ export class VechileInfoComponent implements OnInit {
     Swal.fire('Success', `PDF file downloaded: ${fileName}`, 'success');
   }
   fetchPendingAndCompletedCounts() {
-  const payload = {
-    INOUT: 'OUTWARD',
-    TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
-    SCREEN: 'VEHICLE INFO'
-  };
+    const payload = {
+      INOUT: 'OUTWARD',
+      TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
+      SCREEN: 'VEHICLE INFO'
+    };
 
-  this.service.OutwardCountGlobalWithSap(payload).subscribe(
-    (response: any) => {
-      this.pendingCount = response.ZPEND_CNT || 0;
-      this.completedCount = response.ZCONF_CNT || 0;
-    },
-    (error) => {
-      console.error('Error fetching counts:', error);
-      this.pendingCount = 0;
-      this.completedCount = 0;
-     
-    }
-  );
-}
+    this.service.OutwardCountGlobalWithSap(payload).subscribe(
+      (response: any) => {
+        this.pendingCount = response.ZPEND_CNT || 0;
+        this.completedCount = response.ZCONF_CNT || 0;
+      },
+      (error) => {
+        console.error('Error fetching counts:', error);
+        this.pendingCount = 0;
+        this.completedCount = 0;
 
-refreshScreen() {
- 
-  
-  // Reset order type and SAP type
-  this.orderType = '';
-  this.sapType = '';
-  this.showForm = false;
-  this.isUpdateMode = false;
-  
-  // Reset previous state trackers
-  this.previousOrderType = null;
-  this.previousSapType = null;
-  
-  // Reset invoice/PO numbers
-  this.invoicenumber = '';
-  this.ponumber = '';
-  
-  // Reset shipment type
-  this.shipmentType = '';
-  
-  // Reset search fields
-  this.searchReference = '';
-  this.selectedType = '';
-  this.searchOptionsList = [];
-  this.dropdownOpen = false;
-  
-  // Reset table display flags
-  this.showTable = false;
-  
-  // Reset filter fields
-  this.filterFromDate = '';
-  this.filterToDate = '';
-  this.filterPlant = '';
-  this.filterDivision = '';
-  this.filterTransporter = '';
-  this.filterSapType = '';
-  this.filterVehicleType = '';
-  this.filterStatus = '';
-  this.filteredData = [];
-  this.filterApplied = false;
-  
-  // Reset data arrays
-  this.VehicleInfoData = [];
-  this.dispatchData = [];
-  this.selectedItems = [];
-  
-  // Reset counts
-  this.pendingCount = 0;
-  this.completedCount = 0;
-  
-  // Reset checkbox state
-  this.isAllSelected = false;
-  
-  // Reset Vehicle Form
-  this.VehicleForm.reset();
-  
+      }
+    );
+  }
 
-  
-  // Show success message
-  Swal.fire({
-    text: 'Screen refreshed successfully',
-    icon: 'success',
-    confirmButtonText: 'Ok',
-    timer: 4000,
-   
-  });
-  
-  // Trigger change detection
-  this.cd.detectChanges();
-}
+  refreshScreen() {
+
+
+    // Reset order type and SAP type
+    this.orderType = '';
+    this.sapType = '';
+    this.showForm = false;
+    this.isUpdateMode = false;
+
+    // Reset previous state trackers
+    this.previousOrderType = null;
+    this.previousSapType = null;
+
+    // Reset invoice/PO numbers
+    this.invoicenumber = '';
+    this.ponumber = '';
+
+    // Reset shipment type
+    this.shipmentType = '';
+
+    // Reset search fields
+    this.searchReference = '';
+    this.selectedType = '';
+    this.searchOptionsList = [];
+    this.dropdownOpen = false;
+
+    // Reset table display flags
+    this.showTable = false;
+
+    // Reset filter fields
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterSapType = '';
+    this.filterVehicleType = '';
+    this.filterStatus = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+
+    // Reset data arrays
+    this.VehicleInfoData = [];
+    this.dispatchData = [];
+    this.selectedItems = [];
+
+    // Reset counts
+    this.pendingCount = 0;
+    this.completedCount = 0;
+
+    // Reset checkbox state
+    this.isAllSelected = false;
+
+    // Reset Vehicle Form
+    this.VehicleForm.reset();
+
+
+
+    // Show success message
+    Swal.fire({
+      text: 'Screen refreshed successfully',
+      icon: 'success',
+      confirmButtonText: 'Ok',
+      timer: 4000,
+
+    });
+
+    // Trigger change detection
+    this.cd.detectChanges();
+  }
 
 
 }

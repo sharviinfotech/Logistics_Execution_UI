@@ -128,8 +128,9 @@
                     </td>
 
                     <td>
-                      <input type="text" formControlName="workOrderNumber" class="width-le" placeholder="Enter Work Order No."
-                        (blur)="onFieldBlur(i, 'WORK_ORDER_NO')" (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
+                      <input type="text" formControlName="workOrderNumber" class="width-le"
+                        placeholder="Enter Work Order No." (blur)="onFieldBlur(i, 'WORK_ORDER_NO')"
+                        (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
                         (keydown.tab)="onFieldBlur(i, 'WORK_ORDER_NO')" [readonly]="i !== 0" />
                     </td>
 
@@ -159,11 +160,26 @@
 
           <!-- SAP → Invoice + Search -->
           <div class="input-row input-flex" *ngIf="sapType === 'SAP'">
-            <div class="form-field flex-1">
+            <!-- <div class="form-field flex-1">
               <input type="text" name="invoicenumber" [(ngModel)]="invoicenumber" placeholder=" "
                 (input)="onInputChange('invoice')" />
               <label>Invoice Number</label>
+            </div> -->
+
+            <div class="form-field flex-1">
+              <select class="form-control" name="invoicenumber" [(ngModel)]="invoicenumber"
+                (change)="onInputChange('invoice')">
+
+                <option value="" disabled selected>Select Invoice</option>
+
+                <option *ngFor="let inv of invoiceF4List" [value]="inv">
+                  {{ inv }}
+                </option>
+
+              </select>
+              <label>Invoice Number</label>
             </div>
+
 
             <button type="button" class="btn-get" (click)="getForm('invoice')"
               [disabled]="!invoicenumber || invoicenumber.trim() === ''">
@@ -220,9 +236,16 @@
       <!-- Form Section -->
       <form class="form-grid" [formGroup]="segmentInfo" *ngIf="showForm">
 
-        <div class="form-field" [class.filled]="segmentInfo.get('INV_VBELN')?.value">
-          <input type="text" formControlName="INV_VBELN" placeholder=" " />
-          <label>Invoice No</label>
+        <div class="form-field" *ngIf="sapType === 'Non-SAP'">
+          <select class="form-control" formControlName="VBELN">
+            <option value="" disabled>Select Invoice Number</option>
+
+            <option *ngFor="let inv of invoiceF4List" [value]="inv">
+              {{ inv }}
+            </option>
+          </select>
+
+          <label>Invoice Number</label>
         </div>
 
 
@@ -299,25 +322,41 @@
 
         <!-- Branch -->
         <div class="form-field" [class.filled]="segmentInfo.get('BRANCH')?.value">
-          <ng-container *ngIf="sapType  || showF4.BRANCH; else sapBranch">
-            <select formControlName="BRANCH" (change)="fetchzonechange()">
+          <ng-container *ngIf="sapType || showF4.BRANCH; else sapBranch">
+            <select formControlName="BRANCH" (change)="fetchZoneChange()">
               <option value="">Select Branch (State)</option>
               <option *ngFor="let b of branchList" [value]="b.BRANCH_DESC">
                 {{ b.BRANCH_DESC }}
               </option>
             </select>
           </ng-container>
+
           <ng-template #sapBranch>
-            <input type="text" formControlName="BRANCH" placeholder=" " readonly />
+            <input type="text" formControlName="BRANCH" placeholder=" " />
           </ng-template>
+
           <label>Branch</label>
         </div>
 
         <!-- Branch Zone -->
-        <div class="form-field" [class.filled]="segmentInfo.get('BRANCH_ZONE')?.value">
+        <!-- <div class="form-field" [class.filled]="segmentInfo.get('BRANCH_ZONE')?.value">
           <input type="text" formControlName="BRANCH_ZONE" placeholder=" " readonly />
           <label>Branch Zone</label>
+        </div> -->
+
+        <!-- Branch Zone -->
+        <div class="form-field" [class.filled]="segmentInfo.get('BRANCH_ZONE')?.value">
+          <ng-container *ngIf="sapType || showF4.BRANCH_ZONE; else sapBranchZone">
+            <input type="text" formControlName="BRANCH_ZONE" placeholder=" " />
+          </ng-container>
+
+          <ng-template #sapBranchZone>
+            <input type="text" formControlName="BRANCH_ZONE" placeholder=" " readonly />
+          </ng-template>
+
+          <label>Branch Zone</label>
         </div>
+
 
         <!-- TAT Type -->
         <div class="form-field" [class.filled]="segmentInfo.get('TAT_Type')?.value">

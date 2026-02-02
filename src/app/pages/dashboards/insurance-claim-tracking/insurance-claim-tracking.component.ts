@@ -93,6 +93,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   dispatchData: any[] = [];
   InsuranceClaimTrackingData: any[] = [];
   filterSapType: string = '';
+  invoiceF4List: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -112,6 +113,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   // Form Builders
   buildHeaderForm(): void {
     this.HeaderForm = this.fb.group({
+      VBELN: [''],
       ZMAPID: [''],
       INV_NO: [''],
       REFNO: [''],
@@ -302,8 +304,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     }
     this.previousSapType = this.sapType;
     if (this.orderType === 'Outward' && this.sapType) {
-    this.fetchPendingAndCompletedCounts();
-  }
+      this.fetchPendingAndCompletedCounts();
+    }
     // ✅ Complete reset when SAP mode changes
     this.invoicenumber = '';
     this.ponumber = '';
@@ -385,11 +387,50 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     });
   }
 
+  // populateReferenceRows(data: any[]): void {
+  //   this.referenceItems.clear();
+
+  //   if (data && data.length > 0) {
+  //     data.forEach(d => {
+  //       this.referenceItems.push(
+  //         this.fb.group({
+  //           MAPID: [d.MAPID || ''],
+  //           referenceNumber: [d.REF_NO || d.referenceNumber || ''],
+  //           workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
+  //           lrNumber: [d.LR_NO || d.lrNumber || ''],
+  //           transporter: [d.TRANSPORTER || d.transporter || '']
+  //         })
+  //       );
+  //     });
+  //   } else {
+  //     Swal.fire({
+  //       icon: 'info',
+  //       title: 'No Records Found',
+  //       text: 'No matching reference details were found.',
+  //       timer: 1500,
+  //       showConfirmButton: false,
+  //       width: '300px'
+  //     });
+  //     this.referenceItems.push(this.createReferenceRow());
+  //   }
+  // }
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
+    this.invoiceF4List = [];   // 🔑 Reset F4 list
 
     if (data && data.length > 0) {
       data.forEach(d => {
+
+        // ✅ EXTRACT INVOICE NUMBERS FOR F4
+        if (d.INV_NO && Array.isArray(d.INV_NO)) {
+          d.INV_NO.forEach((inv: any) => {
+            if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+              this.invoiceF4List.push(inv.VBELN);
+            }
+          });
+        }
+
+        // ✅ EXISTING LOGIC (UNCHANGED)
         this.referenceItems.push(
           this.fb.group({
             MAPID: [d.MAPID || ''],
@@ -400,6 +441,9 @@ export class InsuranceClaimTrackingComponent implements OnInit {
           })
         );
       });
+
+      console.log('🟢 Invoice F4 List:', this.invoiceF4List);
+
     } else {
       Swal.fire({
         icon: 'info',
@@ -912,17 +956,110 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   }
 
   // Fetch Invoice Details Non-SAP
-  fetchInvoiceDetailsNonSap(event?: any) {
+  // fetchInvoiceDetailsNonSap(event?: any) {
+
+  //   if (this.sapType !== 'Non-SAP') {
+  //     return;
+  //   }
+
+  //   // 🔴 IMPORTANT FIX
+  //   const dcRefNo = event?.target?.value || this.invoicenumber;
+
+  //   if (!dcRefNo || !dcRefNo.toString().trim()) {
+  //     Swal.fire('Warning', 'Please enter DC Reference Number', 'warning');
+  //     return;
+  //   }
+
+  //   const payload = {
+  //     VBELN: dcRefNo.toString().trim()
+  //   };
+
+  //   console.log('📤 Non-SAP Fetch Payload:', payload);
+
+  //   this.spinner.show();
+
+  //   this.service.fetchinvoicelistnonsap(payload).subscribe({
+  //     next: (res: any[]) => {
+  //       this.spinner.hide();
+
+  //       if (!res || res.length === 0) {
+  //         Swal.fire('No data found', '', 'info');
+  //         return;
+  //       }
+
+  //       const header = res[0].HEADER;
+  //       const items = res[0].ITEM;
+
+  //       this.showTable = true;
+  //       this.ShowHeaderForm = true;
+  //       this.showForm = true;
+
+  //       this.HeaderForm.patchValue({
+  //         INV_NO: dcRefNo,
+  //         FI: header.FI,
+  //         REP_DATE: header.REP_DATE,
+  //         CLAIM_REF: header.CLAIM_REF,
+  //         INV_DATE: header.INV_DATE,
+  //         INV_BV: header.INV_BV,
+  //         LOSS_DCL: header.LOSS_DCL,
+  //         CLM_RF: header.CLM_RF,
+  //         SOL_VAL: header.SOL_VAL,
+  //         CUSTOMER: header.CUSTOMER,
+  //         SO_NO: header.SO_NO,
+  //         LOCATION: header.LOCATION,
+  //         DAMAGE_RMK: header.DAMAGE_RMK,
+  //         CLM_INF: header.CLM_INF,
+  //         CLM_ST: header.CLM_ST,
+  //         CLM_DOC_ST: header.CLM_DOC_ST,
+  //         COURIER_DET: header.COURIER_DET,
+  //         PAY_ST: header.PAY_ST,
+  //         PAY_INFO: header.PAY_INFO,
+  //         UTR: header.UTR,
+  //         CLM_SET_DT: header.CLM_SET_DT,
+  //         SALE_PERSON: header.SALE_PERSON
+  //       });
+
+  //       this.items.clear();
+
+  //       items.forEach((x: any) => {
+  //         this.items.push(this.fb.group({
+  //           selected: [false],
+  //           ZMAPID: [x.ZMAPID],
+  //           ZREFNO: [x.REFNO],
+  //           ZLINE_NO: [x.LINE_NO],
+  //           INV_NO: [dcRefNo],
+  //           POSNR: [x.POSNR],
+  //           VEH_LINE: [x.VEH_LINE],
+  //           VEHICLE: [x.VEHICLE],
+  //           TRUCK_NO: [x.TRUCK_NO],
+  //           LR_NO: [x.LR_NO],
+  //           AH: [x.AH],
+  //           NO_SETS: [x.NO_SETS],
+  //           TRANSPORTER: [x.TRANSPORTER],
+  //           ZWORK_ORDER: [x.WORK_ORDER],
+  //           ZBILLNO: [x.BILLNO]
+  //         }));
+  //       });
+
+  //     },
+  //     error: () => {
+  //       this.spinner.hide();
+  //       Swal.fire('Error fetching Non-SAP data', '', 'error');
+  //     }
+  //   });
+  // }
+
+  fetchInvoiceDetailsNonSap() {
 
     if (this.sapType !== 'Non-SAP') {
       return;
     }
 
-    // 🔴 IMPORTANT FIX
-    const dcRefNo = event?.target?.value || this.invoicenumber;
+    // ✅ Get from HeaderForm
+    const dcRefNo = this.HeaderForm.get('VBELN')?.value;
 
     if (!dcRefNo || !dcRefNo.toString().trim()) {
-      Swal.fire('Warning', 'Please enter DC Reference Number', 'warning');
+      Swal.fire('Warning', 'Please select DC Reference Number', 'warning');
       return;
     }
 
@@ -994,6 +1131,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
             TRANSPORTER: [x.TRANSPORTER],
             ZWORK_ORDER: [x.WORK_ORDER],
             ZBILLNO: [x.BILLNO]
+
           }));
         });
 
@@ -1004,6 +1142,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       }
     });
   }
+
+
 
   // Save Non-SAP
   onSaveNonSap(action: 'stay' | 'next' | 'previous' = 'stay'): void {
@@ -1052,8 +1192,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
           Swal.fire({
             text: '✅ Data Saved Successfully!',
             icon: 'success',
-            showConfirmButton: false,
-            timer: 900,
+            confirmButtonText: 'Ok',
+            timer: 2000,
             willClose: () => {
               if (action === 'next') {
                 this.router.navigate(['/next-screen']);
@@ -1812,103 +1952,103 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     Swal.fire('Success', `PDF file downloaded: ${fileName}`, 'success');
   }
   fetchPendingAndCompletedCounts() {
-  const payload = {
-    INOUT: 'OUTWARD',
-    TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
-    SCREEN: 'INSURANCE CLAIM STATUS'
-  };
- 
-  this.service.OutwardCountGlobalWithSap(payload).subscribe(
-    (response: any) => {
-      this.pendingCount = response.ZPEND_CNT || 0;
-      this.completedCount = response.ZCONF_CNT || 0;
-    },
-    (error) => {
-      console.error('Error fetching counts:', error);
-      this.pendingCount = 0;
-      this.completedCount = 0;
-     
-    }
-  );
-}
+    const payload = {
+      INOUT: 'OUTWARD',
+      TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
+      SCREEN: 'INSURANCE CLAIM STATUS'
+    };
 
-refreshScreen() {
+    this.service.OutwardCountGlobalWithSap(payload).subscribe(
+      (response: any) => {
+        this.pendingCount = response.ZPEND_CNT || 0;
+        this.completedCount = response.ZCONF_CNT || 0;
+      },
+      (error) => {
+        console.error('Error fetching counts:', error);
+        this.pendingCount = 0;
+        this.completedCount = 0;
 
-  
-  // Reset order type and SAP type
-  this.orderType = '';
-  this.sapType = '';
-  this.showForm = false;
-  this.isUpdateMode = false;
-  this.isEditMode = false;
-  
-  // Reset previous state trackers
-  this.previousOrderType = null;
-  this.previousSapType = null;
-  
-  // Reset invoice/PO numbers
-  this.invoicenumber = '';
-  this.ponumber = '';
-  
-  // Reset search fields
-  this.searchReference = '';
-  this.selectedType = '';
-  this.searchOptionsList = [];
-  this.dropdownOpen = false;
-  
-  // Reset table display flags
-  this.showTable = false;
-  this.ShowHeaderForm = false;
-  this.SavedDataShow = false;
-  this.headerData = null;
-  this.itemsList = [];
-  
-  // Reset filter fields
-  this.filterFromDate = '';
-  this.filterToDate = '';
-  this.filterPlant = '';
-  this.filterDivision = '';
-  this.filterTransporter = '';
-  this.filterSapType = '';
-  this.filterVehicleType = '';
-  this.filterStatus = '';
-  this.filteredData = [];
-  this.filterApplied = false;
-  
-  // Reset data arrays
-  this.InsurancetrackingHeader = [];
-  this.InsurancetrackingItems = [];
-  this.dispatchData = [];
-  this.selectedItems = [];
-  this.InsuranceClaimTrackingData = [];
-  
-  // Reset transit response
-  this.transitResponse = {};
-  
-  // Reset counts
-  this.pendingCount = 0;
-  this.completedCount = 0;
-  
-  // Reset checkbox state
-  this.isAllSelected = false;
-  
-  // Reset Header Form
-  this.HeaderForm.reset();
-  
+      }
+    );
+  }
 
-  
+  refreshScreen() {
 
-  
-  // Show success message
-  Swal.fire({
-    text: 'Screen refreshed successfully',
-    icon: 'success',
-    confirmButtonText: 'Ok',
-    timer: 4000,
-    
-  });
-  
-  // Trigger change detection
-  this.cd.detectChanges();
-}
+
+    // Reset order type and SAP type
+    this.orderType = '';
+    this.sapType = '';
+    this.showForm = false;
+    this.isUpdateMode = false;
+    this.isEditMode = false;
+
+    // Reset previous state trackers
+    this.previousOrderType = null;
+    this.previousSapType = null;
+
+    // Reset invoice/PO numbers
+    this.invoicenumber = '';
+    this.ponumber = '';
+
+    // Reset search fields
+    this.searchReference = '';
+    this.selectedType = '';
+    this.searchOptionsList = [];
+    this.dropdownOpen = false;
+
+    // Reset table display flags
+    this.showTable = false;
+    this.ShowHeaderForm = false;
+    this.SavedDataShow = false;
+    this.headerData = null;
+    this.itemsList = [];
+
+    // Reset filter fields
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterSapType = '';
+    this.filterVehicleType = '';
+    this.filterStatus = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+
+    // Reset data arrays
+    this.InsurancetrackingHeader = [];
+    this.InsurancetrackingItems = [];
+    this.dispatchData = [];
+    this.selectedItems = [];
+    this.InsuranceClaimTrackingData = [];
+
+    // Reset transit response
+    this.transitResponse = {};
+
+    // Reset counts
+    this.pendingCount = 0;
+    this.completedCount = 0;
+
+    // Reset checkbox state
+    this.isAllSelected = false;
+
+    // Reset Header Form
+    this.HeaderForm.reset();
+
+
+
+
+
+    // Show success message
+    Swal.fire({
+      text: 'Screen refreshed successfully',
+      icon: 'success',
+      confirmButtonText: 'Ok',
+      timer: 4000,
+
+    });
+
+    // Trigger change detection
+    this.cd.detectChanges();
+  }
 }

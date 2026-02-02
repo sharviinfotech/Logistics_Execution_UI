@@ -82,6 +82,7 @@ export class SegmentInfoComponent implements OnInit {
   filterApplied: boolean = false;
   dropdownOpen = false;
   filterSapType: string = '';
+  invoiceF4List: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -111,13 +112,7 @@ export class SegmentInfoComponent implements OnInit {
     this.fetchPlantCodeList();
 
     // ✅ Subscribe to TAT_Type changes
-    this.segmentInfo.get('TAT_Type')?.valueChanges.subscribe(() => {
-      if (this.sapType === 'SAP') {
-        this.TatTypeChange();
-      } else if (this.sapType === 'Non-SAP') {
-        this.TatTypeNonSap();
-      }
-    });
+
   }
 
   get referenceItems(): FormArray {
@@ -198,8 +193,8 @@ export class SegmentInfoComponent implements OnInit {
     }
     this.previousSapType = this.sapType;
     if (this.orderType === 'Outward' && this.sapType) {
-    this.fetchPendingAndCompletedCounts();
-  }
+      this.fetchPendingAndCompletedCounts();
+    }
 
     if (this.sapType === 'Non-SAP') {
       this.segmentInfo.reset();
@@ -344,23 +339,71 @@ export class SegmentInfoComponent implements OnInit {
     });
   }
 
+  // populateReferenceRows(data: any[]): void {
+  //   this.referenceItems.clear();
+
+  //   if (data && data.length > 0) {
+  //     data.forEach(d => {
+  //       this.referenceItems.push(
+  //         this.fb.group({
+  //           referenceNumber: [d.REF_NO || ''],
+  //           workOrderNumber: [d.WORK_ORDER_NO || ''],
+  //           lrNumber: [d.LR_NO || ''],
+  //           transporter: [d.TRANSPORTER || ''],
+  //           SONO: [d.SONO || d.SO_NO || ''],
+  //           ODN_NO: [d.ODN_NO || ''],  // ODN Number
+
+  //         })
+  //       );
+  //     });
+  //   } else {
+  //     Swal.fire({
+  //       icon: 'info',
+  //       title: 'No Records Found',
+  //       text: 'No matching reference details were found.',
+  //       timer: 1500,
+  //       showConfirmButton: false,
+  //       width: '300px'
+  //     });
+  //     this.referenceItems.push(this.createReferenceRow());
+  //   }
+  // }
+
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
+    this.invoiceF4List = [];   // 🔑 Reset F4 list
 
     if (data && data.length > 0) {
       data.forEach(d => {
+
+        // ✅ EXTRACT INVOICE NUMBERS FOR F4
+        if (d.INV_NO && Array.isArray(d.INV_NO)) {
+          d.INV_NO.forEach((inv: any) => {
+            if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+              this.invoiceF4List.push(inv.VBELN);
+            }
+          });
+        }
+
+        // ✅ EXISTING LOGIC (UNCHANGED)
         this.referenceItems.push(
           this.fb.group({
-            referenceNumber: [d.REF_NO || ''],
-            workOrderNumber: [d.WORK_ORDER_NO || ''],
-            lrNumber: [d.LR_NO || ''],
-            transporter: [d.TRANSPORTER || ''],
-            SONO: [d.SONO || d.SO_NO || ''],
-            ODN_NO: [d.ODN_NO || ''],  // ODN Number
-
+            MAPID: [d.MAPID],
+            referenceNumber: [d.REF_NO || d.referenceNumber || ''],
+            workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
+            lrNumber: [d.LR_NO || d.lrNumber || ''],
+            transporter: [d.TRANSPORTER || d.transporter || ''],
+            soNumber: [d.SO_NO || d.soNumber || ''],
+            odnNumber: [d.ODN_NO || d.odnNumber || ''],
+            materialType: [d.MTART || d.materialType || ''],
+            plantCode: [d.PLANT_CODE || d.ZPIN_PLT || d.plantCode || ''],
+            shippingPoint: [d.SHIPPING_POINT || d.ZPIN_STP || d.shippingPoint || '']
           })
         );
       });
+
+      console.log('🟢 Invoice F4 List:', this.invoiceF4List);
+
     } else {
       Swal.fire({
         icon: 'info',
@@ -373,6 +416,9 @@ export class SegmentInfoComponent implements OnInit {
       this.referenceItems.push(this.createReferenceRow());
     }
   }
+
+
+
 
   onCheckboxChange(event: Event, index: number): void {
     const checkbox = event.target as HTMLInputElement;
@@ -579,7 +625,7 @@ export class SegmentInfoComponent implements OnInit {
           INV_NUM: formValue.INV_VBELN || this.invoicenumber || '',
           SALE_PERSON: formValue.SALE_PERSON || '',
           SEGMENT: formValue.SEGMENT || '',
-          APPTYP: formValue.APPTYP || '',
+          APPTYP: formValue.APPTYP.DESC || '',
 
           CUST_PROFILE: formValue.CUST_PROF || '',
           BRANCH: formValue.BRANCH || '',
@@ -614,6 +660,8 @@ export class SegmentInfoComponent implements OnInit {
               this.router.navigate(['/invoice-load-details']);
             } else {
               this.segmentInfo.reset();
+              this.referenceItems.clear();
+              this.referenceItems.push(this.createReferenceRow());
               this.selectedItems = [];
               this.showForm = false;
             }
@@ -804,29 +852,29 @@ export class SegmentInfoComponent implements OnInit {
   }
 
 
-  TatTypeChange(): void {
-    const formValue = this.segmentInfo.value;
+  onTatTypeChange(): void {
+    const formValue = this.segmentInfo.getRawValue();
     const invNo = this.invoicenumber || formValue.INV_VBELN || 'NA';
 
-    
-
-    const obj = {
+    const payload = {
       INV_NO: invNo,
       BRANCH: formValue.BRANCH,
       BRANCH_ZONE: formValue.BRANCH_ZONE,
       TAT_TYPE: formValue.TAT_Type
     };
 
-    console.log('📤 Fetching SAP TAT from backend with payload:', obj);
-
     this.spinner.show();
 
-    this.service.fetchTAT(obj).subscribe({
+    const tatApi =
+      this.sapType === 'SAP'
+        ? this.service.fetchTAT(payload)
+        : this.service.fetchNonSapTAT(payload);
+
+    tatApi.subscribe({
       next: (res: any) => {
         this.spinner.hide();
-        console.log('✅ SAP TAT Response:', res);
 
-        if (res && (res.TAT || res.ETA)) {
+        if (res?.TAT || res?.ETA) {
           this.segmentInfo.patchValue({
             TAT_DAYS: res.TAT || '',
             ETA_DATE: res.ETA || ''
@@ -835,50 +883,16 @@ export class SegmentInfoComponent implements OnInit {
           Swal.fire('No TAT data found for selected type', '', 'info');
         }
       },
-      error: (err) => {
-        this.spinner.hide();
-        console.error('❌ Error fetching SAP TAT details:', err);
-        Swal.fire('Error fetching SAP TAT details', '', 'error');
-      }
-    });
-  }
-
-  TatTypeNonSap(): void {
-    const formValue = this.segmentInfo.getRawValue();
-    const invNo = this.invoicenumber || formValue.INV_VBELN || 'NA';
-
-    const obj = {
-      INV_NO: invNo,
-      BRANCH: formValue.BRANCH,
-      BRANCH_ZONE: formValue.BRANCH_ZONE,
-      TAT_TYPE: formValue.TAT_Type
-    };
-
-    this.spinner.show();
-    this.service.fetchNonSapTAT(obj).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        if (res) {
-          this.segmentInfo.patchValue({
-            TAT_DAYS: res.TAT || '',
-            ETA_DATE: res.ETA || ''
-          });
-        }
-      },
       error: () => {
         this.spinner.hide();
-        Swal.fire('Error fetching Non-SAP TAT details', '', 'error');
+        Swal.fire('Error fetching TAT details', '', 'error');
       }
     });
   }
 
-  onTatTypeChange(): void {
-    if (this.sapType === 'SAP') {
-      this.TatTypeChange();
-    } else if (this.sapType === 'Non-SAP') {
-      this.TatTypeNonSap();
-    }
-  }
+
+
+
 
   saveSegmentInfoWithoutSAP(
     action: 'stay' | 'next' | 'previous' = 'stay'
@@ -946,6 +960,9 @@ export class SegmentInfoComponent implements OnInit {
               this.router.navigate(['/invoice-load-details']);
             } else {
               this.segmentInfo.reset();
+              this.referenceItems.clear();
+              this.referenceItems.push(this.createReferenceRow());
+              this.selectedItems = [];
               this.showForm = true;
             }
           });
@@ -965,47 +982,37 @@ export class SegmentInfoComponent implements OnInit {
   }
 
 
-  fetchzonechange() {
-    console.log('SAP Type:', this.sapType);
-
-    if (!this.sapType || this.sapType.toLowerCase() !== 'non-sap') {
-      console.log('Skipping fetchzonechange: SAP mode active');
-      return;
-    }
-
-    const branchDesc = this.segmentInfo.value.BRANCH;
+  fetchZoneChange(): void {
+    const formValue = this.segmentInfo.getRawValue();
+    const branchDesc = formValue.BRANCH;
 
     if (!branchDesc) {
-      console.log('❌ Branch missing, resetting zone');
-      this.segmentInfo.patchValue({
-        BRANCH_ZONE: '',
-      });
+      this.segmentInfo.patchValue({ BRANCH_ZONE: '' });
       return;
     }
 
-    const obj = { STATE: branchDesc };
-    console.log('📦 Fetching Zone & TAT with payload:', obj);
+    const payload = { STATE: branchDesc };
 
     this.spinner.show();
 
-    this.service.fetchzoneTat(obj).subscribe({
+    this.service.fetchzoneTat(payload).subscribe({
       next: (res: any) => {
         this.spinner.hide();
-        console.log('✅ Zone Response:', res);
+
         this.segmentInfo.patchValue({
-          BRANCH_ZONE: res.ZZONE || '',
+          BRANCH_ZONE: res?.ZZONE || ''
         });
       },
       error: (err) => {
         this.spinner.hide();
-        console.error('❌ Error fetching Zone & TAT:', err);
-        Swal.fire('Error fetching Zone & TAT', '', 'error');
-        this.segmentInfo.patchValue({
-          BRANCH_ZONE: '',
-        });
+        console.error('Error fetching Zone:', err);
+
+        Swal.fire('Error fetching Zone details', '', 'error');
+        this.segmentInfo.patchValue({ BRANCH_ZONE: '' });
       }
     });
   }
+
 
   isSap(): boolean {
     return this.sapType === 'SAP';
@@ -1446,68 +1453,68 @@ export class SegmentInfoComponent implements OnInit {
   }
 
   fetchPendingAndCompletedCounts() {
-  const payload = {
-    INOUT: 'OUTWARD',
-    TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
-    SCREEN: 'SEGMENT INFO'
-  };
- 
-  this.service.OutwardCountGlobalWithSap(payload).subscribe(
-    (response: any) => {
-      this.pendingCount = response.ZPEND_CNT || 0;
-      this.completedCount = response.ZCONF_CNT || 0;
-    },
-    (error) => {
-      console.error('Error fetching counts:', error);
-      this.pendingCount = 0;
-      this.completedCount = 0;
-     
-    }
-  );
-}
+    const payload = {
+      INOUT: 'OUTWARD',
+      TRANS_TYPE: this.sapType === 'SAP' ? 'WITHSAP' : 'WITHOUTSAP',
+      SCREEN: 'SEGMENT INFO'
+    };
 
-refreshScreen() {
- 
-  
-  // Reset order type and SAP type
-  this.orderType = '';
-  this.sapType = '';
-  this.showForm = false;
-  this.isUpdateMode = false;
-  
-  // Reset search fields
-   this.searchReference = '';
-  this.selectedType = '';
- 
-  this.searchOptionsList = [];
-  this.dropdownOpen = false;
-  
-  
-  // Reset filter fields
-  this.filterFromDate = '';
-  this.filterToDate = '';
-  this.filterPlant = '';
-  this.filterDivision = '';
-  this.filterTransporter = '';
-  this.filterSapType = '';
-  this.filterVehicleType = '';
-  this.filteredData = [];
-  this.filterApplied = false;
-  
-  // Reset form
+    this.service.OutwardCountGlobalWithSap(payload).subscribe(
+      (response: any) => {
+        this.pendingCount = response.ZPEND_CNT || 0;
+        this.completedCount = response.ZCONF_CNT || 0;
+      },
+      (error) => {
+        console.error('Error fetching counts:', error);
+        this.pendingCount = 0;
+        this.completedCount = 0;
 
-  
-  // Show success message
-  Swal.fire({
-    text: 'Screen refreshed successfully',
-    icon: 'success',
-   
-     confirmButtonText: 'Ok',
-    timer: 4000
-  });
-  
-  this.cd.detectChanges();
-}
+      }
+    );
+  }
+
+  refreshScreen() {
+
+
+    // Reset order type and SAP type
+    this.orderType = '';
+    this.sapType = '';
+    this.showForm = false;
+    this.isUpdateMode = false;
+
+    // Reset search fields
+    this.searchReference = '';
+    this.selectedType = '';
+
+    this.searchOptionsList = [];
+    this.dropdownOpen = false;
+
+
+    // Reset filter fields
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterSapType = '';
+    this.filterVehicleType = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+
+    // Reset form
+
+
+    // Show success message
+    Swal.fire({
+      text: 'Screen refreshed successfully',
+      icon: 'success',
+
+      confirmButtonText: 'Ok',
+      timer: 4000
+    });
+
+    this.cd.detectChanges();
+  }
 
 
 }
