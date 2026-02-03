@@ -6,12 +6,13 @@ import { ChatComponent } from './chat/chat.component';
 import { DefaultComponent } from './dashboards/default/default.component';
 import { FilemanagerComponent } from './filemanager/filemanager.component';
 import { InvoiceComponent } from './dashboards/invoice/invoice.component';
+import { DispatchComponent } from './dashboards/dispatch/dispatch.component';
 
 const routes: Routes = [
   // { path: '', redirectTo: 'dashboard' },
   {
     path: "",
-    component: DefaultComponent
+    component: DispatchComponent
   },
   { path: 'dashboard', component: DefaultComponent },
   // { path: 'Invoice', component: InvoiceComponent },
