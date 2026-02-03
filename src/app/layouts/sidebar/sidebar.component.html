@@ -1,99 +1,132 @@
 <!-- ========== Left Sidebar Start ========== -->
-
 <ng-template #contentTemplate>
-
-  <!--- Sidemenu -->
   <div id="sidebar-menu">
-    <!-- Left Menu Start -->
     <ul class="metismenu list-unstyled" id="side-menu" #sideMenu>
-      <!-- {{menuItems}} -->
+
       @for (item of menuItems; track $index) {
-      <ng-container>
-        @if(item.isTitle){
-        <li class="menu-title">{{ item.label | translate }}</li>
-        }@else if(!item.isTitle && !item.isLayout){
-        <li>
-          @if(hasItems(item)){
-          <a href="javascript:void(0);" class="is-parent" [ngClass]="{'has-arrow': !item.badge, 'has-dropdown': item.badge}">
-            @if(item.icon){
-            <i class="bx {{item.icon}}"></i>
-            }
-            <span> {{ item.label | translate }}</span>
-            @if(item.badge){
-            <span class="badge rounded-pill float-end bg-{{item.badge.variant}}">{{item.badge.text |
-              translate}}</span>
-            }
-          </a>}
-          @else{
-          <a routerLink="{{item.link}}" class="side-nav-link-ref" routerLinkActive="active">
-            @if(item.icon){
-            <i class="bx {{ item.icon }}"></i>
-            }
-            <span> {{ item.label | translate }}</span>
-            @if(item.badge){
-            <span class="badge rounded-pill bg-{{item.badge.variant}} float-end">{{item.badge.text |
-              translate}}</span>
-            }
-          </a>
-          }
-          @if(hasItems(item)){
-          <ul class="sub-menu" aria-expanded="false">
-            @for (subitem of item.subItems; track $index) {
-            <li>
-              @if(hasItems(subitem)){
-              <a class="side-nav-link-a-ref has-arrow" href="javascript:void(0);" [attr.data-parent]="subitem.parentId">
-                {{ subitem.label | translate}}
-              </a>
-              <ul class="sub-menu mm-collapse" aria-expanded="false">
-                @for (subSubitem of subitem.subItems; track $index) {
-                <li>
-                  <a [attr.data-parent]="subSubitem.parentId" routerLink="{{subSubitem.link}}" routerLinkActive="active" class="side-nav-link-ref">
-                    {{ subSubitem.label | translate }}
-                  </a>
-                </li>
-                }
-              </ul>}
-              @else{
-              <a routerLink="{{subitem.link}}" class="side-nav-link-ref" [attr.data-parent]="subitem.parentId" routerLinkActive="active">
-                {{ subitem.label | translate}}
-                @if(subitem.badge){
-                <span class="badge rounded-pill bg-{{subitem.badge.variant}} float-end">{{subitem.badge.text |
-                  translate}}</span>
-                }
-              </a>
-              }
-            </li>
-            }
-          </ul>
-          }
-        </li>
+        @if (item.isTitle) {
+          <li class="menu-title">{{ item.label | translate }}</li>
         }
-      </ng-container>
+        @else if (!item.isTitle && !item.isLayout) {
+          <!-- Parent LI -->
+          <li
+            routerLinkActive="mm-active menu-open"
+            [routerLinkActiveOptions]="{ exact: false }"
+            #rla="routerLinkActive"
+          >
+            @if (hasItems(item)) {
+              <!-- Parent label -->
+              <a href="javascript:void(0);" class="is-parent has-arrow" (click)="handleMenuClick()">
+                @if (item.icon) {
+                  <i class="bx {{ item.icon }}"></i>
+                }
+                <span>{{ item.label | translate }}</span>
+                @if (item.badge) {
+                  <span class="badge rounded-pill float-end bg-{{item.badge.variant}}">
+                    {{item.badge.text | translate}}
+                  </span>
+                }
+              </a>
+
+              <!-- Sub menu -->
+              <ul
+                class="sub-menu mm-collapse"
+                [class.mm-show]="rla.isActive"
+                [class.mm-initial-show]="isInitialLoad"
+                [attr.aria-expanded]="rla.isActive"
+              >
+                @for (subitem of item.subItems; track $index) {
+                  <li
+                    routerLinkActive="active mm-active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    #subRla="routerLinkActive"  (click)="handleMenuClick()"
+                  >
+                    @if (hasItems(subitem)) {
+                      <a class="side-nav-link-a-ref has-arrow" href="javascript:void(0);">
+                        @if (subitem.icon) {
+                          <i class="bx {{ subitem.icon }}"></i>
+                        }
+                        {{ subitem.label | translate }}
+                      </a>
+
+                      <ul
+                        class="sub-menu mm-collapse"
+                        [class.mm-show]="subRla.isActive"
+                        [class.mm-initial-show]="isInitialLoad"
+                        [attr.aria-expanded]="subRla.isActive"
+                      >
+                        @for (subSubitem of subitem.subItems; track $index) {
+                          <li
+                            routerLinkActive="active mm-active"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                            (click)="handleMenuClick()"
+                          >
+                            <a class="side-nav-link-ref" [routerLink]="[subSubitem.link]">
+                              @if (subSubitem.icon) {
+                                <i class="bx {{ subSubitem.icon }}"></i>
+                              }
+                              {{ subSubitem.label | translate }}
+                            </a>
+                          </li>
+                        }
+                      </ul>
+                    }
+                    @else {
+                      <a
+                        class="side-nav-link-ref"
+                        [routerLink]="[subitem.link]"
+                        routerLinkActive="active mm-active"
+                        [routerLinkActiveOptions]="{ exact: true }"
+                        (click)="handleMenuClick()"
+                      >
+                        @if (subitem.icon) {
+                          <i class="bx {{ subitem.icon }}"></i>
+                        }
+                        {{ subitem.label | translate }}
+                        @if (subitem.badge) {
+                          <span class="badge rounded-pill bg-{{subitem.badge.variant}} float-end">
+                            {{ subitem.badge.text | translate }}
+                          </span>
+                        }
+                      </a>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+            @else {
+              <!-- Single link -->
+              <a
+                class="side-nav-link-ref"
+                [routerLink]="[item.link]"
+                routerLinkActive="active mm-active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                (click)="handleMenuClick()"
+              >
+                @if (item.icon) {
+                  <i class="bx {{ item.icon }}"></i>
+                }
+                <span>{{ item.label | translate }}</span>
+                @if (item.badge) {
+                  <span class="badge rounded-pill bg-{{item.badge.variant}} float-end">
+                    {{item.badge.text | translate}}
+                  </span>
+                }
+              </a>
+            }
+          </li>
+        }
       }
+
     </ul>
   </div>
 </ng-template>
-<!-- Sidebar -->
 
 <div class="vertical-menu">
-  <!-- Sidebar Logo -->
-  <!-- Sidebar Logo -->
-<!-- <div class="sidebar-logo-container">
-  <img src="assets/images/sharvi logo 2.png" alt="Sharvi Infotech Logo" class="sidebar-logo" />
-</div> -->
-
-
-  <ngx-simplebar class="h-100" #componentRef style="background: #8f1e42
- ">
-    @if(isCondensed){
+  <ngx-simplebar class="h-100" #componentRef>
     <div>
       <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
     </div>
-    }@else {
-    <div>
-      <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
-    </div>
-    }
   </ngx-simplebar>
 </div>
 <!-- Left Sidebar End -->

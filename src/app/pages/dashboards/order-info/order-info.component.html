@@ -11,29 +11,15 @@
         <div class="icon">
           <i class="fa fa-plus"></i>
         </div>
-        <div class="text-content">
-          <span class="title">Creation</span>
-          <span class="description">Create new Order Info entries for inward or outward logistics</span>
-        </div>
+        <span>Creation</span>
       </label>
-
       <label>
         <input type="radio" name="mainMode" [(ngModel)]="mainMode" value="filter" (change)="onMainModeChange()" />
-        <div class="icon" style="border-radius: 8px">
-          <i class="fa fa-file-download"></i>
-
+        <div class="icon red">
+          <i class="fa fa-file"></i>
         </div>
-        <div class="text-content">
-          <span class="title">Filter & Download</span>
-          <span class="description">Filter records by date, plant, division and export to Excel</span>
-        </div>
+        <span>Filter and Download</span>
       </label>
-    </div>
-
-    <div class="text-right" style="margin-top: 10px;">
-      <button class="btn btn-md btn-raised btn-refresh" (click)="refreshScreen()">
-        <i class="fas fa-sync-alt"></i> Refresh
-      </button>
     </div>
 
     <br />
@@ -44,11 +30,11 @@
       <!-- Order Type with Processing Badge -->
       <div class="order-type-wrapper">
         <div class="form-radio optional" *ngIf="!orderType">
-          <!-- <label>
+          <label>
             <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward"
               (change)="onOrderTypeChange()" />
             <span>Inward</span>
-          </label> -->
+          </label>
           <label>
             <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward"
               (change)="onOrderTypeChange()" />
@@ -73,30 +59,18 @@
       <br />
 
       <!-- SAP Type Selection -->
-      <div *ngIf="orderType" class="sap-row">
+      <div *ngIf="orderType" class="sap-row" style="display: flex !important;margin-bottom: 10px;">
         <div class="form-radio optional sap-radio">
           <label>
-            <input type="radio" [(ngModel)]="sapType" value="SAP" (change)=" onSapTypeChange()" />
+            <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
             <span>With SAP</span>
           </label>
           <label>
-            <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)=" onSapTypeChange()" />
+            <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
             <span>Without SAP</span>
           </label>
         </div>
-
-        <!-- PENDING & COMPLETED COUNTS (Only for Outward) -->
-        <div *ngIf="orderType === 'Outward' && sapType" class="status-counts-container">
-          <div class="pending-box">
-            <i class="fas fa-clock"></i>
-            <span class="count-text">Pending: {{ pendingCount }}</span>
-          </div>
-
-          <div class="completed-box">
-            <i class="fas fa-check-circle"></i>
-            <span class="count-text">Completed: {{ completedCount }}</span>
-          </div>
-        </div>
+        <br>
       </div>
 
       <!-- Common Section for Both SAP and Non-SAP -->
@@ -141,19 +115,19 @@
                     <td>{{ i + 1 }}</td>
 
                     <td>
-                      <input type="text" formControlName="referenceNumber" class="width-le" placeholder="Enter Ref. No."
+                      <input type="text" formControlName="referenceNumber" placeholder="Enter Ref. No."
                         (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
                         (keydown.tab)="onFieldBlur(i, 'REF_NO')" [readonly]="i !== 0" />
                     </td>
 
                     <td>
-                      <input type="text" formControlName="workOrderNumber" class="width-le" placeholder="Enter Work Order No."
+                      <input type="text" formControlName="workOrderNumber" placeholder="Enter Work Order No."
                         (blur)="onFieldBlur(i, 'WORK_ORDER_NO')" (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
                         (keydown.tab)="onFieldBlur(i, 'WORK_ORDER_NO')" [readonly]="i !== 0" />
                     </td>
 
                     <td>
-                      <input type="text" formControlName="lrNumber" class="width-le" placeholder="Enter LR No."
+                      <input type="text" formControlName="lrNumber" placeholder="Enter LR No."
                         (blur)="onFieldBlur(i, 'LR_NO')" (keydown.enter)="onFieldBlur(i, 'LR_NO')"
                         (keydown.tab)="onFieldBlur(i, 'LR_NO')" [readonly]="i !== 0" />
                     </td>
@@ -612,8 +586,6 @@
               <th>Work Order</th>
               <th>LR No</th>
               <th>Transporter</th>
-              <th>Created date</th>
-              <th>Vehicle Type</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -622,10 +594,23 @@
             <tr *ngFor="let item of searchOptionsList; let i = index" [class.editing]="item.isEdit">
 
               <!-- Reusable pattern -->
-              <td>{{ item.ZREFNO }}</td>
-              <td>{{ item.ZINV_NO }}</td>
+              <td>
+                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZREFNO">
+                <span *ngIf="!item.isEdit">{{ item.ZREFNO }}</span>
+              </td>
 
-              <td>{{ item.ZLINE_NO }}</td>
+              <td>
+                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZINV_NO">
+                <span *ngIf="!item.isEdit">{{ item.ZINV_NO }}</span>
+              </td>
+
+              <td>
+                <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-sm"
+                  [(ngModel)]="item.ZLINE_NO">
+                <span *ngIf="!item.isEdit">{{ item.ZLINE_NO }}</span>
+              </td>
 
               <td>
                 <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
@@ -767,13 +752,6 @@
                 <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm"
                   [(ngModel)]="item.ZTRANSPORTER">
                 <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
-              </td>
-              <td>{{ item.ZCREATED_DT }}</td>
-
-              <td>
-                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-                  [(ngModel)]="item.ZVEH_TYPE">
-                <span *ngIf="!item.isEdit">{{ item.ZVEH_TYPE}}</span>
               </td>
 
               <!-- ACTION -->

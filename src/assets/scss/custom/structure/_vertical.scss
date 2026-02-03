@@ -206,7 +206,7 @@
 
 // Enlarge menu
 .vertical-collpsed {
-    min-height: 1760px;
+    // min-height: 1760px;
 
     .main-content {
         margin-left: $sidebar-collapsed-width;
@@ -249,7 +249,7 @@
 
     // Side menu
     .vertical-menu {
-        position: absolute;
+        position: fixed;
         width: $sidebar-collapsed-width !important;
         z-index: 5;
 
@@ -291,8 +291,8 @@
                     white-space: nowrap;
 
                     >a {
-                        padding: 15px 20px;
-                        min-height: 55px;
+                        padding: 5px;
+                        min-height: 45px;
                         transition: none;
 
                         &:hover,
@@ -443,7 +443,7 @@ body[data-sidebar="dark"] {
 
     // Enlarge menu
     &.vertical-collpsed {
-        min-height: 1760px;
+        // min-height: 1760px;
 
         // Side menu
         .vertical-menu {
