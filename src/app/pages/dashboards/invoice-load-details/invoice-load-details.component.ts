@@ -112,7 +112,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       ZTRUC_TYPE: [data?.ZTRUC_TYPE || '', Validators.required],
       ZTRUC_WT: [data?.ZTRUC_WT || '', Validators.required],
       ZACT_LOAD: [data?.ZACT_LOAD || '', Validators.required],
-      ZTRUCK_LINE: [data?.ZTRUCK_LINE || ''],
+      // ZTRUCK_LINE: [data?.ZTRUCK_LINE || ''],
       ZACT_VOL: [data?.ZACT_VOL || '', Validators.required],
       ZLF_VOL: [data?.ZLF_VOL || '', Validators.required],
       ZLF_WT: [data?.ZLF_WT || '', Validators.required],
@@ -508,7 +508,10 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       return;
     }
 
-    const payload = { INV_GET: referenceNumber.trim() };
+    const payload = {
+    INV_GET: referenceNumber.trim(),
+    SCREEN: 'WITHSAP'
+  };
 
     this.spinner.show();
 
@@ -536,7 +539,9 @@ export class InvoiceLoadDetailsComponent implements OnInit {
                 ZLRNO: ref.lrNumber || '',
                 ZTRANSPORTER: ref.transporter || '',
 
-                ZTRUCK_LINE: i + 1
+                ZTRUCK_LINE: i + 1,
+
+                ZWEEK_SF: this.sapType === 'SAP' ? (res[0]?.ZWEEK_SF || '') : ''
               });
             }
           });
@@ -1052,6 +1057,41 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       }
     });
   }
+
+  onVehicleTypeChange(i: number): void {
+  const row = this.invoices.at(i);
+  const selectedTruck = row.get('ZTRUC_TYPE')?.value;
+
+  if (!selectedTruck) {
+    // Clear ZTRUC_WT if no truck type selected
+    row.patchValue({
+      ZTRUC_WT: ''
+    });
+    return;
+  }
+
+  // Find the matching vehicle type from the loaded list
+  const matchedVehicle = this.vehicleTypes.find(
+    v => v.ZTRUC_TYPE === selectedTruck
+  );
+
+  if (matchedVehicle) {
+    // Patch the passing weight directly from local data
+    row.patchValue({
+      ZTRUC_WT: matchedVehicle.ZTRUC_WT || ''
+    }, { emitEvent: false });
+    
+    console.log(`✅ Patched ZTRUC_WT: ${matchedVehicle.ZTRUC_WT} for ${selectedTruck}`);
+  } else {
+    // If not found in local list, clear the weight
+    row.patchValue({
+      ZTRUC_WT: ''
+    });
+    console.warn(`⚠️ No matching weight found for: ${selectedTruck}`);
+  }
+}
+
+  
 
   isSap(): boolean {
     return this.sapType === 'SAP';
@@ -1660,6 +1700,81 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
     this.cd.detectChanges();
   }
+
+  fetchDcRef(): void {
+    const referenceNumber =
+      this.InvoiceForm.get('INV_VBELN')?.value; // ✅ correct value
+
+    if (!referenceNumber || !referenceNumber.trim()) {
+    Swal.fire(
+      'Warning',
+      `Please enter ${this.orderType === 'Inward' ? 'PO' : 'invoice'} number`,
+      'warning'
+    );
+    return;
+  }
+
+  if (!this.selectedItems || this.selectedItems.length === 0) {
+    Swal.fire(
+      'Warning',
+      'Please select at least one reference row',
+      'warning'
+    );
+    return;
+  }
+
+  const payload = {
+    INV_GET: referenceNumber.trim(),
+    SCREEN: 'WITHOUTSAP'
+  };
+
+  this.spinner.show();
+
+  this.service.Invoiceloaddetailsfetch(payload).subscribe({
+    next: (res: any) => {
+      this.spinner.hide();
+
+      if (Array.isArray(res) && res.length > 0) {
+        this.invoices.clear();
+
+        this.selectedItems.forEach((ref: any) => {
+          const truckCount = Number(ref.ZNO_TRUCKS) || 1;
+
+          for (let i = 0; i < truckCount; i++) {
+            this.addRow({
+              VBELN: referenceNumber,
+              ZMAPID: ref.MAPID || '',
+              ZREFNO: ref.referenceNumber || '',
+              ZWORK_ORDER: ref.workOrderNumber || '',
+              ZLRNO: ref.lrNumber || '',
+              ZTRANSPORTER: ref.transporter || '',
+              ZTRUCK_LINE: i + 1,
+
+               ZWEEK_SF: res[0]?.ZWEEK_SF || ''
+            });
+          }
+        });
+
+        this.showForm = true;
+        this.searchOptionsList = [];
+
+        Swal.fire(
+          'Success',
+          'Invoice rows created based on No of Trucks',
+          'success'
+        );
+      } else {
+        Swal.fire('Info', 'No records found for this invoice', 'info');
+      }
+    },
+    error: (err) => {
+      this.spinner.hide();
+      Swal.fire('Error', 'Fetch failed', 'error');
+      console.error(err);
+      }
+    });
+  }
+
 
 
 }

@@ -239,16 +239,16 @@
         <div class="form-grid">
 
           <div class="form-field" *ngIf="sapType === 'Non-SAP'">
-            <select class="form-control" formControlName="INV_VBELN">
+            <select class="form-control" formControlName="INV_VBELN" (change)="fetchDcRef()"
+              (keydown.enter)="fetchDcRef()" (keydown.tab)="fetchDcRef()">
               <option value="" disabled>Select DC Reference</option>
-
               <option *ngFor="let inv of invoiceF4List" [value]="inv">
                 {{ inv }}
               </option>
             </select>
-
             <label>DC Reference Number</label>
           </div>
+
 
         </div>
       </form>
@@ -295,7 +295,7 @@
 
 
                 <td>
-                  <select formControlName="ZTRUC_TYPE">
+                  <select formControlName="ZTRUC_TYPE" (change)="onVehicleTypeChange(i)">
                     <option value="">-- Select Vehicle Type --</option>
                     <option *ngFor="let v of vehicleTypes" [value]="v.ZTRUC_TYPE">
                       {{ v.ZTRUC_TYPE }}

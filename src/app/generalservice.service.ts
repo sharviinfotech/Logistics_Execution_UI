@@ -419,6 +419,10 @@ export class GeneralserviceService {
     return this.http.get(environment.baseUrl + 'api/external/LE/UserCreation/DisplayTable');
   }
 
+  UserCreationDelete(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/UserCreationDelete', obj);
+  }
+
 
 
 
