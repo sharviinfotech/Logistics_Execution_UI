@@ -1350,23 +1350,24 @@ export class VechileInfoComponent implements OnInit {
   //     }
   //   });
   // }
+
   fetchDCReferenceNo(): void {
 
     if (this.sapType !== 'Non-SAP') return;
 
     const invoiceNo = this.VehicleForm.get('VBELN')?.value;
-
     if (!invoiceNo) {
       Swal.fire('Warning', 'Invoice number is required', 'warning');
       return;
     }
 
+    // 🔴 Must have selected references
     if (!this.selectedItems || this.selectedItems.length === 0) {
-      Swal.fire('Warning', 'Please select at least one reference row', 'warning');
+      Swal.fire('Warning', 'Please select DC reference rows first', 'warning');
       return;
     }
 
-    const payload = { VBELN: invoiceNo };
+    const payload = { INV_NO: invoiceNo };
 
     this.spinner.show();
 
@@ -1375,12 +1376,49 @@ export class VechileInfoComponent implements OnInit {
         this.spinner.hide();
         console.log('✅ DC Response:', res);
 
-        if (res?.ZTRANS_TYPE) {
-          this.shipmentType = res.ZTRANS_TYPE;
+        const firstRef = Array.isArray(res) ? res[0] : res;
 
-          // 🔥 SAME AS WITH SAP
-          this.buildVehicleRowsFromSelected(invoiceNo);
+        if (firstRef?.ZTRANS_TYPE) {
+          this.shipmentType = firstRef.ZTRANS_TYPE;
         }
+
+        this.vehicles.clear();
+
+        console.log('✅ Selected Items for row creation:', this.selectedItems);
+
+
+        this.selectedItems.forEach((ref: any) => {
+
+          const truckCount = Number(ref.ZNO_TRUCKS) || 1;
+
+          console.log(
+            `MAPID ${ref.MAPID} → Trucks: ${truckCount}`
+          );
+
+          for (let i = 0; i < truckCount; i++) {
+            this.vehicles.push(this.createVehicleRow({
+              VBELN: invoiceNo,
+              ZMAPID: ref.MAPID || '',
+              ZREFNO: ref.referenceNumber || '',
+              ZWORK_ORDER: ref.workOrderNumber || '',
+              ZLRNO: ref.lrNumber || '',
+              ZTRANSPORTER: ref.transporter || '',
+              ZTRUCK_LINE: i + 1,
+              ZTRX_TYPE: this.shipmentType || ''
+            }));
+          }
+
+        });
+
+        this.showTable = true;
+
+        console.log('✅ Total Vehicle Rows Created:', this.vehicles.length);
+
+        Swal.fire(
+          'Success',
+          `${this.vehicles.length} line items created based on No of Trucks`,
+          'success'
+        );
       },
       error: () => {
         this.spinner.hide();
@@ -1389,32 +1427,6 @@ export class VechileInfoComponent implements OnInit {
     });
   }
 
-  buildVehicleRowsFromSelected(referenceNumber: string): void {
-    this.vehicles.clear();
-
-    console.log('🔁 Building vehicle rows from selectedItems:', this.selectedItems);
-
-    this.selectedItems.forEach((ref: any) => {
-      const truckCount = Number(ref.ZNO_TRUCKS) || 1;
-
-      for (let i = 0; i < truckCount; i++) {
-        this.vehicles.push(this.createVehicleRow({
-          VBELN: referenceNumber,
-          ZMAPID: ref.MAPID || '',
-          ZREFNO: ref.referenceNumber || '',
-          ZWORK_ORDER: ref.workOrderNumber || '',
-          ZLRNO: ref.lrNumber || '',
-          ZTRANSPORTER: ref.transporter || '',
-          ZTRUCK_LINE: i + 1,
-          ZTRX_TYPE: this.shipmentType || ''   // 🔥 For Non-SAP
-        }));
-      }
-    });
-
-    this.showTable = true;
-
-    console.log('✅ Vehicles built:', this.vehicles.length);
-  }
 
 
   applyShipmentTypeToAllRows() {

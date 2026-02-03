@@ -42,6 +42,12 @@ interface User {
   ACTIVITIES: Activity[];
 }
 
+interface DeleteUserResponse {
+  STATUS: string;
+  MESSAGE: string;
+  NUMBER: string;
+}
+
 @Component({
   selector: 'app-user-creation',
   templateUrl: './user-creation.component.html',
@@ -87,6 +93,7 @@ export class UserCreationComponent implements OnInit {
 
   selectedPlants: string[] = [];
   selectedDivisions: string[] = [];
+  showPassword = false;
 
 
 
@@ -128,7 +135,7 @@ export class UserCreationComponent implements OnInit {
     this.initForm();
   }
 
-  // ================= Reactive Form Init =================
+
   initForm() {
     this.userForm = this.fb.group({
       USER: ['', Validators.required],
@@ -152,12 +159,14 @@ export class UserCreationComponent implements OnInit {
   }
 
 
-  // ================= Activities FormArray =================
+
   get activitiesFormArray(): FormArray {
     return this.userForm.get('ACTIVITIES') as FormArray;
   }
 
-
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
 
   isActivitySelected(activity: string): boolean {
     return this.activitiesFormArray.value.includes(activity);
@@ -710,10 +719,39 @@ export class UserCreationComponent implements OnInit {
   }
 
 
-
   deleteUser(index: number) {
-    if (confirm('Are you sure you want to delete this user?')) {
-      this.users.splice(index, 1);
+    if (!confirm('Are you sure you want to delete this user?')) {
+      return;
     }
+
+    const selectedUser = this.users[index];
+
+    const payload = {
+      DEL_USER: selectedUser.USER   // ✅ FIXED
+    };
+
+    this.spinner.show();
+
+    this.service.UserCreationDelete(payload).subscribe({
+      next: (res: any) => {   // ✅ FIXED
+        this.spinner.hide();
+
+        if (res.STATUS === 'TRUE') {
+          Swal.fire('Deleted!', res.MESSAGE, 'success');
+
+          // ✅ Remove from UI only after success
+          this.users.splice(index, 1);
+        } else {
+          Swal.fire('Failed!', res.MESSAGE, 'error');
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('Delete API Error:', err);
+        Swal.fire('Error!', 'Something went wrong while deleting user.', 'error');
+      }
+    });
   }
+
+
 }

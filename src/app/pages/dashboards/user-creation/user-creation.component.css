@@ -1,0 +1,22 @@
+.password-group .password-wrapper {
+    position: relative;
+}
+
+.password-group .form-input {
+    padding-right: 40px;
+    /* space for eye */
+}
+
+.toggle-eye {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+    font-size: 16px;
+}
+
+.toggle-eye:hover {
+    color: #000;
+}
