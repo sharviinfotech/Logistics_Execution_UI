@@ -502,6 +502,12 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       return;
     }
 
+    // ✅ MUST select reference rows first
+    if (!this.selectedItems || this.selectedItems.length === 0) {
+      Swal.fire('Warning', 'Please select at least one reference row', 'warning');
+      return;
+    }
+
     const payload = { INV_GET: referenceNumber.trim() };
 
     this.spinner.show();
@@ -510,29 +516,26 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       next: (res: any) => {
         this.spinner.hide();
 
-        // Even if invoice API returns 1 row,
-        // we will generate rows from referenceItems
         if (Array.isArray(res) && res.length > 0) {
           this.invoices.clear();
 
-          console.log('🔎 Reference Items:', this.referenceItems.value);
+          console.log('✅ Selected Reference Items:', this.selectedItems);
 
-          // 🔥 LOOP REFERENCE ITEMS (SOURCE OF TRUTH)
-          this.referenceItems.value.forEach((ref: any) => {
+          // 🔥 LOOP ONLY SELECTED REFERENCES
+          this.selectedItems.forEach((ref: any) => {
             const truckCount = Number(ref.ZNO_TRUCKS) || 1;
 
             for (let i = 0; i < truckCount; i++) {
               this.addRow({
                 VBELN: referenceNumber,
 
-                // Map from reference table
+                // Map from selected reference
                 ZMAPID: ref.MAPID || '',
                 ZREFNO: ref.referenceNumber || '',
                 ZWORK_ORDER: ref.workOrderNumber || '',
                 ZLRNO: ref.lrNumber || '',
                 ZTRANSPORTER: ref.transporter || '',
 
-                // Optional tracking
                 ZTRUCK_LINE: i + 1
               });
             }
@@ -545,7 +548,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
           Swal.fire(
             'Success',
-            `Invoice details loaded (Truck-wise: ${this.invoices.length} rows)`,
+            `Invoice rows created based on No of Trucks`,
             'success'
           );
         } else {
@@ -559,6 +562,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       }
     });
   }
+
 
 
 
@@ -911,16 +915,6 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       );
     });
   }
-
-
-
-
-
-
-
-
-
-
 
 
   deleteRow(row: any, index: number): void {

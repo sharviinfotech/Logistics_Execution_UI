@@ -729,6 +729,12 @@ export class VechileInfoComponent implements OnInit {
       return;
     }
 
+    // ✅ IMPORTANT: Only selected reference rows
+    if (!this.selectedItems || this.selectedItems.length === 0) {
+      Swal.fire('Warning', 'Please select at least one reference row', 'warning');
+      return;
+    }
+
     const payload = { INV_GET: referenceNumber.trim() };
 
     this.spinner.show();
@@ -740,10 +746,10 @@ export class VechileInfoComponent implements OnInit {
         if (Array.isArray(res) && res.length > 0) {
           this.vehicles.clear(); // clear existing vehicle rows
 
-          console.log('🔎 Reference Items:', this.referenceItems.value);
+          console.log('✅ Selected Reference Items:', this.selectedItems);
 
-          // 🔥 LOOP THROUGH REFERENCE ITEMS (SOURCE OF TRUTH)
-          this.referenceItems.value.forEach((ref: any) => {
+          // 🔥 LOOP THROUGH ONLY SELECTED REFERENCE ROWS
+          this.selectedItems.forEach((ref: any) => {
             const truckCount = Number(ref.ZNO_TRUCKS) || 1;
 
             for (let i = 0; i < truckCount; i++) {
@@ -766,7 +772,7 @@ export class VechileInfoComponent implements OnInit {
 
           Swal.fire(
             'Success',
-            `Invoice details loaded (Truck-wise: ${this.vehicles.length} rows)`,
+            `Line items created based on selected references & No of Trucks`,
             'success'
           );
         } else {
