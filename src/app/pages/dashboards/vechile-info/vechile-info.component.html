@@ -1,9 +1,43 @@
 <div class="card-LE">
-  <div class="card-header-LE">Vehicle Info</div>
+  <div class="card-header-LE header-flex">
+      <!-- Left Title -->
+    <div class="header-title">
+      Vehicle Info
+    </div>
+
+    <!-- Right Actions -->
+    <div class="header-actions">
+
+      <!-- Creation -->
+      <button class="header-icon" [class.active]="mainMode === 'creation'"
+            (click)="mainMode='creation'; onMainModeChange()" title="Creation">
+        <i class="fa fa-plus"></i>
+      </button>
+
+      <!-- Filter -->
+      <button class="header-icon" [class.active]="mainMode === 'filter'"
+            (click)="mainMode='filter'; onMainModeChange()" title="Filter & Download. Filter records by date, plant, division and export to Excel">
+        <i class="fa fa-file-download"></i>
+      </button>
+
+      <!-- Download -->
+      <!-- <button class="header-icon" 
+            (click)="downloadExcel()" 
+            title="Download">
+      <i class="fa fa-file-download"></i>
+    </button> -->
+
+      <!-- Refresh -->
+      <button class="header-icon refresh-btn" (click)="refreshScreen()" title="Refresh">
+        <i class="fas fa-sync-alt"></i>
+      </button>
+
+    </div>
+  </div>
 
   <div class="card-body-LE">
 
-    <div class="Creation-radio">
+    <!-- <div class="Creation-radio">
       <label>
         <input type="radio" name="mainMode" [(ngModel)]="mainMode" value="creation" (change)="onMainModeChange()" />
         <div class="icon">
@@ -32,7 +66,7 @@
       <button class="btn btn-md btn-raised btn-refresh" (click)="refreshScreen()">
         <i class="fas fa-sync-alt"></i> Refresh
       </button>
-    </div>
+    </div> -->
 
     <br />
 
@@ -456,10 +490,7 @@
 
 
     </div>
-  </div>
-</div>
-
-<!-- Search Results Table -->
+    <!-- Search Results Table -->
 <div class="card mt-3" *ngIf="searchOptionsList?.length > 0 && mainMode === 'creation'">
   <div class="card-body-LE table-responsive">
     <table class="table table-bordered table-striped text-center">
@@ -795,3 +826,6 @@
     </div>
   </div>
 </div>
+  </div>
+</div>
+

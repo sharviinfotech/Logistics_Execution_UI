@@ -1169,6 +1169,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
 
           Swal.fire('Data fetched successfully!', '', 'success');
+          this.cd.detectChanges();
         }
       },
       error: (err) => {

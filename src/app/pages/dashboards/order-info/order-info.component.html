@@ -1,11 +1,45 @@
 <div class="card-LE">
-  <div class="card-header-LE">
-    Order Info
+   <div class="card-header-LE header-flex">
+
+    <!-- Left Title -->
+    <div class="header-title">
+      Order Info
+    </div>
+
+    <!-- Right Actions -->
+    <div class="header-actions">
+
+      <!-- Creation -->
+      <button class="header-icon" [class.active]="mainMode === 'creation'"
+            (click)="mainMode='creation'; onMainModeChange()" title="Creation">
+        <i class="fa fa-plus"></i>
+      </button>
+
+      <!-- Filter -->
+      <button class="header-icon" [class.active]="mainMode === 'filter'"
+            (click)="mainMode='filter'; onMainModeChange()" title="Filter & Download. Filter records by date, plant, division and export to Excel">
+        <i class="fa fa-file-download"></i>
+      </button>
+
+      <!-- Download -->
+      <!-- <button class="header-icon" 
+            (click)="downloadExcel()" 
+            title="Download">
+      <i class="fa fa-file-download"></i>
+    </button> -->
+
+      <!-- Refresh -->
+      <button class="header-icon refresh-btn" (click)="refreshScreen()" title="Refresh">
+        <i class="fas fa-sync-alt"></i>
+      </button>
+
+    </div>
   </div>
+
   <div class="card-body-LE">
 
     <!-- 🔹 Main Mode Selection (Creation / Filter and Download) -->
-    <div class="Creation-radio">
+    <!-- <div class="Creation-radio">
       <label>
         <input type="radio" name="mainMode" [(ngModel)]="mainMode" value="creation" (change)="onMainModeChange()" />
         <div class="icon">
@@ -20,7 +54,7 @@
         </div>
         <span>Filter and Download</span>
       </label>
-    </div>
+    </div> -->
 
     <br />
 
@@ -331,11 +365,7 @@
       </div>
 
     </div>
-
-  </div>
-</div>
-
-<!-- Form Card -->
+    <!-- Form Card -->
 <div class="card" style="margin-top: 10px;">
   <div class="card-body-LE">
     <!-- Form Section -->
@@ -916,3 +946,7 @@
     </div>
   </div>
 </div>
+
+  </div>
+</div>
+

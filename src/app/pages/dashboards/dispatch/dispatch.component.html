@@ -1,40 +1,46 @@
 <div class="card-LE">
-  <div class="card-header-LE">Dispatch</div>
+  <div class="card-header-LE header-flex">
+
+    <!-- Left Title -->
+    <div class="header-title">
+      Dispatch
+    </div>
+
+    <!-- Right Actions -->
+    <div class="header-actions">
+
+      <!-- Creation -->
+      <button class="header-icon" [class.active]="mainMode === 'creation'"
+        (click)="mainMode='creation'; onMainModeChange()" title="Creation">
+        <i class="fa fa-plus"></i>
+      </button>
+
+      <!-- Filter -->
+      <button class="header-icon" [class.active]="mainMode === 'filter'" (click)="mainMode='filter'; onMainModeChange()"
+        title="Filter & Download. Filter records by date, plant, division and export to Excel">
+        <i class="fa fa-file-download"></i>
+      </button>
+
+      <!-- Download -->
+      <!-- <button class="header-icon" 
+            (click)="downloadExcel()" 
+            title="Download">
+      <i class="fa fa-file-download"></i>
+    </button> -->
+
+      <!-- Refresh -->
+      <button class="header-icon refresh-btn" (click)="refreshScreen()" title="Refresh">
+        <i class="fas fa-sync-alt"></i>
+      </button>
+
+    </div>
+  </div>
 
   <div class="card-body-LE">
 
     <!-- 🔹 Main Mode Selection (Creation / Filter and Download) -->
 
-    <div class="Creation-radio">
-      <label>
-        <input type="radio" name="mainMode" [(ngModel)]="mainMode" value="creation" (change)="onMainModeChange()" />
-        <div class="icon">
-          <i class="fa fa-plus"></i>
-        </div>
-        <div class="text-content">
-          <span class="title">Creation</span>
-          <span class="description">Create new dispatch entries for inward or outward logistics</span>
-        </div>
-      </label>
 
-      <label>
-        <input type="radio" name="mainMode" [(ngModel)]="mainMode" value="filter" (change)="onMainModeChange()" />
-        <div class="icon" style="border-radius: 8px">
-          <i class="fa fa-file-download"></i>
-
-        </div>
-        <div class="text-content">
-          <span class="title">Filter & Download</span>
-          <span class="description">Filter records by date, plant, division and export to Excel</span>
-        </div>
-      </label>
-    </div>
-
-    <div class="text-right" style="margin-top: 10px;">
-      <button class="btn btn-md btn-raised btn-refresh" (click)="refreshScreen()">
-        <i class="fas fa-sync-alt"></i> Refresh
-      </button>
-    </div>
 
 
     <br />
@@ -350,59 +356,58 @@
 
 
     </div>
+    <div class="card" style="margin-top: 10px;" *ngIf="filteredData && filteredData.length > 0">
+      <div class="card-body-LE">
+        <!-- Results Table -->
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped text-center">
+            <thead>
+              <tr>
+                <th>SI.No</th>
+                <th>Reference No</th>
+                <th>Line No</th>
+                <th>Date</th>
+                <th>Plant</th>
+                <th>Division</th>
+                <th>Vehicle Type</th>
+                <th>No. of Trucks</th>
+                <th>Work Order</th>
+                <th>Vendor Code</th>
+                <th>Transporter</th>
+                <th>No. of LRs</th>
+                <th>LR Number</th>
+                <th>Loading Point</th>
+                <th>Unloading Point</th>
+                <th>No of Invoices</th>
+                <th>Created Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let record of filteredData; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ record.ZREFNO }}</td>
+                <td>{{ record.ZLINE_NO }}</td>
+                <td>{{ record.ZCREATED_DT | date: 'dd-MM-yyyy' }}</td>
+                <td>{{ record.ZWERKS }}</td>
+                <td>{{ record.ZDIVISION }}</td>
+                <td>{{ record.ZVEH_TYPE }}</td>
+                <td>{{ record.ZNO_TRUCKS }}</td>
+                <td>{{ record.ZWORK_ORDER }}</td>
+                <td>{{ record.ZVENDOR_CD }}</td>
+                <td>{{ record.ZTRANSPORTER }}</td>
+                <td>{{ record.ZNO_LRS }}</td>
+                <td>{{ record.ZLR_NO }}</td>
+                <td>{{ record.ZLOAD_PT }}</td>
+                <td>{{ record.ZUNLOAD_PT }}</td>
+                <td>{{ record.ZNO_INVOICES }}</td>
+                <td>{{ record.ZCREATED_DT | date: 'dd-MM-yyyy ' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-  </div>
-</div>
-
-<div class="card" style="margin-top: 10px;" *ngIf="filteredData && filteredData.length > 0">
-  <div class="card-body-LE">
-    <!-- Results Table -->
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped text-center">
-        <thead>
-          <tr>
-            <th>SI.No</th>
-            <th>Reference No</th>
-            <th>Line No</th>
-            <th>Date</th>
-            <th>Plant</th>
-            <th>Division</th>
-            <th>Vehicle Type</th>
-            <th>No. of Trucks</th>
-            <th>Work Order</th>
-            <th>Vendor Code</th>
-            <th>Transporter</th>
-            <th>No. of LRs</th>
-            <th>LR Number</th>
-            <th>Loading Point</th>
-            <th>Unloading Point</th>
-            <th>No of Invoices</th>
-            <th>Created Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let record of filteredData; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>{{ record.ZREFNO }}</td>
-            <td>{{ record.ZLINE_NO }}</td>
-            <td>{{ record.ZCREATED_DT | date: 'dd-MM-yyyy' }}</td>
-            <td>{{ record.ZWERKS }}</td>
-            <td>{{ record.ZDIVISION }}</td>
-            <td>{{ record.ZVEH_TYPE }}</td>
-            <td>{{ record.ZNO_TRUCKS }}</td>
-            <td>{{ record.ZWORK_ORDER }}</td>
-            <td>{{ record.ZVENDOR_CD }}</td>
-            <td>{{ record.ZTRANSPORTER }}</td>
-            <td>{{ record.ZNO_LRS }}</td>
-            <td>{{ record.ZLR_NO }}</td>
-            <td>{{ record.ZLOAD_PT }}</td>
-            <td>{{ record.ZUNLOAD_PT }}</td>
-            <td>{{ record.ZNO_INVOICES }}</td>
-            <td>{{ record.ZCREATED_DT | date: 'dd-MM-yyyy ' }}</td>
-          </tr>
-        </tbody>
-      </table>
     </div>
-  </div>
 
+  </div>
 </div>
