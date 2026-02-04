@@ -76,6 +76,8 @@ export class VechileInfoComponent implements OnInit {
   vehicleApiData: any[] = [];
 
 
+
+
   constructor(
     private fb: FormBuilder,
     private cd: ChangeDetectorRef,
@@ -113,7 +115,7 @@ export class VechileInfoComponent implements OnInit {
       ZMAPID: [data?.ZMAPID || ''],
 
       ZTRX_TYPE: [
-        data?.ZTRX_TYPE || this.shipmentType || '',
+        data?.ZTRX_TYPE || '',
         Validators.required
       ],
       ZTRANSPORTER: [data?.ZTRANSPORTER || '', Validators.required],
@@ -263,6 +265,7 @@ export class VechileInfoComponent implements OnInit {
     this.referenceItems.clear();
     this.addRow();
     this.referenceItems.push(this.createReferenceRow());
+    this.invoiceF4List = [];
   }
 
 
@@ -730,7 +733,7 @@ export class VechileInfoComponent implements OnInit {
       return;
     }
 
-    // ✅ Must have selected references
+
     if (!this.selectedItems || this.selectedItems.length === 0) {
       Swal.fire('Warning', 'Please select at least one reference row', 'warning');
       return;
@@ -753,36 +756,26 @@ export class VechileInfoComponent implements OnInit {
           console.log('✅ API Response:', res);
           console.log('✅ Selected Reference Items:', this.selectedItems);
 
-          // ✅ Store the shipment type from first record
-          if (res[0]?.ZTRX_TYPE) {
-            this.shipmentType = res[0].ZTRX_TYPE;
+          if (res[0]) {
+            this.shipmentType = res[0].ZTRX_TYPE || '';
           }
 
-          // ✅ Create rows for each selected reference
+
+
           this.selectedItems.forEach((ref: any) => {
             const truckCount = Number(ref.ZNO_TRUCKS) || 1;
 
             for (let i = 0; i < truckCount; i++) {
-              // ✅ Find matching API data by POSNR if available
+
               const matchingData = res.find((item: any) =>
                 item.POSNR === ((this.selectedItems.indexOf(ref) + 1) * 10)
-              ) || res[0]; // fallback to first record
+              ) || res[0];
 
               this.vehicles.push(this.createVehicleRow({
-                VBELN: referenceNumber,
-                POSNR: (this.selectedItems.indexOf(ref) + 1) * 10,
-                ZREFNO: ref.referenceNumber || '',
-                ZWORK_ORDER: ref.workOrderNumber || '',
-                ZLRNO: ref.lrNumber || '',
-                ZTRANSPORTER: ref.transporter || '',
                 ZTRUCK_LINE: i + 1,
 
                 // ✅ GET FROM API RESPONSE
-                ZTRX_TYPE: matchingData?.ZTRX_TYPE || this.shipmentType || '',
-                ZODN_NO: matchingData?.ZODN_NO || '',
-                ZSONO: matchingData?.ZSONO || '',
-                ZSALE_PERSON: matchingData?.ZSALE_PERSON || '',
-                ZLOCATION: matchingData?.ZLOCATION || ''
+                ZTRX_TYPE: matchingData?.ZTRX_TYPE || '',
               }));
             }
           });
@@ -1235,7 +1228,7 @@ export class VechileInfoComponent implements OnInit {
   }
 
   onFilterSapTypeChange(): void {
-    // Reset all filter fields
+
     this.filterFromDate = '';
     this.filterToDate = '';
     this.filterPlant = '';
@@ -1244,7 +1237,6 @@ export class VechileInfoComponent implements OnInit {
     this.filterVehicleType = '';
     this.filterStatus = '';
 
-    // Clear filtered data and results
     this.filteredData = [];
     this.filterApplied = false;
 
@@ -1293,7 +1285,7 @@ export class VechileInfoComponent implements OnInit {
       next: (res: any) => {
         this.spinner.hide();
 
-        /** 🔴 NO DATA FOUND HANDLING */
+
         if (res?.STATUS === 'FALSE') {
           this.VehicleInfoData = [];
           this.dispatchData = [];
@@ -1306,7 +1298,7 @@ export class VechileInfoComponent implements OnInit {
           return;
         }
 
-        /** 🟢 DATA FOUND */
+
         let records: any[] = [];
         if (Array.isArray(res)) records = res;
         else if (res?.HEADER) records = res.HEADER;
@@ -1383,7 +1375,7 @@ export class VechileInfoComponent implements OnInit {
       return;
     }
 
-    // 🔴 Must have selected references
+
     if (!this.selectedItems || this.selectedItems.length === 0) {
       Swal.fire('Warning', 'Please select DC reference rows first', 'warning');
       return;
@@ -1419,11 +1411,6 @@ export class VechileInfoComponent implements OnInit {
 
           for (let i = 0; i < truckCount; i++) {
             this.vehicles.push(this.createVehicleRow({
-              VBELN: invoiceNo,
-              ZREFNO: ref.referenceNumber || '',
-              ZWORK_ORDER: ref.workOrderNumber || '',
-              ZLRNO: ref.lrNumber || '',
-              ZTRANSPORTER: ref.transporter || '',
               ZTRUCK_LINE: i + 1,
               ZTRX_TYPE: this.shipmentType || ''
             }));
