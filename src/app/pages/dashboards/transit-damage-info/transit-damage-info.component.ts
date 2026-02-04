@@ -306,6 +306,7 @@ export class TransitDamageInfoComponent implements OnInit {
     if (this.sapType !== 'Non-SAP') {
       this.showTable = false;
       this.ShowHeaderForm = false;
+      
       this.showForm = false;
       this.searchOptionsList = [];
     }
@@ -317,6 +318,7 @@ export class TransitDamageInfoComponent implements OnInit {
     this.selectedType = '';
     this.searchOptionsList = [];
     this.selectedItems = [];
+     this.invoiceF4List = [];
     this.SavedDataShow = false;
     this.headerData = null;
     this.itemsList = [];

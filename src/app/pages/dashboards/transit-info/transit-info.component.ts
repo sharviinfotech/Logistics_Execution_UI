@@ -239,6 +239,7 @@ export class TransitInfoComponent implements OnInit {
     this.searchOptionsList = [];
     this.selectedItems = [];
     this.transitInfo.reset();
+     this.invoiceF4List = [];
     this.referenceItems.clear();
     this.referenceItems.push(this.createReferenceRow());
     // 🔥 CLEAR SEARCH TABLE DATA when order type changes

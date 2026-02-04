@@ -232,6 +232,8 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
     this.invoices.clear();
     this.addRow();
+    this.ponumber = '';
+    this.invoicenumber = '';
     this.showForm = this.sapType !== 'SAP';
   }
 
@@ -242,6 +244,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     this.InvoiceForm.reset();
     this.invoices.clear();
     this.referenceItems.clear();
+    this.invoiceF4List = [];
     this.addRow();
     this.referenceItems.push(this.createReferenceRow());
   }
