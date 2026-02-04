@@ -262,6 +262,8 @@ export class SegmentInfoComponent implements OnInit {
     });
   }
 
+
+
   patchForm(data: any) {
     this.segmentInfo.patchValue({
       REF_NO: data.REFNO || '',
@@ -620,13 +622,16 @@ export class SegmentInfoComponent implements OnInit {
           WORK_ORDER: item.workOrderNumber || '',
           LRNO: item.lrNumber || '',
           TRANSPORTER: item.transporter || '',
-          SO_NO: item.SONO || '',           // ✅ FIXED: Read from item.SONO
-          ODN_NO: item.ODN_NO || '',        // ✅ Already correct
+          SO_NO: item.SONO || '',
+          ODN_NO: item.ODN_NO || '',
 
           INV_NUM: formValue.INV_VBELN || this.invoicenumber || '',
           SALE_PERSON: formValue.SALE_PERSON || '',
           SEGMENT: formValue.SEGMENT || '',
-          APPTYP: formValue.APPTYP.DESC || '',
+          // APPTYP: formValue.APPTYP.DESC || '',
+          APPTYP: formValue.APPTYP?.DESC || formValue.APPTYP || '',
+
+
 
           CUST_PROFILE: formValue.CUST_PROF || '',
           BRANCH: formValue.BRANCH || '',
@@ -855,14 +860,23 @@ export class SegmentInfoComponent implements OnInit {
 
   onTatTypeChange(): void {
     const formValue = this.segmentInfo.getRawValue();
-    const invNo = this.invoicenumber || formValue.INV_VBELN || 'NA';
 
-    const payload = {
-      INV_NO: invNo,
+    const invNo = this.invoicenumber || formValue.INV_VBELN || '';
+
+    // ✅ Build payload based on SAP type
+    let payload: any = {
       BRANCH: formValue.BRANCH,
       BRANCH_ZONE: formValue.BRANCH_ZONE,
       TAT_TYPE: formValue.TAT_Type
     };
+
+    if (this.sapType === 'SAP') {
+      payload.VBELN = invNo;
+    } else {
+      payload.INV_NO = invNo;
+    }
+
+    console.log('🚀 TAT Payload:', payload);
 
     this.spinner.show();
 
@@ -890,6 +904,7 @@ export class SegmentInfoComponent implements OnInit {
       }
     });
   }
+
 
 
 

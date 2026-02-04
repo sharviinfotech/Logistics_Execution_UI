@@ -717,6 +717,7 @@ export class VechileInfoComponent implements OnInit {
   //     }
   //   });
   // }
+
   fetchVehicleDetails(): void {
     const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
 
@@ -729,38 +730,59 @@ export class VechileInfoComponent implements OnInit {
       return;
     }
 
-    // ✅ IMPORTANT: Only selected reference rows
+    // ✅ Must have selected references
     if (!this.selectedItems || this.selectedItems.length === 0) {
       Swal.fire('Warning', 'Please select at least one reference row', 'warning');
       return;
     }
 
-    const payload = { INV_GET: referenceNumber.trim() };
+    const payload = {
+      INV_GET: referenceNumber.trim(),
+      SCREEN: 'WITHSAP'
+    };
 
     this.spinner.show();
 
-    this.service.Invoiceloaddetailsfetch(payload).subscribe({
+    this.service.VehicleInfofetch(payload).subscribe({
       next: (res: any) => {
         this.spinner.hide();
 
         if (Array.isArray(res) && res.length > 0) {
-          this.vehicles.clear(); // clear existing vehicle rows
+          this.vehicles.clear();
 
+          console.log('✅ API Response:', res);
           console.log('✅ Selected Reference Items:', this.selectedItems);
 
-          // 🔥 LOOP THROUGH ONLY SELECTED REFERENCE ROWS
+          // ✅ Store the shipment type from first record
+          if (res[0]?.ZTRX_TYPE) {
+            this.shipmentType = res[0].ZTRX_TYPE;
+          }
+
+          // ✅ Create rows for each selected reference
           this.selectedItems.forEach((ref: any) => {
             const truckCount = Number(ref.ZNO_TRUCKS) || 1;
 
             for (let i = 0; i < truckCount; i++) {
+              // ✅ Find matching API data by POSNR if available
+              const matchingData = res.find((item: any) =>
+                item.POSNR === ((this.selectedItems.indexOf(ref) + 1) * 10)
+              ) || res[0]; // fallback to first record
+
               this.vehicles.push(this.createVehicleRow({
                 VBELN: referenceNumber,
-                ZMAPID: ref.MAPID || '',
+                POSNR: (this.selectedItems.indexOf(ref) + 1) * 10,
                 ZREFNO: ref.referenceNumber || '',
                 ZWORK_ORDER: ref.workOrderNumber || '',
                 ZLRNO: ref.lrNumber || '',
                 ZTRANSPORTER: ref.transporter || '',
-                ZTRUCK_LINE: i + 1
+                ZTRUCK_LINE: i + 1,
+
+                // ✅ GET FROM API RESPONSE
+                ZTRX_TYPE: matchingData?.ZTRX_TYPE || this.shipmentType || '',
+                ZODN_NO: matchingData?.ZODN_NO || '',
+                ZSONO: matchingData?.ZSONO || '',
+                ZSALE_PERSON: matchingData?.ZSALE_PERSON || '',
+                ZLOCATION: matchingData?.ZLOCATION || ''
               }));
             }
           });
@@ -769,10 +791,11 @@ export class VechileInfoComponent implements OnInit {
           this.searchOptionsList = [];
 
           console.log('✅ Total Vehicle Rows Created:', this.vehicles.length);
+          console.log('✅ Shipment Type Applied:', this.shipmentType);
 
           Swal.fire(
             'Success',
-            `Line items created based on selected references & No of Trucks`,
+            `${this.vehicles.length} line items created based on no of trucks`,
             'success'
           );
         } else {
@@ -786,7 +809,6 @@ export class VechileInfoComponent implements OnInit {
       }
     });
   }
-
 
 
 
@@ -1367,7 +1389,7 @@ export class VechileInfoComponent implements OnInit {
       return;
     }
 
-    const payload = { INV_NO: invoiceNo };
+    const payload = { INV_NO: invoiceNo, SCREEN: 'WITHOUTSAP' };
 
     this.spinner.show();
 
@@ -1398,7 +1420,6 @@ export class VechileInfoComponent implements OnInit {
           for (let i = 0; i < truckCount; i++) {
             this.vehicles.push(this.createVehicleRow({
               VBELN: invoiceNo,
-              ZMAPID: ref.MAPID || '',
               ZREFNO: ref.referenceNumber || '',
               ZWORK_ORDER: ref.workOrderNumber || '',
               ZLRNO: ref.lrNumber || '',

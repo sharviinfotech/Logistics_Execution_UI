@@ -315,7 +315,7 @@
             </thead>
 
             <tbody formArrayName="invoices">
-              <tr *ngFor="let group of invoices.controls; let i = index" [formGroupName]="i">
+              <tr *ngFor="let group of invoices.controls; let i = index" [formGroupName]="i" (click)="onClickRow()">
                 <td><input type="checkbox" formControlName="selected" (change)="onRowCheckboxChange()" /></td>
                 <td>{{ i + 1 }}</td>
 

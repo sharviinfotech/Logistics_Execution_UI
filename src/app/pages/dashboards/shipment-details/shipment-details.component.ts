@@ -407,7 +407,7 @@ export class ShipmentDetailsComponent implements OnInit {
   onchangeMAPID(index: number) {
     const rowForm = this.items.at(index) as FormGroup;
     const selectedMapId = rowForm.get('ZMAPID')?.value;
-
+    console.log("onchangeMAPID this.selectedItems",this.selectedItems,"selectedMapId",selectedMapId)
     const selectedObj = this.selectedItems.find(
       item => item.MAPID == selectedMapId
     );
@@ -422,14 +422,15 @@ export class ShipmentDetailsComponent implements OnInit {
       ZLRNO: selectedObj.lrNumber ?? null,
       ZTRANSPORTER: selectedObj.transporter ?? null,
 
+      // sunil commment due to facing issue these below on 04-02-2026
       // ✅ REQUIRED FOR NON-SAP SAVE
-      VBELN: selectedObj.invNumber ?? this.ProductInfo.get('VBELN')?.value ?? null,
-      POSNR: selectedObj.POSNR ?? null,
-      MTART: selectedObj.materialType ?? null,
-      ZSO_NO: selectedObj.soNumber ?? null,
-      ZODN_NO: selectedObj.odnNumber ?? null,
-      ZPIN_PLT: selectedObj.plantCode ?? null,
-      ZPIN_STP: selectedObj.shippingPoint ?? null
+      // VBELN: selectedObj.invNumber ?? this.ProductInfo.get('VBELN')?.value ?? null,
+      // POSNR: selectedObj.POSNR ?? null,
+      // MTART: selectedObj.materialType ?? null,
+      // ZSO_NO: selectedObj.soNumber ?? null,
+      // ZODN_NO: selectedObj.odnNumber ?? null,
+      // ZPIN_PLT: selectedObj.plantCode ?? null,
+      // ZPIN_STP: selectedObj.shippingPoint ?? null
     });
   }
 
@@ -598,6 +599,9 @@ export class ShipmentDetailsComponent implements OnInit {
   onRowCheckboxChange(): void {
     this.isAllSelected = this.allSelected();
     console.log('All Selected:', this.items.value);
+  }
+  onClickRow(){
+    console.log("this.items.value",this.items.value)
   }
 
   getSelectedRows() {
@@ -779,6 +783,7 @@ export class ShipmentDetailsComponent implements OnInit {
     });
 
     console.log('📤 finalPayload (to send):', finalPayload);
+    
 
     // ✅ SEND PAYLOAD DIRECTLY AS ARRAY (not wrapped in object)
     if (this.sapType === "SAP") {

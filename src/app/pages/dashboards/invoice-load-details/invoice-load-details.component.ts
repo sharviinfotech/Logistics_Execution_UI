@@ -151,6 +151,9 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     this.isAllSelected = this.allSelected();
     console.log('All Selected:', this.invoices.value);
   }
+  onClickRow(){
+    console.log("this.invoices.value",this.invoices.value)
+  }
 
   allSelected(): boolean {
     return this.invoices.controls.length > 0 &&
@@ -544,7 +547,12 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
                 ZTRUCK_LINE: i + 1,
 
-                ZWEEK_SF: this.sapType === 'SAP' ? (res[0]?.ZWEEK_SF || '') : ''
+                ZWEEK_SF: this.sapType === 'SAP' ? (res[0]?.ZWEEK_SF || '') : '',
+
+                // sunil added due to so and odn not storing in obj 
+
+                ZODN_NO: res[0]?.ZODN_NO || '',
+                ZSO_NO: res[0]?.ZSO_NO || ''
               });
             }
           });
