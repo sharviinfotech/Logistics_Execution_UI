@@ -276,6 +276,7 @@ export class FreightBillingComponent implements OnInit {
     this.searchOptionsList = [];
     this.selectedItems = [];
     this.FreightBilling.reset();
+     this.invoiceF4List = [];
     this.referenceItems.clear();
     this.referenceItems.push(this.createReferenceRow());
   }

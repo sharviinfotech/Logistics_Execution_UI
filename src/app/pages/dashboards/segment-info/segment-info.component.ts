@@ -216,6 +216,7 @@ export class SegmentInfoComponent implements OnInit {
     this.searchOptionsList = [];
     this.selectedItems = [];
     this.segmentInfo.reset();
+     this.invoiceF4List = [];
     this.referenceItems.clear();
     this.referenceItems.push(this.createReferenceRow());
     this.resetF4Flags();

@@ -232,6 +232,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     // ✅ Clear all input fields and data
     this.invoicenumber = '';
     this.ponumber = '';
+     this.invoiceF4List = [];
     this.searchReference = '';
     this.selectedType = '';
     this.searchOptionsList = [];

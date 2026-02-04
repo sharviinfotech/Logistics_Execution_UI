@@ -195,6 +195,7 @@ export class ShipmentDetailsComponent implements OnInit {
     this.selectedItems = [];
     this.searchReference = '';
     this.selectedType = '';
+    this.invoiceF4List = [];
   }
 
   onSapTypeSelection() {
@@ -212,6 +213,8 @@ export class ShipmentDetailsComponent implements OnInit {
       this.invoicenumber = '';
     } else {
       this.showForm = true;
+      this.ponumber = '';
+      this.invoicenumber = '';
     }
   }
 
@@ -251,12 +254,14 @@ export class ShipmentDetailsComponent implements OnInit {
     this.searchReference = '';
 
     this.searchOptionsList = [];
+    this.invoiceF4List = [];
   }
 
   resetConditionalFields(): void {
     this.showForm = false;
     this.searchOptionsList = [];
     this.selectedItems = [];
+    this.invoiceF4List = [];
     this.ProductInfo.reset();
     this.items.clear();
     this.referenceItems.clear();
