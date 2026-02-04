@@ -346,7 +346,7 @@
                 </thead>
 
                 <tbody formArrayName="items">
-                  <tr *ngFor="let item of items.controls; index as i" [formGroupName]="i">
+                  <tr *ngFor="let item of items.controls; index as i" [formGroupName]="i" (click)="onClickRow()">
 
                     <td><input type="checkbox" formControlName="selected" (change)="onRowCheckboxChange()" /></td>
 
