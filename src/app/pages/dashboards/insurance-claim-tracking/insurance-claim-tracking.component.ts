@@ -2052,4 +2052,28 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     // Trigger change detection
     this.cd.detectChanges();
   }
+
+  onPaymentStatusChange(): void {
+  const paymentStatus = this.HeaderForm.get('PAY_ST')?.value;
+  
+  if (paymentStatus === 'Pending') {
+    // Auto-fill Payment Info and UTR with 'Pending'
+    this.HeaderForm.patchValue({
+      PAY_INFO: 'Pending',
+      UTR: 'Pending'
+    });
+    
+    
+  } else if (paymentStatus === 'Settled') {
+    // Clear the fields and enable manual entry
+    this.HeaderForm.patchValue({
+      PAY_INFO: '',
+      UTR: ''
+    });
+    
+    // Enable these fields for manual entry
+    this.HeaderForm.get('PAY_INFO')?.enable();
+    this.HeaderForm.get('UTR')?.enable();
+  }
+}
 }

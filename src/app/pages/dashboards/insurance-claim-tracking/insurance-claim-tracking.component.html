@@ -379,14 +379,23 @@
         </div>
 
         <div class="form-field">
-          <input type="text" formControlName="PAY_ST" placeholder=" " />
-          <label>Payment Status</label>
+          <select formControlName="PAY_ST" (change)="onPaymentStatusChange()">
+            <option value="">Select Payment Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Settled">Settled</option>
+          </select>
+          <label> Payment Status</label>
         </div>
 
         <div class="form-field">
           <input type="text" formControlName="PAY_INFO" placeholder=" " />
           <label>Payment Info</label>
         </div>
+
+
+
+
+
 
         <div class="form-field">
           <input type="text" formControlName="UTR" placeholder=" " />
