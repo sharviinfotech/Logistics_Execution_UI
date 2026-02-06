@@ -562,7 +562,8 @@
 
     </div>
     <!-- Search Results Table -->
-    <div *ngIf="searchOptionsList?.length > 0" class="table-responsive mt-3">
+    <div *ngIf="searchOptionsList?.length > 0">
+      <div class="table-responsive">
       <table class="table table-bordered table-striped text-center">
         <thead>
           <th>Map ID</th>
@@ -771,6 +772,7 @@
           </tr>
         </tbody>
       </table>
+      </div>
     </div>
 
 
