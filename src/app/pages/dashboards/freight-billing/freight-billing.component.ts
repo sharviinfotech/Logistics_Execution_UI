@@ -83,6 +83,8 @@ export class FreightBillingComponent implements OnInit {
   dispatchData: any[] = [];
   filterSapType: string = '';
   invoiceF4List: string[] = [];
+  minPhysicalDate: string = '';
+
 
   constructor(
     private fb: FormBuilder,
@@ -276,7 +278,8 @@ export class FreightBillingComponent implements OnInit {
     this.searchOptionsList = [];
     this.selectedItems = [];
     this.FreightBilling.reset();
-     this.invoiceF4List = [];
+    this.invoiceF4List = [];
+    this.minPhysicalDate = '';
     this.referenceItems.clear();
     this.referenceItems.push(this.createReferenceRow());
   }
@@ -1407,6 +1410,21 @@ export class FreightBillingComponent implements OnInit {
 
     this.cd.detectChanges();
   }
+  onFreightBillDateChange() {
+    const freightDate = this.FreightBilling.get('FreightBillDate')?.value;
+
+    if (freightDate) {
+      const date = new Date(freightDate);
+      date.setDate(date.getDate() + 2);
+      this.minPhysicalDate = date.toISOString().split('T')[0];
+      const physicalDate = this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.value;
+      if (physicalDate && physicalDate < this.minPhysicalDate) {
+        this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.setValue('');
+      }
+    }
+  }
+
+
 
 
 }

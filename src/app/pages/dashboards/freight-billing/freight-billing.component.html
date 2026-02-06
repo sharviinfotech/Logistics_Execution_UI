@@ -244,7 +244,7 @@
           <label>Freight Bill Number</label>
         </div>
 
-        <div class="form-field">
+        <!-- <div class="form-field">
           <input type="date" formControlName="FreightBillDate" placeholder=" " />
           <label>Freight Bill Date</label>
         </div>
@@ -252,7 +252,17 @@
         <div class="form-field">
           <input type="date" formControlName="FreightBillPhysicalSubmissionDate" placeholder=" " />
           <label>Physical Submission Date</label>
+        </div> -->
+        <div class="form-field">
+          <input type="date" formControlName="FreightBillDate" (change)="onFreightBillDateChange()" />
+          <label>Freight Bill Date</label>
         </div>
+
+        <div class="form-field">
+          <input type="date" formControlName="FreightBillPhysicalSubmissionDate" [min]="minPhysicalDate" />
+          <label>Physical Submission Date</label>
+        </div>
+
 
         <div class="form-field">
           <input type="number" formControlName="FreightCharges" (click)="openModal(calculateTotalpopup)"

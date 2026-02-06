@@ -64,7 +64,7 @@
       <!-- Order Type with Processing Badge -->
       <div class="order-type-wrapper">
         <div class="form-radio optional" *ngIf="!orderType">
-          
+
           <!-- <label>
             <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward"
               (change)="onOrderTypeChange()" />
@@ -629,6 +629,8 @@
                   <th>Work Order</th>
                   <th>LR No</th>
                   <th>Transporter</th>
+                  <th>Created date</th>
+                  <th>Vehicle Type</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -797,6 +799,18 @@
                     <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm"
                       [(ngModel)]="item.ZTRANSPORTER">
                     <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
+                  </td>
+                  <td>
+                    <input *ngIf="item.isEdit" type="date" class="form-control form-control-sm"
+                      [(ngModel)]="item.ZCREATED_DT">
+                    <span *ngIf="!item.isEdit">{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</span>
+                  </td>
+
+                  <!-- Vehicle Type -->
+                  <td>
+                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm"
+                      [(ngModel)]="item.ZVEH_TYPE">
+                    <span *ngIf="!item.isEdit">{{ item.ZVEH_TYPE }}</span>
                   </td>
 
                   <!-- ACTION -->
