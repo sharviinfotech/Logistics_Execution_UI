@@ -162,3 +162,99 @@ input:not(:placeholder-shown) + label {
    ---------------------------- */
 
 /* Base input and select styling */
+
+
+.checkbox-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.custom-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+  position: relative;
+  height: 35px;
+  min-width: 150px;
+}
+
+.custom-checkbox:hover {
+  border-color: #c0c0c0;
+  background: #fafafa;
+}
+
+/* Hide default checkbox */
+.custom-checkbox input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 0;
+  height: 0;
+}
+
+/* Custom checkbox design */
+.checkbox-custom {
+  width: 22px;
+  height: 22px;
+  border: 2px solid #d0d0d0;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  background: white;
+}
+
+/* Checkmark */
+.checkbox-custom::after {
+  content: '✓';
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  display: none;
+}
+
+/* Checked state */
+.custom-checkbox input[type="checkbox"]:checked ~ .checkbox-custom {
+  background: #7D2248;
+  border-color: #7D2248;
+}
+
+.custom-checkbox input[type="checkbox"]:checked ~ .checkbox-custom::after {
+  display: block;
+}
+
+.custom-checkbox input[type="checkbox"]:checked {
+  background: #FFF5F8;
+}
+
+.custom-checkbox:has(input[type="checkbox"]:checked) {
+  border-color: #7D2248;
+  background: #FFF5F8;
+}
+
+.checkbox-label {
+  color: #333;
+  font-weight: 500;
+  font-size: 15px;
+  user-select: none;
+}
+
+.custom-checkbox:has(input[type="checkbox"]:checked) .checkbox-label {
+  color: #7D2248;
+  font-weight: 600;
+}
+
+/* Focus state for accessibility */
+.custom-checkbox input[type="checkbox"]:focus ~ .checkbox-custom {
+  box-shadow: 0 0 0 3px rgba(125, 34, 72, 0.1);
+}
+

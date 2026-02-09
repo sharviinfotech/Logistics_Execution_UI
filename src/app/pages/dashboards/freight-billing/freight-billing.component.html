@@ -238,8 +238,36 @@
           <label>Transportation Type</label>
         </div>
 
+        <!-- ✅ Provision & Account Checkboxes -->
+        <div class="checkbox-row">
+          <label class="custom-checkbox">
+            <input type="checkbox" formControlName="provision" (change)="onProvisionChange()" />
+            <span class="checkbox-custom"></span>
+            <span class="checkbox-label">Provision</span>
+          </label>
 
-        <div class="form-field">
+          <label class="custom-checkbox">
+            <input type="checkbox" formControlName="account" (change)="onAccountChange()" />
+            <span class="checkbox-custom"></span>
+            <span class="checkbox-label">Account</span>
+          </label>
+        </div>
+
+        <div class="form-field" *ngIf="showProvisionFields">
+          <input type="number" formControlName="ProvisionAmount" placeholder=" "
+            (click)="openModal(calculateTotalpopup, 'provision')" />
+          <label>Provision Amount</label>
+        </div>
+
+        <div class="form-field" *ngIf="showProvisionFields">
+          <input type="date" formControlName="ProvisionDate" placeholder=" " />
+          <label>Provision Date</label>
+        </div>
+
+
+
+
+        <div class="form-field" *ngIf="showAccountFields">
           <input type="number" formControlName="FreightBillNumber" placeholder=" " />
           <label>Freight Bill Number</label>
         </div>
@@ -253,26 +281,26 @@
           <input type="date" formControlName="FreightBillPhysicalSubmissionDate" placeholder=" " />
           <label>Physical Submission Date</label>
         </div> -->
-        <div class="form-field">
+        <div class="form-field" *ngIf="showAccountFields">
           <input type="date" formControlName="FreightBillDate" (change)="onFreightBillDateChange()" />
           <label>Freight Bill Date</label>
         </div>
 
-        <div class="form-field">
+        <div class="form-field" *ngIf="showAccountFields">
           <input type="date" formControlName="FreightBillPhysicalSubmissionDate" [min]="minPhysicalDate" />
           <label>Physical Submission Date</label>
         </div>
 
 
-        <div class="form-field">
-          <input type="number" formControlName="FreightCharges" (click)="openModal(calculateTotalpopup)"
+        <div class="form-field" *ngIf="showAccountFields">
+          <input type="number" formControlName="FreightCharges" (click)="openModal(calculateTotalpopup, 'freight')"
             placeholder=" " />
           <label>Freight Charges</label>
         </div>
 
 
-        <div class="form-field">
-          <input type="date" formControlName="BillSubmission" placeholder=" " />
+        <div class="form-field" *ngIf="showAccountFields">
+          <input type="date" formControlName="BillSubmission" [min]="minPhysicalDate" placeholder=" " />
           <label>Bill Submission To F&A</label>
         </div>
 
@@ -716,7 +744,7 @@
     <!-- ✅ MODAL FOR FREIGHT CALCULATION -->
     <ng-template #calculateTotalpopup let-c="close">
       <div class="modal-header">
-        Detailed Freight Charges Input
+        {{ popupType === 'provision' ? 'Detailed Provision Amount Input' : 'Detailed Freight Charges Input' }}
       </div>
 
       <div class="modal-body">
@@ -780,7 +808,7 @@
           <hr />
 
           <div class="total-display">
-            Total Freight: {{ totalFreight }}
+            Total {{ popupType === 'provision' ? 'Provision' : 'Freight' }}: {{ totalFreight }}
           </div>
 
         </form>

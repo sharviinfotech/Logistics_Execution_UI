@@ -31,6 +31,7 @@ interface FreightDetails {
   styleUrls: ['./freight-billing.component.css']
 })
 export class FreightBillingComponent implements OnInit {
+  popupType: 'freight' | 'provision' = 'freight';
 
   FreightBilling!: FormGroup;
   isEditMode = false;
@@ -68,6 +69,10 @@ export class FreightBillingComponent implements OnInit {
   selectedType: any = '';
   searchOptionsList: any[] = [];
   dropdownOpen = false;
+  provision: [false];
+  account: [false];
+  showProvisionFields: boolean = false;
+  showAccountFields: boolean = false;
 
   filterFromDate: string = '';
   filterToDate: string = '';
@@ -78,6 +83,7 @@ export class FreightBillingComponent implements OnInit {
   filterStatus: string = '';
   filteredData: any[] = [];
   filterApplied: boolean = false;
+
   Vehicle_Form!: FormGroup;
   FreightBillingData: any[] = [];
   dispatchData: any[] = [];
@@ -99,7 +105,7 @@ export class FreightBillingComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeForm();
-    this.setupWorkOrderListener();
+    // this.setupWorkOrderListener();
     this.fetchTransporter();
     this.fetchPlantCodeList();
   }
@@ -109,14 +115,18 @@ export class FreightBillingComponent implements OnInit {
       ponumber: [''],
       REFNO: [''],
       invoicenumber: [''],
-      FreightBillNumber: ['', Validators.required],
-      FreightBillDate: ['', Validators.required],
-      FreightBillPhysicalSubmissionDate: ['', Validators.required],
-      FreightCharges: ['', [Validators.required, Validators.min(0)]],
+      FreightBillNumber: [''],
+      FreightBillDate: [''],
+      FreightBillPhysicalSubmissionDate: [''],
+      FreightCharges: ['', [Validators.min(0)]],
       WorkOrderNumber: [''],
-      BillSubmission: ['', Validators.required],
+      BillSubmission: [''],
       LRNO: [''],
       TRANSPORTER: [''],
+      provision: [false],
+      account: [false],
+      ProvisionAmount: [''],
+      ProvisionDate: [''],
       referenceItems: this.fb.array([this.createReferenceRow()])
 
     });
@@ -162,73 +172,73 @@ export class FreightBillingComponent implements OnInit {
     this.searchOptionsList = [];
   }
 
-  setupWorkOrderListener(): void {
-    const fields = [
-      'FreightBillNumber',
-      'FreightBillDate',
-      'FreightBillPhysicalSubmissionDate',
-      'FreightCharges'
-    ];
+  // setupWorkOrderListener(): void {
+  //   const fields = [
+  //     'FreightBillNumber',
+  //     'FreightBillDate',
+  //     'FreightBillPhysicalSubmissionDate',
+  //     'FreightCharges'
+  //   ];
 
-    // FIRST TIME → ENABLE ALL FIELDS BY DEFAULT
-    fields.forEach(f => {
-      this.FreightBilling.get(f)?.enable({ emitEvent: false });
-    });
+  //   // FIRST TIME → ENABLE ALL FIELDS BY DEFAULT
+  //   fields.forEach(f => {
+  //     this.FreightBilling.get(f)?.enable({ emitEvent: false });
+  //   });
 
-    this.FreightBilling.get('WorkOrderNumber')?.valueChanges.subscribe((value) => {
+  //   this.FreightBilling.get('WorkOrderNumber')?.valueChanges.subscribe((value) => {
 
-      // → WORK ORDER NUMBER select chesina ENABLE
-      if (value === 'WORK ORDER NUMBER') {
-        fields.forEach(f => {
-          this.FreightBilling.get(f)?.enable();
-        });
-      }
+  //     // → WORK ORDER NUMBER select chesina ENABLE
+  //     if (value === 'WORK ORDER NUMBER') {
+  //       fields.forEach(f => {
+  //         this.FreightBilling.get(f)?.enable();
+  //       });
+  //     }
 
-      // → Rate Contract / Customer Transporter / Local Transporter / Company Vehicle → DISABLE
-      else if (value && value !== '') {
-        fields.forEach(f => {
-          this.FreightBilling.get(f)?.disable();
-          this.FreightBilling.get(f)?.setValue('');
-        });
-      }
+  //     // → Rate Contract / Customer Transporter / Local Transporter / Company Vehicle → DISABLE
+  //     else if (value && value !== '') {
+  //       fields.forEach(f => {
+  //         this.FreightBilling.get(f)?.disable();
+  //         this.FreightBilling.get(f)?.setValue('');
+  //       });
+  //     }
 
-      // → EMPTY select chesina (Select Option) → ENABLE
-      else {
-        fields.forEach(f => {
-          this.FreightBilling.get(f)?.enable();
-        });
-      }
-    });
-  }
+  //     // → EMPTY select chesina (Select Option) → ENABLE
+  //     else {
+  //       fields.forEach(f => {
+  //         this.FreightBilling.get(f)?.enable();
+  //       });
+  //     }
+  //   });
+  // }
 
 
-  disableFreightFields() {
-    const fields = ['FreightBillNumber', 'FreightBillDate', 'FreightBillPhysicalSubmissionDate', 'FreightCharges'];
-    fields.forEach(f => {
-      this.FreightBilling.get(f)?.clearValidators();
-      this.FreightBilling.get(f)?.disable();
-      this.FreightBilling.get(f)?.setValue('');
-    });
-  }
+  // disableFreightFields() {
+  //   const fields = ['FreightBillNumber', 'FreightBillDate', 'FreightBillPhysicalSubmissionDate', 'FreightCharges'];
+  //   fields.forEach(f => {
+  //     this.FreightBilling.get(f)?.clearValidators();
+  //     this.FreightBilling.get(f)?.disable();
+  //     this.FreightBilling.get(f)?.setValue('');
+  //   });
+  // }
 
-  enableFreightFields() {
-    this.FreightBilling.get('FreightBillNumber')?.setValidators([Validators.required]);
-    this.FreightBilling.get('FreightBillDate')?.setValidators([Validators.required]);
-    this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.setValidators([Validators.required]);
-    this.FreightBilling.get('FreightCharges')?.setValidators([Validators.required, Validators.min(0)]);
+  // enableFreightFields() {
+  //   this.FreightBilling.get('FreightBillNumber')?.setValidators([Validators.required]);
+  //   this.FreightBilling.get('FreightBillDate')?.setValidators([Validators.required]);
+  //   this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.setValidators([Validators.required]);
+  //   this.FreightBilling.get('FreightCharges')?.setValidators([Validators.required, Validators.min(0)]);
 
-    this.FreightBilling.get('FreightBillNumber')?.enable();
-    this.FreightBilling.get('FreightBillDate')?.enable();
-    this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.enable();
-    this.FreightBilling.get('FreightCharges')?.enable();
-  }
+  //   this.FreightBilling.get('FreightBillNumber')?.enable();
+  //   this.FreightBilling.get('FreightBillDate')?.enable();
+  //   this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.enable();
+  //   this.FreightBilling.get('FreightCharges')?.enable();
+  // }
 
-  updateFreightValidators() {
-    this.FreightBilling.get('FreightBillNumber')?.updateValueAndValidity();
-    this.FreightBilling.get('FreightBillDate')?.updateValueAndValidity();
-    this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.updateValueAndValidity();
-    this.FreightBilling.get('FreightCharges')?.updateValueAndValidity();
-  }
+  // updateFreightValidators() {
+  //   this.FreightBilling.get('FreightBillNumber')?.updateValueAndValidity();
+  //   this.FreightBilling.get('FreightBillDate')?.updateValueAndValidity();
+  //   this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.updateValueAndValidity();
+  //   this.FreightBilling.get('FreightCharges')?.updateValueAndValidity();
+  // }
 
 
   onOrderTypeChange(): void {
@@ -587,6 +597,10 @@ export class FreightBillingComponent implements OnInit {
       REFNO: ref.referenceNumber || '',
       BILLNO: formValue.FreightBillNumber || '',
       BILLDATE: formValue.FreightBillDate || '',
+      PRO_CHK: formValue.provision ? 'X' : '',
+      ACC_CHK: formValue.account ? 'X' : '',
+      PROVDT: formValue.ProvisionDate || '',
+      PROVAMT: formValue.ProvisionAmount || 0,
       PHY_DATE: formValue.FreightBillPhysicalSubmissionDate || '',
       FRT_CHARGES: formValue.FreightCharges || 0,
       ORDER_NO: formValue.WorkOrderNumber || '',
@@ -700,7 +714,11 @@ export class FreightBillingComponent implements OnInit {
             ZCREATED_DT: row.ZCREATED_DT,
             ZPLANT: row.ZPLANT,
             ZDIVISION: row.ZDIVISION,
-            ZVEH_TYPE: row.ZVEH_TYPE
+            ZVEH_TYPE: row.ZVEH_TYPE,
+            ZPRO_CHK: row.ZPRO_CHK,
+            ZACC_CHK: row.ZACC_CHK,
+            ZPROVDT: row.ZPROVDT,
+            ZPROVAMT: row.ZPROVAMT
           }
         ]
       };
@@ -854,8 +872,18 @@ export class FreightBillingComponent implements OnInit {
     return this.totalFreight;
   }
 
-  openModal(calculateTotalpopup: any) {
-    if (this.FreightBilling.get('FreightCharges')?.disabled) {
+  openModal(calculateTotalpopup: any, type: 'freight' | 'provision') {
+
+    // ✅ If user is opening Freight popup after Provision popup → reset all popup fields
+    if (this.popupType === 'provision' && type === 'freight') {
+      this.freightDetails = this.resetDetails();
+      this.totalFreight = 0;
+    }
+
+    this.popupType = type;
+
+    // ✅ Only block Freight popup when FreightCharges disabled
+    if (type === 'freight' && this.FreightBilling.get('FreightCharges')?.disabled) {
       Swal.fire({
         title: 'Field Disabled',
         text: 'Freight Charges cannot be edited when Work Order Number is selected.',
@@ -867,24 +895,50 @@ export class FreightBillingComponent implements OnInit {
     }
 
     this.calculateTotal();
+
     this.modalService.open(calculateTotalpopup, {
       backdrop: 'static',
       keyboard: false,
       size: 'lg'
+    }).result.finally(() => {
+
+      // ✅ If provision popup closed → reset popup values
+      if (type === 'provision') {
+        this.freightDetails = this.resetDetails();
+        this.totalFreight = 0;
+      }
+
     });
   }
 
   saveAndCloseModal() {
     const finalTotal = this.calculateTotal();
+
     console.log("finalTotal", finalTotal);
 
-    this.FreightBilling.get('FreightCharges')?.setValue(finalTotal);
+    if (this.popupType === 'freight') {
+      this.FreightBilling.get('FreightCharges')?.setValue(finalTotal);
+    }
+
+    if (this.popupType === 'provision') {
+      this.FreightBilling.get('ProvisionAmount')?.setValue(finalTotal);
+    }
+
     this.modalService.dismissAll();
-    console.log("FreightCharges", this.FreightBilling.get('FreightCharges')?.value);
+
   }
 
   cancelModal() {
+    if (this.popupType === 'provision') {
+      this.resetPopupData();
+    }
+
     this.modalService.dismissAll();
+  }
+
+  resetPopupData() {
+    this.freightDetails = this.resetDetails();
+    this.totalFreight = 0;
   }
 
   isSap(): boolean {
@@ -1421,6 +1475,37 @@ export class FreightBillingComponent implements OnInit {
       if (physicalDate && physicalDate < this.minPhysicalDate) {
         this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.setValue('');
       }
+      // Also ensure BillSubmission is not earlier than allowed minimum
+      const billSubmission = this.FreightBilling.get('BillSubmission')?.value;
+      if (billSubmission && billSubmission < this.minPhysicalDate) {
+        this.FreightBilling.get('BillSubmission')?.setValue('');
+      }
+    }
+  }
+
+  onProvisionChange() {
+    const provisionChecked = this.FreightBilling.get('provision')?.value;
+
+    if (provisionChecked) {
+      this.FreightBilling.patchValue({ account: false });
+
+      this.showProvisionFields = true;
+      this.showAccountFields = false;
+    } else {
+      this.showProvisionFields = false;
+    }
+  }
+
+  onAccountChange() {
+    const accountChecked = this.FreightBilling.get('account')?.value;
+
+    if (accountChecked) {
+      this.FreightBilling.patchValue({ provision: false });
+
+      this.showAccountFields = true;
+      this.showProvisionFields = false;
+    } else {
+      this.showAccountFields = false;
     }
   }
 
