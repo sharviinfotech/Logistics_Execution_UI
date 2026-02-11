@@ -55,6 +55,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
   pendingCount: number = 0;
   completedCount: number = 0;
+  casesCount: number = 0;
 
   // Search functionality
   selectedItems: any[] = [];
@@ -1238,7 +1239,14 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
 
   // Method to update the edited row
-  updateSearchRow(headerRow: any, itemRows: any[]): void {
+  updateSearchRow(row: any): void {
+    // Determine if this is a header row or an item row
+    const isHeaderRow = row === this.headerData;
+    
+    // For item rows, use just the item. For header rows, use header + items
+    const headerRow = isHeaderRow ? row : this.headerData;
+    const itemRows = isHeaderRow ? (this.itemsList || []) : [row];
+
     Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to update this transit record?',
@@ -1250,11 +1258,16 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       if (!result.isConfirmed) return;
 
       // 🔑 Validate mandatory HEADER fields
-      if (!headerRow.ZREFNO) {
+      if (!headerRow || !headerRow.ZREFNO) {
         Swal.fire('Error', 'Missing mandatory ZREFNO in header', 'error');
         return;
       }
 
+      // Validate that we have items
+      if (!itemRows || itemRows.length === 0) {
+        Swal.fire('Error', 'No items found to update', 'error');
+        return;
+      }
 
       //  const invalidItems = itemRows.filter(item => !item.ZREFNO);
       //  if (invalidItems.length > 0) {
@@ -1963,11 +1976,13 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       (response: any) => {
         this.pendingCount = response.ZPEND_CNT || 0;
         this.completedCount = response.ZCONF_CNT || 0;
+        this.casesCount = response.ZCASE_REP || 0;
       },
       (error) => {
         console.error('Error fetching counts:', error);
         this.pendingCount = 0;
         this.completedCount = 0;
+        this.casesCount = 0;
 
       }
     );
@@ -2029,6 +2044,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     // Reset counts
     this.pendingCount = 0;
     this.completedCount = 0;
+    this.casesCount = 0;
 
     // Reset checkbox state
     this.isAllSelected = false;

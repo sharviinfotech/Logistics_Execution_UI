@@ -49,6 +49,9 @@ export class FreightBillingComponent implements OnInit {
   previousOrderType: string | null = null;
   previousSapType: string | null = null;
   isUpdateMode: boolean = false;
+  selectedPAData: any = null;
+  selectedPAItem: any = null;
+  selectedPAIndex: number = -1;
 
   // Search functionality
   selectedItems: any[] = [];
@@ -90,6 +93,18 @@ export class FreightBillingComponent implements OnInit {
   filterSapType: string = '';
   invoiceF4List: string[] = [];
   minPhysicalDate: string = '';
+
+  paFormData: any = {
+  provisionChecked: false,
+  provisionAmount: '',
+  provisionDate: '',
+  accountChecked: false,
+  freightBillNumber: '',
+  freightBillDate: '',
+  physicalSubmissionDate: '',
+  freightCharges: '',
+  billSubmission: ''
+};
 
 
   constructor(
@@ -672,7 +687,7 @@ export class FreightBillingComponent implements OnInit {
 
 
   // Method to update the edited row
-  updateSearchRow(row: any, index: number): void {
+updateSearchRow(row: any, index: number): void {
     Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to update this Freight Billing record?',
@@ -1502,12 +1517,102 @@ export class FreightBillingComponent implements OnInit {
     if (accountChecked) {
       this.FreightBilling.patchValue({ provision: false });
 
-      this.showAccountFields = true;
+      this.showAccountFields = true ;
       this.showProvisionFields = false;
     } else {
       this.showAccountFields = false;
     }
   }
+
+  viewPACheck(item: any): void {
+  this.selectedPAData = item;
+  
+  // Get reference to the modal template
+  const modalRef = this.modalService.open(
+    document.querySelector('#pACheckModal') as any,
+    {
+      backdrop: 'static',
+      keyboard: false,
+      size: 'md',
+      centered: true
+    }
+  );
+}
+
+
+
+// Open modal and load data
+openPACheckModal(template: any, item: any, index: number): void {
+  this.selectedPAItem = item;
+  this.selectedPAIndex = index;
+  
+  // Load existing data into form
+  this.paFormData = {
+    provisionChecked: item.ZPRO_CHK === 'X',
+    provisionAmount: item.ZPROVAMT || '',
+    provisionDate: item.ZPROVDT || '',
+    accountChecked: item.ZACC_CHK === 'X',
+    freightBillNumber: item.ZBILLNO || '',
+    freightBillDate: item.ZBILLDATE || '',
+    physicalSubmissionDate: item.ZPHY_DATE || '',
+    freightCharges: item.ZFRT_CHARGES || '',
+    billSubmission: item.ZBILL_SUBMISSION || ''
+  };
+  
+  this.modalService.open(template, {
+    backdrop: 'static',
+    keyboard: false,
+    size: 'lg',
+    centered: true
+  });
+}
+
+// Handle provision checkbox
+onProvisionCheckChange(): void {
+
+}
+
+// Handle account checkbox
+onAccountCheckChange(): void {
+
+}
+
+// Update P/A details - calls existing updateSearchRow method
+updatePADetails(): void {
+ 
+  if (this.paFormData.provisionChecked) {
+    this.selectedPAItem.ZPRO_CHK = 'X';
+    this.selectedPAItem.ZPROVAMT = this.paFormData.provisionAmount;
+    this.selectedPAItem.ZPROVDT = this.paFormData.provisionDate;
+  } else {
+    this.selectedPAItem.ZPRO_CHK = '';
+    this.selectedPAItem.ZPROVAMT = '';
+    this.selectedPAItem.ZPROVDT = '';
+  }
+  
+  
+  if (this.paFormData.accountChecked) {
+    this.selectedPAItem.ZACC_CHK = 'X';
+    this.selectedPAItem.ZBILLNO = this.paFormData.freightBillNumber;
+    this.selectedPAItem.ZBILLDATE = this.paFormData.freightBillDate;
+    this.selectedPAItem.ZPHY_DATE = this.paFormData.physicalSubmissionDate;
+    this.selectedPAItem.ZFRT_CHARGES = this.paFormData.freightCharges;
+    this.selectedPAItem.ZBILL_SUBMISSION = this.paFormData.billSubmission;
+  } else {
+    this.selectedPAItem.ZACC_CHK = '';
+    this.selectedPAItem.ZBILLNO = '';
+    this.selectedPAItem.ZBILLDATE = '';
+    this.selectedPAItem.ZPHY_DATE = '';
+    this.selectedPAItem.ZFRT_CHARGES = '';
+    this.selectedPAItem.ZBILL_SUBMISSION = '';
+  }
+  
+  // Close modal
+  this.modalService.dismissAll();
+  
+  // Call existing update method
+  this.updateSearchRow(this.selectedPAItem, this.selectedPAIndex);
+}
 
 
 

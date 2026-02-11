@@ -252,7 +252,8 @@ td {
 .table tbody td input[type="text"],
 .table tbody td input[type="number"],
 .table tbody td input[type="date"],
-.table tbody td input[type="datetime-local"],
+.table tbody td input[type="tel"],
+.table tbody td input[type="datetime-local"],  
 .table tbody td select {
 
   padding: 10px 12px;
@@ -1887,6 +1888,29 @@ input[type="radio"] {
   color: #155724;
 }
 
+
+.cases-box {
+  background: #8595e6;      /* Light Red Background */
+  padding: 8px 12px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  
+  gap: 6px;
+ 
+}
+
+.cases-box i {
+  color: #253897;           /* Dark Red Icon */
+  font-size: 15px;
+}
+
+.cases-box .count-text {
+  font-weight: 600;
+  font-size: 13px;
+  color: #253897;           /* Dark Red Text */
+}
 
 .action-btns {
   display: flex;

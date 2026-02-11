@@ -56,6 +56,9 @@ export class TransitDamageInfoComponent implements OnInit {
 
   pendingCount: number = 0;
   completedCount: number = 0;
+  casesCount: number = 0;
+
+
 
   // Search functionality
   selectedItems: any[] = [];
@@ -123,7 +126,7 @@ export class TransitDamageInfoComponent implements OnInit {
       CONSIGN_NAME: ['', Validators.required],
       DAMAGE_RMK: [''],
       SETTLEMENT: ['', Validators.required],
-      CLOSING_DT: ['', Validators.required],
+      CLOSING_DT: [''],
       IMAGES: [''],
       FSRREPORT: [''],
       FIRREPORT: [''],
@@ -1908,11 +1911,13 @@ export class TransitDamageInfoComponent implements OnInit {
       (response: any) => {
         this.pendingCount = response.ZPEND_CNT || 0;
         this.completedCount = response.ZCONF_CNT || 0;
+        this.casesCount = response.ZCASE_REP || 0;
       },
       (error) => {
         console.error('Error fetching counts:', error);
         this.pendingCount = 0;
         this.completedCount = 0;
+        this.casesCount = 0;
 
       }
     );
@@ -1975,6 +1980,7 @@ export class TransitDamageInfoComponent implements OnInit {
     // Reset counts
     this.pendingCount = 0;
     this.completedCount = 0;
+    this.casesCount = 0;
 
     // Reset checkbox state
     this.isAllSelected = false;

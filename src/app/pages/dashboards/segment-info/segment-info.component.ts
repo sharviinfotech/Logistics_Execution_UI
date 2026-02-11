@@ -661,7 +661,7 @@ export class SegmentInfoComponent implements OnInit {
             confirmButtonText: 'Ok',
           }).then(() => {
             if (action === 'next') {
-              this.router.navigate(['/vehicle-info']);
+              this.router.navigate(['/vechile-info']);
             } else if (action === 'previous') {
               this.router.navigate(['/invoice-load-details']);
             } else {

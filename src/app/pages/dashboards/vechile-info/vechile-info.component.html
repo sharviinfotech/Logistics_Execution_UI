@@ -338,10 +338,18 @@
                 <td><input type="text" formControlName="ZTRUC_TYPE" /></td>
                 <td><input type="text" formControlName="ZTRUC_WT" class="width-le" /></td>
                 <td><input type="number" formControlName="ZTRUC_VOL" class="width-le" /></td>
-                <td><input type="text" formControlName="ZVEH_NUM" class="width-le" /></td>
+                <td>
+                  <input type="text" formControlName="ZVEH_NUM" class="width-le"
+                    placeholder="AP/TS09AB1234" (input)="onVehicleNumberInput($event, i)"
+                    title="Format: State Code/Registration (e.g., AP/TS09AB1234)" />
+                </td>
                 <td><input type="number" formControlName="ZNOOFVEH" min="1" class="width-le" /></td>
                 <td><input type="text" formControlName="ZDNAME" /></td>
-                <td><input type="text" formControlName="ZDNUMBER" class="width-le" /></td>
+                <td>
+                  <input type="tel" formControlName="ZDNUMBER" class="width-le"
+                    maxlength="10" minlength="10" pattern="[0-9]{10}" inputmode="numeric"
+                    (input)="onMobileInput($event, i)" />
+                </td>
                 <td class="action-btns">
                   <button type="button" class="btn-add" (click)="addRow()">+</button>
                   <button type="button" class="btn-remove" (click)="removeRow(i)"
@@ -603,7 +611,8 @@
           <!-- Vehicle No -->
           <td>
             <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZVEH_NUM">
+              [(ngModel)]="item.ZVEH_NUM" placeholder="AP/TS09AB1234" (input)="onVehicleNumberEditInput(item)"
+              title="Format: State Code/Registration (e.g., AP/TS09AB1234)" />
             <span *ngIf="!item.isEdit">{{ item.ZVEH_NUM }}</span>
           </td>
 
@@ -629,8 +638,9 @@
           </td>
 
           <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZDNUMBER">
+            <input *ngIf="item.isEdit" type="tel" class="form-control form-control-sm width-md"
+              [(ngModel)]="item.ZDNUMBER" maxlength="10" minlength="10" pattern="[0-9]{10}" inputmode="numeric"
+              (input)="onMobileEditInput(item)" />
             <span *ngIf="!item.isEdit">{{ item.ZDNUMBER }}</span>
           </td>
 

@@ -124,7 +124,7 @@ export class VechileInfoComponent implements OnInit {
       ZTRUC_WT: [data?.ZTRUC_WT || '', Validators.required],
       ZTRUCK_LINE: [data?.ZTRUCK_LINE || ''],
       ZTRUC_VOL: [data?.ZTRUC_VOL || '', [Validators.required, Validators.min(0)]],
-      ZVEH_NUM: [data?.ZVEH_NUM || '', Validators.required],
+      ZVEH_NUM: [data?.ZVEH_NUM || '', [Validators.required, Validators.pattern(/^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/)]],
       ZNOOFVEH: [data?.ZNOOFVEH || '', [Validators.required, Validators.min(1)]],
       ZDNAME: [data?.ZDNAME || '', Validators.required],
       ZDNUMBER: [data?.ZDNUMBER || '', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
@@ -657,6 +657,47 @@ export class VechileInfoComponent implements OnInit {
     }
   }
 
+  // Ensure mobile input contains only digits and max 10 characters for reactive form rows
+  onMobileInput(event: any, index: number): void {
+    const input = event.target as HTMLInputElement;
+    let val = (input.value || '').replace(/\D+/g, '');
+    if (val.length > 10) val = val.slice(0, 10);
+    input.value = val;
+    const row = this.vehicles.at(index) as FormGroup;
+    if (row) {
+      row.get('ZDNUMBER')?.setValue(val);
+    }
+  }
+
+  // Ensure mobile input contains only digits and max 10 characters for ngModel-ed edit rows
+  onMobileEditInput(item: any): void {
+    if (!item) return;
+    let val = String(item.ZDNUMBER || '')?.replace(/\D+/g, '');
+    if (val.length > 10) val = val.slice(0, 10);
+    item.ZDNUMBER = val;
+  }
+
+  // Enforce vehicle number format (XX/YYYYY... where XX=state code, YYYYY=registration)
+  onVehicleNumberInput(event: any, index: number): void {
+    const input = event.target as HTMLInputElement;
+    let val = (input.value || '').toUpperCase();
+    // Allow only letters, digits, and forward slash
+    val = val.replace(/[^A-Z0-9\/]/g, '');
+    input.value = val;
+    const row = this.vehicles.at(index) as FormGroup;
+    if (row) {
+      row.get('ZVEH_NUM')?.setValue(val);
+    }
+  }
+
+  // Enforce vehicle number format for ngModel-ed edit rows
+  onVehicleNumberEditInput(item: any): void {
+    if (!item) return;
+    let val = String(item.ZVEH_NUM || '').toUpperCase();
+    val = val.replace(/[^A-Z0-9\/]/g, '');
+    item.ZVEH_NUM = val;
+  }
+
   getForm(type: 'purchase' | 'invoice'): void {
     this.fetchVehicleDetails();
   }
@@ -838,6 +879,20 @@ export class VechileInfoComponent implements OnInit {
         timer: 3000,
         confirmButtonText: 'Ok',
       });
+      return;
+    }
+
+    // Validate mobile numbers for selected rows: must be exactly 10 digits
+    const invalidMobileRow = filtered.find((r: any) => !(/^[0-9]{10}$/.test(String(r.ZDNUMBER || '').trim())));
+    if (invalidMobileRow) {
+      Swal.fire('Warning', 'Driver Mobile must be exactly 10 digits for all selected rows.', 'warning');
+      return;
+    }
+
+    // Validate vehicle numbers for selected rows: must be in format XX/YYY... (e.g., AP/TS457889)
+    const invalidVehicleRow = filtered.find((r: any) => !(/^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/.test(String(r.ZVEH_NUM || '').trim())));
+    if (invalidVehicleRow) {
+      Swal.fire('Warning', 'Vehicle Number must be in format like AP/TS09AB1234 (state code/registration).', 'warning');
       return;
     }
 
@@ -1028,6 +1083,18 @@ export class VechileInfoComponent implements OnInit {
       cancelButtonText: 'Cancel'
     }).then(result => {
       if (!result.isConfirmed) return;
+
+      // Validate edited mobile number if present
+      if (row.ZDNUMBER && !(/^[0-9]{10}$/.test(String(row.ZDNUMBER).trim()))) {
+        Swal.fire('Warning', 'Driver Mobile must be exactly 10 digits.', 'warning');
+        return;
+      }
+
+      // Validate vehicle number format if present
+      if (row.ZVEH_NUM && !(/^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/.test(String(row.ZVEH_NUM).trim()))) {
+        Swal.fire('Warning', 'Vehicle Number must be in format like AP/TS09AB1234 (state code/registration).', 'warning');
+        return;
+      }
 
       this.spinner.show();
 

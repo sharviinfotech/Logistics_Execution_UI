@@ -1,394 +1,405 @@
-<div class="card-body-LE">
-    <!-- Header Section -->
-    <div class="header-section">
-        <h1 class="page-title">User Management</h1>
-        <button class="btn-create-user" (click)="openModal()">
-            <span class="btn-icon">+</span>
-            Create New User
-        </button>
-    </div>
+<div class="card-LE">
 
-    <!-- User Table -->
-    <div class="table-container">
-        <table class="user-table">
-            <thead>
-                <tr>
-                    <th>Username</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>Contact</th>
-                    <th>Employee Code</th>
-                    <th>In/Out</th>
-                    <th>Category</th>
-                    <th>Roles</th>
-                    <th>Status</th>
-                    <th>Plants</th>
-                    <th>Divisions</th>
-                    <th>Activities</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
+    <div class="card-header-LE header-flex">
 
-            <tbody>
-                <tr *ngFor="let user of users; let i = index">
-
-                    <td>{{ user.USER }}</td>
-                    <td>{{ user.FIRST_NAME }}</td>
-                    <td>{{ user.LAST_NAME }}</td>
-                    <td>{{ user.EMAIL }}</td>
-                    <td>{{ user.CONTACT }}</td>
-                    <td>{{ user.EMP_CODE }}</td>
-                    <td>{{ user.INOUT_TYPE }}</td>
-                    <td>{{ user.CATEGORY }}</td>
-                    <td>{{ user.ROLES }}</td>
-
-                    <td>
-                        <span class="status-badge" [class.active]="user.STATUS === 'Active'"
-                            [class.inactive]="user.STATUS === 'Inactive'">
-                            {{ user.STATUS }}
-                        </span>
-                    </td>
-
-                    <!-- ✅ PLANTS -->
-                    <td>
-                        <span class="count-badge">
-                            {{ user.PLANTS.length }} Plants
-                        </span>
-
-                        <button *ngIf="user.PLANTS?.length" class="btn-view" (click)="openPlantCard(user.PLANTS)">
-                            View
-                        </button>
-                    </td>
-
-                    <!-- ✅ DIVISIONS -->
-                    <td>
-                        <span class="count-badge">
-                            {{ user.DIVISIONS.length }} Divisions
-                        </span>
-
-                        <button *ngIf="user.DIVISIONS?.length" class="btn-view"
-                            (click)="openDivisionCard(user.DIVISIONS)">
-                            View
-                        </button>
-                    </td>
-
-                    <!-- Activities -->
-                    <td>
-                        <span class="count-badge">
-                            {{ user.ACTIVITIES.length }} Activities
-                        </span>
-
-                        <button *ngIf="user.ACTIVITIES?.length" class="btn-view"
-                            (click)="openActivityCard(user.ACTIVITIES)">
-                            View
-                        </button>
-                    </td>
-
-                    <td>
-                        <button class="btn-action btn-edit" (click)="editUser(user, i)">✎</button>
-                        <button class="btn-action btn-danger" (click)="deleteUser(i)">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                    </td>
-
-                </tr>
-            </tbody>
-        </table>
-
-    </div>
-
-    <!-- View List Card -->
-    <div class="view-card-overlay" *ngIf="showViewCard" (click)="closeViewCard()">
-        <div class="view-card" (click)="$event.stopPropagation()">
-
-            <div class="view-card-header">
-                <h3>{{ viewCardTitle }}</h3>
-                <button class="btn-close" (click)="closeViewCard()">×</button>
-            </div>
-
-            <div class="view-card-body">
-                <div *ngFor="let item of viewCardData" class="view-item">
-                    {{ item }}
-                </div>
-            </div>
-
+        <div class="header-title">
+            User Management
+        </div>
+        <!-- Header Section -->
+        <div class="header-section">
+            <button class="btn-create-user" (click)="openModal()">
+                <span class="btn-icon">+</span>
+                Create New User
+            </button>
         </div>
     </div>
+    <div class="card-body-LE">
+        <!-- User Table -->
+        <div class="table-container">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Contact</th>
+                        <th>Employee Code</th>
+                        <th>In/Out</th>
+                        <th>Category</th>
+                        <th>Roles</th>
+                        <th>Status</th>
+                        <th>Plants</th>
+                        <th>Divisions</th>
+                        <th>Activities</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
 
+                <tbody>
+                    <tr *ngFor="let user of users; let i = index">
 
+                        <td>{{ user.USER }}</td>
+                        <td>{{ user.FIRST_NAME }}</td>
+                        <td>{{ user.LAST_NAME }}</td>
+                        <td>{{ user.EMAIL }}</td>
+                        <td>{{ user.CONTACT }}</td>
+                        <td>{{ user.EMP_CODE }}</td>
+                        <td>{{ user.INOUT_TYPE }}</td>
+                        <td>{{ user.CATEGORY }}</td>
+                        <td>{{ user.ROLES }}</td>
 
-
-    <!-- Items per page -->
-    <div class="pagination-info">
-        Items per page: <span class="items-count">{{ users.length }}</span>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
-        <div class="modal-container" (click)="$event.stopPropagation()">
-
-            <!-- Modal Header -->
-            <div class="modal-header">
-                <h2 class="modal-title">Create New User</h2>
-                <button class="btn-close" (click)="closeModal()">×</button>
-            </div>
-
-            <!-- Modal Body -->
-            <div class="modal-body">
-
-                <form class="user-form" [formGroup]="userForm">
-
-                    <!-- Row 1 -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Username<span class="required">*</span></label>
-                            <input class="form-input" formControlName="USER" placeholder="Enter username">
-                            <span class="error-message"
-                                *ngIf="userForm.get('USER')?.touched && userForm.get('USER')?.invalid">
-                                Username is required
+                        <td>
+                            <span class="status-badge" [class.active]="user.STATUS === 'Active'"
+                                [class.inactive]="user.STATUS === 'Inactive'">
+                                {{ user.STATUS }}
                             </span>
-                        </div>
+                        </td>
 
-                        <div class="form-group">
-                            <label class="form-label">First Name<span class="required">*</span></label>
-                            <input class="form-input" formControlName="FIRST_NAME" placeholder="Enter first name">
-                        </div>
+                        <!-- ✅ PLANTS -->
+                        <td>
+                            <span class="count-badge">
+                                {{ user.PLANTS.length }} Plants
+                            </span>
 
-                        <div class="form-group">
-                            <label class="form-label">Last Name</label>
-                            <input class="form-input" formControlName="LAST_NAME" placeholder="Enter last name">
-                        </div>
+                            <button *ngIf="user.PLANTS?.length" class="btn-view" (click)="openPlantCard(user.PLANTS)">
+                                View
+                            </button>
+                        </td>
+
+                        <!-- ✅ DIVISIONS -->
+                        <td>
+                            <span class="count-badge">
+                                {{ user.DIVISIONS.length }} Divisions
+                            </span>
+
+                            <button *ngIf="user.DIVISIONS?.length" class="btn-view"
+                                (click)="openDivisionCard(user.DIVISIONS)">
+                                View
+                            </button>
+                        </td>
+
+                        <!-- Activities -->
+                        <td>
+                            <span class="count-badge">
+                                {{ user.ACTIVITIES.length }} Activities
+                            </span>
+
+                            <button *ngIf="user.ACTIVITIES?.length" class="btn-view"
+                                (click)="openActivityCard(user.ACTIVITIES)">
+                                View
+                            </button>
+                        </td>
+
+                        <td>
+                            <button class="btn-action btn-edit" (click)="editUser(user, i)">✎</button>
+                            <button class="btn-action btn-danger" (click)="deleteUser(i)">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </td>
+
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <!-- View List Card -->
+        <div class="view-card-overlay" *ngIf="showViewCard" (click)="closeViewCard()">
+            <div class="view-card" (click)="$event.stopPropagation()">
+
+                <div class="view-card-header">
+                    <h3>{{ viewCardTitle }}</h3>
+                    <button class="btn-close" (click)="closeViewCard()">×</button>
+                </div>
+
+                <div class="view-card-body">
+                    <div *ngFor="let item of viewCardData" class="view-item">
+                        {{ item }}
                     </div>
+                </div>
 
-                    <!-- Row 2 -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Contact<span class="required">*</span></label>
-                            <input class="form-input" formControlName="CONTACT" placeholder="Enter contact number">
+            </div>
+        </div>
+
+
+
+
+        <!-- Items per page -->
+        <div class="pagination-info">
+            Items per page: <span class="items-count">{{ users.length }}</span>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+            <div class="modal-container" (click)="$event.stopPropagation()">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h2 class="modal-title">Create New User</h2>
+                    <button class="btn-close" (click)="closeModal()">×</button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+
+                    <form class="user-form" [formGroup]="userForm">
+
+                        <!-- Row 1 -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Username<span class="required">*</span></label>
+                                <input class="form-input" formControlName="USER" placeholder="Enter username">
+                                <span class="error-message"
+                                    *ngIf="userForm.get('USER')?.touched && userForm.get('USER')?.invalid">
+                                    Username is required
+                                </span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">First Name<span class="required">*</span></label>
+                                <input class="form-input" formControlName="FIRST_NAME" placeholder="Enter first name">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Last Name</label>
+                                <input class="form-input" formControlName="LAST_NAME" placeholder="Enter last name">
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Email<span class="required">*</span></label>
-                            <input class="form-input" formControlName="EMAIL" placeholder="Enter email address">
+                        <!-- Row 2 -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Contact<span class="required">*</span></label>
+                                <input class="form-input" formControlName="CONTACT" placeholder="Enter contact number">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Email<span class="required">*</span></label>
+                                <input class="form-input" formControlName="EMAIL" placeholder="Enter email address">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <select class="form-select" formControlName="CATEGORY">
+                                    <option value="Internal">Internal</option>
+                                    <option value="External">External</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Category</label>
-                            <select class="form-select" formControlName="CATEGORY">
-                                <option value="Internal">Internal</option>
-                                <option value="External">External</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Row 3 -->
-                    <div class="form-row">
-                        <!-- <div class="form-group">
+                        <!-- Row 3 -->
+                        <div class="form-row">
+                            <!-- <div class="form-group">
                             <label class="form-label">Password<span class="required">*</span></label>
                             <input class="form-input" type="password" formControlName="PASSWORD"
                                 placeholder="Enter password">
                         </div> -->
-                        <div class="form-group password-group">
-                            <label class="form-label">
-                                Password <span class="required">*</span>
-                            </label>
-
-                            <div class="password-wrapper">
-                                <input class="form-input" [type]="showPassword ? 'text' : 'password'"
-                                    formControlName="PASSWORD" placeholder="Enter password" />
-                                <span class="toggle-eye" (click)="togglePassword()">
-                                    <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-                                </span>
-                            </div>
-                        </div>
-
-
-
-                        <div class="form-group">
-                            <label class="form-label">Employee Code<span class="required">*</span></label>
-                            <input class="form-input" formControlName="EMP_CODE" placeholder="Enter employee code">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">In/Out Type<span class="required">*</span></label>
-                            <select class="form-input" formControlName="INOUT_TYPE">
-                                <option value="">Select Type</option>
-                                <option value="inward">Inward</option>
-                                <option value="outward">Outward</option>
-                            </select>
-
-                        </div>
-                    </div>
-
-                    <!-- Row 4 -->
-                    <div class="form-row">
-
-                        <!-- Plant -->
-                        <div class="form-group">
-                            <label class="form-label">Plants</label>
-
-                            <!-- Clickable Input -->
-                            <div class="form-input dropdown-input" (click)="togglePlantDropdown()">
-                                {{ getSelectedPlantsText() }}
-                            </div>
-
-                            <!-- Dropdown -->
-                            <div class="multi-select-dropdown" *ngIf="showPlantDropdown">
-                                <div *ngFor="let plant of PlantCodeList">
-                                    <label class="dropdown-option">
-                                        <input type="checkbox" [checked]="isPlantSelected(plant.PLANT)"
-                                            (change)="onPlantToggle(plant.PLANT, $event)" />
-                                        {{ plant.PLANT }}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-
-
-                        <!-- Division -->
-                        <div class="form-group">
-                            <label class="form-label">Divisions</label>
-
-                            <!-- Clickable Input -->
-                            <div class="form-input dropdown-input" (click)="toggleDivisionDropdown()">
-                                {{ getSelectedDivisionsText() }}
-                            </div>
-
-                            <!-- Dropdown -->
-                            <div class="multi-select-dropdown" *ngIf="showDivisionDropdown">
-                                <div *ngFor="let div of DivisionList">
-                                    <label class="dropdown-option">
-                                        <input type="checkbox" [checked]="isDivisionSelected(div.DIVISION)"
-                                            (change)="onDivisionToggle(div.DIVISION, $event)" />
-                                        {{ div.DIVISION }}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <!-- Role -->
-                        <div class="form-group">
-                            <label class="form-label">Role</label>
-                            <select class="form-select" formControlName="ROLES">
-                                <option value="">Select role</option>
-                                <option *ngFor="let role of availableRoles" [value]="role.name">
-                                    {{ role.name }}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-
-
-                    <!-- Row for Activities + Status -->
-                    <div class="form-row">
-
-                        <!-- Activities -->
-                        <div class="form-group">
-                            <label class="form-label">Activities (Screens)</label>
-
-                            <div class="activities-header">
-                                <button type="button" class="btn-select-activities" (click)="toggleActivityModal()">
-                                    Select Screens ({{ activitiesFormArray.length }})
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Activities Modal Popup -->
-                        <div class="activity-modal-overlay" *ngIf="showActivityModal" (click)="toggleActivityModal()">
-                            <div class="activity-modal-container" (click)="$event.stopPropagation()">
-
-                                <!-- Modal Header -->
-                                <div class="activity-modal-header">
-                                    <div class="activities-header-new">
-                                        <h3 class="modal-title">Screen Permissions</h3>
-                                        <div class="activity-count">
-                                            {{ activitiesFormArray.length }} of {{ availableActivities.length }}
-                                            assigned
-                                        </div>
-                                    </div>
-                                    <button type="button" class="btn-close-modal"
-                                        (click)="toggleActivityModal()">×</button>
-                                </div>
-
-                                <!-- Modal Subheader -->
-                                <div class="activities-subheader">
-                                    <span class="activities-subtitle">Select which screens this role can access</span>
-                                    <div class="bulk-actions">
-                                        <button type="button" class="btn-bulk" (click)="selectAllActivities()">Select
-                                            All</button>
-                                        <button type="button" class="btn-bulk"
-                                            (click)="deselectAllActivities()">Deselect All</button>
-                                    </div>
-                                </div>
-
-                                <!-- Modal Body -->
-                                <div class="activity-modal-body">
-                                    <div class="activities-grid-new">
-                                        <div *ngFor="let activity of availableActivities" class="activity-pill"
-                                            [class.selected]="isActivitySelected(activity)"
-                                            (click)="selectActivity(activity)">
-                                            <span class="activity-name">{{ activity }}</span>
-                                            <button type="button" class="activity-remove"
-                                                *ngIf="isActivitySelected(activity)">
-                                                ×
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Modal Footer -->
-                                <div class="activity-modal-footer">
-                                    <button type="button" class="btn-create" (click)="toggleActivityModal()">
-                                        Add
-                                    </button>
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <!-- Status -->
-                        <div class="form-group">
-                            <label class="form-label">Status</label>
-
-                            <div class="status-toggle-group">
-                                <button type="button" class="btn-status"
-                                    [class.active]="userForm.value.STATUS === 'Inactive'"
-                                    (click)="setStatus('Inactive')">
-                                    Inactive
-                                </button>
-
-                                <label class="toggle-switch">
-                                    <input type="checkbox" [checked]="userForm.value.STATUS === 'Active'" (change)="setStatus(
-                           userForm.value.STATUS === 'Active' ? 'Inactive' : 'Active'
-                       )">
-                                    <span class="toggle-slider"></span>
+                            <div class="form-group password-group">
+                                <label class="form-label">
+                                    Password <span class="required">*</span>
                                 </label>
 
-                                <button type="button" class="btn-status"
-                                    [class.active]="userForm.value.STATUS === 'Active'" (click)="setStatus('Active')">
-                                    Active
-                                </button>
+                                <div class="password-wrapper">
+                                    <input class="form-input" [type]="showPassword ? 'text' : 'password'"
+                                        formControlName="PASSWORD" placeholder="Enter password" />
+                                    <span class="toggle-eye" (click)="togglePassword()">
+                                        <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+                                    </span>
+                                </div>
+                            </div>
+
+
+
+                            <div class="form-group">
+                                <label class="form-label">Employee Code<span class="required">*</span></label>
+                                <input class="form-input" formControlName="EMP_CODE" placeholder="Enter employee code">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">In/Out Type<span class="required">*</span></label>
+                                <select class="form-input" formControlName="INOUT_TYPE">
+                                    <option value="">Select Type</option>
+                                    <option value="inward">Inward</option>
+                                    <option value="outward">Outward</option>
+                                </select>
+
                             </div>
                         </div>
 
-                    </div>
+                        <!-- Row 4 -->
+                        <div class="form-row">
+
+                            <!-- Plant -->
+                            <div class="form-group">
+                                <label class="form-label">Plants</label>
+
+                                <!-- Clickable Input -->
+                                <div class="form-input dropdown-input" (click)="togglePlantDropdown()">
+                                    {{ getSelectedPlantsText() }}
+                                </div>
+
+                                <!-- Dropdown -->
+                                <div class="multi-select-dropdown" *ngIf="showPlantDropdown">
+                                    <div *ngFor="let plant of PlantCodeList">
+                                        <label class="dropdown-option">
+                                            <input type="checkbox" [checked]="isPlantSelected(plant.PLANT)"
+                                                (change)="onPlantToggle(plant.PLANT, $event)" />
+                                            {{ plant.PLANT }}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <!-- Division -->
+                            <div class="form-group">
+                                <label class="form-label">Divisions</label>
+
+                                <!-- Clickable Input -->
+                                <div class="form-input dropdown-input" (click)="toggleDivisionDropdown()">
+                                    {{ getSelectedDivisionsText() }}
+                                </div>
+
+                                <!-- Dropdown -->
+                                <div class="multi-select-dropdown" *ngIf="showDivisionDropdown">
+                                    <div *ngFor="let div of DivisionList">
+                                        <label class="dropdown-option">
+                                            <input type="checkbox" [checked]="isDivisionSelected(div.DIVISION)"
+                                                (change)="onDivisionToggle(div.DIVISION, $event)" />
+                                            {{ div.DIVISION }}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- Role -->
+                            <div class="form-group">
+                                <label class="form-label">Role</label>
+                                <select class="form-select" formControlName="ROLES">
+                                    <option value="">Select role</option>
+                                    <option *ngFor="let role of availableRoles" [value]="role.name">
+                                        {{ role.name }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <!-- Row for Activities + Status -->
+                        <div class="form-row">
+
+                            <!-- Activities -->
+                            <div class="form-group">
+                                <label class="form-label">Activities (Screens)</label>
+
+                                <div class="activities-header">
+                                    <button type="button" class="btn-select-activities" (click)="toggleActivityModal()">
+                                        Select Screens ({{ activitiesFormArray.length }})
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Activities Modal Popup -->
+                            <div class="activity-modal-overlay" *ngIf="showActivityModal"
+                                (click)="toggleActivityModal()">
+                                <div class="activity-modal-container" (click)="$event.stopPropagation()">
+
+                                    <!-- Modal Header -->
+                                    <div class="activity-modal-header">
+                                        <div class="activities-header-new">
+                                            <h3 class="modal-title">Screen Permissions</h3>
+                                            <div class="activity-count">
+                                                {{ activitiesFormArray.length }} of {{ availableActivities.length }}
+                                                assigned
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn-close-modal"
+                                            (click)="toggleActivityModal()">×</button>
+                                    </div>
+
+                                    <!-- Modal Subheader -->
+                                    <div class="activities-subheader">
+                                        <span class="activities-subtitle">Select which screens this role can
+                                            access</span>
+                                        <div class="bulk-actions">
+                                            <button type="button" class="btn-bulk"
+                                                (click)="selectAllActivities()">Select
+                                                All</button>
+                                            <button type="button" class="btn-bulk"
+                                                (click)="deselectAllActivities()">Deselect All</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Modal Body -->
+                                    <div class="activity-modal-body">
+                                        <div class="activities-grid-new">
+                                            <div *ngFor="let activity of availableActivities" class="activity-pill"
+                                                [class.selected]="isActivitySelected(activity)"
+                                                (click)="selectActivity(activity)">
+                                                <span class="activity-name">{{ activity }}</span>
+                                                <button type="button" class="activity-remove"
+                                                    *ngIf="isActivitySelected(activity)">
+                                                    ×
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Modal Footer -->
+                                    <div class="activity-modal-footer">
+                                        <button type="button" class="btn-create" (click)="toggleActivityModal()">
+                                            Add
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Status -->
+                            <div class="form-group">
+                                <label class="form-label">Status</label>
+
+                                <div class="status-toggle-group">
+                                    <button type="button" class="btn-status"
+                                        [class.active]="userForm.value.STATUS === 'Inactive'"
+                                        (click)="setStatus('Inactive')">
+                                        Inactive
+                                    </button>
+
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" [checked]="userForm.value.STATUS === 'Active'" (change)="setStatus(
+                           userForm.value.STATUS === 'Active' ? 'Inactive' : 'Active'
+                       )">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+
+                                    <button type="button" class="btn-status"
+                                        [class.active]="userForm.value.STATUS === 'Active'"
+                                        (click)="setStatus('Active')">
+                                        Active
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
 
 
 
 
-                    <!-- Footer -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn-create"
-                            (click)="editingIndex !== null ? updateUser() : createUser()">
-                            {{ editingIndex !== null ? 'Update' : 'Create' }}
-                        </button>
+                        <!-- Footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn-create"
+                                (click)="editingIndex !== null ? updateUser() : createUser()">
+                                {{ editingIndex !== null ? 'Update' : 'Create' }}
+                            </button>
 
-                    </div>
+                        </div>
 
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

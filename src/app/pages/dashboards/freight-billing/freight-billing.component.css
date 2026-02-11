@@ -258,3 +258,57 @@ input:not(:placeholder-shown) + label {
   box-shadow: 0 0 0 3px rgba(125, 34, 72, 0.1);
 }
 
+/* P/A Check Modal Styles */
+.section-box {
+  background: #f8f9fa;
+  border-left: 4px solid #007bff;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+}
+
+.section-title {
+  color: #007bff;
+  font-weight: 600;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.section-title i {
+  margin-right: 8px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row label {
+  font-weight: 500;
+  color: #555;
+  margin: 0;
+}
+
+.detail-row span {
+  color: #333;
+  font-weight: 400;
+}
+
+.no-data {
+  text-align: center;
+  padding: 30px;
+  color: #999;
+}
+
+.no-data i {
+  font-size: 48px;
+  margin-bottom: 10px;
+  display: block;
+}
+

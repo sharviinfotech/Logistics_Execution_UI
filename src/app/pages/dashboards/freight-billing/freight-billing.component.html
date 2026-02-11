@@ -465,6 +465,9 @@
                 <th>ODN No</th>
                 <th>SO NO</th>
                 <th>Sale Person</th>
+                <th>P/A Check</th>
+                <th>Provision Amount</th>
+                <th>Provision Date</th>
                 <th>Freight Bill No</th>
                 <th>Freight Bill Date</th>
                 <th>Physical Submission Date</th>
@@ -510,6 +513,23 @@
                   <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
                     [(ngModel)]="item.ZSALE_PERSON">
                   <span *ngIf="!item.isEdit">{{ item.ZSALE_PERSON }}</span>
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-info view-btn" (click)="openPACheckModal(pACheckModal, item, i)">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </td>
+
+                <td>
+                  <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZPROVAMT">
+                  <span *ngIf="!item.isEdit">{{ item.ZPROVAMT }}</span>
+                </td>
+
+                <td>
+                  <input *ngIf="item.isEdit" type="date" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZPROVDT">
+                  <span *ngIf="!item.isEdit">{{ item.ZPROVDT | date:'dd-MM-yyyy' }}</span>
                 </td>
 
                 <td>
@@ -627,24 +647,25 @@
             <thead>
               <tr>
                 <th>SI.No</th>
-
                 <th>REFNO</th>
                 <th>Invoice No</th>
                 <!-- <th>Line No</th> -->
                 <th>Odn Number</th>
                 <th>SO Number</th>
                 <th>Sale Person</th>
+                <th>Provision</th>
+                <th>Provision Amount</th>
+                <th>Provision Date</th>
+                <th>Account</th>
                 <th>Freight Bill No</th>
                 <th>Freight Bill Date</th>
                 <th>Physical Submission Date</th>
                 <th>Freight Charges</th>
                 <th>Work order type</th>
                 <th>Bill Submission</th>
-
                 <th>Location</th>
                 <th>Vehicle Line</th>
                 <th>Vehicle Number</th>
-
                 <th>Plant</th>
                 <th>Division</th>
                 <th>Work Order</th>
@@ -664,6 +685,10 @@
                 <td>{{ item.ZODN_NO }}</td>
                 <td>{{ item.ZSONO}}</td>
                 <td>{{ item.ZSALE_PERSON }}</td>
+                <td>{{ item.ZPRO_CHK ? 'X' : 'No' }}</td>
+                <td>{{ item.ZPROVAMT }}</td>
+                <td>{{ item.ZPROVDT | date:'dd-MM-yyyy' }}</td>
+                <td>{{ item.ZACC_CHK ? 'X' : 'No' }}</td>
                 <td>{{ item.ZBILLNO}}</td>
                 <td>{{ item.ZBILLDATE }}</td>
                 <td>{{ item.ZPHY_DATE}}</td>
@@ -828,5 +853,96 @@
 
       </div>
     </ng-template>
+
+    <!-- ✅ P/A CHECK VIEW & UPDATE MODAL -->
+    <ng-template #pACheckModal let-c="close">
+      <div class="modal-header">
+        <h5>Provision / Account Details - Update</h5>
+        <button type="button" class="close" (click)="c('Cross click')">
+          <span>&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Provision Section -->
+        <div class="section-box">
+          <h6 class="section-title">
+            <i class="fas fa-check-circle"></i> Provision Details
+          </h6>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <input type="checkbox" [(ngModel)]="paFormData.provisionChecked" (change)="onProvisionCheckChange()"
+                id="provisionCheck" />
+              <label for="provisionCheck" style="display: inline; margin-left: 8px;">
+                Provision
+              </label>
+            </div>
+
+            <div class="form-field" *ngIf="paFormData.provisionChecked">
+              <input type="number" [(ngModel)]="paFormData.provisionAmount" placeholder=" " />
+              <label>Provision Amount</label>
+            </div>
+
+            <div class="form-field" *ngIf="paFormData.provisionChecked">
+              <input type="date" [(ngModel)]="paFormData.provisionDate" placeholder=" " />
+              <label>Provision Date</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account Section -->
+        <div class="section-box" style="margin-top: 20px;">
+          <h6 class="section-title">
+            <i class="fas fa-file-invoice"></i> Account Details
+          </h6>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <input type="checkbox" [(ngModel)]="paFormData.accountChecked" (change)="onAccountCheckChange()"
+                id="accountCheck" />
+              <label for="accountCheck" style="display: inline; margin-left: 8px;">
+                Account
+              </label>
+            </div>
+
+            <div class="form-field" *ngIf="paFormData.accountChecked">
+              <input type="text" [(ngModel)]="paFormData.freightBillNumber" placeholder=" " />
+              <label>Freight Bill Number</label>
+            </div>
+
+            <div class="form-field" *ngIf="paFormData.accountChecked">
+              <input type="date" [(ngModel)]="paFormData.freightBillDate" placeholder=" " />
+              <label>Freight Bill Date</label>
+            </div>
+
+            <div class="form-field" *ngIf="paFormData.accountChecked">
+              <input type="date" [(ngModel)]="paFormData.physicalSubmissionDate" placeholder=" " />
+              <label>Physical Submission Date</label>
+            </div>
+
+            <div class="form-field" *ngIf="paFormData.accountChecked">
+              <input type="number" [(ngModel)]="paFormData.freightCharges" placeholder=" " />
+              <label>Freight Charges</label>
+            </div>
+
+            <div class="form-field" *ngIf="paFormData.accountChecked">
+              <input type="date" [(ngModel)]="paFormData.billSubmission" placeholder=" " />
+              <label>Bill Submission To F&A</label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="c('Close')">Cancel</button>
+        <button class="btn btn-primary" (click)="updatePADetails()">
+          <i class="fas fa-save"></i> Update
+        </button>
+      </div>
+    </ng-template>
+
   </div>
 </div>
