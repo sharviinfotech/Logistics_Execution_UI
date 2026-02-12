@@ -304,6 +304,30 @@
           <label>Bill Submission To F&A</label>
         </div>
 
+        <div class="form-field">
+          <input type="file" accept=".jpg,.jpeg,.png,.pdf,.xls,.xlsx"
+            (change)="onFileChange($event, 'FreightBillupload')" />
+          <label>Freight Bill upload</label>
+        </div>
+
+        <div class="form-field">
+          <input type="file" accept=".jpg,.jpeg,.png,.pdf,.xls,.xlsx"
+            (change)="onFileChange($event, 'UnloadingChargesApproval')" />
+          <label>Unloading Charges Approval</label>
+        </div>
+
+        <div class="form-field">
+          <input type="file" accept=".jpg,.jpeg,.png,.pdf,.xls,.xlsx"
+            (change)="onFileChange($event, 'DetentionChargesUploading')" />
+          <label>Detention Charges Uploading</label>
+        </div>
+
+        <div class="form-field">
+          <input type="file" accept=".jpg,.jpeg,.png,.pdf,.xls,.xlsx"
+            (change)="onFileChange($event, 'WorkOrderUploading')" />
+          <label>Work Order Uploading</label>
+        </div>
+
       </form>
 
       <!-- ✅ BUTTONS (VISIBLE ALWAYS WHEN showForm = true) -->
@@ -474,6 +498,10 @@
                 <th>Freight Charges</th>
                 <th>Work Order</th>
                 <th>Bill Submission</th>
+                <th>Freight Bill upload</th>
+                <th>Unloading Charges Approval</th>
+                <th>Detention Charges Uploading</th>
+                <th>Work Order Uploading</th>
                 <th>Work Order Type</th>
                 <th>LR No</th>
                 <th>Transporter</th>
@@ -538,6 +566,7 @@
                   <span *ngIf="!item.isEdit">{{ item.ZBILLNO }}</span>
                 </td>
 
+
                 <td>
                   <input *ngIf="item.isEdit" type="date" class="form-control form-control-sm"
                     [(ngModel)]="item.ZBILLDATE">
@@ -575,6 +604,49 @@
                 </td>
 
                 <td>
+                  <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZFRBILLUP">
+                  <span *ngIf="!item.isEdit">{{ item.ZFRBILLUP }}</span>
+                </td>
+
+                <td>
+                  <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZUNLOADAPP">
+                  <span *ngIf="!item.isEdit">{{ item.ZUNLOADAPP }}</span>
+                </td>
+
+                <td>
+                  <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZDETENTUP">
+                  <span *ngIf="!item.isEdit">{{ item.ZDETENTUP }}</span>
+                </td>
+
+                <td>
+                  <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZWORDUP">
+                  <span *ngIf="!item.isEdit">{{ item.ZWORDUP }}</span>
+                </td>
+
+                <td>
+                  <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZWORKORDER">
+                  <span *ngIf="!item.isEdit">{{ item.ZWORKORDER }}</span>
+                </td>
+
+
+                <td>
+                  <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZLRNO">
+                  <span *ngIf="!item.isEdit">{{ item.ZLRNO }}</span>
+                </td>
+
+                <td>
+                  <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZTRANSPORTER">
+                  <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
+                </td>
+
+                <!-- <td>
                   <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
                     [(ngModel)]="item.ZWORKORDER">
                   <span *ngIf="!item.isEdit">{{ item.ZWORKORDER }}</span>
@@ -590,7 +662,7 @@
                   <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
                     [(ngModel)]="item.ZTRANSPORTER">
                   <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
-                </td>
+                </td> -->
 
                 <td>
                   <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
@@ -881,7 +953,8 @@
             </div>
 
             <div class="form-field" *ngIf="paFormData.provisionChecked">
-              <input type="number" [(ngModel)]="paFormData.provisionAmount" placeholder=" " />
+              <input type="number" [(ngModel)]="paFormData.provisionAmount" placeholder=" "
+                (click)="openPAModal(calculateTotalpopup, 'provision')" />
               <label>Provision Amount</label>
             </div>
 
@@ -902,7 +975,7 @@
             <div class="form-field">
               <input type="checkbox" [(ngModel)]="paFormData.accountChecked" (change)="onAccountCheckChange()"
                 id="accountCheck" />
-              <label for="accountCheck" style="display: inline; margin-left: 8px;">
+              <label for="accountCheck" style="display: inline; margin-left: 8px; ">
                 Account
               </label>
             </div>
@@ -913,22 +986,25 @@
             </div>
 
             <div class="form-field" *ngIf="paFormData.accountChecked">
-              <input type="date" [(ngModel)]="paFormData.freightBillDate" placeholder=" " />
+              <input type="date" [(ngModel)]="paFormData.freightBillDate" (change)="onPAFreightBillDateChange()"
+                placeholder=" " />
               <label>Freight Bill Date</label>
             </div>
 
             <div class="form-field" *ngIf="paFormData.accountChecked">
-              <input type="date" [(ngModel)]="paFormData.physicalSubmissionDate" placeholder=" " />
+              <input type="date" [(ngModel)]="paFormData.physicalSubmissionDate" [min]="minPhysicalDate"
+                placeholder=" " />
               <label>Physical Submission Date</label>
             </div>
 
             <div class="form-field" *ngIf="paFormData.accountChecked">
-              <input type="number" [(ngModel)]="paFormData.freightCharges" placeholder=" " />
+              <input type="number" [(ngModel)]="paFormData.freightCharges" placeholder=" "
+                (click)="openPAModal(calculateTotalpopup, 'freight')" />
               <label>Freight Charges</label>
             </div>
 
             <div class="form-field" *ngIf="paFormData.accountChecked">
-              <input type="date" [(ngModel)]="paFormData.billSubmission" placeholder=" " />
+              <input type="date" [(ngModel)]="paFormData.billSubmission" [min]="minPhysicalDate" placeholder=" " />
               <label>Bill Submission To F&A</label>
             </div>
           </div>

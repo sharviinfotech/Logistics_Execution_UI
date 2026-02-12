@@ -114,6 +114,7 @@
             <thead>
               <tr>
                 <th>SI.No</th>
+                <th *ngIf="isUpdateMode">Created Date</th>
                 <th>Vehicle Type</th>
                 <th>Workorder</th>
                 <th>No Of Trucks</th>
@@ -134,6 +135,9 @@
               <tr *ngFor="let row of rows.controls; let i = index" [formGroupName]="i">
 
                 <td>{{ i + 1 }}</td>
+                <td *ngIf="isUpdateMode">
+                  <input type="date" formControlName="CREATED_DT" />
+                </td>
                 <td>
                   <select formControlName="VehicleType">
                     <option value="" disabled>Select Vehicle Type</option>
@@ -351,9 +355,6 @@
           </button>
         </div>
       </div>
-
-
-
 
     </div>
     <div class="card" style="margin-top: 10px;" *ngIf="filteredData && filteredData.length > 0">

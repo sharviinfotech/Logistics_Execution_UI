@@ -128,7 +128,8 @@ export class SegmentInfoComponent implements OnInit {
       soNumber: [''],
       odnNumber: [''],
       SONO: [''],       // ✔ match backend
-      ODN_NO: ['']
+      ODN_NO: [''],
+      lineNumber: [''] 
     });
   }
 
@@ -316,7 +317,10 @@ export class SegmentInfoComponent implements OnInit {
       REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
-      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : ''
+      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
+      LINE_NO: values.lineNumber || ''
+
+
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -400,7 +404,8 @@ export class SegmentInfoComponent implements OnInit {
             odnNumber: [d.ODN_NO || d.odnNumber || ''],
             materialType: [d.MTART || d.materialType || ''],
             plantCode: [d.PLANT_CODE || d.ZPIN_PLT || d.plantCode || ''],
-            shippingPoint: [d.SHIPPING_POINT || d.ZPIN_STP || d.shippingPoint || '']
+            shippingPoint: [d.SHIPPING_POINT || d.ZPIN_STP || d.shippingPoint || ''],
+            lineNumber: [d.LINE_NO || d.ZLINE_NO || d.lineNumber || '']
           })
         );
       });
@@ -622,6 +627,7 @@ export class SegmentInfoComponent implements OnInit {
           WORK_ORDER: item.workOrderNumber || '',
           LRNO: item.lrNumber || '',
           TRANSPORTER: item.transporter || '',
+          LINE_NO: item.lineNumber || '',
           SO_NO: item.SONO || '',
           ODN_NO: item.ODN_NO || '',
 
@@ -939,7 +945,7 @@ export class SegmentInfoComponent implements OnInit {
     const payload = {
       CREATE: this.selectedItems.map((item: any, index: number) => ({
         REFNO: item.referenceNumber || 0,
-        LINE_NO: index + 1,
+        LINE_NO: item.lineNumber || '',
         WORK_ORDER: item.workOrderNumber || '',
         LRNO: item.lrNumber || '',
         TRANSPORTER: item.transporter || '',

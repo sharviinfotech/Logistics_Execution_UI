@@ -116,6 +116,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     this.HeaderForm = this.fb.group({
       VBELN: [''],
       ZMAPID: [''],
+      LINE_NO: [''],
       INV_NO: [''],
       REFNO: [''],
       SALE_PERSON: [''],
@@ -168,7 +169,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       referenceNumber: [''],
       workOrderNumber: [''],
       lrNumber: [''],
-      transporter: ['']
+      transporter: [''],
+      lineNumber: ['']
     });
   }
 
@@ -363,7 +365,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
-      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : ''
+      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
+      LINE_NO: values.lineNumber || ''
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -439,7 +442,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
             referenceNumber: [d.REF_NO || d.referenceNumber || ''],
             workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
             lrNumber: [d.LR_NO || d.lrNumber || ''],
-            transporter: [d.TRANSPORTER || d.transporter || '']
+            transporter: [d.TRANSPORTER || d.transporter || ''],
+            lineNumber: [d.LINE_NO || d.lineNumber || '']
           })
         );
       });
@@ -474,7 +478,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         ZWORK_ORDER: selectedObj.workOrderNumber || '',
         LR_NO: selectedObj.lrNumber || '',
         TRANSPORTER: selectedObj.transporter || '',
-        ZMAPID: selectedObj.MAPID || ''
+        ZMAPID: selectedObj.MAPID || '',
+         ZLINE_NO: selectedObj.lineNumber ?? null
       });
     }
     console.log('Updated items form:', this.items.value);
@@ -492,7 +497,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
           item.referenceNumber === rowValue.referenceNumber &&
           item.workOrderNumber === rowValue.workOrderNumber &&
           item.lrNumber === rowValue.lrNumber &&
-          item.transporter === rowValue.transporter
+          item.transporter === rowValue.transporter &&
+          item.lineNumber === rowValue.lineNumber
       );
       if (!exists) {
         this.selectedItems.push(rowValue);
@@ -505,7 +511,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
             item.referenceNumber === rowValue.referenceNumber &&
             item.workOrderNumber === rowValue.workOrderNumber &&
             item.lrNumber === rowValue.lrNumber &&
-            item.transporter === rowValue.transporter
+            item.transporter === rowValue.transporter &&
+            item.lineNumber === rowValue.lineNumber
           )
       );
     }
@@ -521,7 +528,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         item.referenceNumber === rowValue.referenceNumber &&
         item.workOrderNumber === rowValue.workOrderNumber &&
         item.lrNumber === rowValue.lrNumber &&
-        item.transporter === rowValue.transporter
+        item.transporter === rowValue.transporter &&
+        item.lineNumber === rowValue.lineNumber 
     );
   }
 
@@ -802,6 +810,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
         this.HeaderForm.patchValue({
           INV_NO: header.INV_NO,
+
           FI: header.FI,
           REP_DATE: header.REP_DATE,
           CLAIM_REF: header.CLAIM_REF,
@@ -869,7 +878,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       .map(({ selected, ...row }) => ({
         ...row,
         WORK_ORDER: row.ZWORK_ORDER,
-        BILLNO: row.BILLNO,
+        BILLNO: row.ZBILLNO,
       }));
 
     if (filtered.length === 0) {
@@ -892,6 +901,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     delete headerValue.referenceItems;
 
     headerValue.INV_NO = referenceNumber;
+    headerValue.LINE_NO = filtered[0]?.ZLINE_NO || filtered[0]?.LINE_NO || null;
 
     // 🔥 IMPORTANT: Set REFNO explicitly
     headerValue.REFNO =
@@ -905,6 +915,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     // 5️⃣ Apply common values to ITEM
     filtered.forEach(row => {
       row.INV_NO = referenceNumber;
+      row.LINE_NO = row.ZLINE_NO || row.LINE_NO || null;
       row.REFNO = headerValue.REFNO; // ✅ same REFNO
       // Ensure backend receives z-prefixed bill/workorder keys as well
       row.ZBILLNO = row.BILLNO || row.ZBILLNO || '';
@@ -1170,12 +1181,17 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
     headerValue.INV_NO = invoiceNo;
     headerValue.REFNO = refNo;
+    headerValue.LINE_NO = this.selectedItems[0]?.LINE_NO 
+                   || this.selectedItems[0]?.lineNo
+                   || this.selectedItems[0]?.ZLINE_NO
+                   || null;
     const itemsPayload = this.items.controls
       .filter(ctrl => ctrl.value.selected === true)
       .map(ctrl => ({
         ...ctrl.value,
         INV_NO: invoiceNo,
-        REFNO: refNo
+        REFNO: refNo,
+        LINE_NO: ctrl.value.LINE_NO || ctrl.value.ZLINE_NO || null
       }));
 
     const payload = {

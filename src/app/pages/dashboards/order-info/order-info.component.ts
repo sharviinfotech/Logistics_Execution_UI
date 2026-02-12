@@ -156,7 +156,8 @@ export class OrderInfoComponent implements OnInit {
       referenceNumber: [''],
       workOrderNumber: [''],
       lrNumber: [''],
-      transporter: ['']
+      transporter: [''],
+      lineNumber: [''] 
     });
   }
 
@@ -618,6 +619,7 @@ export class OrderInfoComponent implements OnInit {
       WORK_ORDER_NO: row.workOrderNumber || "",
       LR_NO: row.lrNumber || "",
       TRANSPORTER: row.transporter || "",
+      LINE_NO: row.lineNumber || "",
       INV_VBELN: this.isSap() ? formValue.TaxInvoice : formValue.DCReference,
       INV_ODNO: formValue.ODN,
       INV_DATE: this.isSap()
@@ -636,7 +638,7 @@ export class OrderInfoComponent implements OnInit {
       SUB_DIVISION: formValue.SubDivision,
       SO_REF_NO: formValue.RefNumber,
       CUST_NAME: formValue.Customer,
-      LINE_NO: row.lineNumber || "",
+      
       CUST_GROUP: formValue.CustomerGroup,
       CNEE_NAME: formValue.CNee,
       DEST_LOC: formValue.DestinationLocation,
@@ -1184,7 +1186,8 @@ export class OrderInfoComponent implements OnInit {
       REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
-      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : ''
+      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
+       LINE_NO: values.lineNumber || ''
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -1225,7 +1228,8 @@ export class OrderInfoComponent implements OnInit {
             referenceNumber: [d.REF_NO || ''],
             workOrderNumber: [d.WORK_ORDER_NO || ''],
             lrNumber: [d.LR_NO || ''],
-            transporter: [d.TRANSPORTER || '']
+            transporter: [d.TRANSPORTER || ''],
+            lineNumber: [d.LINE_NO || '']
           })
         );
       });

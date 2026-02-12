@@ -133,6 +133,7 @@ export class TransitDamageInfoComponent implements OnInit {
       COF: [''],
       ODN_NO: [''],
       SONO: [''],
+      LINE_NO: [''],
       SALE_PERSON: [''],
       LOCATION: [''],
       ROUTE: [''],
@@ -161,7 +162,8 @@ export class TransitDamageInfoComponent implements OnInit {
       referenceNumber: [''],
       workOrderNumber: [''],
       lrNumber: [''],
-      transporter: ['']
+      transporter: [''],
+      lineNumber: ['']
     });
   }
 
@@ -169,6 +171,7 @@ export class TransitDamageInfoComponent implements OnInit {
     const row = this.fb.group({
       selected: [false],
       ZMAPID: [''],
+      ZLINE_NO: [''],
       INV_NO: [''],
       POSNR: [''],
       VEH_LINE: [''],
@@ -360,7 +363,9 @@ export class TransitDamageInfoComponent implements OnInit {
       REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
-      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : ''
+      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
+      LINE_NO: values.lineNumber || ''
+
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -438,7 +443,8 @@ export class TransitDamageInfoComponent implements OnInit {
             referenceNumber: [d.REF_NO || d.referenceNumber || ''],
             workOrderNumber: [d.WORK_ORDER_NO || d.workOrderNumber || ''],
             lrNumber: [d.LR_NO || d.lrNumber || ''],
-            transporter: [d.TRANSPORTER || d.transporter || '']
+            transporter: [d.TRANSPORTER || d.transporter || ''],
+            lineNumber: [d.LINE_NO || d.lineNumber || '']
           })
         );
       });
@@ -472,7 +478,8 @@ export class TransitDamageInfoComponent implements OnInit {
         WORK_ORDER: selectedObj.workOrderNumber || "",
         LR_NO: selectedObj.lrNumber || "",
         TRANSPORTER: selectedObj.transporter || "",
-        ZMAPID: selectedObj.MAPID || ""
+        ZMAPID: selectedObj.MAPID || "",
+        ZLINE_NO: selectedObj.lineNumber ?? null
       });
     }
     console.log("Updated items form:", this.items.value);
@@ -489,7 +496,9 @@ export class TransitDamageInfoComponent implements OnInit {
           item.referenceNumber === rowValue.referenceNumber &&
           item.workOrderNumber === rowValue.workOrderNumber &&
           item.lrNumber === rowValue.lrNumber &&
-          item.transporter === rowValue.transporter
+          item.transporter === rowValue.transporter &&
+          item.lineNumber === rowValue.lineNumber
+
       );
       if (!exists) {
         this.selectedItems.push(rowValue);
@@ -502,7 +511,8 @@ export class TransitDamageInfoComponent implements OnInit {
             item.referenceNumber === rowValue.referenceNumber &&
             item.workOrderNumber === rowValue.workOrderNumber &&
             item.lrNumber === rowValue.lrNumber &&
-            item.transporter === rowValue.transporter
+            item.transporter === rowValue.transporter &&
+            item.lineNumber === rowValue.lineNumber
           )
       );
     }
@@ -519,7 +529,8 @@ export class TransitDamageInfoComponent implements OnInit {
         item.referenceNumber === rowValue.referenceNumber &&
         item.workOrderNumber === rowValue.workOrderNumber &&
         item.lrNumber === rowValue.lrNumber &&
-        item.transporter === rowValue.transporter
+        item.transporter === rowValue.transporter &&
+         item.lineNumber === rowValue.lineNumber 
     );
   }
 
@@ -797,6 +808,7 @@ export class TransitDamageInfoComponent implements OnInit {
 
         this.HeaderForm.patchValue({
           INV_NO: header.INV_NO,
+          
           INV_DATE: header.INV_DATE,
           FSR_RPT_DT: header.FSR_RPT_DT,
           BASIC_VALUE: header.BASIC_VALUE,
@@ -823,6 +835,7 @@ export class TransitDamageInfoComponent implements OnInit {
           const row = this.fb.group({
             selected: [false],
             ZMAPID: [x.MAPID || ''],
+            ZLINE_NO: [x.LINE_NO || x.ZLINE_NO || ''],
             INV_NO: [x.INV_NO],
             REFNO: [x.REFNO],
             BILLNO: [x.BILLNO],
@@ -874,6 +887,7 @@ export class TransitDamageInfoComponent implements OnInit {
     headerValue.INV_NO = invoiceNo;
 
     headerValue.REFNO = selectedItems[0]?.REFNO || null;
+    headerValue.LINE_NO = selectedItems[0]?.ZLINE_NO || null;
     headerValue.INC_DATE = headerValue.INC_DATE || null;
     headerValue.CLOSING_DT = headerValue.CLOSING_DT || null;
     headerValue.ROUTE = headerValue.ROUTE ||
@@ -1060,6 +1074,7 @@ export class TransitDamageInfoComponent implements OnInit {
             selected: [false],
             ZMAPID: [x.ZMAPID],
             REFNO: [x.REFNO],
+            ZLINE_NO: [x.LINE_NO || x.ZLINE_NO || ''],
             INV_NO: [dcRefNo],
             POSNR: [x.POSNR],
             VEH_LINE: [x.VEH_LINE],
@@ -1104,6 +1119,7 @@ export class TransitDamageInfoComponent implements OnInit {
 
     headerValue.INV_NO = invoiceNo;
     headerValue.REFNO = refNo;
+    headerValue.LINE_NO = this.selectedItems[0]?.lineNumber || null;
 
     /* ITEMS */
     const itemsPayload = this.items.controls
@@ -1210,7 +1226,7 @@ export class TransitDamageInfoComponent implements OnInit {
         ZINV_NO: item.ZINV_NO || null,
         ZREFNO: String(item.ZREFNO),
         ZLINE_NO: String(item.ZLINE_NO),
-        ZPOSNR: item.ZLINE_NO || null,
+        ZPOSNR: item.ZPOSNR || item.POSNR || null,
         ZVEH_LINE: item.ZVEH_LINE || null,
         ZTRUCK_NO: item.ZTRUCK_NO || null,
         ZLR_NO: item.ZLRNO || null,

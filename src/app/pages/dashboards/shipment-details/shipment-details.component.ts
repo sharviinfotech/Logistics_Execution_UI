@@ -163,7 +163,8 @@ export class ShipmentDetailsComponent implements OnInit {
       odnNumber: [''],       // ODN Number
       materialType: [''],    // Material Type (MTART)
       plantCode: [''],       // Plant Code (ZPIN_PLT)
-      shippingPoint: ['']    // Shipping Point (ZPIN_STP)
+      shippingPoint: [''],
+      lineNumber: ['']    // Shipping Point (ZPIN_STP)
     });
   }
 
@@ -293,7 +294,8 @@ export class ShipmentDetailsComponent implements OnInit {
       REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
-      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : ''
+      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
+      LINE_NO: values.lineNumber || ''
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -382,7 +384,8 @@ export class ShipmentDetailsComponent implements OnInit {
             odnNumber: [d.ODN_NO || d.odnNumber || ''],
             materialType: [d.MTART || d.materialType || ''],
             plantCode: [d.PLANT_CODE || d.ZPIN_PLT || d.plantCode || ''],
-            shippingPoint: [d.SHIPPING_POINT || d.ZPIN_STP || d.shippingPoint || '']
+            shippingPoint: [d.SHIPPING_POINT || d.ZPIN_STP || d.shippingPoint || ''],
+            lineNumber: [d.LINE_NO || d.lineNumber || '']
           })
         );
       });
@@ -421,6 +424,7 @@ export class ShipmentDetailsComponent implements OnInit {
       ZWORK_ORDER: selectedObj.workOrderNumber ?? null,
       ZLRNO: selectedObj.lrNumber ?? null,
       ZTRANSPORTER: selectedObj.transporter ?? null,
+      ZLINE_NO: selectedObj.lineNumber ?? null
 
       // sunil commment due to facing issue these below on 04-02-2026
       // ✅ REQUIRED FOR NON-SAP SAVE
@@ -448,7 +452,8 @@ export class ShipmentDetailsComponent implements OnInit {
           item.lrNumber === rowValue.lrNumber &&
           item.transporter === rowValue.transporter &&
           item.soNumber === rowValue.soNumber &&
-          item.odnNumber === rowValue.odnNumber
+          item.odnNumber === rowValue.odnNumber &&
+          item.lineNumber === rowValue.lineNumber 
       );
       if (!exists) {
         this.selectedItems.push(rowValue);
@@ -463,7 +468,8 @@ export class ShipmentDetailsComponent implements OnInit {
             item.lrNumber === rowValue.lrNumber &&
             item.transporter === rowValue.transporter &&
             item.soNumber === rowValue.soNumber &&
-            item.odnNumber === rowValue.odnNumber
+            item.odnNumber === rowValue.odnNumber &&
+            item.lineNumber === rowValue.lineNumber
           )
       );
     }
@@ -482,7 +488,8 @@ export class ShipmentDetailsComponent implements OnInit {
         item.lrNumber === rowValue.lrNumber &&
         item.transporter === rowValue.transporter &&
         item.soNumber === rowValue.soNumber &&
-        item.odnNumber === rowValue.odnNumber
+        item.odnNumber === rowValue.odnNumber &&
+         item.lineNumber === rowValue.lineNumber 
     );
   }
 

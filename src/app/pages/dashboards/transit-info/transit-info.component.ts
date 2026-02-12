@@ -122,6 +122,7 @@ export class TransitInfoComponent implements OnInit {
       workOrderNumber: [''],
       lrNumber: [''],
       transporter: [''],
+      lineNumber: [''], 
       vehicleNo: [''],
       vehicleLine: ['']
     });
@@ -273,7 +274,8 @@ export class TransitInfoComponent implements OnInit {
       REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
-      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : ''
+      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
+      LINE_NO: values.lineNumber || ''
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -344,7 +346,8 @@ export class TransitInfoComponent implements OnInit {
             lrNumber: [d.LR_NO || ''],
             transporter: [d.TRANSPORTER || ''],
             vehicleNo: [d.VEH_NUM || ''],
-            vehicleLine: [d.VEH_LINE || '']
+            vehicleLine: [d.VEH_LINE || ''],
+            lineNumber: [d.LINE_NO || d.ZLINE_NO || d.lineNumber || '']
           })
         );
       });
@@ -615,6 +618,7 @@ export class TransitInfoComponent implements OnInit {
         VEH_LINE: 1,
         VEH_NUM: "",
         LRNO: "",
+        LINE_NO:"",
         WORK_ORDER: "",
         TRANSPORTER: ""
       });
@@ -629,7 +633,8 @@ export class TransitInfoComponent implements OnInit {
         VEH_NUM: "",
         LRNO: item.lrNumber,
         WORK_ORDER: item.workOrderNumber,
-        TRANSPORTER: item.transporter
+        TRANSPORTER: item.transporter,
+        LINE_NO: item.lineNumber || item.LINE_NO || item.ZLINE_NO || ''
       }));
 
     }

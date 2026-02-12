@@ -125,7 +125,8 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       ZLRNO: [data?.ZLRNO || ''],
       ZTRANSPORTER: [data?.ZTRANSPORTER || ''],
       ZSO_NO: [data?.ZSO_NO || ''],
-      ZODN_NO: [data?.ZODN_NO || '']
+      ZODN_NO: [data?.ZODN_NO || ''],
+      ZLINE_NO: [data?.ZLINE_NO || ''],
     });
   }
 
@@ -138,6 +139,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       transporter: [''],
       soNumber: [''],
       odnNumber: [''],
+      lineNumber: ['']
     });
   }
 
@@ -263,7 +265,8 @@ export class InvoiceLoadDetailsComponent implements OnInit {
         ZWORK_ORDER: selectedObj.workOrderNumber || "",
         ZLRNO: selectedObj.lrNumber || "",
         ZTRANSPORTER: selectedObj.transporter || "",
-        ZMAPID: selectedObj.MAPID || ""
+        ZMAPID: selectedObj.MAPID || "",
+      ZLINE_NO: selectedObj.lineNumber ?? null
       });
     }
     console.log("Updated invoices form:", this.invoices.value);
@@ -296,7 +299,8 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
-      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : ''
+      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
+      LINE_NO: values.lineNumber || ''
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -372,7 +376,8 @@ export class InvoiceLoadDetailsComponent implements OnInit {
             soNumber: [''],
             odnNumber: [''],
             ZNO_TRUCKS: [d.ZNO_TRUCKS],
-            INV_NO_LIST: [d.INV_NO || []]
+            INV_NO_LIST: [d.INV_NO || []],
+            lineNumber: [d.LINE_NO || d.lineNumber || '']
           })
         );
 
@@ -414,7 +419,8 @@ export class InvoiceLoadDetailsComponent implements OnInit {
           item.lrNumber === rowValue.lrNumber &&
           item.transporter === rowValue.transporter &&
           item.soNumber === rowValue.soNumber &&
-          item.odnNumber === rowValue.odnNumber
+          item.odnNumber === rowValue.odnNumber &&
+          item.lineNumber === rowValue.lineNumber 
       );
       if (!exists) {
         this.selectedItems.push(rowValue);
@@ -429,7 +435,8 @@ export class InvoiceLoadDetailsComponent implements OnInit {
             item.lrNumber === rowValue.lrNumber &&
             item.transporter === rowValue.transporter &&
             item.soNumber === rowValue.soNumber &&
-            item.odnNumber === rowValue.odnNumber
+            item.odnNumber === rowValue.odnNumber &&
+            item.lineNumber === rowValue.lineNumber 
           )
       );
     }
@@ -448,7 +455,9 @@ export class InvoiceLoadDetailsComponent implements OnInit {
         item.lrNumber === rowValue.lrNumber &&
         item.transporter === rowValue.transporter &&
         item.soNumber === rowValue.soNumber &&
-        item.odnNumber === rowValue.odnNumber
+        item.odnNumber === rowValue.odnNumber &&
+         item.lineNumber === rowValue.lineNumber 
+
     );
   }
 
@@ -544,6 +553,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
                 ZWORK_ORDER: ref.workOrderNumber || '',
                 ZLRNO: ref.lrNumber || '',
                 ZTRANSPORTER: ref.transporter || '',
+                ZLINE_NO: ref.lineNumber || '', 
 
                 ZTRUCK_LINE: i + 1,
 

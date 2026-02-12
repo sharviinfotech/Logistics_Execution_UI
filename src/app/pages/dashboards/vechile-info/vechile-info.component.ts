@@ -135,7 +135,8 @@ export class VechileInfoComponent implements OnInit {
 
       // ZTRANSPORTER: [data?.ZTRANSPORTER || ''],
       ZSO_NO: [data?.ZSONO || ''],
-      ZODN_NO: [data?.ZODN_NO || '']
+      ZODN_NO: [data?.ZODN_NO || ''],
+      ZLINE_NO: [data?.ZLINE_NO || ''],
     });
   }
 
@@ -148,6 +149,7 @@ export class VechileInfoComponent implements OnInit {
       transporter: [''],
       soNumber: [''],
       odnNumber: [''],
+       lineNumber: ['']
 
     });
   }
@@ -288,7 +290,8 @@ export class VechileInfoComponent implements OnInit {
         ZWORK_ORDER: selectedObj.workOrderNumber || '',
         ZLRNO: selectedObj.lrNumber || '',
         ZTRANSPORTER: selectedObj.transporter || '',
-        ZMAPID: selectedObj.MAPID || ''
+        ZMAPID: selectedObj.MAPID || '',
+        ZLINE_NO: selectedObj.lineNumber ?? null
       });
     }
 
@@ -382,7 +385,8 @@ export class VechileInfoComponent implements OnInit {
       REF_NO: fieldKey === 'REF_NO' ? values.referenceNumber : '',
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
-      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : ''
+      TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
+      LINE_NO: values.lineNumber || ''
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -456,6 +460,7 @@ export class VechileInfoComponent implements OnInit {
             soNumber: [''],
             odnNumber: [''],
             ZNO_TRUCKS: [d.ZNO_TRUCKS],
+            lineNumber: [d.LINE_NO || d.lineNumber || ''],
             INV_NO_LIST: [d.INV_NO || []]
           })
         );
@@ -516,7 +521,8 @@ export class VechileInfoComponent implements OnInit {
           item.lrNumber === rowValue.lrNumber &&
           item.transporter === rowValue.transporter &&
           item.soNumber === rowValue.soNumber &&
-          item.odnNumber === rowValue.odnNumber
+          item.odnNumber === rowValue.odnNumber &&
+          item.lineNumber === rowValue.lineNumber 
       );
       if (!exists) {
         this.selectedItems.push(rowValue);
@@ -531,7 +537,8 @@ export class VechileInfoComponent implements OnInit {
             item.lrNumber === rowValue.lrNumber &&
             item.transporter === rowValue.transporter &&
             item.soNumber === rowValue.soNumber &&
-            item.odnNumber === rowValue.odnNumber
+            item.odnNumber === rowValue.odnNumber &&
+            item.lineNumber === rowValue.lineNumber 
           )
       );
     }
@@ -550,7 +557,8 @@ export class VechileInfoComponent implements OnInit {
         item.lrNumber === rowValue.lrNumber &&
         item.transporter === rowValue.transporter &&
         item.soNumber === rowValue.soNumber &&
-        item.odnNumber === rowValue.odnNumber
+        item.odnNumber === rowValue.odnNumber &&
+        item.lineNumber === rowValue.lineNumber 
     );
   }
 

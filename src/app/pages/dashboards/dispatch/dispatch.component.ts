@@ -176,6 +176,7 @@ export class DispatchComponent implements OnInit {
   createRow(isFirstRow: boolean = false): FormGroup {
     const row = this.fb.group({
       LINE_NO: [''],
+      CREATED_DT: [''],
       workorder: [''],
       VehicleType: ['', Validators.required],
       NoOfTrucks: ['', Validators.required],
@@ -535,6 +536,7 @@ export class DispatchComponent implements OnInit {
     records.forEach((item, index) => {
       const row = this.fb.group({
         LINE_NO: [item.LINE_NO || ''],
+        CREATED_DT: [item.CREATED_DT || ''],
         workorder: [item.WORK_ORDER || ''],
         VehicleType: [item.VEH_TYPE || '', Validators.required],
         NoOfTrucks: [item.NO_TRUCKS || '', Validators.required],
@@ -550,6 +552,7 @@ export class DispatchComponent implements OnInit {
       });
 
       row.get('LINE_NO')?.disable();
+      
       rowsArray.push(row);
       if (index !== 0) row.get('VehicleType')?.disable();
     });
@@ -577,6 +580,7 @@ export class DispatchComponent implements OnInit {
     const payload = rawRows.map((row: any) => ({
       REFNO: Number(this.searchReference),
       LINE_NO: Number(row.LINE_NO),
+      CREATED_DT: row.CREATED_DT || '',
       VEH_TYPE: row.VehicleType,
       NO_TRUCKS: Number(row.NoOfTrucks),
       NO_INVOICES: Number(row.NoOfInvoices),
@@ -588,7 +592,8 @@ export class DispatchComponent implements OnInit {
       NO_LRS: Number(row.NoOfLRs) || 0,
       LR_NO: row.LRNumber || '',
       LOAD_PT: row.LoadingPoints || '',
-      UNLOAD_PT: row.UnLoadingPoints || ''
+      UNLOAD_PT: row.UnLoadingPoints || '',
+
     }));
 
     console.log("📤 Update payload:", payload);
