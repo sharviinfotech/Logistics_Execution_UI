@@ -1624,6 +1624,17 @@ export class FreightBillingComponent implements OnInit {
 
   // Open modal and load data
   openPACheckModal(template: any, item: any, index: number): void {
+
+     if (!item.isEdit) {
+    Swal.fire({
+      title: 'Edit Required',
+      text: 'If you want to edit, please click the Edit button first.',
+      icon: 'info',
+      confirmButtonText: 'Ok',
+      timer: 3000
+    });
+    return;  // ⬅️ Exit without opening modal
+  }
     this.selectedPAItem = item;
     this.selectedPAIndex = index;
 

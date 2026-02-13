@@ -114,7 +114,7 @@ export class OrderInfoComponent implements OnInit {
 
     this.initialFormValues = this.OrderInfo.value;
     this.setupPhysicalDispatch();
-    this.fetchCustomers();
+    // this.fetchCustomers();  //Due to 404 error pradeep comment this line this one cant use in this screen any where
     this.fetchTransporter();
   }
 
@@ -1122,22 +1122,22 @@ export class OrderInfoComponent implements OnInit {
       }
     );
   }
-
-  fetchCustomers(): void {
-    this.spinner.show();
-    this.service.getAllCustomerList().subscribe(
-      (res: any) => {
-        console.log('📥 Customer list fetched:', res);
-        // normalize to expected structure if needed
-        this.customerList = Array.isArray(res) ? res : (res?.data || []);
-        this.spinner.hide();
-      },
-      (error) => {
-        console.error('❌ Customer fetch error:', error);
-        this.spinner.hide();
-      }
-    );
-  }
+//Due to 404 error pradeep comment this line this one cant use in this screen any where
+  // fetchCustomers(): void {
+  //   this.spinner.show();
+  //   this.service.getAllCustomerList().subscribe(
+  //     (res: any) => {
+  //       console.log('📥 Customer list fetched:', res);
+  //       // normalize to expected structure if needed
+  //       this.customerList = Array.isArray(res) ? res : (res?.data || []);
+  //       this.spinner.hide();
+  //     },
+  //     (error) => {
+  //       console.error('❌ Customer fetch error:', error);
+  //       this.spinner.hide();
+  //     }
+  //   );
+  // }
 
   fetchzonechange(): void {
     if (this.OrderInfo.value.DestinationState) {

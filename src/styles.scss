@@ -217,7 +217,8 @@ td {
   background-color: white !important;
   padding: 20px;
   border-radius: 8px;
-  max-height: 80vh;
+  max-height: 70vh;
+  margin-left: 10%;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -253,6 +254,7 @@ td {
 .table tbody td input[type="number"],
 .table tbody td input[type="date"],
 .table tbody td input[type="tel"],
+.table tbody td input[type="file"],
 .table tbody td input[type="datetime-local"],  
 .table tbody td select {
 

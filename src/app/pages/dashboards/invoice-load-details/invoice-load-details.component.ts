@@ -754,6 +754,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
         ZTRANSPORTER: inv.ZTRANSPORTER || "",
         VBELN: dcRefNo,
         POSNR: index + 10,
+        ZLINE_NO: inv.ZLINE_NO,
         ZTRUC_TYPE: inv.ZTRUC_TYPE,
         ZTRUC_WT: inv.ZTRUC_WT,
         ZACT_LOAD: inv.ZACT_LOAD,
@@ -827,7 +828,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   // Method to update the edited row
 
   updateInvoiceSap(row: any) {
-    if (!row.ZMAPID || !row.VBELN || !row.POSNR || !row.ZLINE_NO) {
+    if (!row.ZREFNO || !row.VBELN ||  !row.ZMAPID || !row.ZLINE_NO) {
       Swal.fire('Error', 'Primary key missing', 'error');
       return null;
     }
@@ -857,7 +858,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     return this.service.InvoiceloaddetailsSave(payload);
   }
   updateInvoiceNonSap(row: any) {
-    if (!row.ZMAPID || !row.VBELN || !row.POSNR || !row.ZLINE_NO) {
+    if (!row.ZMAPID || !row.VBELN ||  !row.ZREFNO || !row.ZLINE_NO) {
       Swal.fire('Error', 'Primary key missing', 'error');
       return null;
     }
@@ -889,6 +890,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     return this.service.InvoiceloaddetailsNonSap(payload);
   }
   updateInvoiceRow(row: any): void {
+    console.log("Updating Row:", row);
     Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to update this invoice record?',

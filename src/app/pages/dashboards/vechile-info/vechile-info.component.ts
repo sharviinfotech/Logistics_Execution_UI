@@ -291,7 +291,7 @@ export class VechileInfoComponent implements OnInit {
         ZLRNO: selectedObj.lrNumber || '',
         ZTRANSPORTER: selectedObj.transporter || '',
         ZMAPID: selectedObj.MAPID || '',
-        ZLINE_NO: selectedObj.lineNumber ?? null
+        ZLINE_NO: selectedObj.lineNumber || ''
       });
     }
 
@@ -948,6 +948,7 @@ export class VechileInfoComponent implements OnInit {
     apiCall.subscribe({
       next: (res: any) => {
         this.spinner.hide();
+        console.log("SAVE API RESPONSE:", res);
         if (res?.NUMBER === '200') {
           Swal.fire({
             title: 'Success',
