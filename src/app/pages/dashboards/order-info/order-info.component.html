@@ -639,29 +639,16 @@
                 <tr *ngFor="let item of searchOptionsList; let i = index" [class.editing]="item.isEdit">
 
                   <!-- Reusable pattern -->
-                  <td>
-                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-                      [(ngModel)]="item.ZREFNO">
-                    <span *ngIf="!item.isEdit">{{ item.ZREFNO }}</span>
-                  </td>
+                  <td>{{ item.ZREFNO }}</td>
+                  <td>{{ item.ZINV_NO  }}</td>
 
-                  <td>
-                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-                      [(ngModel)]="item.ZINV_NO">
-                    <span *ngIf="!item.isEdit">{{ item.ZINV_NO }}</span>
-                  </td>
 
-                  <td>
-                    <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-sm"
-                      [(ngModel)]="item.ZLINE_NO">
-                    <span *ngIf="!item.isEdit">{{ item.ZLINE_NO }}</span>
-                  </td>
 
-                  <td>
-                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-                      [(ngModel)]="item.ZODN_NO">
-                    <span *ngIf="!item.isEdit">{{ item.ZODN_NO }}</span>
-                  </td>
+                  <td>{{ item.ZLINE_NO }}</td>
+                  <td>{{ item.ZODN_NO }}</td>
+
+
+
 
                   <td>
                     <input *ngIf="item.isEdit" type="date" class="form-control form-control-sm"
@@ -688,7 +675,7 @@
                   </td>
 
                   <td>
-                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm"
+                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
                       [(ngModel)]="item.ZFYEAR">
                     <span *ngIf="!item.isEdit">{{ item.ZFYEAR }}</span>
                   </td>
@@ -718,7 +705,7 @@
                   </td>
 
                   <td>
-                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm"
+                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
                       [(ngModel)]="item.ZTRX_TYPE">
                     <span *ngIf="!item.isEdit">{{ item.ZTRX_TYPE }}</span>
                   </td>
@@ -736,7 +723,7 @@
                   </td>
 
                   <td>
-                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm"
+                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
                       [(ngModel)]="item.ZSUB_DIVISION">
                     <span *ngIf="!item.isEdit">{{ item.ZSUB_DIVISION }}</span>
                   </td>
@@ -748,7 +735,7 @@
                   </td>
 
                   <td>
-                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm"
+                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
                       [(ngModel)]="item.ZCUST_NAME">
                     <span *ngIf="!item.isEdit">{{ item.ZCUST_NAME }}</span>
                   </td>
@@ -760,13 +747,13 @@
                   </td>
 
                   <td>
-                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm"
+                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
                       [(ngModel)]="item.ZCONSIGN_NAME">
                     <span *ngIf="!item.isEdit">{{ item.ZCONSIGN_NAME }}</span>
                   </td>
 
                   <td>
-                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm"
+                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
                       [(ngModel)]="item.ZDES_LOC">
                     <span *ngIf="!item.isEdit">{{ item.ZDES_LOC }}</span>
                   </td>
@@ -796,19 +783,19 @@
                   </td>
 
                   <td>
-                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm"
+                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
                       [(ngModel)]="item.ZTRANSPORTER">
                     <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
                   </td>
                   <td>
-                    <input *ngIf="item.isEdit" type="date" class="form-control form-control-sm"
+                    <input *ngIf="item.isEdit" type="date" class="form-control form-control-sm width-md"
                       [(ngModel)]="item.ZCREATED_DT">
                     <span *ngIf="!item.isEdit">{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</span>
                   </td>
 
                   <!-- Vehicle Type -->
                   <td>
-                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm"
+                    <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
                       [(ngModel)]="item.ZVEH_TYPE">
                     <span *ngIf="!item.isEdit">{{ item.ZVEH_TYPE }}</span>
                   </td>

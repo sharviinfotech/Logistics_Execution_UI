@@ -55,6 +55,7 @@ export class FreightBillingComponent implements OnInit {
 
   // Search functionality
   selectedItems: any[] = [];
+  fullReferenceData: any[] = [];
   searchReference: string = '';
   searchOptions = [
     { key: 'ref_no', label: 'Reference No' },
@@ -397,8 +398,10 @@ export class FreightBillingComponent implements OnInit {
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
     this.invoiceF4List = [];
+    this.fullReferenceData = [];
 
     if (data && data.length > 0) {
+      this.fullReferenceData = data;
       data.forEach(d => {
 
         // ✅ EXTRACT INVOICE NUMBERS FOR F4
@@ -413,6 +416,7 @@ export class FreightBillingComponent implements OnInit {
         // ✅ EXISTING ROW PUSH
         this.referenceItems.push(
           this.fb.group({
+            MAPID: [d.MAPID || ''],
             referenceNumber: [d.REF_NO || ''],
             workOrderNumber: [d.WORK_ORDER_NO || ''],
             lrNumber: [d.LR_NO || ''],
@@ -448,6 +452,7 @@ export class FreightBillingComponent implements OnInit {
       if (!exists) {
         this.selectedItems.push(rowValue);
       }
+      this.updateInvoiceListForSelectedItems();
     } else {
       this.selectedItems = this.selectedItems.filter(
         (item) =>
@@ -458,10 +463,41 @@ export class FreightBillingComponent implements OnInit {
             item.transporter === rowValue.transporter
           )
       );
+      this.updateInvoiceListForSelectedItems();
     }
 
     console.log('✅ Selected Items:', this.selectedItems);
   }
+
+  updateInvoiceListForSelectedItems(): void {
+  this.invoiceF4List = [];
+ 
+  if (this.selectedItems.length === 0) {
+    // No items selected, clear invoice list
+    console.log('⚠️ No items selected, invoice list cleared');
+    return;
+  }
+ 
+  // Get unique MAPIDs from selected items
+  const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
+ 
+  console.log('🔍 Selected MAPIDs:', selectedMapIds);
+ 
+  // Filter reference data for selected MAPIDs and extract invoices
+  this.fullReferenceData.forEach(refItem => {
+    if (selectedMapIds.includes(refItem.MAPID)) {
+      if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
+        refItem.INV_NO.forEach((inv: any) => {
+          if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+            this.invoiceF4List.push(inv.VBELN);
+          }
+        });
+      }
+    }
+  });
+ 
+  console.log('📋 Filtered Invoice List:', this.invoiceF4List);
+}
 
   isItemSelected(index: number): boolean {
     const rowValue = (this.referenceItems.at(index) as FormGroup).value;
@@ -988,32 +1024,47 @@ export class FreightBillingComponent implements OnInit {
   }
 
   cancelModal() {
-    if (this.popupType === 'provision') {
-      this.resetPopupData();
-    }
+  if (this.isPAModalContext) {
+    // Reset popup data but don't clear paFormData
+    this.freightDetails = this.resetDetails();
+    this.totalFreight = 0;
     this.isPAModalContext = false;
-    this.modalService.dismissAll();
+  } else if (this.popupType === 'provision') {
+    this.resetPopupData();
   }
+  
+  this.modalService.dismissAll();
+}
 
   resetPopupData() {
     this.freightDetails = this.resetDetails();
     this.totalFreight = 0;
   }
 
-  openPAModal(calculateTotalpopup: any, type: 'freight' | 'provision') {
-    this.isPAModalContext = true;
-    this.popupType = type;
+   openPAModal(calculateTotalpopup: any, type: 'freight' | 'provision') {
+  this.isPAModalContext = true;
+  this.popupType = type;
 
-
+  // ✅ Load existing value into popup if present
+  if (type === 'freight' && this.paFormData.freightCharges) {
+    this.freightDetails = this.resetDetails();
+    this.freightDetails.basicFreight = Number(this.paFormData.freightCharges) || 0;
+    this.totalFreight = this.freightDetails.basicFreight;
+  } else if (type === 'provision' && this.paFormData.provisionAmount) {
+    this.freightDetails = this.resetDetails();
+    this.freightDetails.basicFreight = Number(this.paFormData.provisionAmount) || 0;
+    this.totalFreight = this.freightDetails.basicFreight;
+  } else {
     this.freightDetails = this.resetDetails();
     this.totalFreight = 0;
-
-    this.modalService.open(calculateTotalpopup, {
-      backdrop: 'static',
-      keyboard: false,
-      size: 'lg'
-    });
   }
+
+  this.modalService.open(calculateTotalpopup, {
+    backdrop: 'static',
+    keyboard: false,
+    size: 'lg'
+  });
+}
 
   isSap(): boolean {
     return this.sapType === 'SAP';

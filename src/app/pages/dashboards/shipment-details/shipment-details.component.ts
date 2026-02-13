@@ -80,6 +80,8 @@ export class ShipmentDetailsComponent implements OnInit {
   showOrderInfoTable = false;
   showDispatchTable = false;
   invoiceF4List: string[] = [];
+  fullReferenceData: any[] = [];
+
 
   constructor(
     private fb: FormBuilder,
@@ -359,8 +361,11 @@ export class ShipmentDetailsComponent implements OnInit {
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
     this.invoiceF4List = [];   // 🔑 Reset F4 list
+     this.selectedItems = [];
+     this.fullReferenceData = [];
 
     if (data && data.length > 0) {
+       this.fullReferenceData = data;
       data.forEach(d => {
 
         // ✅ EXTRACT INVOICE NUMBERS FOR F4
@@ -458,7 +463,9 @@ export class ShipmentDetailsComponent implements OnInit {
       if (!exists) {
         this.selectedItems.push(rowValue);
       }
+      this.updateInvoiceListForSelectedItems();
     } else {
+
       this.selectedItems = this.selectedItems.filter(
         (item) =>
           !(
@@ -472,10 +479,40 @@ export class ShipmentDetailsComponent implements OnInit {
             item.lineNumber === rowValue.lineNumber
           )
       );
+      this.updateInvoiceListForSelectedItems();
     }
 
     console.log('✅ Selected Items:', this.selectedItems);
   }
+   updateInvoiceListForSelectedItems(): void {
+  this.invoiceF4List = [];
+ 
+  if (this.selectedItems.length === 0) {
+    // No items selected, clear invoice list
+    console.log('⚠️ No items selected, invoice list cleared');
+    return;
+  }
+ 
+  // Get unique MAPIDs from selected items
+  const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
+ 
+  console.log('🔍 Selected MAPIDs:', selectedMapIds);
+ 
+  // Filter reference data for selected MAPIDs and extract invoices
+  this.fullReferenceData.forEach(refItem => {
+    if (selectedMapIds.includes(refItem.MAPID)) {
+      if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
+        refItem.INV_NO.forEach((inv: any) => {
+          if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+            this.invoiceF4List.push(inv.VBELN);
+          }
+        });
+      }
+    }
+  });
+ 
+  console.log('📋 Filtered Invoice List:', this.invoiceF4List);
+}
 
   isItemSelected(index: number): boolean {
     const rowValue = (this.referenceItems.at(index) as FormGroup).value;

@@ -1,6 +1,14 @@
 /* Radio button styling */
 
-
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 13px;
+  margin-top: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px !important;
+}
 
 
 

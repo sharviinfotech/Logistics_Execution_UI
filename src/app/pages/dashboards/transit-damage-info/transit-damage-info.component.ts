@@ -53,6 +53,7 @@ export class TransitDamageInfoComponent implements OnInit {
   transitResponse: any = {};
   VendorCodeList: any[] = [];
   mainMode: string = 'creation'; // Default to creation mode
+  fullReferenceData: any[] = [];
 
   pendingCount: number = 0;
   completedCount: number = 0;
@@ -423,8 +424,11 @@ export class TransitDamageInfoComponent implements OnInit {
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
     this.invoiceF4List = [];   // 🔑 Reset F4 list
+      this.fullReferenceData = [];
+ 
 
     if (data && data.length > 0) {
+       this.fullReferenceData = data;
       data.forEach(d => {
 
         // ✅ EXTRACT INVOICE NUMBERS FOR F4
@@ -503,6 +507,7 @@ export class TransitDamageInfoComponent implements OnInit {
       if (!exists) {
         this.selectedItems.push(rowValue);
       }
+      this.updateInvoiceListForSelectedItems();
     } else {
       this.selectedItems = this.selectedItems.filter(
         (item) =>
@@ -515,10 +520,40 @@ export class TransitDamageInfoComponent implements OnInit {
             item.lineNumber === rowValue.lineNumber
           )
       );
+      this.updateInvoiceListForSelectedItems();
     }
 
     console.log('✅ Selected Items:', this.selectedItems);
   }
+  updateInvoiceListForSelectedItems(): void {
+  this.invoiceF4List = [];
+ 
+  if (this.selectedItems.length === 0) {
+    // No items selected, clear invoice list
+    console.log('⚠️ No items selected, invoice list cleared');
+    return;
+  }
+ 
+  // Get unique MAPIDs from selected items
+  const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
+ 
+  console.log('🔍 Selected MAPIDs:', selectedMapIds);
+ 
+  // Filter reference data for selected MAPIDs and extract invoices
+  this.fullReferenceData.forEach(refItem => {
+    if (selectedMapIds.includes(refItem.MAPID)) {
+      if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
+        refItem.INV_NO.forEach((inv: any) => {
+          if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+            this.invoiceF4List.push(inv.VBELN);
+          }
+        });
+      }
+    }
+  });
+ 
+  console.log('📋 Filtered Invoice List:', this.invoiceF4List);
+}
 
   isItemSelected(index: number): boolean {
     const rowValue = (this.referenceItems.at(index) as FormGroup).value;
@@ -789,11 +824,14 @@ export class TransitDamageInfoComponent implements OnInit {
     this.service.TransitDamageInfofetch(payload).subscribe({
       next: (res: any) => {
         this.spinner.hide();
+       
 
         if (!res || res.length === 0) {
           Swal.fire("No data found", '', 'info');
           return;
         }
+
+         Swal.fire('Success', 'Invoice Details fetched successfully!', 'success');
 
         const header = res[0].HEADER;
         const items = res[0].ITEM;
@@ -808,7 +846,7 @@ export class TransitDamageInfoComponent implements OnInit {
 
         this.HeaderForm.patchValue({
           INV_NO: header.INV_NO,
-          
+         
           INV_DATE: header.INV_DATE,
           FSR_RPT_DT: header.FSR_RPT_DT,
           BASIC_VALUE: header.BASIC_VALUE,
