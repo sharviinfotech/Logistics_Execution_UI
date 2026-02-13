@@ -77,6 +77,8 @@ export class TransitInfoComponent implements OnInit {
   TransitInfoData: any[] = [];
   filterSapType: string = '';
   invoiceF4List: string[] = [];
+  fullReferenceData: any[] = [];
+
 
 
   constructor(
@@ -324,9 +326,11 @@ export class TransitInfoComponent implements OnInit {
 
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
-    this.invoiceF4List = [];   // 🔥 RESET F4 LIST
+    this.invoiceF4List = [];   
+     this.fullReferenceData = [];
 
     if (data && data.length > 0) {
+       this.fullReferenceData = data;
       data.forEach(d => {
 
         // ✅ EXTRACT INVOICE NUMBERS FOR F4
@@ -341,6 +345,7 @@ export class TransitInfoComponent implements OnInit {
         // ✅ EXISTING ROW PUSH
         this.referenceItems.push(
           this.fb.group({
+              MAPID: [d.MAPID || ''], 
             referenceNumber: [d.REF_NO || ''],
             workOrderNumber: [d.WORK_ORDER_NO || ''],
             lrNumber: [d.LR_NO || ''],
@@ -395,6 +400,7 @@ export class TransitInfoComponent implements OnInit {
       if (!exists) {
         this.selectedItems.push(rowValue);
       }
+       this.updateInvoiceListForSelectedItems();
     } else {
       this.selectedItems = this.selectedItems.filter(
         (item) =>
@@ -405,6 +411,7 @@ export class TransitInfoComponent implements OnInit {
             item.transporter === rowValue.transporter
           )
       );
+       this.updateInvoiceListForSelectedItems();
     }
 
     console.log('✅ Selected Items:', this.selectedItems);
@@ -421,6 +428,37 @@ export class TransitInfoComponent implements OnInit {
         item.transporter === rowValue.transporter
     );
   }
+
+    updateInvoiceListForSelectedItems(): void {
+  this.invoiceF4List = [];
+
+  if (this.selectedItems.length === 0) {
+    // No items selected, clear invoice list
+    console.log('⚠️ No items selected, invoice list cleared');
+    return;
+  }
+
+  // Get unique MAPIDs from selected items
+  const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
+
+  console.log('🔍 Selected MAPIDs:', selectedMapIds);
+
+  // Filter reference data for selected MAPIDs and extract invoices
+  this.fullReferenceData.forEach(refItem => {
+    if (selectedMapIds.includes(refItem.MAPID)) {
+      if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
+        refItem.INV_NO.forEach((inv: any) => {
+          if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+            this.invoiceF4List.push(inv.VBELN);
+          }
+        });
+      }
+    }
+  });
+
+  console.log('📋 Filtered Invoice List:', this.invoiceF4List);
+}
+
 
   // onSearchTypeChange(): void {
   //   // Reset data when search type changes

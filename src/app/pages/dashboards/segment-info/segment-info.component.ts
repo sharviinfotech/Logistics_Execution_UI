@@ -83,6 +83,7 @@ export class SegmentInfoComponent implements OnInit {
   dropdownOpen = false;
   filterSapType: string = '';
   invoiceF4List: string[] = [];
+  fullReferenceData: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -252,6 +253,7 @@ export class SegmentInfoComponent implements OnInit {
           this.patchForm(res[0]);
           this.showForm = true;
           this.searchOptionsList = [];
+           Swal.fire('Success', 'Invoice Details fetched successfully!', 'success');
         } else {
           Swal.fire('No data found', '', 'info');
         }
@@ -378,9 +380,11 @@ export class SegmentInfoComponent implements OnInit {
 
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
-    this.invoiceF4List = [];   // 🔑 Reset F4 list
+    this.invoiceF4List = [];  
+        this.fullReferenceData = []; 
 
     if (data && data.length > 0) {
+      this.fullReferenceData = data;
       data.forEach(d => {
 
         // ✅ EXTRACT INVOICE NUMBERS FOR F4
@@ -410,7 +414,8 @@ export class SegmentInfoComponent implements OnInit {
         );
       });
 
-      console.log('🟢 Invoice F4 List:', this.invoiceF4List);
+      
+      console.log('🟢 Full Reference Data stored:', this.fullReferenceData);
 
     } else {
       Swal.fire({
@@ -446,6 +451,7 @@ export class SegmentInfoComponent implements OnInit {
       if (!exists) {
         this.selectedItems.push(rowValue);
       }
+       this.updateInvoiceListForSelectedItems();
 
     } else {
 
@@ -459,6 +465,7 @@ export class SegmentInfoComponent implements OnInit {
             item.transporter === rowValue.transporter
           )
       );
+       this.updateInvoiceListForSelectedItems();
     }
 
     console.log('Selected Items:', this.selectedItems);
@@ -476,6 +483,36 @@ export class SegmentInfoComponent implements OnInit {
         item.transporter === rowValue.transporter
     );
   }
+
+      updateInvoiceListForSelectedItems(): void {
+  this.invoiceF4List = [];
+
+  if (this.selectedItems.length === 0) {
+    // No items selected, clear invoice list
+    console.log('⚠️ No items selected, invoice list cleared');
+    return;
+  }
+
+  // Get unique MAPIDs from selected items
+  const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
+
+  console.log('🔍 Selected MAPIDs:', selectedMapIds);
+
+  // Filter reference data for selected MAPIDs and extract invoices
+  this.fullReferenceData.forEach(refItem => {
+    if (selectedMapIds.includes(refItem.MAPID)) {
+      if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
+        refItem.INV_NO.forEach((inv: any) => {
+          if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+            this.invoiceF4List.push(inv.VBELN);
+          }
+        });
+      }
+    }
+  });
+
+  console.log('📋 Filtered Invoice List:', this.invoiceF4List);
+}
 
   onSearchTypeChange(): void {
     // Reset data when search type changes

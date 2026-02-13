@@ -72,6 +72,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   previousSapType: string | null = null;
   showForm: boolean = false;
   invoiceF4List: string[] = [];
+  fullReferenceData: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -360,9 +361,11 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
-    this.invoiceF4List = [];   // ✅ RESET F4 LIST
+    this.invoiceF4List = [];   
+       this.fullReferenceData = []; 
 
     if (data && data.length > 0) {
+        this.fullReferenceData = data;
       data.forEach(d => {
 
         // ✅ PUSH FORM ROW
@@ -391,7 +394,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
         }
       });
 
-      console.log('✅ Invoice F4 List:', this.invoiceF4List);
+      console.log('🟢 Full Reference Data stored:', this.fullReferenceData);
 
     } else {
       Swal.fire({
@@ -425,6 +428,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       if (!exists) {
         this.selectedItems.push(rowValue);
       }
+        this.updateInvoiceListForSelectedItems();
     } else {
       this.selectedItems = this.selectedItems.filter(
         (item) =>
@@ -439,10 +443,12 @@ export class InvoiceLoadDetailsComponent implements OnInit {
             item.lineNumber === rowValue.lineNumber 
           )
       );
+        this.updateInvoiceListForSelectedItems();
     }
 
     console.log('✅ Selected Items:', this.selectedItems);
   }
+
 
   isItemSelected(index: number): boolean {
     const rowValue = (this.referenceItems.at(index) as FormGroup).value;
@@ -460,6 +466,36 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
     );
   }
+
+    updateInvoiceListForSelectedItems(): void {
+  this.invoiceF4List = [];
+
+  if (this.selectedItems.length === 0) {
+    // No items selected, clear invoice list
+    console.log('⚠️ No items selected, invoice list cleared');
+    return;
+  }
+
+  // Get unique MAPIDs from selected items
+  const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
+
+  console.log('🔍 Selected MAPIDs:', selectedMapIds);
+
+  // Filter reference data for selected MAPIDs and extract invoices
+  this.fullReferenceData.forEach(refItem => {
+    if (selectedMapIds.includes(refItem.MAPID)) {
+      if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
+        refItem.INV_NO.forEach((inv: any) => {
+          if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+            this.invoiceF4List.push(inv.VBELN);
+          }
+        });
+      }
+    }
+  });
+
+  console.log('📋 Filtered Invoice List:', this.invoiceF4List);
+}
 
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
