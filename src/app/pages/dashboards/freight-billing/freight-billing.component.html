@@ -507,6 +507,7 @@
                 <th>Transporter</th>
                 <th>Location</th>
                 <th>Vehicle Number</th>
+                <th>Created Date</th>
                 <th>Vehicle Line</th>
                 <th>Action</th>
               </tr>
@@ -675,6 +676,11 @@
                     [(ngModel)]="item.ZVEH_NUM">
                   <span *ngIf="!item.isEdit">{{ item.ZVEH_NUM }}</span>
                 </td>
+
+
+                <td>{{ item.ZCREATED_DT ? (item.ZCREATED_DT | date:'dd-MM-yyyy') : '-' }}</td>
+
+
 
                 <td>
                   <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
@@ -1019,7 +1025,7 @@
 
       <div class="modal-footer">
         <button class="btn btn-secondary" (click)="c('Close')">Cancel</button>
-        <button class="btn btn-primary" (click)="updatePADetails()">
+        <button class="btn btn-primary" style="background-color: #8f1e42;" (click)="updatePADetails()">
           <i class="fas fa-save"></i> Update
         </button>
       </div>

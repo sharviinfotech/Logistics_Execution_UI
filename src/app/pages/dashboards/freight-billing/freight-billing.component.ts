@@ -52,6 +52,10 @@ export class FreightBillingComponent implements OnInit {
   selectedPAData: any = null;
   selectedPAItem: any = null;
   selectedPAIndex: number = -1;
+  currentCalculateModalRef: any = null;
+  // Store breakdown details for P/A modal
+  paFreightBreakdown: FreightDetails = this.resetDetails();
+  paProvisionBreakdown: FreightDetails = this.resetDetails();
 
   // Search functionality
   selectedItems: any[] = [];
@@ -165,7 +169,7 @@ export class FreightBillingComponent implements OnInit {
       workOrderNumber: [''],
       lrNumber: [''],
       transporter: [''],
-      lineNumber: [''], 
+      lineNumber: [''],
 
     });
   }
@@ -342,7 +346,7 @@ export class FreightBillingComponent implements OnInit {
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
-       LINE_NO: values.lineNumber || ''
+      LINE_NO: values.lineNumber || ''
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -423,7 +427,7 @@ export class FreightBillingComponent implements OnInit {
             transporter: [d.TRANSPORTER || ''],
             vehicleNo: [d.VEH_NUM || ''],
             vehicleLine: [d.VEH_LINE || ''],
-             lineNumber: [d.LINE_NO || d.ZLINE_NO || d.lineNumber || '']
+            lineNumber: [d.LINE_NO || d.ZLINE_NO || d.lineNumber || '']
           })
         );
       });
@@ -470,34 +474,34 @@ export class FreightBillingComponent implements OnInit {
   }
 
   updateInvoiceListForSelectedItems(): void {
-  this.invoiceF4List = [];
- 
-  if (this.selectedItems.length === 0) {
-    // No items selected, clear invoice list
-    console.log('⚠️ No items selected, invoice list cleared');
-    return;
-  }
- 
-  // Get unique MAPIDs from selected items
-  const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
- 
-  console.log('🔍 Selected MAPIDs:', selectedMapIds);
- 
-  // Filter reference data for selected MAPIDs and extract invoices
-  this.fullReferenceData.forEach(refItem => {
-    if (selectedMapIds.includes(refItem.MAPID)) {
-      if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
-        refItem.INV_NO.forEach((inv: any) => {
-          if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
-            this.invoiceF4List.push(inv.VBELN);
-          }
-        });
-      }
+    this.invoiceF4List = [];
+
+    if (this.selectedItems.length === 0) {
+      // No items selected, clear invoice list
+      console.log('⚠️ No items selected, invoice list cleared');
+      return;
     }
-  });
- 
-  console.log('📋 Filtered Invoice List:', this.invoiceF4List);
-}
+
+    // Get unique MAPIDs from selected items
+    const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
+
+    console.log('🔍 Selected MAPIDs:', selectedMapIds);
+
+    // Filter reference data for selected MAPIDs and extract invoices
+    this.fullReferenceData.forEach(refItem => {
+      if (selectedMapIds.includes(refItem.MAPID)) {
+        if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
+          refItem.INV_NO.forEach((inv: any) => {
+            if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+              this.invoiceF4List.push(inv.VBELN);
+            }
+          });
+        }
+      }
+    });
+
+    console.log('📋 Filtered Invoice List:', this.invoiceF4List);
+  }
 
   isItemSelected(index: number): boolean {
     const rowValue = (this.referenceItems.at(index) as FormGroup).value;
@@ -806,8 +810,8 @@ export class FreightBillingComponent implements OnInit {
             ZPROVAMT: row.ZPROVAMT,
             ZFRBILLUP: row.ZFRBILLUP,
             ZUNLOADAPP: row.ZUNLOADAPP,
-              ZDETENTUP: row.ZDETENTUP,
-              ZWORDUP: row.ZWORDUP
+            ZDETENTUP: row.ZDETENTUP,
+            ZWORDUP: row.ZWORDUP
           }
         ]
       };
@@ -985,18 +989,19 @@ export class FreightBillingComponent implements OnInit {
 
     this.calculateTotal();
 
-    this.modalService.open(calculateTotalpopup, {
+    this.currentCalculateModalRef = this.modalService.open(calculateTotalpopup, {
       backdrop: 'static',
       keyboard: false,
       size: 'lg'
-    }).result.finally(() => {
+    });
 
+    this.currentCalculateModalRef.result.finally(() => {
       // ✅ If provision popup closed → reset popup values
       if (type === 'provision') {
         this.freightDetails = this.resetDetails();
         this.totalFreight = 0;
       }
-
+      this.currentCalculateModalRef = null;
     });
   }
 
@@ -1004,11 +1009,15 @@ export class FreightBillingComponent implements OnInit {
     const finalTotal = this.calculateTotal();
 
     if (this.isPAModalContext) {
-      // For P/A Check Modal
+      // For P/A Check Modal - store BOTH the total AND the breakdown
       if (this.popupType === 'freight') {
         this.paFormData.freightCharges = finalTotal;
+        // ✅ Store the breakdown details
+        this.paFreightBreakdown = { ...this.freightDetails };
       } else if (this.popupType === 'provision') {
         this.paFormData.provisionAmount = finalTotal;
+        // ✅ Store the breakdown details
+        this.paProvisionBreakdown = { ...this.freightDetails };
       }
       this.isPAModalContext = false;
     } else {
@@ -1020,51 +1029,85 @@ export class FreightBillingComponent implements OnInit {
       }
     }
 
-    this.modalService.dismissAll();
+    // Close only the calculate total popup, not all modals
+    if (this.currentCalculateModalRef) {
+      this.currentCalculateModalRef.close();
+      this.currentCalculateModalRef = null;
+    }
   }
 
   cancelModal() {
-  if (this.isPAModalContext) {
-    // Reset popup data but don't clear paFormData
-    this.freightDetails = this.resetDetails();
-    this.totalFreight = 0;
-    this.isPAModalContext = false;
-  } else if (this.popupType === 'provision') {
-    this.resetPopupData();
+    if (this.isPAModalContext) {
+      // Reset popup data but don't clear the saved breakdown or paFormData
+      this.freightDetails = this.resetDetails();
+      this.totalFreight = 0;
+      this.isPAModalContext = false;
+    } else if (this.popupType === 'provision') {
+      this.resetPopupData();
+    }
+
+    // Close only the calculate total popup, not all modals
+    if (this.currentCalculateModalRef) {
+      this.currentCalculateModalRef.dismiss();
+      this.currentCalculateModalRef = null;
+    }
   }
-  
-  this.modalService.dismissAll();
-}
 
   resetPopupData() {
     this.freightDetails = this.resetDetails();
     this.totalFreight = 0;
   }
 
-   openPAModal(calculateTotalpopup: any, type: 'freight' | 'provision') {
-  this.isPAModalContext = true;
-  this.popupType = type;
+  openPAModal(calculateTotalpopup: any, type: 'freight' | 'provision') {
+    this.isPAModalContext = true;
+    this.popupType = type;
 
-  // ✅ Load existing value into popup if present
-  if (type === 'freight' && this.paFormData.freightCharges) {
-    this.freightDetails = this.resetDetails();
-    this.freightDetails.basicFreight = Number(this.paFormData.freightCharges) || 0;
-    this.totalFreight = this.freightDetails.basicFreight;
-  } else if (type === 'provision' && this.paFormData.provisionAmount) {
-    this.freightDetails = this.resetDetails();
-    this.freightDetails.basicFreight = Number(this.paFormData.provisionAmount) || 0;
-    this.totalFreight = this.freightDetails.basicFreight;
-  } else {
-    this.freightDetails = this.resetDetails();
-    this.totalFreight = 0;
+    // ✅ Load the BREAKDOWN details, not just the total
+    if (type === 'freight') {
+      // Check if we have saved breakdown details
+      const hasBreakdown = Object.values(this.paFreightBreakdown).some(val => val !== 0);
+
+      if (hasBreakdown) {
+        // Restore the breakdown
+        this.freightDetails = { ...this.paFreightBreakdown };
+      } else if (this.paFormData.freightCharges) {
+        // If no breakdown but have a total, put it in basicFreight
+        this.freightDetails = this.resetDetails();
+        this.freightDetails.basicFreight = Number(this.paFormData.freightCharges) || 0;
+      } else {
+        // Fresh start
+        this.freightDetails = this.resetDetails();
+      }
+      this.totalFreight = this.calculateTotal();
+
+    } else if (type === 'provision') {
+      // Check if we have saved breakdown details
+      const hasBreakdown = Object.values(this.paProvisionBreakdown).some(val => val !== 0);
+
+      if (hasBreakdown) {
+        // Restore the breakdown
+        this.freightDetails = { ...this.paProvisionBreakdown };
+      } else if (this.paFormData.provisionAmount) {
+        // If no breakdown but have a total, put it in basicFreight
+        this.freightDetails = this.resetDetails();
+        this.freightDetails.basicFreight = Number(this.paFormData.provisionAmount) || 0;
+      } else {
+        // Fresh start
+        this.freightDetails = this.resetDetails();
+      }
+      this.totalFreight = this.calculateTotal();
+
+    } else {
+      this.freightDetails = this.resetDetails();
+      this.totalFreight = 0;
+    }
+
+    this.currentCalculateModalRef = this.modalService.open(calculateTotalpopup, {
+      backdrop: 'static',
+      keyboard: false,
+      size: 'lg'
+    });
   }
-
-  this.modalService.open(calculateTotalpopup, {
-    backdrop: 'static',
-    keyboard: false,
-    size: 'lg'
-  });
-}
 
   isSap(): boolean {
     return this.sapType === 'SAP';
@@ -1676,16 +1719,16 @@ export class FreightBillingComponent implements OnInit {
   // Open modal and load data
   openPACheckModal(template: any, item: any, index: number): void {
 
-     if (!item.isEdit) {
-    Swal.fire({
-      title: 'Edit Required',
-      text: 'If you want to edit, please click the Edit button first.',
-      icon: 'info',
-      confirmButtonText: 'Ok',
-      timer: 3000
-    });
-    return;  // ⬅️ Exit without opening modal
-  }
+    if (!item.isEdit) {
+      Swal.fire({
+        title: 'Edit Required',
+        text: 'If you want to edit, please click the Edit button first.',
+        icon: 'info',
+        confirmButtonText: 'Ok',
+        timer: 3000
+      });
+      return;  // ⬅️ Exit without opening modal
+    }
     this.selectedPAItem = item;
     this.selectedPAIndex = index;
 

@@ -293,7 +293,7 @@ input:not(:placeholder-shown) + label {
 /* P/A Check Modal Styles */
 .Provision-card {
   background: #f8f9fa;
-  border-left: 4px solid #007bff;
+  border-left: 4px solid #8f1e42;
   padding: 15px;
   margin-bottom: 15px;
   border-radius: 4px;
@@ -301,7 +301,7 @@ input:not(:placeholder-shown) + label {
 }
 .Account-card{
   background: #f8f9fa;
-  border-left: 4px solid #007bff;
+  border-left: 4px solid #8f1e42;
   padding: 15px;
   margin-bottom: 15px;
   border-radius: 4px;
@@ -312,7 +312,7 @@ input:not(:placeholder-shown) + label {
 
 
 .section-title {
-  color: #007bff;
+  color: #8f1e42;
   font-weight: 600;
   margin-bottom: 12px;
   font-size: 14px;
