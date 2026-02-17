@@ -99,6 +99,7 @@ export class TransitDamageInfoComponent implements OnInit {
   TransitdamageInfoData: any[] = [];
   filterSapType: string = '';
   invoiceF4List: string[] = [];
+  
 
   constructor(
     private fb: FormBuilder,
@@ -525,21 +526,16 @@ export class TransitDamageInfoComponent implements OnInit {
 
     console.log('✅ Selected Items:', this.selectedItems);
   }
-  updateInvoiceListForSelectedItems(): void {
+updateInvoiceListForSelectedItems(): void {
   this.invoiceF4List = [];
- 
+
   if (this.selectedItems.length === 0) {
-    // No items selected, clear invoice list
-    console.log('⚠️ No items selected, invoice list cleared');
+    this.HeaderForm.get('VBELN')?.setValue('');
     return;
   }
- 
-  // Get unique MAPIDs from selected items
+
   const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
- 
-  console.log('🔍 Selected MAPIDs:', selectedMapIds);
- 
-  // Filter reference data for selected MAPIDs and extract invoices
+
   this.fullReferenceData.forEach(refItem => {
     if (selectedMapIds.includes(refItem.MAPID)) {
       if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
@@ -551,9 +547,13 @@ export class TransitDamageInfoComponent implements OnInit {
       }
     }
   });
- 
+
+
+  this.HeaderForm.get('VBELN')?.setValue('');
+
   console.log('📋 Filtered Invoice List:', this.invoiceF4List);
 }
+
 
   isItemSelected(index: number): boolean {
     const rowValue = (this.referenceItems.at(index) as FormGroup).value;
@@ -1059,7 +1059,7 @@ export class TransitDamageInfoComponent implements OnInit {
       return;
     }
 
-    // ✅ Get from HeaderForm
+   
     const dcRefNo = this.HeaderForm.get('VBELN')?.value;
 
     if (!dcRefNo || !dcRefNo.toString().trim()) {
@@ -1075,7 +1075,7 @@ export class TransitDamageInfoComponent implements OnInit {
 
     this.spinner.show();
 
-    this.service.fetchinvoicelistnonsap(payload).subscribe({
+    this.service.TransitDamageinfofetchNonsap(payload).subscribe({
       next: (res: any[]) => {
         this.spinner.hide();
 
