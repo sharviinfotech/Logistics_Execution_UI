@@ -528,8 +528,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   this.invoiceF4List = [];
  
   if (this.selectedItems.length === 0) {
-    // No items selected, clear invoice list
-    console.log('⚠️ No items selected, invoice list cleared');
+   this.HeaderForm.get('VBELN')?.setValue('');
     return;
   }
  
@@ -550,6 +549,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       }
     }
   });
+   this.HeaderForm.get('VBELN')?.setValue('');
  
   console.log('📋 Filtered Invoice List:', this.invoiceF4List);
 }

@@ -335,7 +335,7 @@ export class GeneralserviceService {
   TransitDamageInfoSave(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/TransitDamageInfo/Outward/Save', obj);
   }
-  fetchinvoicelistnonsapwosp(obj) {
+  TransitDamageinfofetchNonsap(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/TransitDamageInfo/NonSap/fetchinvoicelistnonsap', obj);
   }
   withoutsapSave(obj) {
