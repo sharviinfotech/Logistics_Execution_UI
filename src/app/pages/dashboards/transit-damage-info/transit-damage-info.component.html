@@ -174,7 +174,7 @@
 
                     <td>
                       <input type="text" formControlName="referenceNumber" class="width-le" placeholder="Enter Ref. No."
-                        (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
+                       maxlength="10" (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
                         (keydown.tab)="onFieldBlur(i, 'REF_NO')" [readonly]="i !== 0" />
                     </td>
 

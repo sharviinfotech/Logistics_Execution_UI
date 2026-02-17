@@ -209,6 +209,10 @@
       <img src="assets/images/LE_Top bar 2.png" alt="" height="120" width="250">
     </div>
     <div class="d-flex">
+            <button type="button" class="btn header-item noti-icon waves-effect" data-bs-toggle="fullscreen"
+        (click)="fullscreen()">
+        <i class="bx bx-fullscreen"></i>
+      </button>
 
       <div class="mt-1 text-white text-center">
            Welcome : {{loginData?.FIRST_NAME}} <span class="ml-2">{{loginData?.LAST_NAME}}</span>

@@ -165,7 +165,7 @@
 
                     <td>
                       <input type="text" formControlName="referenceNumber" class="width-le" placeholder="Enter Ref. No."
-                        (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
+                       maxlength="10" (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
                         (keydown.tab)="onFieldBlur(i, 'REF_NO')" [readonly]="i !== 0" />
                     </td>
 
@@ -340,7 +340,8 @@
                 <td><input type="number" formControlName="ZTRUC_VOL" class="width-le" /></td>
                 <td>
                   <input type="text" formControlName="ZVEH_NUM" class="width-le"
-                    placeholder="AP/TS09AB1234" (input)="onVehicleNumberInput($event, i)"
+                  maxlength="10" pattern="[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}"
+                    placeholder="" (input)="onVehicleNumberInput($event, i)"
                     title="Format: State Code/Registration (e.g., AP/TS09AB1234)" />
                 </td>
                 <td><input type="number" formControlName="ZNOOFVEH" min="1" class="width-le" /></td>
@@ -611,8 +612,8 @@
           <!-- Vehicle No -->
           <td>
             <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZVEH_NUM" placeholder="AP/TS09AB1234" (input)="onVehicleNumberEditInput(item)"
-              title="Format: State Code/Registration (e.g., AP/TS09AB1234)" />
+              [(ngModel)]="item.ZVEH_NUM" placeholder=""  maxlength="10" pattern="[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}" 
+               (input)="onVehicleNumberEditInput(item)" title="Format: State Code/Registration (e.g., AP/TS09AB1234)" />
             <span *ngIf="!item.isEdit">{{ item.ZVEH_NUM }}</span>
           </td>
 

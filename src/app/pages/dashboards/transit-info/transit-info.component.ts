@@ -124,7 +124,7 @@ export class TransitInfoComponent implements OnInit {
       workOrderNumber: [''],
       lrNumber: [''],
       transporter: [''],
-      lineNumber: [''], 
+      lineNumber: [''],
       vehicleNo: [''],
       vehicleLine: ['']
     });
@@ -242,7 +242,7 @@ export class TransitInfoComponent implements OnInit {
     this.searchOptionsList = [];
     this.selectedItems = [];
     this.transitInfo.reset();
-     this.invoiceF4List = [];
+    this.invoiceF4List = [];
     this.referenceItems.clear();
     this.referenceItems.push(this.createReferenceRow());
     // 🔥 CLEAR SEARCH TABLE DATA when order type changes
@@ -326,11 +326,11 @@ export class TransitInfoComponent implements OnInit {
 
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
-    this.invoiceF4List = [];   
-     this.fullReferenceData = [];
+    this.invoiceF4List = [];
+    this.fullReferenceData = [];
 
     if (data && data.length > 0) {
-       this.fullReferenceData = data;
+      this.fullReferenceData = data;
       data.forEach(d => {
 
         // ✅ EXTRACT INVOICE NUMBERS FOR F4
@@ -345,7 +345,7 @@ export class TransitInfoComponent implements OnInit {
         // ✅ EXISTING ROW PUSH
         this.referenceItems.push(
           this.fb.group({
-              MAPID: [d.MAPID || ''], 
+            MAPID: [d.MAPID || ''],
             referenceNumber: [d.REF_NO || ''],
             workOrderNumber: [d.WORK_ORDER_NO || ''],
             lrNumber: [d.LR_NO || ''],
@@ -400,7 +400,7 @@ export class TransitInfoComponent implements OnInit {
       if (!exists) {
         this.selectedItems.push(rowValue);
       }
-       this.updateInvoiceListForSelectedItems();
+      this.updateInvoiceListForSelectedItems();
     } else {
       this.selectedItems = this.selectedItems.filter(
         (item) =>
@@ -411,7 +411,7 @@ export class TransitInfoComponent implements OnInit {
             item.transporter === rowValue.transporter
           )
       );
-       this.updateInvoiceListForSelectedItems();
+      this.updateInvoiceListForSelectedItems();
     }
 
     console.log('✅ Selected Items:', this.selectedItems);
@@ -429,35 +429,35 @@ export class TransitInfoComponent implements OnInit {
     );
   }
 
-    updateInvoiceListForSelectedItems(): void {
-  this.invoiceF4List = [];
+  updateInvoiceListForSelectedItems(): void {
+    this.invoiceF4List = [];
 
-  if (this.selectedItems.length === 0) {
-    // No items selected, clear invoice list
-    console.log('⚠️ No items selected, invoice list cleared');
-    return;
-  }
-
-  // Get unique MAPIDs from selected items
-  const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
-
-  console.log('🔍 Selected MAPIDs:', selectedMapIds);
-
-  // Filter reference data for selected MAPIDs and extract invoices
-  this.fullReferenceData.forEach(refItem => {
-    if (selectedMapIds.includes(refItem.MAPID)) {
-      if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
-        refItem.INV_NO.forEach((inv: any) => {
-          if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
-            this.invoiceF4List.push(inv.VBELN);
-          }
-        });
-      }
+    if (this.selectedItems.length === 0) {
+      // No items selected, clear invoice list
+      console.log('⚠️ No items selected, invoice list cleared');
+      return;
     }
-  });
 
-  console.log('📋 Filtered Invoice List:', this.invoiceF4List);
-}
+    // Get unique MAPIDs from selected items
+    const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
+
+    console.log('🔍 Selected MAPIDs:', selectedMapIds);
+
+    // Filter reference data for selected MAPIDs and extract invoices
+    this.fullReferenceData.forEach(refItem => {
+      if (selectedMapIds.includes(refItem.MAPID)) {
+        if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
+          refItem.INV_NO.forEach((inv: any) => {
+            if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+              this.invoiceF4List.push(inv.VBELN);
+            }
+          });
+        }
+      }
+    });
+
+    console.log('📋 Filtered Invoice List:', this.invoiceF4List);
+  }
 
 
   // onSearchTypeChange(): void {
@@ -656,7 +656,7 @@ export class TransitInfoComponent implements OnInit {
         VEH_LINE: 1,
         VEH_NUM: "",
         LRNO: "",
-        LINE_NO:"",
+        LINE_NO: "",
         WORK_ORDER: "",
         TRANSPORTER: ""
       });
@@ -1483,6 +1483,13 @@ export class TransitInfoComponent implements OnInit {
     });
 
     this.cd.detectChanges();
+  }
+
+  onVehicleNumberEditInput(item: any): void {
+    if (!item) return;
+    let val = String(item.ZVEH_NUM || '').toUpperCase();
+    val = val.replace(/[^A-Z0-9\/]/g, '');
+    item.ZVEH_NUM = val;
   }
 
 

@@ -74,6 +74,7 @@ export class OrderInfoComponent implements OnInit {
   filterSapType: string = '';
   showOrderInfoTable = false;
   showDispatchTable = false;
+  formArray: any;
 
   constructor(
     private fb: FormBuilder,
@@ -153,11 +154,14 @@ export class OrderInfoComponent implements OnInit {
 
   createItemRow(): FormGroup {
     return this.fb.group({
-      referenceNumber: [''],
+      referenceNumber: ['', [
+        Validators.required,
+        Validators.pattern(/^[0-9]{10}$/)
+      ]],
       workOrderNumber: [''],
       lrNumber: [''],
       transporter: [''],
-      lineNumber: [''] 
+      lineNumber: ['']
     });
   }
 
@@ -638,7 +642,7 @@ export class OrderInfoComponent implements OnInit {
       SUB_DIVISION: formValue.SubDivision,
       SO_REF_NO: formValue.RefNumber,
       CUST_NAME: formValue.Customer,
-      
+
       CUST_GROUP: formValue.CustomerGroup,
       CNEE_NAME: formValue.CNee,
       DEST_LOC: formValue.DestinationLocation,
@@ -1122,7 +1126,7 @@ export class OrderInfoComponent implements OnInit {
       }
     );
   }
-//Due to 404 error pradeep comment this line this one cant use in this screen any where
+  //Due to 404 error pradeep comment this line this one cant use in this screen any where
   // fetchCustomers(): void {
   //   this.spinner.show();
   //   this.service.getAllCustomerList().subscribe(
@@ -1187,7 +1191,7 @@ export class OrderInfoComponent implements OnInit {
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
-       LINE_NO: values.lineNumber || ''
+      LINE_NO: values.lineNumber || ''
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -2009,6 +2013,8 @@ export class OrderInfoComponent implements OnInit {
     // Trigger change detection
     this.cd.detectChanges();
   }
+
+ 
 
 
 

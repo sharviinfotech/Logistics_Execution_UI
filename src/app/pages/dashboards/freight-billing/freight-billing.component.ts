@@ -200,75 +200,6 @@ export class FreightBillingComponent implements OnInit {
     this.searchOptionsList = [];
   }
 
-  // setupWorkOrderListener(): void {
-  //   const fields = [
-  //     'FreightBillNumber',
-  //     'FreightBillDate',
-  //     'FreightBillPhysicalSubmissionDate',
-  //     'FreightCharges'
-  //   ];
-
-  //   // FIRST TIME → ENABLE ALL FIELDS BY DEFAULT
-  //   fields.forEach(f => {
-  //     this.FreightBilling.get(f)?.enable({ emitEvent: false });
-  //   });
-
-  //   this.FreightBilling.get('WorkOrderNumber')?.valueChanges.subscribe((value) => {
-
-  //     // → WORK ORDER NUMBER select chesina ENABLE
-  //     if (value === 'WORK ORDER NUMBER') {
-  //       fields.forEach(f => {
-  //         this.FreightBilling.get(f)?.enable();
-  //       });
-  //     }
-
-  //     // → Rate Contract / Customer Transporter / Local Transporter / Company Vehicle → DISABLE
-  //     else if (value && value !== '') {
-  //       fields.forEach(f => {
-  //         this.FreightBilling.get(f)?.disable();
-  //         this.FreightBilling.get(f)?.setValue('');
-  //       });
-  //     }
-
-  //     // → EMPTY select chesina (Select Option) → ENABLE
-  //     else {
-  //       fields.forEach(f => {
-  //         this.FreightBilling.get(f)?.enable();
-  //       });
-  //     }
-  //   });
-  // }
-
-
-  // disableFreightFields() {
-  //   const fields = ['FreightBillNumber', 'FreightBillDate', 'FreightBillPhysicalSubmissionDate', 'FreightCharges'];
-  //   fields.forEach(f => {
-  //     this.FreightBilling.get(f)?.clearValidators();
-  //     this.FreightBilling.get(f)?.disable();
-  //     this.FreightBilling.get(f)?.setValue('');
-  //   });
-  // }
-
-  // enableFreightFields() {
-  //   this.FreightBilling.get('FreightBillNumber')?.setValidators([Validators.required]);
-  //   this.FreightBilling.get('FreightBillDate')?.setValidators([Validators.required]);
-  //   this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.setValidators([Validators.required]);
-  //   this.FreightBilling.get('FreightCharges')?.setValidators([Validators.required, Validators.min(0)]);
-
-  //   this.FreightBilling.get('FreightBillNumber')?.enable();
-  //   this.FreightBilling.get('FreightBillDate')?.enable();
-  //   this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.enable();
-  //   this.FreightBilling.get('FreightCharges')?.enable();
-  // }
-
-  // updateFreightValidators() {
-  //   this.FreightBilling.get('FreightBillNumber')?.updateValueAndValidity();
-  //   this.FreightBilling.get('FreightBillDate')?.updateValueAndValidity();
-  //   this.FreightBilling.get('FreightBillPhysicalSubmissionDate')?.updateValueAndValidity();
-  //   this.FreightBilling.get('FreightCharges')?.updateValueAndValidity();
-  // }
-
-
   onOrderTypeChange(): void {
     if (this.previousOrderType !== null && this.previousOrderType !== this.orderType) {
       this.sapType = '';
@@ -371,33 +302,6 @@ export class FreightBillingComponent implements OnInit {
       }
     });
   }
-
-  // populateReferenceRows(data: any[]): void {
-  //   this.referenceItems.clear();
-
-  //   if (data && data.length > 0) {
-  //     data.forEach(d => {
-  //       this.referenceItems.push(
-  //         this.fb.group({
-  //           referenceNumber: [d.REF_NO || ''],
-  //           workOrderNumber: [d.WORK_ORDER_NO || ''],
-  //           lrNumber: [d.LR_NO || ''],
-  //           transporter: [d.TRANSPORTER || '']
-  //         })
-  //       );
-  //     });
-  //   } else {
-  //     Swal.fire({
-  //       icon: 'info',
-  //       title: 'No Records Found',
-  //       text: 'No matching reference details were found.',
-  //       timer: 1500,
-  //       showConfirmButton: false,
-  //       width: '300px'
-  //     });
-  //     this.referenceItems.push(this.createReferenceRow());
-  //   }
-  // }
 
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
@@ -657,6 +561,7 @@ export class FreightBillingComponent implements OnInit {
     console.log("ref", ref);
 
     console.log("formValue", formValue);
+    
     const record = {
       INV_NO: formValue.invoicenumber || formValue.ponumber || '',
       REFNO: ref.referenceNumber || '',
@@ -677,8 +582,31 @@ export class FreightBillingComponent implements OnInit {
       FRBILLUP: formValue.FreightBillupload || '',
       UNLOADAPP: formValue.UnloadingChargesApproval || '',
       DETENTUP: formValue.DetentionChargesUploading || '',
-      WORDUP: formValue.WorkOrderUploading || ''
+      WORDUP: formValue.WorkOrderUploading || '',
+      
+      // ✅ Freight Charges Breakdown (when Account checkbox is checked)
+      ZFC_BASIC: formValue.account ? (this.paFreightBreakdown.basicFreight || 0) : 0,
+      ZFC_DELOAD: formValue.account ? (this.paFreightBreakdown.detentionLoading || 0) : 0,
+      ZFC_DEUNLOAD: formValue.account ? (this.paFreightBreakdown.detentionUnloading || 0) : 0,
+      ZFC_LOAD: formValue.account ? (this.paFreightBreakdown.loadingCharges || 0) : 0,
+      ZFC_UNLOAD: formValue.account ? (this.paFreightBreakdown.unloadingCharges || 0) : 0,
+      ZFC_ROUTE: formValue.account ? (this.paFreightBreakdown.routeChangeCharges || 0) : 0,
+      ZFC_TSHIP: formValue.account ? (this.paFreightBreakdown.transhipmentCharges || 0) : 0,
+      ZFC_OTHER: formValue.account ? (this.paFreightBreakdown.otherCharges || 0) : 0,
+      ZFC_DEDUCT: formValue.account ? (this.paFreightBreakdown.deduction || 0) : 0,
+      
+      // ✅ Provision Amount Breakdown (when Provision checkbox is checked)
+      ZPR_BASIC: formValue.provision ? (this.paProvisionBreakdown.basicFreight || 0) : 0,
+      ZPR_DELOAD: formValue.provision ? (this.paProvisionBreakdown.detentionLoading || 0) : 0,
+      ZPR_DEUNLOAD: formValue.provision ? (this.paProvisionBreakdown.detentionUnloading || 0) : 0,
+      ZPR_LOAD: formValue.provision ? (this.paProvisionBreakdown.loadingCharges || 0) : 0,
+      ZPR_UNLOAD: formValue.provision ? (this.paProvisionBreakdown.unloadingCharges || 0) : 0,
+      ZPR_ROUTE: formValue.provision ? (this.paProvisionBreakdown.routeChangeCharges || 0) : 0,
+      ZPR_TSHIP: formValue.provision ? (this.paProvisionBreakdown.transhipmentCharges || 0) : 0,
+      ZPR_OTHER: formValue.provision ? (this.paProvisionBreakdown.otherCharges || 0) : 0,
+      ZPR_DEDUCT: formValue.provision ? (this.paProvisionBreakdown.deduction || 0) : 0
     };
+    
     console.log("record", record);
 
     this.spinner.show();
@@ -811,7 +739,29 @@ export class FreightBillingComponent implements OnInit {
             ZFRBILLUP: row.ZFRBILLUP,
             ZUNLOADAPP: row.ZUNLOADAPP,
             ZDETENTUP: row.ZDETENTUP,
-            ZWORDUP: row.ZWORDUP
+            ZWORDUP: row.ZWORDUP,
+            
+            // ✅ Freight Charges Breakdown
+            ZFC_BASIC: row.ZFC_BASIC || 0,
+            ZFC_DELOAD: row.ZFC_DELOAD || 0,
+            ZFC_DEUNLOAD: row.ZFC_DEUNLOAD || 0,
+            ZFC_LOAD: row.ZFC_LOAD || 0,
+            ZFC_UNLOAD: row.ZFC_UNLOAD || 0,
+            ZFC_ROUTE: row.ZFC_ROUTE || 0,
+            ZFC_TSHIP: row.ZFC_TSHIP || 0,
+            ZFC_OTHER: row.ZFC_OTHER || 0,
+            ZFC_DEDUCT: row.ZFC_DEDUCT || 0,
+            
+            // ✅ Provision Amount Breakdown
+            ZPR_BASIC: row.ZPR_BASIC || 0,
+            ZPR_DELOAD: row.ZPR_DELOAD || 0,
+            ZPR_DEUNLOAD: row.ZPR_DEUNLOAD || 0,
+            ZPR_LOAD: row.ZPR_LOAD || 0,
+            ZPR_UNLOAD: row.ZPR_UNLOAD || 0,
+            ZPR_ROUTE: row.ZPR_ROUTE || 0,
+            ZPR_TSHIP: row.ZPR_TSHIP || 0,
+            ZPR_OTHER: row.ZPR_OTHER || 0,
+            ZPR_DEDUCT: row.ZPR_DEDUCT || 0
           }
         ]
       };
@@ -1024,8 +974,12 @@ export class FreightBillingComponent implements OnInit {
       // For Creation Form (existing logic)
       if (this.popupType === 'freight') {
         this.FreightBilling.get('FreightCharges')?.setValue(finalTotal);
+        // ✅ Store the breakdown for Account checkbox
+        this.paFreightBreakdown = { ...this.freightDetails };
       } else if (this.popupType === 'provision') {
         this.FreightBilling.get('ProvisionAmount')?.setValue(finalTotal);
+        // ✅ Store the breakdown for Provision checkbox
+        this.paProvisionBreakdown = { ...this.freightDetails };
       }
     }
 
@@ -1231,11 +1185,6 @@ export class FreightBillingComponent implements OnInit {
     this.spinner.show();
 
     let apiCall;
-    // if (this.sapType === 'SAP') {
-    //   apiCall = this.service.fetchOrderInfoFiltered(payload);
-    // } else {
-    //   apiCall = this.service.fetchGlobalFilteredNonSap( payload );
-    // }
 
     if (this.filterSapType === 'SAP') {
       apiCall = this.service.fetchOrderInfoFiltered(payload);
@@ -1555,13 +1504,6 @@ export class FreightBillingComponent implements OnInit {
       alternateRowStyles: {
         fillColor: [245, 245, 245]
       },
-      // columnStyles: {
-      //   0: { cellWidth: 8 },  
-      //   1: { cellWidth: 12 }, 
-      //   2: { cellWidth: 12 }, 
-      //   3: { cellWidth: 10 }, 
-      //   4: { cellWidth: 12 }, 
-      // },
       theme: 'grid'
     });
 
@@ -1745,6 +1687,32 @@ export class FreightBillingComponent implements OnInit {
       freightCharges: item.ZFRT_CHARGES || '',
       billSubmission: item.ZBILL_SUBMISSION || ''
     };
+    
+    // ✅ Load Freight Breakdown from backend
+    this.paFreightBreakdown = {
+      basicFreight: item.ZFC_BASIC || 0,
+      detentionLoading: item.ZFC_DELOAD || 0,
+      detentionUnloading: item.ZFC_DEUNLOAD || 0,
+      loadingCharges: item.ZFC_LOAD || 0,
+      unloadingCharges: item.ZFC_UNLOAD || 0,
+      routeChangeCharges: item.ZFC_ROUTE || 0,
+      transhipmentCharges: item.ZFC_TSHIP || 0,
+      otherCharges: item.ZFC_OTHER || 0,
+      deduction: item.ZFC_DEDUCT || 0
+    };
+    
+    // ✅ Load Provision Breakdown from backend
+    this.paProvisionBreakdown = {
+      basicFreight: item.ZPR_BASIC || 0,
+      detentionLoading: item.ZPR_DELOAD || 0,
+      detentionUnloading: item.ZPR_DEUNLOAD || 0,
+      loadingCharges: item.ZPR_LOAD || 0,
+      unloadingCharges: item.ZPR_UNLOAD || 0,
+      routeChangeCharges: item.ZPR_ROUTE || 0,
+      transhipmentCharges: item.ZPR_TSHIP || 0,
+      otherCharges: item.ZPR_OTHER || 0,
+      deduction: item.ZPR_DEDUCT || 0
+    };
 
     this.modalService.open(template, {
       backdrop: 'static',
@@ -1771,10 +1739,32 @@ export class FreightBillingComponent implements OnInit {
       this.selectedPAItem.ZPRO_CHK = 'X';
       this.selectedPAItem.ZPROVAMT = this.paFormData.provisionAmount;
       this.selectedPAItem.ZPROVDT = this.paFormData.provisionDate;
+      
+      // ✅ Store Provision Breakdown
+      this.selectedPAItem.ZPR_BASIC = this.paProvisionBreakdown.basicFreight || 0;
+      this.selectedPAItem.ZPR_DELOAD = this.paProvisionBreakdown.detentionLoading || 0;
+      this.selectedPAItem.ZPR_DEUNLOAD = this.paProvisionBreakdown.detentionUnloading || 0;
+      this.selectedPAItem.ZPR_LOAD = this.paProvisionBreakdown.loadingCharges || 0;
+      this.selectedPAItem.ZPR_UNLOAD = this.paProvisionBreakdown.unloadingCharges || 0;
+      this.selectedPAItem.ZPR_ROUTE = this.paProvisionBreakdown.routeChangeCharges || 0;
+      this.selectedPAItem.ZPR_TSHIP = this.paProvisionBreakdown.transhipmentCharges || 0;
+      this.selectedPAItem.ZPR_OTHER = this.paProvisionBreakdown.otherCharges || 0;
+      this.selectedPAItem.ZPR_DEDUCT = this.paProvisionBreakdown.deduction || 0;
     } else {
       this.selectedPAItem.ZPRO_CHK = '';
       this.selectedPAItem.ZPROVAMT = '';
       this.selectedPAItem.ZPROVDT = '';
+      
+      // ✅ Clear Provision Breakdown
+      this.selectedPAItem.ZPR_BASIC = 0;
+      this.selectedPAItem.ZPR_DELOAD = 0;
+      this.selectedPAItem.ZPR_DEUNLOAD = 0;
+      this.selectedPAItem.ZPR_LOAD = 0;
+      this.selectedPAItem.ZPR_UNLOAD = 0;
+      this.selectedPAItem.ZPR_ROUTE = 0;
+      this.selectedPAItem.ZPR_TSHIP = 0;
+      this.selectedPAItem.ZPR_OTHER = 0;
+      this.selectedPAItem.ZPR_DEDUCT = 0;
     }
 
 
@@ -1785,6 +1775,17 @@ export class FreightBillingComponent implements OnInit {
       this.selectedPAItem.ZPHY_DATE = this.paFormData.physicalSubmissionDate;
       this.selectedPAItem.ZFRT_CHARGES = this.paFormData.freightCharges;
       this.selectedPAItem.ZBILL_SUBMISSION = this.paFormData.billSubmission;
+      
+      // ✅ Store Freight Breakdown
+      this.selectedPAItem.ZFC_BASIC = this.paFreightBreakdown.basicFreight || 0;
+      this.selectedPAItem.ZFC_DELOAD = this.paFreightBreakdown.detentionLoading || 0;
+      this.selectedPAItem.ZFC_DEUNLOAD = this.paFreightBreakdown.detentionUnloading || 0;
+      this.selectedPAItem.ZFC_LOAD = this.paFreightBreakdown.loadingCharges || 0;
+      this.selectedPAItem.ZFC_UNLOAD = this.paFreightBreakdown.unloadingCharges || 0;
+      this.selectedPAItem.ZFC_ROUTE = this.paFreightBreakdown.routeChangeCharges || 0;
+      this.selectedPAItem.ZFC_TSHIP = this.paFreightBreakdown.transhipmentCharges || 0;
+      this.selectedPAItem.ZFC_OTHER = this.paFreightBreakdown.otherCharges || 0;
+      this.selectedPAItem.ZFC_DEDUCT = this.paFreightBreakdown.deduction || 0;
     } else {
       this.selectedPAItem.ZACC_CHK = '';
       this.selectedPAItem.ZBILLNO = '';
@@ -1792,6 +1793,17 @@ export class FreightBillingComponent implements OnInit {
       this.selectedPAItem.ZPHY_DATE = '';
       this.selectedPAItem.ZFRT_CHARGES = '';
       this.selectedPAItem.ZBILL_SUBMISSION = '';
+      
+      // ✅ Clear Freight Breakdown
+      this.selectedPAItem.ZFC_BASIC = 0;
+      this.selectedPAItem.ZFC_DELOAD = 0;
+      this.selectedPAItem.ZFC_DEUNLOAD = 0;
+      this.selectedPAItem.ZFC_LOAD = 0;
+      this.selectedPAItem.ZFC_UNLOAD = 0;
+      this.selectedPAItem.ZFC_ROUTE = 0;
+      this.selectedPAItem.ZFC_TSHIP = 0;
+      this.selectedPAItem.ZFC_OTHER = 0;
+      this.selectedPAItem.ZFC_DEDUCT = 0;
     }
 
     // Close modal
@@ -1800,8 +1812,4 @@ export class FreightBillingComponent implements OnInit {
     // Call existing update method
     this.updateSearchRow(this.selectedPAItem, this.selectedPAIndex);
   }
-
-
-
-
 }

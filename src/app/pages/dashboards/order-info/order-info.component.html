@@ -162,25 +162,25 @@
                     <td>{{ i + 1 }}</td>
 
                     <td>
-                      <input type="text" formControlName="referenceNumber" placeholder="Enter Ref. No."
-                        (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
+                      <input type="text" formControlName="referenceNumber" class="width-le" placeholder="Enter Ref. No."
+                      maxlength="10" (input)="onlyNumbers($event, i)"  (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
                         (keydown.tab)="onFieldBlur(i, 'REF_NO')" [readonly]="i !== 0" />
                     </td>
 
                     <td>
-                      <input type="text" formControlName="workOrderNumber" placeholder="Enter Work Order No."
+                      <input type="text" formControlName="workOrderNumber" class="width-le" placeholder="Enter Work Order No."
                         (blur)="onFieldBlur(i, 'WORK_ORDER_NO')" (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
                         (keydown.tab)="onFieldBlur(i, 'WORK_ORDER_NO')" [readonly]="i !== 0" />
                     </td>
 
                     <td>
-                      <input type="text" formControlName="lrNumber" placeholder="Enter LR No."
+                      <input type="text" formControlName="lrNumber" class="width-le" placeholder="Enter LR No."
                         (blur)="onFieldBlur(i, 'LR_NO')" (keydown.enter)="onFieldBlur(i, 'LR_NO')"
                         (keydown.tab)="onFieldBlur(i, 'LR_NO')" [readonly]="i !== 0" />
                     </td>
 
                     <td>
-                      <input type="text" formControlName="transporter" placeholder="Enter Transporter"
+                      <input type="text" formControlName="transporter"  placeholder="Enter Transporter"
                         (blur)="onFieldBlur(i, 'TRANSPORTER')" (keydown.enter)="onFieldBlur(i, 'TRANSPORTER')"
                         (keydown.tab)="onFieldBlur(i, 'TRANSPORTER')" [readonly]="i !== 0" />
                     </td>

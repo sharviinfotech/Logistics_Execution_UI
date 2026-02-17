@@ -279,7 +279,7 @@ export class Login2Component implements OnInit {
     return;
   }
 
-  this.fullscreen();
+  // this.fullscreen();
   
   // ✅ CORRECT payload structure
   const loginPayload = {
