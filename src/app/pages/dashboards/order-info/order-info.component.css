@@ -67,13 +67,6 @@ input[type="radio"] {
 }
 
 
-
-
-
-
-
-
-
 @media (max-width: 768px) {
   .form-radio.optional {
     flex-direction: column;
@@ -113,11 +106,7 @@ input[type="radio"] {
   /* Forces the removal of the pseudo-element content */
 }
 
-/* ========================================
-   NEW CSS - Processing Badge & Toggle Arrow
-   ======================================== */
 
-/* Wrapper for Order Type + Processing Badge + Arrow */
 .order-type-wrapper {
   display: flex;
   align-items: center;
