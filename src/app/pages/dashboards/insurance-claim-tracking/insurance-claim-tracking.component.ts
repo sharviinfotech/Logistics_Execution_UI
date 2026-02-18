@@ -878,7 +878,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         items.forEach((x: any) => {
           const row = this.fb.group({
             selected: [false],
-            ZMAPID: [x.MAPID || ''],
+           ZMAPID: [x.ZMAPID || x.MAPID || ''],
             ZREFNO: [x.ZREFNO],
             ZLINE_NO: [x.ZLINE_NO],
             INV_NO: [x.INV_NO],
@@ -1168,7 +1168,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         items.forEach((x: any) => {
           this.items.push(this.fb.group({
             selected: [false],
-            ZMAPID: [x.ZMAPID],
+            ZMAPID: [x.ZMAPID || x.MAPID || ''],
             ZREFNO: [x.REFNO],
             ZLINE_NO: [x.LINE_NO],
             INV_NO: [dcRefNo],

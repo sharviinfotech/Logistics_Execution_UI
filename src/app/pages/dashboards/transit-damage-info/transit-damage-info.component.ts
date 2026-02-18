@@ -872,7 +872,7 @@ updateInvoiceListForSelectedItems(): void {
         items.forEach((x: any) => {
           const row = this.fb.group({
             selected: [false],
-            ZMAPID: [x.MAPID || ''],
+            ZMAPID: [x.ZMAPID || x.MAPID || ''],
             ZLINE_NO: [x.LINE_NO || x.ZLINE_NO || ''],
             INV_NO: [x.INV_NO],
             REFNO: [x.REFNO],
@@ -1110,7 +1110,7 @@ updateInvoiceListForSelectedItems(): void {
         items.forEach((x: any) => {
           this.items.push(this.fb.group({
             selected: [false],
-            ZMAPID: [x.ZMAPID],
+            ZMAPID: [x.ZMAPID || x.MAPID || ''],
             REFNO: [x.REFNO],
             ZLINE_NO: [x.LINE_NO || x.ZLINE_NO || ''],
             INV_NO: [dcRefNo],
