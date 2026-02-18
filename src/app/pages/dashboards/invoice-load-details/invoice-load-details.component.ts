@@ -657,90 +657,74 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   }
 
   // ✅ SAVE FOR SAP
-  saveInvoiceDetails(action: 'stay' | 'next' | 'previous' = 'stay'): void {
-    const filtered = this.invoices.value
-      .filter((row: any) => row.selected === true)
-      .map(({ selected, ...rest }) => rest);
+ saveInvoiceDetails(action: 'stay' | 'next' | 'previous' = 'stay'): void {
+  const filtered = this.invoices.value
+    .filter((row: any) => row.selected === true)
+    .map(({ selected, ...rest }) => rest);
 
-    if (filtered.length === 0) {
-      Swal.fire({
-        title: 'Warning',
-        text: 'Please select at least one row to save.',
-        icon: 'warning',
-        timer: 3000,
-        confirmButtonText: 'Ok',
-      });
-      return;
-    }
-
-    this.InvoiceForm.markAllAsTouched();
-    if (this.InvoiceForm.invalid) {
-      Swal.fire('Error', 'Please fill all required fields', 'error');
-      return;
-    }
-
-    if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        text: 'Please select at least one reference row before saving'
-      });
-      return;
-    }
-
-    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
-
-    // ✅ Map using data from ZMAPID selection in each row
-    // const payload = filtered.map((item: any, index: number) => ({
-    //   VBELN: referenceNumber,
-    //   POSNR: item.POSNR || '',
-    //   ZREFNO: item.ZREFNO || '',
-    //   ZWORK_ORDER: item.ZWORK_ORDER || '',
-    //   ZLRNO: item.ZLRNO || '',
-    //   ZTRANSPORTER: item.ZTRANSPORTER || '',
-    //   ZLINE_NO: index + 1,
-    //   ZSO_NO: "",
-    //   ZODN_NO: "",
-    //   ZTRUC_TYPE: item.ZTRUC_TYPE,
-    //   ZTRUC_WT: item.ZTRUC_WT,
-    //   ZACT_LOAD: Number(item.ZACT_LOAD),
-    //   ZACT_VOL: Number(item.ZACT_VOL),
-    //   ZLF_VOL: Number(item.ZLF_VOL),
-    //   ZLF_WT: item.ZLF_WT,
-    //   ZWEEK_SF: item.ZWEEK_SF,
-    //   ZEWAYBILL_NO: item.ZEWAYBILL_NO,
-    //   ZEWAYBILL_DT: item.ZEWAYBILL_DT,
-    //   ZMAPID: item.ZMAPID || '',
-    // }));
-
-    this.spinner.show();
-    this.service.InvoiceloaddetailsSave(filtered).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        if (res?.NUMBER === '200') {
-          Swal.fire({
-            title: 'Success',
-            text: res.MSG || 'Saved Successfully',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-          }).then(() => {
-            if (action === 'next') {
-              this.router.navigate(['/segment-info']);
-            } else if (action === 'previous') {
-              this.router.navigate(['/shipment-details']);
-            } else {
-              this.resetForm();
-            }
-          });
-        } else {
-          Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
-        }
-      },
-      error: () => {
-        this.spinner.hide();
-        Swal.fire('Error', 'Save failed', 'error');
-      }
+  if (filtered.length === 0) {
+    Swal.fire({
+      title: 'Warning',
+      text: 'Please select at least one row to save.',
+      icon: 'warning',
+      timer: 3000,
+      confirmButtonText: 'Ok',
     });
+    return;
   }
+
+  this.InvoiceForm.markAllAsTouched();
+  if (this.InvoiceForm.invalid) {
+    Swal.fire('Error', 'Please fill all required fields', 'error');
+    return;
+  }
+
+  if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
+    Swal.fire({
+      icon: 'warning',
+      text: 'Please select at least one reference row before saving'
+    });
+    return;
+  }
+
+  const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+
+  // ✅ ADD ZUSER TO EACH ITEM
+  const loggedInUser = this.getCurrentUser();
+  const payloadWithUser = filtered.map((item: any) => ({
+    ...item,
+    ZUSER: loggedInUser
+  }));
+
+  this.spinner.show();
+  this.service.InvoiceloaddetailsSave(payloadWithUser).subscribe({
+    next: (res: any) => {
+      this.spinner.hide();
+      if (res?.NUMBER === '200') {
+        Swal.fire({
+          title: 'Success',
+          text: res.MSG || 'Saved Successfully',
+          icon: 'success',
+          confirmButtonText: 'Ok'
+        }).then(() => {
+          if (action === 'next') {
+            this.router.navigate(['/segment-info']);
+          } else if (action === 'previous') {
+            this.router.navigate(['/shipment-details']);
+          } else {
+            this.resetForm();
+          }
+        });
+      } else {
+        Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
+      }
+    },
+    error: () => {
+      this.spinner.hide();
+      Swal.fire('Error', 'Save failed', 'error');
+    }
+  });
+}
 
   // 8. ✅ Update saveInvoiceNonsapDetails similarly
   saveInvoiceNonsapDetails(action: 'stay' | 'next' | 'previous' = 'stay'): void {
@@ -797,10 +781,13 @@ export class InvoiceLoadDetailsComponent implements OnInit {
         ZACT_VOL: inv.ZACT_VOL,
         ZLF_VOL: inv.ZLF_VOL,
         ZLF_WT: inv.ZLF_WT,
+        ZODN_NO:inv.ZODN_NO,
+        ZSO_NO: inv.ZSO_NO,
         ZWEEK_SF: inv.ZWEEK_SF,
         ZEWAYBILL_NO: inv.ZEWAYBILL_NO,
         ZEWAYBILL_DT: inv.ZEWAYBILL_DT,
         ZMAPID: inv.ZMAPID || "",
+        ZUSER: this.getCurrentUser()
       })),
     };
 
@@ -1834,6 +1821,15 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       }
     });
   }
+
+  getCurrentUser(): string {
+  const currentUser = localStorage.getItem('currentUser');
+  if (currentUser) {
+    const user = JSON.parse(currentUser);
+    return user.USER || '';
+  }
+  return '';
+}
 
 
 

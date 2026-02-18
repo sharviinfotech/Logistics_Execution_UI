@@ -73,56 +73,60 @@
 
     <div *ngIf="mainMode === 'creation'">
       <!-- ORDER TYPE -->
-      <div class="form-radio optional">
+      <div class="form-radio optional ">
         <!-- <label>
-          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward"
-            (change)="onOrderTypeSelection()" />
+          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
           <span>Inward</span>
         </label> -->
-
         <label>
-          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward"
-            (change)="onOrderTypeSelection()" />
+          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
           <span>Outward</span>
         </label>
+        <div *ngIf="orderType" class="sap-row">
+          <div class="sap-toggle-group">
+
+            <!-- WITH SAP -->
+            <div class="sap-toggle-item">
+              <label class="toggle-label">
+                <input type="radio" name="sapType" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeSelection()" />
+                <span class="toggle-track">
+                  <span class="toggle-circle"></span>
+                </span>
+                <span class="toggle-text">With SAP</span>
+              </label>
+            </div>
+
+            <!-- WITHOUT SAP -->
+            <div class="sap-toggle-item">
+              <label class="toggle-label">
+                <input type="radio" name="sapType" [(ngModel)]="sapType" value="Non-SAP"
+                  (change)="onSapTypeSelection()" />
+                <span class="toggle-track">
+                  <span class="toggle-circle"></span>
+                </span>
+                <span class="toggle-text">Without SAP</span>
+              </label>
+            </div>
+
+          </div>
+
+          <!-- PENDING & COMPLETED COUNTS -->
+          <div *ngIf="orderType === 'Outward' && sapType" class="status-counts-container">
+            <div class="pending-box">
+              <i class="fas fa-clock"></i>
+              <span class="count-text">Pending: {{ pendingCount }}</span>
+            </div>
+            <div class="completed-box">
+              <i class="fas fa-check-circle"></i>
+              <span class="count-text">Completed: {{ completedCount }}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <br />
 
-      <!-- SAP TYPE -->
 
-      <div *ngIf="orderType" class="sap-row">
-        <div class="form-radio optional sap-radio">
-          <label>
-            <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeSelection()" />
-            <span>With SAP</span>
-          </label>
-          <label>
-            <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeSelection()" />
-            <span>Without SAP</span>
-          </label>
-        </div>
-
-        <!-- PENDING & COMPLETED COUNTS (Only for Outward) -->
-        <div *ngIf="orderType === 'Outward' && sapType" class="status-counts-container">
-          <div class="cases-box">
-            <i class="fas fa-clipboard-list"></i>
-            <span class="count-text">No.of Cases Reported: {{ casesCount }}</span>
-          </div>
-          
-          <div class="pending-box">
-            <i class="fas fa-clock"></i>
-            <span class="count-text">Pending: {{ pendingCount }}</span>
-          </div>
-
-          <div class="completed-box">
-            <i class="fas fa-check-circle"></i>
-            <span class="count-text">Completed: {{ completedCount }}</span>
-          </div>
-
-
-        </div>
-      </div>
 
       <!-- Input Section -->
       <div class="input-row" *ngIf="sapType">
@@ -174,7 +178,7 @@
 
                     <td>
                       <input type="text" formControlName="referenceNumber" class="width-le" placeholder="Enter Ref. No."
-                       maxlength="10" (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
+                        maxlength="10" (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
                         (keydown.tab)="onFieldBlur(i, 'REF_NO')" [readonly]="i !== 0" />
                     </td>
 

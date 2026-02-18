@@ -1,6 +1,6 @@
 <div class="card-LE">
   <div class="card-header-LE header-flex">
-      <!-- Left Title -->
+    <!-- Left Title -->
     <div class="header-title">
       Vehicle Info
     </div>
@@ -10,13 +10,13 @@
 
       <!-- Creation -->
       <button class="header-icon" [class.active]="mainMode === 'creation'"
-            (click)="mainMode='creation'; onMainModeChange()" title="Creation">
+        (click)="mainMode='creation'; onMainModeChange()" title="Creation">
         <i class="fa fa-plus"></i>
       </button>
 
       <!-- Filter -->
-      <button class="header-icon" [class.active]="mainMode === 'filter'"
-            (click)="mainMode='filter'; onMainModeChange()" title="Filter & Download. Filter records by date, plant, division and export to Excel">
+      <button class="header-icon" [class.active]="mainMode === 'filter'" (click)="mainMode='filter'; onMainModeChange()"
+        title="Filter & Download. Filter records by date, plant, division and export to Excel">
         <i class="fa fa-file-download"></i>
       </button>
 
@@ -72,48 +72,61 @@
 
     <div *ngIf="mainMode === 'creation'">
       <!-- Order Type -->
-      <div class="form-radio optional">
+      <div class="form-radio optional ">
         <!-- <label>
-          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward"
-            (change)="onOrderTypeSelection()" />
+          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
           <span>Inward</span>
         </label> -->
-
         <label>
-          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward"
-            (change)="onOrderTypeSelection()" />
+          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
           <span>Outward</span>
         </label>
+        <div *ngIf="orderType" class="sap-row">
+          <div class="sap-toggle-group">
+
+            <!-- WITH SAP -->
+            <div class="sap-toggle-item">
+              <label class="toggle-label">
+                <input type="radio" name="sapType" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeSelection()" />
+                <span class="toggle-track">
+                  <span class="toggle-circle"></span>
+                </span>
+                <span class="toggle-text">With SAP</span>
+              </label>
+            </div>
+
+            <!-- WITHOUT SAP -->
+            <div class="sap-toggle-item">
+              <label class="toggle-label">
+                <input type="radio" name="sapType" [(ngModel)]="sapType" value="Non-SAP"
+                  (change)="onSapTypeSelection()" />
+                <span class="toggle-track">
+                  <span class="toggle-circle"></span>
+                </span>
+                <span class="toggle-text">Without SAP</span>
+              </label>
+            </div>
+
+          </div>
+
+          <!-- PENDING & COMPLETED COUNTS -->
+          <div *ngIf="orderType === 'Outward' && sapType" class="status-counts-container">
+            <div class="pending-box">
+              <i class="fas fa-clock"></i>
+              <span class="count-text">Pending: {{ pendingCount }}</span>
+            </div>
+            <div class="completed-box">
+              <i class="fas fa-check-circle"></i>
+              <span class="count-text">Completed: {{ completedCount }}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <br />
 
       <!-- SAP Type -->
-      <div *ngIf="orderType" class="sap-row">
-        <div class="form-radio optional sap-radio">
-          <label>
-            <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeSelection()" />
-            <span>With SAP</span>
-          </label>
-          <label>
-            <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeSelection()" />
-            <span>Without SAP</span>
-          </label>
-        </div>
 
-        <!-- PENDING & COMPLETED COUNTS (Only for Outward) -->
-        <div *ngIf="orderType === 'Outward' && sapType" class="status-counts-container">
-          <div class="pending-box">
-            <i class="fas fa-clock"></i>
-            <span class="count-text">Pending: {{ pendingCount }}</span>
-          </div>
-
-          <div class="completed-box">
-            <i class="fas fa-check-circle"></i>
-            <span class="count-text">Completed: {{ completedCount }}</span>
-          </div>
-        </div>
-      </div>
 
       <!-- Input Section -->
       <div class="input-row" *ngIf="sapType">
@@ -165,7 +178,7 @@
 
                     <td>
                       <input type="text" formControlName="referenceNumber" class="width-le" placeholder="Enter Ref. No."
-                       maxlength="10" (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
+                        maxlength="10" (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
                         (keydown.tab)="onFieldBlur(i, 'REF_NO')" [readonly]="i !== 0" />
                     </td>
 
@@ -339,17 +352,15 @@
                 <td><input type="text" formControlName="ZTRUC_WT" class="width-le" /></td>
                 <td><input type="number" formControlName="ZTRUC_VOL" class="width-le" /></td>
                 <td>
-                  <input type="text" formControlName="ZVEH_NUM" class="width-le"
-                  maxlength="10" pattern="[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}"
-                    placeholder="" (input)="onVehicleNumberInput($event, i)"
+                  <input type="text" formControlName="ZVEH_NUM" class="width-le" maxlength="10"
+                    pattern="[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}" placeholder="" (input)="onVehicleNumberInput($event, i)"
                     title="Format: State Code/Registration (e.g., AP/TS09AB1234)" />
                 </td>
                 <td><input type="number" formControlName="ZNOOFVEH" min="1" class="width-le" /></td>
                 <td><input type="text" formControlName="ZDNAME" /></td>
                 <td>
-                  <input type="tel" formControlName="ZDNUMBER" class="width-le"
-                    maxlength="10" minlength="10" pattern="[0-9]{10}" inputmode="numeric"
-                    (input)="onMobileInput($event, i)" />
+                  <input type="tel" formControlName="ZDNUMBER" class="width-le" maxlength="10" minlength="10"
+                    pattern="[0-9]{10}" inputmode="numeric" (input)="onMobileInput($event, i)" />
                 </td>
                 <td class="action-btns">
                   <button type="button" class="btn-add" (click)="addRow()">+</button>
@@ -500,343 +511,343 @@
 
     </div>
     <!-- Search Results Table -->
-<div class="card mt-3" *ngIf="searchOptionsList?.length > 0 && mainMode === 'creation'">
-  <div class="card-body-LE table-responsive">
-    <table class="table table-bordered table-striped text-center">
-      <thead>
-        <tr>
-          <th>Map ID</th>
-          <th>Ref No</th>
-          <th>Invoice No</th>
-          <th>Line No</th>
-          <th>POSNR</th>
-          <th>Vehicle Line</th>
-          <th>ODN No</th>
-          <th>SO NO</th>
-          <th>Type of Shipment</th>
-          <th>Transporter</th>
-          <th>LR No</th>
-          <th>Type of Vehicle</th>
-          <th>Passing Weight</th>
-          <th>Volume</th>
-          <th>Vehicle Number</th>
-          <th>No of Vehicles</th>
-          <th>Sales Person</th>
-          <th>Driver Name</th>
-          <th>Driver Mobile</th>
-          <th>Work Order</th>
-          <th>Location</th>
-          <th>Plant</th>
-          <th>Division</th>
-          <th>Created Date</th>
-          <th>Vehicle Type</th>
-          <th>Action</th>
-        </tr>
-      </thead>
+    <div class="card mt-3" *ngIf="searchOptionsList?.length > 0 && mainMode === 'creation'">
+      <div class="card-body-LE table-responsive">
+        <table class="table table-bordered table-striped text-center">
+          <thead>
+            <tr>
+              <th>Map ID</th>
+              <th>Ref No</th>
+              <th>Invoice No</th>
+              <th>Line No</th>
+              <th>POSNR</th>
+              <th>Vehicle Line</th>
+              <th>ODN No</th>
+              <th>SO NO</th>
+              <th>Type of Shipment</th>
+              <th>Transporter</th>
+              <th>LR No</th>
+              <th>Type of Vehicle</th>
+              <th>Passing Weight</th>
+              <th>Volume</th>
+              <th>Vehicle Number</th>
+              <th>No of Vehicles</th>
+              <th>Sales Person</th>
+              <th>Driver Name</th>
+              <th>Driver Mobile</th>
+              <th>Work Order</th>
+              <th>Location</th>
+              <th>Plant</th>
+              <th>Division</th>
+              <th>Created Date</th>
+              <th>Vehicle Type</th>
+              <th>Action</th>
+            </tr>
+          </thead>
 
-      <tbody>
-        <tr *ngFor="let item of searchOptionsList; let i = index" [class.editing]="item.isEdit">
+          <tbody>
+            <tr *ngFor="let item of searchOptionsList; let i = index" [class.editing]="item.isEdit">
 
-          <!-- MAP ID -->
-          <td>{{ item.ZMAPID }}</td>
+              <!-- MAP ID -->
+              <td>{{ item.ZMAPID }}</td>
 
-          <!-- REF NO -->
+              <!-- REF NO -->
 
-          <td>{{ item.ZREFNO }}</td>
+              <td>{{ item.ZREFNO }}</td>
 
-          <!-- Invoice -->
-          <td>{{ item.VBELN }}</td>
-          <td>{{ item.ZLINE_NO }}</td>
+              <!-- Invoice -->
+              <td>{{ item.VBELN }}</td>
+              <td>{{ item.ZLINE_NO }}</td>
 
-          <td>{{ item.POSNR }}</td>
+              <td>{{ item.POSNR }}</td>
 
-          <!-- Vehicle Line -->
-          <td>{{ item.ZVEH_LINE }}</td>
+              <!-- Vehicle Line -->
+              <td>{{ item.ZVEH_LINE }}</td>
 
-          <!-- ODN -->
-          <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZODN_NO">
-            <span *ngIf="!item.isEdit">{{ item.ZODN_NO }}</span>
-          </td>
+              <!-- ODN -->
+              <td>
+                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZODN_NO">
+                <span *ngIf="!item.isEdit">{{ item.ZODN_NO }}</span>
+              </td>
 
-          <!-- SO -->
-          <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZSONO">
-            <span *ngIf="!item.isEdit">{{ item.ZSONO }}</span>
-          </td>
+              <!-- SO -->
+              <td>
+                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZSONO">
+                <span *ngIf="!item.isEdit">{{ item.ZSONO }}</span>
+              </td>
 
-          <!-- Shipment -->
-          <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZTRX_TYPE">
-            <span *ngIf="!item.isEdit">{{ item.ZTRX_TYPE }}</span>
-          </td>
+              <!-- Shipment -->
+              <td>
+                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZTRX_TYPE">
+                <span *ngIf="!item.isEdit">{{ item.ZTRX_TYPE }}</span>
+              </td>
 
-          <!-- Transporter -->
-          <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZTRANSPORTER">
-            <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
-          </td>
+              <!-- Transporter -->
+              <td>
+                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZTRANSPORTER">
+                <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
+              </td>
 
-          <!-- LR -->
-          <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZLRNO">
-            <span *ngIf="!item.isEdit">{{ item.ZLRNO }}</span>
-          </td>
+              <!-- LR -->
+              <td>
+                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZLRNO">
+                <span *ngIf="!item.isEdit">{{ item.ZLRNO }}</span>
+              </td>
 
-          <!-- Vehicle Type -->
-          <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZTRUC_TYPE">
-            <span *ngIf="!item.isEdit">{{ item.ZTRUC_TYPE }}</span>
-          </td>
+              <!-- Vehicle Type -->
+              <td>
+                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZTRUC_TYPE">
+                <span *ngIf="!item.isEdit">{{ item.ZTRUC_TYPE }}</span>
+              </td>
 
-          <!-- Weight -->
-          <td>
-            <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZTRUC_WT">
-            <span *ngIf="!item.isEdit">{{ item.ZTRUC_WT }}</span>
-          </td>
+              <!-- Weight -->
+              <td>
+                <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZTRUC_WT">
+                <span *ngIf="!item.isEdit">{{ item.ZTRUC_WT }}</span>
+              </td>
 
-          <!-- Volume -->
-          <td>
-            <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZTRUC_VOL">
-            <span *ngIf="!item.isEdit">{{ item.ZTRUC_VOL }}</span>
-          </td>
+              <!-- Volume -->
+              <td>
+                <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZTRUC_VOL">
+                <span *ngIf="!item.isEdit">{{ item.ZTRUC_VOL }}</span>
+              </td>
 
-          <!-- Vehicle No -->
-          <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZVEH_NUM" placeholder=""  maxlength="10" pattern="[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}" 
-               (input)="onVehicleNumberEditInput(item)" title="Format: State Code/Registration (e.g., AP/TS09AB1234)" />
-            <span *ngIf="!item.isEdit">{{ item.ZVEH_NUM }}</span>
-          </td>
+              <!-- Vehicle No -->
+              <td>
+                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZVEH_NUM" placeholder="" maxlength="10" pattern="[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}"
+                  (input)="onVehicleNumberEditInput(item)"
+                  title="Format: State Code/Registration (e.g., AP/TS09AB1234)" />
+                <span *ngIf="!item.isEdit">{{ item.ZVEH_NUM }}</span>
+              </td>
 
-          <!-- No Vehicles -->
-          <td>
-            <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZNOOFVEH">
-            <span *ngIf="!item.isEdit">{{ item.ZNOOFVEH }}</span>
-          </td>
+              <!-- No Vehicles -->
+              <td>
+                <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZNOOFVEH">
+                <span *ngIf="!item.isEdit">{{ item.ZNOOFVEH }}</span>
+              </td>
 
-          <!-- Sales -->
-          <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZSALE_PERSON">
-            <span *ngIf="!item.isEdit">{{ item.ZSALE_PERSON }}</span>
-          </td>
+              <!-- Sales -->
+              <td>
+                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZSALE_PERSON">
+                <span *ngIf="!item.isEdit">{{ item.ZSALE_PERSON }}</span>
+              </td>
 
-          <!-- Driver -->
-          <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZDNAME">
-            <span *ngIf="!item.isEdit">{{ item.ZDNAME }}</span>
-          </td>
+              <!-- Driver -->
+              <td>
+                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZDNAME">
+                <span *ngIf="!item.isEdit">{{ item.ZDNAME }}</span>
+              </td>
 
-          <td>
-            <input *ngIf="item.isEdit" type="tel" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZDNUMBER" maxlength="10" minlength="10" pattern="[0-9]{10}" inputmode="numeric"
-              (input)="onMobileEditInput(item)" />
-            <span *ngIf="!item.isEdit">{{ item.ZDNUMBER }}</span>
-          </td>
+              <td>
+                <input *ngIf="item.isEdit" type="tel" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZDNUMBER" maxlength="10" minlength="10" pattern="[0-9]{10}" inputmode="numeric"
+                  (input)="onMobileEditInput(item)" />
+                <span *ngIf="!item.isEdit">{{ item.ZDNUMBER }}</span>
+              </td>
 
-          <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZWORK_ORDER">
-            <span *ngIf="!item.isEdit">{{ item.ZWORK_ORDER }}</span>
-          </td>
-
-
-          <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZLOCATION">
-            <span *ngIf="!item.isEdit">{{ item.ZLOCATION }}</span>
-          </td>
+              <td>
+                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZWORK_ORDER">
+                <span *ngIf="!item.isEdit">{{ item.ZWORK_ORDER }}</span>
+              </td>
 
 
-
-          <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZPLANT">
-            <span *ngIf="!item.isEdit">{{ item.ZPLANT }}</span>
-          </td>
-
-
-          <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZDIVISION">
-            <span *ngIf="!item.isEdit">{{ item.ZDIVISION }}</span>
-          </td>
+              <td>
+                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZLOCATION">
+                <span *ngIf="!item.isEdit">{{ item.ZLOCATION }}</span>
+              </td>
 
 
 
-          <td>
-            <input *ngIf="item.isEdit" type="date" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZCREATED_DT">
-            <span *ngIf="!item.isEdit">{{ item.ZCREATED_DT }}</span>
-          </td>
+              <td>
+                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZPLANT">
+                <span *ngIf="!item.isEdit">{{ item.ZPLANT }}</span>
+              </td>
 
 
-          <td>
-            <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-              [(ngModel)]="item.ZVEH_TYPE">
-            <span *ngIf="!item.isEdit">{{ item.ZVEH_TYPE }}</span>
-          </td>
+              <td>
+                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZDIVISION">
+                <span *ngIf="!item.isEdit">{{ item.ZDIVISION }}</span>
+              </td>
 
 
-          <!-- ACTION -->
-          <td>
-            <div *ngIf="!item.isEdit">
-              <button class="btn btn-sm btn-primary me-1" (click)="editSearchRow(item)">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="btn btn-sm btn-danger" (click)="deleteRow(item, i)">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
 
-            <div *ngIf="item.isEdit">
-              <button class="btn btn-sm btn-success me-1" (click)="updateVehicleRow(item)">
-                <i class="fas fa-check"></i>
-              </button>
-              <button class="btn btn-sm btn-secondary" (click)="cancelSearchEdit(item)">
-                <i class="fas fa-times"></i>
-              </button>
-            </div>
-          </td>
-
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+              <td>
+                <input *ngIf="item.isEdit" type="date" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZCREATED_DT">
+                <span *ngIf="!item.isEdit">{{ item.ZCREATED_DT }}</span>
+              </td>
 
 
-<div class="card" style="margin-top: 10px;"
-  *ngIf=" filterApplied && filterStatus === 'Completed' && VehicleInfoData?.length > 0 && mainMode === 'filter'">
-  <div class="card-body-LE">
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped text-center">
-        <thead>
-          <tr>
-            <th>SI.No</th>
-            <th>Map ID</th>
-            <th>REFNO</th>
-            <th>Invoice No</th>
-            <!-- <th>Line No</th> -->
-            <th>Odn Number</th>
-            <th>SO Number</th>
-            <th>Vehicle Line</th>
-            <th>Type of Shipment</th>
-            <th>Type of Vehicle</th>
-            <th>Passing Weight (Tons)</th>
-            <th>Volume of Truck</th>
-            <th>Vehicle Number</th>
-            <th>No of Vehicles</th>
-            <th>Sales Person</th>
-            <th>Driver Name</th>
-            <th>Driver Mobile</th>
-            <th>Work Order</th>
-            <th>Location</th>
-            <th>Plant</th>
-            <th>Division</th>
-            <th>LR No</th>
-            <th>Transporter</th>
-            <th>Created date</th>
-            <th>Vehicle Type</th>
-          </tr>
-        </thead>
+              <td>
+                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZVEH_TYPE">
+                <span *ngIf="!item.isEdit">{{ item.ZVEH_TYPE }}</span>
+              </td>
 
-        <tbody>
-          <tr *ngFor="let item of VehicleInfoData; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>{{ item.ZMAPID }}</td>
-            <td>{{ item.ZREFNO }}</td>
-            <td>{{ item.VBELN }}</td>
-            <td>{{ item.ZODN_NO }}</td>
-            <td>{{ item.ZSONO }}</td>
-            <td>{{ item.ZVEH_LINE }}</td>
-            <td>{{ item.ZTRX_TYPE }}</td>
-            <td>{{ item.ZTRUC_TYPE }}</td>
-            <td>{{ item.ZTRUC_WT }}</td>
-            <td>{{ item.ZTRUC_VOL }}</td>
-            <td>{{ item.ZVEH_NUM }}</td>
-            <td>{{ item.ZNOOFVEH }}</td>
-            <td>{{ item.ZSALE_PERSON }}</td>
-            <td>{{ item.ZDNAME }}</td>
-            <td>{{ item.ZDNUMBER }}</td>
-            <td>{{ item.ZWORK_ORDER }}</td>
-            <td>{{ item.ZLOCATION }}</td>
-            <td>{{ item.ZPLANT }}</td>
-            <td>{{ item.ZDIVISION }}</td>
-            <td>{{ item.ZLRNO }}</td>
-            <td>{{ item.ZTRANSPORTER }}</td>
-            <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZVEH_TYPE }}</td>
-          </tr>
-        </tbody>
-      </table>
+
+              <!-- ACTION -->
+              <td>
+                <div *ngIf="!item.isEdit">
+                  <button class="btn btn-sm btn-primary me-1" (click)="editSearchRow(item)">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger" (click)="deleteRow(item, i)">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+
+                <div *ngIf="item.isEdit">
+                  <button class="btn btn-sm btn-success me-1" (click)="updateVehicleRow(item)">
+                    <i class="fas fa-check"></i>
+                  </button>
+                  <button class="btn btn-sm btn-secondary" (click)="cancelSearchEdit(item)">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </td>
+
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <div class="card" style="margin-top: 10px;"
+      *ngIf=" filterApplied && filterStatus === 'Completed' && VehicleInfoData?.length > 0 && mainMode === 'filter'">
+      <div class="card-body-LE">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped text-center">
+            <thead>
+              <tr>
+                <th>SI.No</th>
+                <th>Map ID</th>
+                <th>REFNO</th>
+                <th>Invoice No</th>
+                <!-- <th>Line No</th> -->
+                <th>Odn Number</th>
+                <th>SO Number</th>
+                <th>Vehicle Line</th>
+                <th>Type of Shipment</th>
+                <th>Type of Vehicle</th>
+                <th>Passing Weight (Tons)</th>
+                <th>Volume of Truck</th>
+                <th>Vehicle Number</th>
+                <th>No of Vehicles</th>
+                <th>Sales Person</th>
+                <th>Driver Name</th>
+                <th>Driver Mobile</th>
+                <th>Work Order</th>
+                <th>Location</th>
+                <th>Plant</th>
+                <th>Division</th>
+                <th>LR No</th>
+                <th>Transporter</th>
+                <th>Created date</th>
+                <th>Vehicle Type</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let item of VehicleInfoData; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ item.ZMAPID }}</td>
+                <td>{{ item.ZREFNO }}</td>
+                <td>{{ item.VBELN }}</td>
+                <td>{{ item.ZODN_NO }}</td>
+                <td>{{ item.ZSONO }}</td>
+                <td>{{ item.ZVEH_LINE }}</td>
+                <td>{{ item.ZTRX_TYPE }}</td>
+                <td>{{ item.ZTRUC_TYPE }}</td>
+                <td>{{ item.ZTRUC_WT }}</td>
+                <td>{{ item.ZTRUC_VOL }}</td>
+                <td>{{ item.ZVEH_NUM }}</td>
+                <td>{{ item.ZNOOFVEH }}</td>
+                <td>{{ item.ZSALE_PERSON }}</td>
+                <td>{{ item.ZDNAME }}</td>
+                <td>{{ item.ZDNUMBER }}</td>
+                <td>{{ item.ZWORK_ORDER }}</td>
+                <td>{{ item.ZLOCATION }}</td>
+                <td>{{ item.ZPLANT }}</td>
+                <td>{{ item.ZDIVISION }}</td>
+                <td>{{ item.ZLRNO }}</td>
+                <td>{{ item.ZTRANSPORTER }}</td>
+                <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
+                <td>{{ item.ZVEH_TYPE }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top: 10px;"
+      *ngIf="filterApplied && filterStatus === 'Pending' && dispatchData?.length > 0 && mainMode === 'filter'">
+      <div class="card-body-LE">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped text-center">
+            <thead>
+              <tr>
+                <th>SI.No</th>
+                <th>Reference No</th>
+                <th>Line No</th>
+                <th>Date</th>
+                <th>Plant</th>
+                <th>Division</th>
+                <th>Vehicle Type</th>
+                <th>No. of Trucks</th>
+                <th>Work Order</th>
+                <th>Vendor Code</th>
+                <th>Transporter</th>
+                <th>No. of LRs</th>
+                <th>LR Number</th>
+                <th>Loading Point</th>
+                <th>Unloading Point</th>
+                <th>No Of Invoices/th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let item of dispatchData; let i = index">
+
+                <td>{{ i + 1 }}</td>
+                <td>{{ item.ZREFNO }}</td>
+                <td>{{ item.ZLINE_NO }}</td>
+                <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
+                <td>{{ item.ZWERKS }}</td>
+                <td>{{ item.ZDIVISION }}</td>
+                <td>{{ item.ZVEH_TYPE }}</td>
+                <td>{{ item.ZNO_TRUCKS }}</td>
+                <td>{{ item.ZWORK_ORDER }}</td>
+                <td>{{ item.ZVENDOR_CD }}</td>
+                <td>{{ item.ZTRANSPORTER }}</td>
+                <td>{{ item.ZNO_LRS }}</td>
+                <td>{{ item.ZLR_NO }}</td>
+                <td>{{ item.ZLOAD_PT }}</td>
+                <td>{{ item.ZUNLOAD_PT }}</td>
+                <td>{{ item.ZNO_INVOICES }}</td>
+              </tr>
+
+
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </div>
-<div class="card" style="margin-top: 10px;"
-  *ngIf="filterApplied && filterStatus === 'Pending' && dispatchData?.length > 0 && mainMode === 'filter'">
-  <div class="card-body-LE">
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped text-center">
-        <thead>
-          <tr>
-            <th>SI.No</th>
-            <th>Reference No</th>
-            <th>Line No</th>
-            <th>Date</th>
-            <th>Plant</th>
-            <th>Division</th>
-            <th>Vehicle Type</th>
-            <th>No. of Trucks</th>
-            <th>Work Order</th>
-            <th>Vendor Code</th>
-            <th>Transporter</th>
-            <th>No. of LRs</th>
-            <th>LR Number</th>
-            <th>Loading Point</th>
-            <th>Unloading Point</th>
-            <th>No Of Invoices/th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr *ngFor="let item of dispatchData; let i = index">
-
-            <td>{{ i + 1 }}</td>
-            <td>{{ item.ZREFNO }}</td>
-            <td>{{ item.ZLINE_NO }}</td>
-            <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZWERKS }}</td>
-            <td>{{ item.ZDIVISION }}</td>
-            <td>{{ item.ZVEH_TYPE }}</td>
-            <td>{{ item.ZNO_TRUCKS }}</td>
-            <td>{{ item.ZWORK_ORDER }}</td>
-            <td>{{ item.ZVENDOR_CD }}</td>
-            <td>{{ item.ZTRANSPORTER }}</td>
-            <td>{{ item.ZNO_LRS }}</td>
-            <td>{{ item.ZLR_NO }}</td>
-            <td>{{ item.ZLOAD_PT }}</td>
-            <td>{{ item.ZUNLOAD_PT }}</td>
-            <td>{{ item.ZNO_INVOICES }}</td>
-          </tr>
-
-
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-  </div>
-</div>
-

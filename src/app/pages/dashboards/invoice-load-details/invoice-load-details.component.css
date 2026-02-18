@@ -161,9 +161,5 @@ input[type="radio"] {
 }
 
 
-.search-container {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
+
 

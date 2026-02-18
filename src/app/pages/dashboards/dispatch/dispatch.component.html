@@ -93,10 +93,9 @@
                 [disabled]="!selectedType" (keyup.enter)="onSearchReference()" />
 
               <!-- 🔎 Button -->
-              <button type="button" class="search-btn" [disabled]="!selectedType || !searchValue"
-                (click)="onSearchReference()">
-                <i class="fas fa-search"></i>
-              </button>
+                  <button type="button" class="search-btn-global" (click)="onSearchReference()">
+                    <i class="fas fa-search"></i>
+                  </button>
 
             </div>
           </div>

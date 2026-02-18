@@ -62,31 +62,52 @@
     <div *ngIf="mainMode === 'creation'">
 
       <!-- Order Type with Processing Badge -->
-      <div class="order-type-wrapper">
-        <div class="form-radio optional" *ngIf="!orderType">
+      <div class="form-radio optional ">
+        <!-- <label>
+          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
+          <span>Inward</span>
+        </label> -->
+        <label>
+          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
+          <span>Outward</span>
+        </label>
+        <div *ngIf="orderType" class="sap-row">
+          <div class="sap-toggle-group">
 
-          <!-- <label>
-            <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward"
-              (change)="onOrderTypeChange()" />
-            <span>Inward</span>
-          </label> -->
-          <label>
-            <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward"
-              (change)="onOrderTypeChange()" />
-            <span>Outward</span>
-          </label>
-        </div>
-        <div class="status-display-container" *ngIf="orderType">
-          <button class="toggle-arrow arrow-icon" [class.reversed]="orderType === 'Outward'" (click)="toggleOrderType()"
-            type="button">
-            <svg viewBox="0 0 24 24">
-              <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z" />
-            </svg>
-          </button>
+            <!-- WITH SAP -->
+            <div class="sap-toggle-item">
+              <label class="toggle-label">
+                <input type="radio" name="sapType" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
+                <span class="toggle-track">
+                  <span class="toggle-circle"></span>
+                </span>
+                <span class="toggle-text">With SAP</span>
+              </label>
+            </div>
 
-          <div class="processing-badge">
-            <span class="status-dot"></span>
-            <span>{{ orderType }} is Processing</span>
+            <!-- WITHOUT SAP -->
+            <div class="sap-toggle-item">
+              <label class="toggle-label">
+                <input type="radio" name="sapType" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
+                <span class="toggle-track">
+                  <span class="toggle-circle"></span>
+                </span>
+                <span class="toggle-text">Without SAP</span>
+              </label>
+            </div>
+
+          </div>
+
+          <!-- PENDING & COMPLETED COUNTS -->
+          <div *ngIf="orderType === 'Outward' && sapType" class="status-counts-container">
+            <div class="pending-box">
+              <i class="fas fa-clock"></i>
+              <span class="count-text">Pending: {{ pendingCount }}</span>
+            </div>
+            <div class="completed-box">
+              <i class="fas fa-check-circle"></i>
+              <span class="count-text">Completed: {{ completedCount }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -94,31 +115,7 @@
       <br />
 
       <!-- SAP Type Selection -->
-      <div *ngIf="orderType" class="sap-row" style="display: flex !important;margin-bottom: 10px;">
-        <div class="form-radio optional sap-radio">
-          <label>
-            <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
-            <span>With SAP</span>
-          </label>
-          <label>
-            <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
-            <span>Without SAP</span>
-          </label>
-        </div>
-        <!-- PENDING & COMPLETED COUNTS (Only for Outward) -->
-        <div *ngIf="orderType === 'Outward' && sapType" class="status-counts-container">
-          <div class="pending-box">
-            <i class="fas fa-clock"></i>
-            <span class="count-text">Pending: {{ pendingCount }}</span>
-          </div>
 
-          <div class="completed-box">
-            <i class="fas fa-check-circle"></i>
-            <span class="count-text">Completed: {{ completedCount }}</span>
-          </div>
-        </div>
-
-      </div>
 
       <!-- Common Section for Both SAP and Non-SAP -->
       <div class="input-row" *ngIf="sapType">
@@ -163,13 +160,15 @@
 
                     <td>
                       <input type="text" formControlName="referenceNumber" class="width-le" placeholder="Enter Ref. No."
-                      maxlength="10" (input)="onlyNumbers($event, i)"  (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
-                        (keydown.tab)="onFieldBlur(i, 'REF_NO')" [readonly]="i !== 0" />
+                        maxlength="10" (input)="onlyNumbers($event, i)" (blur)="onFieldBlur(i, 'REF_NO')"
+                        (keydown.enter)="onFieldBlur(i, 'REF_NO')" (keydown.tab)="onFieldBlur(i, 'REF_NO')"
+                        [readonly]="i !== 0" />
                     </td>
 
                     <td>
-                      <input type="text" formControlName="workOrderNumber" class="width-le" placeholder="Enter Work Order No."
-                        (blur)="onFieldBlur(i, 'WORK_ORDER_NO')" (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
+                      <input type="text" formControlName="workOrderNumber" class="width-le"
+                        placeholder="Enter Work Order No." (blur)="onFieldBlur(i, 'WORK_ORDER_NO')"
+                        (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')"
                         (keydown.tab)="onFieldBlur(i, 'WORK_ORDER_NO')" [readonly]="i !== 0" />
                     </td>
 
@@ -180,7 +179,7 @@
                     </td>
 
                     <td>
-                      <input type="text" formControlName="transporter"  placeholder="Enter Transporter"
+                      <input type="text" formControlName="transporter" placeholder="Enter Transporter"
                         (blur)="onFieldBlur(i, 'TRANSPORTER')" (keydown.enter)="onFieldBlur(i, 'TRANSPORTER')"
                         (keydown.tab)="onFieldBlur(i, 'TRANSPORTER')" [readonly]="i !== 0" />
                     </td>
@@ -231,13 +230,12 @@
             </div>
           </div>
 
-          <!-- Non-SAP: Only Search Bar (No Input Field, No GET Button) -->
+          <!-- Non-SAP Only Search -->
           <div class="input-row input-flex" *ngIf="sapType === 'Non-SAP'">
             <div class="search-bar-wrapper-global">
               <div class="search-container">
                 <div class="search-box">
-                  <select class="search-type-select" [(ngModel)]="selectedType" name="searchType"
-                    (change)="onSearchTypeChange()">
+                  <select class="search-type-select" [(ngModel)]="selectedType" name="searchType">
                     <option value="" disabled selected>Select</option>
                     <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                   </select>
@@ -640,7 +638,7 @@
 
                   <!-- Reusable pattern -->
                   <td>{{ item.ZREFNO }}</td>
-                  <td>{{ item.ZINV_NO  }}</td>
+                  <td>{{ item.ZINV_NO }}</td>
 
 
 

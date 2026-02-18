@@ -1224,122 +1224,154 @@ input[type="radio"] {
   display: none;
 }
 
-/* Common container (Inward/Outward + SAP toggles) */
-.form-radio.optional,
-.sap-radio {
+/* Hide all radio inputs */
+input[type="radio"] {
+  display: none;
+}
+
+/* =============================== */
+/* OUTWARD RADIO BUTTON STYLE      */
+/* =============================== */
+.form-radio.optional {
   display: flex;
   align-items: center;
-  gap: 40px;
-  padding: 10px;
-  /* margin-bottom: 25px; */
-  /* background: linear-gradient(135deg, #ffffff 0%, #f3dce0 40%, #eed3d8 100%); */
-  /* border-radius: 16px; */
-  /* border: 1px solid rgba(139, 35, 50, 0.2); */
-  // box-shadow: 0 2px 10px rgb(83 10 21 / 10%);
+  gap: 20px;
+  padding: 8px 0;
+  flex-wrap: wrap;
 }
 
-/* Each label (text + switch) */
-.form-radio.optional label,
-.sap-radio label {
-  cursor: pointer;
-  display: inline-flex;
+.form-radio.optional > label {
+  display: flex;
   align-items: center;
-  font-size: 15px;
-  font-weight: 600;
-  color: #2c3e50;
-  position: relative;
-  transition: all 0.3s ease;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  color: #8B2332;
 }
 
-
-
-/* Toggle track (background bar) */
-.form-radio.optional label span::before,
-.sap-radio label span::before {
-  content: "";
-  display: inline-block;
-  width: 54px;
-  height: 28px;
-  border-radius: 30px;
-  margin-right: 10px;
-  background: linear-gradient(180deg, #d7d7d7 0%, #bfbfbf 100%);
-  transition: all 0.3s ease;
+.form-radio.optional > label span {
   position: relative;
-  vertical-align: middle;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  padding-left: 26px;
 }
 
-/* Water bubble (switch knob) */
-.form-radio.optional label span::after,
-.sap-radio label span::after {
+/* Outer circle */
+.form-radio.optional > label span::before {
   content: "";
   position: absolute;
-  left: 3px;
+  left: 0;
   top: 50%;
   transform: translateY(-50%);
-  width: 23px;
-  height: 23px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #ffffff 0%, #c0e8ff 30%, #9cd6ff 60%, #6bbcff 100%);
-  box-shadow:
-    inset 0 2px 4px rgba(255, 255, 255, 0.6),
-    0 3px 8px rgba(0, 0, 0, 0.3),
-    0 0 12px rgba(255, 255, 255, 0.5);
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(3px);
+  border: 2px solid #8B2332;
+  background: #fff;
 }
 
-/* Water bubble reflection */
-.form-radio.optional label span::after::before,
-.sap-radio label span::after::before {
+/* Inner dot when selected */
+.form-radio.optional > label input[type="radio"]:checked + span::after {
   content: "";
   position: absolute;
-  top: 4px;
-  left: 6px;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 8px;
   height: 8px;
-  background: rgba(255, 255, 255, 0.8);
   border-radius: 50%;
-  filter: blur(1px);
+  background: #8B2332;
 }
 
-/* Active (ON) track color */
-.form-radio.optional input[type="radio"]:checked+span::before,
-.sap-radio input[type="radio"]:checked+span::before {
-  background: linear-gradient(green);
-  box-shadow: 0 0 8px rgba(139, 35, 50, 0.4);
+/* =============================== */
+/* SAP ROW                         */
+/* =============================== */
+.sap-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-/* Move water bubble to the right */
-.form-radio.optional input[type="radio"]:checked+span::after,
-.sap-radio input[type="radio"]:checked+span::after {
-  left: 28px;
-  background: radial-gradient(white);
-  box-shadow:
-    inset 0 2px 4px rgba(255, 255, 255, 0.5),
-    0 3px 10px rgba(139, 35, 50, 0.4),
-    0 0 16px rgba(255, 180, 180, 0.6);
+/* =============================== */
+/* SAP TOGGLE GROUP                */
+/* =============================== */
+.sap-toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  border-left: 2px solid #e0e0e0;
+  padding-left: 24px;
+  margin-left: 4px;
+  padding-right: 24px;
+  border-right: 2px solid #e0e0e0;
 }
 
-/* Checked label color */
-.form-radio.optional input[type="radio"]:checked+span,
-.sap-radio input[type="radio"]:checked+span {
-  color: #8B2332;
+.sap-toggle-item {
+  display: flex;
+  align-items: center;
+}
+
+/* Label row: toggle + text side by side */
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: #aaa;
+  user-select: none;
+}
+
+/* =============================== */
+/* TOGGLE TRACK                    */
+/* =============================== */
+.toggle-track {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
+  border-radius: 12px;
+  background: #ccc;           /* OFF = grey */
+  transition: background 0.3s;
+  flex-shrink: 0;
+}
+
+/* =============================== */
+/* TOGGLE CIRCLE                   */
+/* =============================== */
+.toggle-circle {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+  transition: left 0.3s;
+}
+
+/* =============================== */
+/* CHECKED STATE                   */
+/* =============================== */
+
+/* Track goes dark maroon when selected */
+input[type="radio"]:checked ~ .toggle-track {
+  background: #8B2332;
+}
+
+/* Circle slides right when selected */
+input[type="radio"]:checked ~ .toggle-track .toggle-circle {
+  left: 25px;
+}
+
+/* Label text turns green when selected */
+input[type="radio"]:checked ~ .toggle-text {
+  color: #28a745;
   font-weight: 700;
 }
 
-/* Hover Glow */
-.form-radio.optional label:hover span::before,
-.sap-radio label:hover span::before {
-  filter: brightness(1.1);
-  box-shadow: 0 0 8px rgba(139, 35, 50, 0.25);
-}
 
-/* Bubble click feedback */
-.form-radio.optional label:active span::after,
-.sap-radio label:active span::after {
-  transform: translateY(-50%) scale(1.08);
-}
 
 .btn-get {
   background: linear-gradient(135deg, #00A651 0%, #00A651 100%);
@@ -1539,33 +1571,56 @@ input[type="radio"] {
 }
 
 .search-container {
-  display: flex;
-  justify-content: center;
+  
   width: 100%;
+}
+
+.search-box .search-input {
+  flex: 1;
+  height: 100%;
+  padding: 0 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px; /* fully individual rounded box */
+  box-shadow: none;
+  font-size: 14px;
+  color: #374151;
+  background-color: #f9fafb;
+  outline: none;
+  width: 112px;
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+
+  &:focus {
+    border-color: #d1d5db;
+    box-shadow: none;
+  }
 }
 
 .search-box {
   display: flex;
   align-items: center;
-  width: 100%;
-  max-width: 700px;
-  background: #fff;
-  border-radius: 30px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  border: 1px solid #ddd;
+  gap: 8px; /* gap between the three separate elements */
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
+  height: 42px;
 }
 
 .search-type-select {
-  border: none;
-  outline: none;
-  background: transparent;
-  padding: 10px 14px;
+ height: 100%;
+  min-width: 130px;
+  padding: 0 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px; /* fully individual rounded box */
+  background-color: #fff;
   font-size: 14px;
-  color: #555;
-  appearance: none;
-  border-right: 1px solid #ddd;
-  width: 120px;
+  color: #374151;
+  outline: none;
+  cursor: pointer;
+  appearance: auto;
 }
 
 .search-input {
@@ -1581,19 +1636,34 @@ input[type="radio"] {
   color: #aaa;
 }
 
-.search-btn {
-  background: #28a745;
-  color: white;
+.search-box .search-btn-global {
+  position: static;
+  transform: none;
+  top: auto;
+  right: auto;
+  width: 44px;
+  height: 44px;
+  background-color: #9b1c3a;
   border: none;
-  padding: 10px 16px;
-  border-radius: 0 30px 30px 0;
+  border-radius: 8px; /* square-ish with slight rounding */
   cursor: pointer;
-  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background-color 0.2s ease;
+
+  i {
+    color: #fff;
+    font-size: 15px;
+  }
+
+  &:hover {
+    background-color: #7f1531;
+  }
 }
 
-.search-btn:hover {
-  background: #218838;
-}
+
 
 .btn-remove-LR {
   background: transparent;
@@ -1820,12 +1890,7 @@ input[type="radio"] {
   min-width: 250px;
 }
 
-.sap-row {
-  display: flex !important;
-  align-items: center;
-  margin-bottom: 10px;
-  gap: 20px;
-}
+
 
 /* Status Counts Container */
 .status-counts-container {
@@ -1844,7 +1909,7 @@ input[type="radio"] {
   display: flex;
   align-items: center;
   white-space: nowrap;
-  width: 40%;
+  width: 55%;
 
 }
 
@@ -1856,7 +1921,7 @@ input[type="radio"] {
   display: flex;
   align-items: center;
   white-space: nowrap;
-  width: 40%;
+  width: 75%;
 
 }
 
@@ -2577,7 +2642,7 @@ input[type="radio"] {
 .status-toggle-group {
   display: flex;
   align-items: center;
-  gap: 12px;
+  // gap: 12px;
 }
 
 .btn-status {
@@ -2626,7 +2691,7 @@ input[type="radio"] {
   background-color: #cbd5e1;
   transition: 0.3s;
   border-radius: 28px;
-  width: 140%;
+  width: 92%;
 }
 
 .toggle-slider:before {
@@ -2644,6 +2709,7 @@ input[type="radio"] {
 .toggle-switch input:checked+.toggle-slider {
   background-color: #10b981;
   width: 49px;
+  margin-left: 4px;
 }
 
 .toggle-switch input:checked+.toggle-slider:before {
