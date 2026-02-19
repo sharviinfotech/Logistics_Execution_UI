@@ -1224,7 +1224,7 @@ export class FreightBillingComponent implements OnInit {
         if (this.filterStatus === 'Completed') {
           this.FreightBillingData = records;
           this.dispatchData = [];
-          Swal.fire('Success', `Vehicle Info records: ${records.length}`, 'success');
+          Swal.fire('Success', `Freight Billing records: ${records.length}`, 'success');
         }
         else if (this.filterStatus === 'Pending') {
           this.dispatchData = records;

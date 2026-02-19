@@ -1,5 +1,5 @@
 <div class="card-LE">
-    <div class="card-header-LE header-flex">
+  <div class="card-header-LE header-flex">
 
     <!-- Left Title -->
     <div class="header-title">
@@ -11,13 +11,13 @@
 
       <!-- Creation -->
       <button class="header-icon" [class.active]="mainMode === 'creation'"
-            (click)="mainMode='creation'; onMainModeChange()" title="Creation">
+        (click)="mainMode='creation'; onMainModeChange()" title="Creation">
         <i class="fa fa-plus"></i>
       </button>
 
       <!-- Filter -->
-      <button class="header-icon" [class.active]="mainMode === 'filter'"
-            (click)="mainMode='filter'; onMainModeChange()" title="Filter & Download. Filter records by date, plant, division and export to Excel">
+      <button class="header-icon" [class.active]="mainMode === 'filter'" (click)="mainMode='filter'; onMainModeChange()"
+        title="Filter & Download. Filter records by date, plant, division and export to Excel">
         <i class="fa fa-file-download"></i>
       </button>
 
@@ -72,7 +72,7 @@
 
     <div *ngIf="mainMode === 'creation'">
 
-           <div class="form-radio optional ">
+      <div class="form-radio optional ">
         <!-- <label>
           <input type="radio" name="orderType" [(ngModel)]="orderType" value="Inward" (change)="onOrderTypeChange()" />
           <span>Inward</span>
@@ -84,41 +84,41 @@
         <div *ngIf="orderType" class="sap-row">
           <div class="sap-toggle-group">
 
-      <!-- WITH SAP -->
-      <div class="sap-toggle-item">
-        <label class="toggle-label">
-          <input type="radio" name="sapType" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
-          <span class="toggle-track">
-            <span class="toggle-circle"></span>
-          </span>
-          <span class="toggle-text">With SAP</span>
-        </label>
-      </div>
+            <!-- WITH SAP -->
+            <div class="sap-toggle-item">
+              <label class="toggle-label">
+                <input type="radio" name="sapType" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
+                <span class="toggle-track">
+                  <span class="toggle-circle"></span>
+                </span>
+                <span class="toggle-text">With SAP</span>
+              </label>
+            </div>
 
-      <!-- WITHOUT SAP -->
-      <div class="sap-toggle-item">
-        <label class="toggle-label">
-          <input type="radio" name="sapType" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
-          <span class="toggle-track">
-            <span class="toggle-circle"></span>
-          </span>
-          <span class="toggle-text">Without SAP</span>
-        </label>
-      </div>
+            <!-- WITHOUT SAP -->
+            <div class="sap-toggle-item">
+              <label class="toggle-label">
+                <input type="radio" name="sapType" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
+                <span class="toggle-track">
+                  <span class="toggle-circle"></span>
+                </span>
+                <span class="toggle-text">Without SAP</span>
+              </label>
+            </div>
 
-    </div>
+          </div>
 
-    <!-- PENDING & COMPLETED COUNTS -->
-    <div *ngIf="orderType === 'Outward' && sapType" class="status-counts-container">
-      <div class="pending-box">
-        <i class="fas fa-clock"></i>
-        <span class="count-text">Pending: {{ pendingCount }}</span>
-      </div>
-      <div class="completed-box">
-        <i class="fas fa-check-circle"></i>
-        <span class="count-text">Completed: {{ completedCount }}</span>
-      </div>
-    </div>
+          <!-- PENDING & COMPLETED COUNTS -->
+          <div *ngIf="orderType === 'Outward' && sapType" class="status-counts-container">
+            <div class="pending-box">
+              <i class="fas fa-clock"></i>
+              <span class="count-text">Pending: {{ pendingCount }}</span>
+            </div>
+            <div class="completed-box">
+              <i class="fas fa-check-circle"></i>
+              <span class="count-text">Completed: {{ completedCount }}</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -168,7 +168,7 @@
 
                     <td>
                       <input type="text" formControlName="referenceNumber" class="width-le" placeholder="Enter Ref. No."
-                       maxlength="10" (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
+                        maxlength="10" (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
                         (keydown.tab)="onFieldBlur(i, 'REF_NO')" [readonly]="i !== 0" />
                     </td>
 
@@ -214,7 +214,7 @@
                     <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                   </select>
 
-                  <input type="text" class="search-input" placeholder="Enter Reference / Invoice / ODN / SO Number"
+                  <input type="text" class="search-input" style="width: 300px; flex: none; min-width: 0;" placeholder="Enter Reference / Invoice / ODN / SO Number"
                     [(ngModel)]="searchReference" name="searchReference" (keyup.enter)="onSearchReference()" />
 
                   <button type="button" class="search-btn-global" (click)="onSearchReference()">
@@ -322,16 +322,30 @@
     <div *ngIf="mainMode === 'filter'" class="filter-section">
 
       <!-- SAP Type Selection (Filter Mode) -->
-      <div class="filter-sap-row" style="display: flex; margin-bottom: 10px;">
-        <div class="form-radio optional sap-radio">
-          <label>
-            <input type="radio" [(ngModel)]="filterSapType" value="SAP" (change)="onFilterSapTypeChange()" />
-            <span>With SAP</span>
-          </label>
-          <label>
-            <input type="radio" [(ngModel)]="filterSapType" value="Non-SAP" (change)="onFilterSapTypeChange()" />
-            <span>Without SAP</span>
-          </label>
+      <div class="filter-sap-row">
+        <div class="sap-toggle-group" style="margin-bottom: 40px; border-left: 0px">
+
+          <!-- WITH SAP -->
+          <div class="sap-toggle-item">
+            <label class="toggle-label">
+              <input type="radio" [(ngModel)]="filterSapType" value="SAP" (change)="onFilterSapTypeChange()" />
+              <span class="toggle-track">
+                <span class="toggle-circle"></span>
+              </span>
+              <span class="toggle-text">With SAP</span>
+            </label>
+          </div>
+
+          <!-- WITHOUT SAP -->
+          <div class="sap-toggle-item">
+            <label class="toggle-label">
+              <input type="radio" [(ngModel)]="filterSapType" value="Non-SAP" (change)="onFilterSapTypeChange()" />
+              <span class="toggle-track">
+                <span class="toggle-circle"></span>
+              </span>
+              <span class="toggle-text">Without SAP</span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -449,392 +463,391 @@
 
     </div>
     <!-- HEADER DETAILS -->
-<div class="card" style="margin-top: 10px;" *ngIf="showTable && headerData">
-  <div class="card-body-LE">
-    <h5 class="mb-3">Header Details</h5>
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped text-center">
-        <thead>
-          <tr>
-            <th>Ref No</th>
-            <th>Invoice No</th>
-            <th>ODN No</th>
-            <th>SO No</th>
-            <th>Sales Person</th>
-            <th>Physical Arrived</th>
-            <th>Unloading DT</th>
-            <th>POD Scan</th>
-            <th>SIT/SALE</th>
-            <th>Location</th>
-            <th>Plant</th>
-            <th>Division</th>
-            <th>Created date</th>
-            <th>Vehicle Type</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+    <div class="card" style="margin-top: 10px;" *ngIf="showTable && headerData">
+      <div class="card-body-LE">
+        <h5 class="mb-3">Header Details</h5>
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped text-center">
+            <thead>
+              <tr>
+                <th>Ref No</th>
+                <th>Invoice No</th>
+                <th>ODN No</th>
+                <th>SO No</th>
+                <th>Sales Person</th>
+                <th>Physical Arrived</th>
+                <th>Unloading DT</th>
+                <th>POD Scan</th>
+                <th>SIT/SALE</th>
+                <th>Location</th>
+                <th>Plant</th>
+                <th>Division</th>
+                <th>Created date</th>
+                <th>Vehicle Type</th>
+                <th>Action</th>
+              </tr>
+            </thead>
 
-        <tbody>
-          <tr [class.editing]="headerData.isEdit">
+            <tbody>
+              <tr [class.editing]="headerData.isEdit">
 
-            <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="headerData.ZREFNO">
-              <span *ngIf="!headerData.isEdit">{{ headerData.ZREFNO }}</span>
-            </td>
+                <td>
+                  <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="headerData.ZREFNO">
+                  <span *ngIf="!headerData.isEdit">{{ headerData.ZREFNO }}</span>
+                </td>
 
-            <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="headerData.ZINV_NO">
-              <span *ngIf="!headerData.isEdit">{{ headerData.ZINV_NO }}</span>
-            </td>
+                <td>
+                  <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="headerData.ZINV_NO">
+                  <span *ngIf="!headerData.isEdit">{{ headerData.ZINV_NO }}</span>
+                </td>
 
-            <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="headerData.ZODN_NO">
-              <span *ngIf="!headerData.isEdit">{{ headerData.ZODN_NO }}</span>
-            </td>
+                <td>
+                  <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="headerData.ZODN_NO">
+                  <span *ngIf="!headerData.isEdit">{{ headerData.ZODN_NO }}</span>
+                </td>
 
-            <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="headerData.ZSONO">
-              <span *ngIf="!headerData.isEdit">{{ headerData.ZSONO }}</span>
-            </td>
+                <td>
+                  <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="headerData.ZSONO">
+                  <span *ngIf="!headerData.isEdit">{{ headerData.ZSONO }}</span>
+                </td>
 
-            <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="headerData.ZSALE_PERSON">
-              <span *ngIf="!headerData.isEdit">{{ headerData.ZSALE_PERSON }}</span>
-            </td>
+                <td>
+                  <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="headerData.ZSALE_PERSON">
+                  <span *ngIf="!headerData.isEdit">{{ headerData.ZSALE_PERSON }}</span>
+                </td>
 
-            <td>
-              <input *ngIf="headerData.isEdit" type="date" class="form-control form-control-sm width-md"
-                [(ngModel)]="headerData.ZPY_ARRIVED_DEST">
-              <span *ngIf="!headerData.isEdit">
-                {{ headerData.ZPY_ARRIVED_DEST | date:'dd-MM-yyyy' }}
-              </span>
-            </td>
+                <td>
+                  <input *ngIf="headerData.isEdit" type="date" class="form-control form-control-sm width-md"
+                    [(ngModel)]="headerData.ZPY_ARRIVED_DEST">
+                  <span *ngIf="!headerData.isEdit">
+                    {{ headerData.ZPY_ARRIVED_DEST | date:'dd-MM-yyyy' }}
+                  </span>
+                </td>
 
-            <td>
-              <input *ngIf="headerData.isEdit" type="datetime-local" class="form-control form-control-sm width-md"
-                [(ngModel)]="headerData.ZUNLOADING_DT">
-              <span *ngIf="!headerData.isEdit">{{ headerData.ZUNLOADING_DT }}</span>
-            </td>
+                <td>
+                  <input *ngIf="headerData.isEdit" type="datetime-local" class="form-control form-control-sm width-md"
+                    [(ngModel)]="headerData.ZUNLOADING_DT">
+                  <span *ngIf="!headerData.isEdit">{{ headerData.ZUNLOADING_DT }}</span>
+                </td>
 
-            <td>
-              <input *ngIf="headerData.isEdit" type="datetime-local" class="form-control form-control-sm width-md"
-                [(ngModel)]="headerData.ZPOD_SCAN">
-              <span *ngIf="!headerData.isEdit">{{ headerData.ZPOD_SCAN }}</span>
-            </td>
+                <td>
+                  <input *ngIf="headerData.isEdit" type="datetime-local" class="form-control form-control-sm width-md"
+                    [(ngModel)]="headerData.ZPOD_SCAN">
+                  <span *ngIf="!headerData.isEdit">{{ headerData.ZPOD_SCAN }}</span>
+                </td>
 
-            <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="headerData.ZSIT_SALE">
-              <span *ngIf="!headerData.isEdit">{{ headerData.ZSIT_SALE }}</span>
-            </td>
+                <td>
+                  <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="headerData.ZSIT_SALE">
+                  <span *ngIf="!headerData.isEdit">{{ headerData.ZSIT_SALE }}</span>
+                </td>
 
-            <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="headerData.ZLOCATION">
-              <span *ngIf="!headerData.isEdit">{{ headerData.ZLOCATION }}</span>
-            </td>
+                <td>
+                  <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="headerData.ZLOCATION">
+                  <span *ngIf="!headerData.isEdit">{{ headerData.ZLOCATION }}</span>
+                </td>
 
-            <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="headerData.ZPLANT">
-              <span *ngIf="!headerData.isEdit">{{ headerData.ZPLANT }}</span>
-            </td>
+                <td>
+                  <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="headerData.ZPLANT">
+                  <span *ngIf="!headerData.isEdit">{{ headerData.ZPLANT }}</span>
+                </td>
 
-            <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="headerData.ZDIVISION">
-              <span *ngIf="!headerData.isEdit">{{ headerData.ZDIVISION }}</span>
-            </td>
+                <td>
+                  <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="headerData.ZDIVISION">
+                  <span *ngIf="!headerData.isEdit">{{ headerData.ZDIVISION }}</span>
+                </td>
 
-            <td>
-              <input *ngIf="headerData.isEdit" type="date" class="form-control form-control-sm width-md"
-                [(ngModel)]="headerData.ZCREATED_DT">
-              <span *ngIf="!headerData.isEdit">{{ headerData.ZCREATED_DT | date:'dd-MM-yyyy' }}</span>
-            </td>
+                <td>
+                  <input *ngIf="headerData.isEdit" type="date" class="form-control form-control-sm width-md"
+                    [(ngModel)]="headerData.ZCREATED_DT">
+                  <span *ngIf="!headerData.isEdit">{{ headerData.ZCREATED_DT | date:'dd-MM-yyyy' }}</span>
+                </td>
 
-            <td>
-              <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="headerData.ZVEH_TYPE">
-              <span *ngIf="!headerData.isEdit">{{ headerData.ZVEH_TYPE }}</span>
-            </td>
+                <td>
+                  <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="headerData.ZVEH_TYPE">
+                  <span *ngIf="!headerData.isEdit">{{ headerData.ZVEH_TYPE }}</span>
+                </td>
 
 
 
-            <!-- ACTION -->
-            <td>
-              <div *ngIf="!headerData.isEdit">
-                <button class="btn btn-sm btn-primary" (click)="editSearchRow(headerData)">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-sm btn-danger" (click)="deleteRow(itemsList, i)">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
+                <!-- ACTION -->
+                <td>
+                  <div *ngIf="!headerData.isEdit">
+                    <button class="btn btn-sm btn-primary" (click)="editSearchRow(headerData)">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" (click)="deleteRow(itemsList, i)">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
 
-              <div *ngIf="headerData.isEdit">
-                <button class="btn btn-sm btn-success me-1" (click)="updateSearchRow(headerData, itemsList)">
-                  <i class="fas fa-check"></i>
-                </button>
-                <button class="btn btn-sm btn-secondary" (click)="cancelSearchEdit(headerData)">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-            </td>
+                  <div *ngIf="headerData.isEdit">
+                    <button class="btn btn-sm btn-success me-1" (click)="updateSearchRow(headerData, itemsList)">
+                      <i class="fas fa-check"></i>
+                    </button>
+                    <button class="btn btn-sm btn-secondary" (click)="cancelSearchEdit(headerData)">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </td>
 
-          </tr>
-        </tbody>
-      </table>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- LINE ITEMS -->
-<div class="card" style="margin-top: 10px;" *ngIf="showTable && itemsList.length > 0">
-  <div class="card-body-LE">
-    <h5 class="mb-3">Line Items</h5>
+    <!-- LINE ITEMS -->
+    <div class="card" style="margin-top: 10px;" *ngIf="showTable && itemsList.length > 0">
+      <div class="card-body-LE">
+        <h5 class="mb-3">Line Items</h5>
 
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped text-center">
-        <thead>
-          <tr>
-            <th>Reference Number</th>
-            <th>Line No</th>
-            <th>Invoice Number</th>
-            <th>Vehicle Number</th>
-            <th>Vehicle Line</th>
-            <th>Work Order</th>
-            <th>LR No</th>
-            <th>Transporter</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped text-center">
+            <thead>
+              <tr>
+                <th>Reference Number</th>
+                <th>Line No</th>
+                <th>Invoice Number</th>
+                <th>Vehicle Number</th>
+                <th>Vehicle Line</th>
+                <th>Work Order</th>
+                <th>LR No</th>
+                <th>Transporter</th>
+                <th>Action</th>
+              </tr>
+            </thead>
 
-        <tbody>
-          <tr *ngFor="let item of itemsList; let i = index" [class.editing]="item.isEdit">
+            <tbody>
+              <tr *ngFor="let item of itemsList; let i = index" [class.editing]="item.isEdit">
 
-            <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="item.ZREFNO">
-              <span *ngIf="!item.isEdit">{{ item.ZREFNO }}</span>
-            </td>
+                <td>
+                  <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZREFNO">
+                  <span *ngIf="!item.isEdit">{{ item.ZREFNO }}</span>
+                </td>
 
-            <td>{{ item.ZLINE_NO}}</td>
+                <td>{{ item.ZLINE_NO}}</td>
 
-            <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="item.ZINV_NO">
-              <span *ngIf="!item.isEdit">{{ item.ZINV_NO }}</span>
-            </td>
+                <td>
+                  <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZINV_NO">
+                  <span *ngIf="!item.isEdit">{{ item.ZINV_NO }}</span>
+                </td>
 
-            <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="item.ZVEH_NUM">
-              <span *ngIf="!item.isEdit">{{ item.ZVEH_NUM }}</span>
-            </td>
+                <td>
+                  <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZVEH_NUM">
+                  <span *ngIf="!item.isEdit">{{ item.ZVEH_NUM }}</span>
+                </td>
 
-            <td>
-              <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md"
-                [(ngModel)]="item.ZVEH_LINE">
-              <span *ngIf="!item.isEdit">{{ item.ZVEH_LINE }}</span>
-            </td>
+                <td>
+                  <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZVEH_LINE">
+                  <span *ngIf="!item.isEdit">{{ item.ZVEH_LINE }}</span>
+                </td>
 
-            <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="item.ZWORK_ORDER">
-              <span *ngIf="!item.isEdit">{{ item.ZWORK_ORDER }}</span>
-            </td>
+                <td>
+                  <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZWORK_ORDER">
+                  <span *ngIf="!item.isEdit">{{ item.ZWORK_ORDER }}</span>
+                </td>
 
-            <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="item.ZLRNO">
-              <span *ngIf="!item.isEdit">{{ item.ZLRNO }}</span>
-            </td>
+                <td>
+                  <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZLRNO">
+                  <span *ngIf="!item.isEdit">{{ item.ZLRNO }}</span>
+                </td>
 
-            <td>
-              <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
-                [(ngModel)]="item.ZTRANSPORTER">
-              <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
-            </td>
+                <td>
+                  <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZTRANSPORTER">
+                  <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
+                </td>
 
-            <!-- ACTION -->
-            <td>
-              <div *ngIf="!item.isEdit">
-                <button class="btn btn-sm btn-primary me-1" (click)="editSearchRow(item)">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-sm btn-danger" (click)="deleteRow(itemsList, i)">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
+                <!-- ACTION -->
+                <td>
+                  <div *ngIf="!item.isEdit">
+                    <button class="btn btn-sm btn-primary me-1" (click)="editSearchRow(item)">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" (click)="deleteRow(itemsList, i)">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
 
-              <div *ngIf="item.isEdit">
-                <button class="btn btn-sm btn-success me-1" (click)="updateSearchRow(headerData, itemsList)">
-                  <i class="fas fa-check"></i>
-                </button>
-                <button class="btn btn-sm btn-secondary" (click)="cancelSearchEdit(item)">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-            </td>
+                  <div *ngIf="item.isEdit">
+                    <button class="btn btn-sm btn-success me-1" (click)="updateSearchRow(headerData, itemsList)">
+                      <i class="fas fa-check"></i>
+                    </button>
+                    <button class="btn btn-sm btn-secondary" (click)="cancelSearchEdit(item)">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </td>
 
-          </tr>
-        </tbody>
-      </table>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
 
-<div class="card" style="margin-top: 10px;"
-  *ngIf=" filterApplied && filterStatus === 'Completed' &&  TransitInfoHeader?.length > 0 && mainMode === 'filter'">
-  <div class="card-body-LE">
-    <h5 class="mb-3">Header Items</h5>
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped text-center">
-        <thead>
-          <tr>
-            <th>SI.No</th>
-            <th>REFNO</th>
-            <th>Invoice No</th>
-            <!-- <th>Line No</th> -->
-            <th>Odn Number</th>
-            <th>SO Number</th>
-            <th>Sales Person</th>
-            <th>Physical Arrived</th>
-            <th>Unloading DT</th>
-            <th>POD Scan</th>
-            <th>SIT/SALE</th>
-            <th>Location</th>
-            <th>Plant</th>
-            <th>Division</th>
-            <th>Created date</th>
-            <th>Vehicle Type</th>
-          </tr>
-        </thead>
+    <div class="card" style="margin-top: 10px;"
+      *ngIf=" filterApplied && filterStatus === 'Completed' &&  TransitInfoHeader?.length > 0 && mainMode === 'filter'">
+      <div class="card-body-LE">
+        <h5 class="mb-3">Header Items</h5>
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped text-center">
+            <thead>
+              <tr>
+                <th>SI.No</th>
+                <th>REFNO</th>
+                <th>Invoice No</th>
+                <!-- <th>Line No</th> -->
+                <th>Odn Number</th>
+                <th>SO Number</th>
+                <th>Sales Person</th>
+                <th>Physical Arrived</th>
+                <th>Unloading DT</th>
+                <th>POD Scan</th>
+                <th>SIT/SALE</th>
+                <th>Location</th>
+                <th>Plant</th>
+                <th>Division</th>
+                <th>Created date</th>
+                <th>Vehicle Type</th>
+              </tr>
+            </thead>
 
-        <tbody>
-          <tr *ngFor="let item of TransitInfoHeader; let i = index">
-            <td>{{ i + 1 }}</td>
+            <tbody>
+              <tr *ngFor="let item of TransitInfoHeader; let i = index">
+                <td>{{ i + 1 }}</td>
 
-            <td>{{ item.ZREFNO }}</td>
-            <td>{{ item.ZINV_NO }}</td>
-            <td>{{ item.ZODN_NO }}</td>
-            <td>{{ item.ZSONO }}</td>
-            <td>{{ item.ZSALE_PERSON }}</td>
-            <td>{{ item.ZPY_ARRIVED_DEST }}</td>
-            <td>{{ item.ZUNLOADING_DT }}</td>
-            <td>{{ item.ZPOD_SCAN}}</td>
-            <td>{{ item.ZSIT_SALE }}</td>
-            <td>{{ item.ZLOCATION }}</td>
-            <td>{{ item.ZPLANT}}</td>
-            <td>{{ item.ZDIVISION }}</td>
-            <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZVEH_TYPE }}</td>
-          </tr>
-        </tbody>
-      </table>
+                <td>{{ item.ZREFNO }}</td>
+                <td>{{ item.ZINV_NO }}</td>
+                <td>{{ item.ZODN_NO }}</td>
+                <td>{{ item.ZSONO }}</td>
+                <td>{{ item.ZSALE_PERSON }}</td>
+                <td>{{ item.ZPY_ARRIVED_DEST }}</td>
+                <td>{{ item.ZUNLOADING_DT }}</td>
+                <td>{{ item.ZPOD_SCAN}}</td>
+                <td>{{ item.ZSIT_SALE }}</td>
+                <td>{{ item.ZLOCATION }}</td>
+                <td>{{ item.ZPLANT}}</td>
+                <td>{{ item.ZDIVISION }}</td>
+                <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
+                <td>{{ item.ZVEH_TYPE }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<div class="card" style="margin-top: 10px;"
-  *ngIf=" filterApplied && filterStatus === 'Completed' &&   TransitInfoItems?.length > 0 && mainMode === 'filter'">
-  <div class="card-body-LE">
-    <h5 class="mb-3">Line Items</h5>
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped text-center">
-        <thead>
-          <tr>
-            <th>SI.No</th>
-            <th>REFNO</th>
-            <th>Invoice No</th>
-            <!-- <th>Line No</th> -->
-            <th>Vehicle Line</th>
-            <th>Vehicle Number</th>
-            <th>LR No</th>
-            <th>work Order Number</th>
-            <th>Transporter</th>
-          </tr>
-        </thead>
+    <div class="card" style="margin-top: 10px;"
+      *ngIf=" filterApplied && filterStatus === 'Completed' &&   TransitInfoItems?.length > 0 && mainMode === 'filter'">
+      <div class="card-body-LE">
+        <h5 class="mb-3">Line Items</h5>
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped text-center">
+            <thead>
+              <tr>
+                <th>SI.No</th>
+                <th>REFNO</th>
+                <th>Invoice No</th>
+                <!-- <th>Line No</th> -->
+                <th>Vehicle Line</th>
+                <th>Vehicle Number</th>
+                <th>LR No</th>
+                <th>work Order Number</th>
+                <th>Transporter</th>
+              </tr>
+            </thead>
 
-        <tbody>
-          <tr *ngFor="let item of TransitInfoItems; let i = index">
-            <td>{{ i + 1 }}</td>
+            <tbody>
+              <tr *ngFor="let item of TransitInfoItems; let i = index">
+                <td>{{ i + 1 }}</td>
 
-            <td>{{ item.ZREFNO }}</td>
-            <td>{{ item.ZINV_NO }}</td>
-            <td>{{ item.ZVEH_LINE}}</td>
-            <td>{{ item.ZVEH_NUM }}</td>
-            <td>{{ item.ZLRNO }}</td>
-            <td>{{ item.ZWORK_ORDER }}</td>
-            <td>{{ item.ZTRANSPORTER }}</td>
+                <td>{{ item.ZREFNO }}</td>
+                <td>{{ item.ZINV_NO }}</td>
+                <td>{{ item.ZVEH_LINE}}</td>
+                <td>{{ item.ZVEH_NUM }}</td>
+                <td>{{ item.ZLRNO }}</td>
+                <td>{{ item.ZWORK_ORDER }}</td>
+                <td>{{ item.ZTRANSPORTER }}</td>
 
-          </tr>
-        </tbody>
-      </table>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
 
-<div class="card" style="margin-top: 10px;"
-  *ngIf="filterApplied && filterStatus === 'Pending' && dispatchData?.length > 0 && mainMode === 'filter'">
-  <div class="card-body-LE">
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped text-center">
-        <thead>
-          <tr>
-            <th>SI.No</th>
-            <th>Reference No</th>
-            <th>Date</th>
-            <th>Plant</th>
-            <th>Division</th>
-            <th>Vehicle Type</th>
-            <th>No. of Trucks</th>
-            <th>Work Order</th>
-            <th>Vendor Code</th>
-            <th>Transporter</th>
-            <th>No. of LRs</th>
-            <th>LR Number</th>
-            <th>Loading Point</th>
-            <th>Unloading Point</th>
-            <th>No Of Invoices</th>
-          </tr>
-        </thead>
+    <div class="card" style="margin-top: 10px;"
+      *ngIf="filterApplied && filterStatus === 'Pending' && dispatchData?.length > 0 && mainMode === 'filter'">
+      <div class="card-body-LE">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped text-center">
+            <thead>
+              <tr>
+                <th>SI.No</th>
+                <th>Reference No</th>
+                <th>Date</th>
+                <th>Plant</th>
+                <th>Division</th>
+                <th>Vehicle Type</th>
+                <th>No. of Trucks</th>
+                <th>Work Order</th>
+                <th>Vendor Code</th>
+                <th>Transporter</th>
+                <th>No. of LRs</th>
+                <th>LR Number</th>
+                <th>Loading Point</th>
+                <th>Unloading Point</th>
+                <th>No Of Invoices</th>
+              </tr>
+            </thead>
 
-        <tbody>
-          <tr *ngFor="let item of dispatchData; let i = index">
+            <tbody>
+              <tr *ngFor="let item of dispatchData; let i = index">
 
-            <td>{{ i + 1 }}</td>
-            <td>{{ item.ZREFNO }}</td>
-            <!-- <td>{{ item.ZLINE_NO }}</td> -->
-            <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
-            <td>{{ item.ZWERKS }}</td>
-            <td>{{ item.ZDIVISION }}</td>
-            <td>{{ item.ZVEH_TYPE }}</td>
-            <td>{{ item.ZNO_TRUCKS }}</td>
-            <td>{{ item.ZWORK_ORDER }}</td>
-            <td>{{ item.ZVENDOR_CD }}</td>
-            <td>{{ item.ZTRANSPORTER }}</td>
-            <td>{{ item.ZNO_LRS }}</td>
-            <td>{{ item.ZLR_NO }}</td>
-            <td>{{ item.ZLOAD_PT }}</td>
-            <td>{{ item.ZUNLOAD_PT }}</td>
-            <td>{{ item.ZNO_INVOICES }}</td>
-          </tr>
+                <td>{{ i + 1 }}</td>
+                <td>{{ item.ZREFNO }}</td>
+                <!-- <td>{{ item.ZLINE_NO }}</td> -->
+                <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
+                <td>{{ item.ZWERKS }}</td>
+                <td>{{ item.ZDIVISION }}</td>
+                <td>{{ item.ZVEH_TYPE }}</td>
+                <td>{{ item.ZNO_TRUCKS }}</td>
+                <td>{{ item.ZWORK_ORDER }}</td>
+                <td>{{ item.ZVENDOR_CD }}</td>
+                <td>{{ item.ZTRANSPORTER }}</td>
+                <td>{{ item.ZNO_LRS }}</td>
+                <td>{{ item.ZLR_NO }}</td>
+                <td>{{ item.ZLOAD_PT }}</td>
+                <td>{{ item.ZUNLOAD_PT }}</td>
+                <td>{{ item.ZNO_INVOICES }}</td>
+              </tr>
 
 
-        </tbody>
-      </table>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
   </div>
 </div>
-

@@ -58,36 +58,36 @@
 
                         <!-- ✅ PLANTS -->
                         <td>
-                            <span class="count-badge">
+                            <!-- <span class="count-badge">
                                 {{ user.PLANTS.length }} Plants
-                            </span>
+                            </span> -->
 
-                            <button *ngIf="user.PLANTS?.length" class="btn-view" (click)="openPlantCard(user.PLANTS)">
-                                View
+                            <button *ngIf="user.PLANTS?.length" class="btn-Screens"
+                                (click)="openPlantCard(user.PLANTS)">
+                                Plants ({{ user.PLANTS.length }})
                             </button>
                         </td>
 
                         <!-- ✅ DIVISIONS -->
                         <td>
-                            <span class="count-badge">
+                            <!-- <span class="count-badge">
                                 {{ user.DIVISIONS.length }} Divisions
-                            </span>
+                            </span> -->
 
-                            <button *ngIf="user.DIVISIONS?.length" class="btn-view"
+                            <button *ngIf="user.DIVISIONS?.length" class="btn-Screens"
                                 (click)="openDivisionCard(user.DIVISIONS)">
-                                View
+                                Divisions ({{ user.DIVISIONS.length }})
                             </button>
                         </td>
 
                         <!-- Activities -->
                         <td>
-                            <span class="count-badge">
-                                {{ user.ACTIVITIES.length }} Activities
-                            </span>
 
-                            <button *ngIf="user.ACTIVITIES?.length" class="btn-view"
+                            <button *ngIf="user.ACTIVITIES?.length" class="btn-Screens"
                                 (click)="openActivityCard(user.ACTIVITIES)">
-                                View
+
+                                <i class="ri-shield-check-line"></i>
+                                🛡 Screens ({{ user.ACTIVITIES.length }})
                             </button>
                         </td>
 
@@ -114,9 +114,24 @@
                 </div>
 
                 <div class="view-card-body">
-                    <div *ngFor="let item of viewCardData" class="view-item">
-                        {{ item }}
-                    </div>
+
+                    <ng-container *ngIf="viewCardTitle === 'Selected Activities'; else plainList">
+                        <div class="activities-grid-new">
+                            <div *ngFor="let activity of availableActivities" class="activity-pill view-only"
+                                [class.selected]="viewCardData.includes(activity)">
+                                <span class="activity-name">{{ activity }}</span>
+                                <span class="activity-check" *ngIf="viewCardData.includes(activity)">✔</span>
+                                <span class="activity-uncheck" *ngIf="!viewCardData.includes(activity)"></span>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <ng-template #plainList>
+                        <div *ngFor="let item of viewCardData" class="view-item">
+                            {{ item }}
+                        </div>
+                    </ng-template>
+
                 </div>
 
             </div>

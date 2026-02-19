@@ -270,7 +270,7 @@
                     <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                   </select>
 
-                  <input type="text" class="search-input" placeholder="Enter Reference / Invoice / ODN / SO Number"
+                  <input type="text" class="search-input" style="width: 300px; flex: none; min-width: 0;" placeholder="Enter Reference / Invoice / ODN / SO Number"
                     [(ngModel)]="searchReference" name="searchReference" (keyup.enter)="onSearchReference()" />
 
                   <button type="button" class="search-btn-global" (click)="onSearchReference()">
@@ -528,16 +528,30 @@
     <div *ngIf="mainMode === 'filter'" class="filter-section">
 
       <!-- SAP Type Selection (Filter Mode) -->
-      <div class="filter-sap-row" style="display: flex; margin-bottom: 10px;">
-        <div class="form-radio optional sap-radio">
-          <label>
-            <input type="radio" [(ngModel)]="filterSapType" value="SAP" (change)="onFilterSapTypeChange()" />
-            <span>With SAP</span>
-          </label>
-          <label>
-            <input type="radio" [(ngModel)]="filterSapType" value="Non-SAP" (change)="onFilterSapTypeChange()" />
-            <span>Without SAP</span>
-          </label>
+      <div class="filter-sap-row">
+        <div class="sap-toggle-group" style="margin-bottom: 40px; border-left: 0px">
+
+          <!-- WITH SAP -->
+          <div class="sap-toggle-item">
+            <label class="toggle-label">
+              <input type="radio" [(ngModel)]="filterSapType" value="SAP" (change)="onFilterSapTypeChange()" />
+              <span class="toggle-track">
+                <span class="toggle-circle"></span>
+              </span>
+              <span class="toggle-text">With SAP</span>
+            </label>
+          </div>
+
+          <!-- WITHOUT SAP -->
+          <div class="sap-toggle-item">
+            <label class="toggle-label">
+              <input type="radio" [(ngModel)]="filterSapType" value="Non-SAP" (change)="onFilterSapTypeChange()" />
+              <span class="toggle-track">
+                <span class="toggle-circle"></span>
+              </span>
+              <span class="toggle-text">Without SAP</span>
+            </label>
+          </div>
         </div>
       </div>
       <br />

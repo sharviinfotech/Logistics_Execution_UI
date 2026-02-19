@@ -58,13 +58,7 @@
           <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
           <span>Outward</span>
         </label>
-      </div>
-
-      <br />
-
-      <!-- 🔹 SAP Type (With / Without SAP) & Search Bar -->
-      <div *ngIf="orderType" class="sap-search-container">
-        <div class="form-radio optional sap-radio">
+          <!-- <div *ngIf="orderType" class="form-radio optional sap-radio">
           <label>
             <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
             <span>With SAP</span>
@@ -73,12 +67,48 @@
             <input type="radio" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
             <span>Without SAP</span>
           </label>
+        </div> -->
+                <div *ngIf="orderType" class="sap-row">
+          <div class="sap-toggle-group">
+
+            <!-- WITH SAP -->
+            <div class="sap-toggle-item">
+              <label class="toggle-label">
+                <input type="radio" name="sapType" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
+                <span class="toggle-track">
+                  <span class="toggle-circle"></span>
+                </span>
+                <span class="toggle-text">With SAP</span>
+              </label>
+            </div>
+
+            <!-- WITHOUT SAP -->
+            <div class="sap-toggle-item">
+              <label class="toggle-label">
+                <input type="radio" name="sapType" [(ngModel)]="sapType" value="Non-SAP"
+                  (change)="onSapTypeChange()" />
+                <span class="toggle-track">
+                  <span class="toggle-circle"></span>
+                </span>
+                <span class="toggle-text">Without SAP</span>
+              </label>
+            </div>
+
+          </div>
+
         </div>
+      </div>
+
+      <br />
+
+      <!-- 🔹 SAP Type (With / Without SAP) & Search Bar -->
+      <div *ngIf="orderType" class="sap-search-container">
+
 
         <!-- 🔍 Search Bar -->
         <div class="search-bar-wrapper" *ngIf="sapType">
           <div class="search-container">
-            <div class="search-box">
+            <div class="search-box" >
 
               <!-- 🔽 Select Search Type -->
               <select class="search-type-select" [(ngModel)]="selectedType" (change)="onSearchTypeChange()">
@@ -89,13 +119,13 @@
               </select>
 
               <!-- 🔍 Single Search Input -->
-              <input type="text" class="search-input" [placeholder]="searchPlaceholder" [(ngModel)]="searchValue"
+              <input type="text" class="search-input"  style="width: 300px; flex: none; min-width: 0;" [placeholder]="searchPlaceholder" [(ngModel)]="searchValue"
                 [disabled]="!selectedType" (keyup.enter)="onSearchReference()" />
 
               <!-- 🔎 Button -->
-                  <button type="button" class="search-btn-global" (click)="onSearchReference()">
-                    <i class="fas fa-search"></i>
-                  </button>
+              <button type="button" class="search-btn-global" (click)="onSearchReference()">
+                <i class="fas fa-search"></i>
+              </button>
 
             </div>
           </div>
@@ -249,16 +279,30 @@
 
     <div *ngIf="mainMode === 'filter'" class="filter-section">
 
-      <div class="filter-sap-row" style="display: flex; margin-bottom: 10px;">
-        <div class="form-radio optional sap-radio">
-          <label>
-            <input type="radio" [(ngModel)]="filterSapType" value="SAP" (change)="onFilterSapTypeChange()" />
-            <span>With SAP</span>
-          </label>
-          <label>
-            <input type="radio" [(ngModel)]="filterSapType" value="Non-SAP" (change)="onFilterSapTypeChange()" />
-            <span>Without SAP</span>
-          </label>
+      <div class="filter-sap-row">
+        <div class="sap-toggle-group" style="margin-bottom: 40px; border-left: 0px">
+
+          <!-- WITH SAP -->
+          <div class="sap-toggle-item">
+            <label class="toggle-label">
+              <input type="radio" [(ngModel)]="filterSapType" value="SAP" (change)="onFilterSapTypeChange()" />
+              <span class="toggle-track">
+                <span class="toggle-circle"></span>
+              </span>
+              <span class="toggle-text">With SAP</span>
+            </label>
+          </div>
+
+          <!-- WITHOUT SAP -->
+          <div class="sap-toggle-item">
+            <label class="toggle-label">
+              <input type="radio" [(ngModel)]="filterSapType" value="Non-SAP" (change)="onFilterSapTypeChange()" />
+              <span class="toggle-track">
+                <span class="toggle-circle"></span>
+              </span>
+              <span class="toggle-text">Without SAP</span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -271,7 +315,7 @@
 
       <!-- Filter Form -->
       <div class="card-body-LE" *ngIf="filterSapType">
-        <div class="form-grid">
+        <div class="form-grid" style="margin-top: 10px;">
 
           <!-- From Date -->
           <div class="form-field">

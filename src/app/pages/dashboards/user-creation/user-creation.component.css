@@ -20,3 +20,76 @@
 .toggle-eye:hover {
     color: #000;
 }
+
+.btn-Screens {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* gap: 8px; */
+
+    padding: 8px 10px;
+    min-width: 140px;
+
+    border: 1px solid #e6ebf2;
+    border-radius: 10px;
+
+    background: #e3f2fd;
+    color: #2d2f33;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05);
+
+    transition: 0.2s ease-in-out;
+}
+
+.btn-Screens:hover {
+    background: #f8fafc;
+    border-color: #d6dde8;
+}
+
+.activity-pill.view-only {
+    cursor: default !important;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border: 1.5px solid #d0d5dd;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #1e2d45;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.activity-pill.view-only.selected {
+    background-color: #EDF0F2;
+    /* white background like image 2 */
+    color: #1e2d45;
+    border-color: #d0d5dd;
+}
+
+.activity-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    background-color: #1e2d45;
+    /* dark circle */
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.view-card-body .activities-grid-new {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 4px 0;
+}

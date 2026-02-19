@@ -1615,7 +1615,7 @@ input[type="radio"]:checked ~ .toggle-text {
   padding: 0 12px;
   border: 1px solid #d1d5db;
   border-radius: 8px; /* fully individual rounded box */
-  background-color: #fff;
+  background-color: #f9fafb;
   font-size: 14px;
   color: #374151;
   outline: none;
@@ -2128,7 +2128,7 @@ input[type="radio"]:checked ~ .toggle-text {
 
 .view-card {
   background: white;
-  width: 400px;
+  // width: 400px;
   max-height: 500px;
   border-radius: 8px;
   display: flex;
