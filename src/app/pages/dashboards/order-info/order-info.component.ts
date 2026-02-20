@@ -398,6 +398,11 @@ export class OrderInfoComponent implements OnInit {
       this.resetConditionalFields();
     }
     this.updateSearchOptionLabels();
+    this.selectedType = '';
+    this.searchValue = '';
+    this.searchReference = '';      
+    this.searchOptionsList = [];
+
 
     this.previousSapType = this.sapType;
     this.setConditionalValidators();
@@ -2014,7 +2019,7 @@ export class OrderInfoComponent implements OnInit {
     this.cd.detectChanges();
   }
 
- 
+
 
 
 

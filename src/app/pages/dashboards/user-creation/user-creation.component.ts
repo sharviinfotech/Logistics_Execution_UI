@@ -32,6 +32,7 @@ interface User {
   EMAIL: string;
   CONTACT: string;
   PASSWORD: string;
+  CONFPSWD: string;
   EMP_CODE: string;
   INOUT_TYPE: string;
   CATEGORY: string;
@@ -94,6 +95,7 @@ export class UserCreationComponent implements OnInit {
   selectedPlants: string[] = [];
   selectedDivisions: string[] = [];
   showPassword = false;
+  showConfirmPassword = false;
 
 
 
@@ -144,6 +146,7 @@ export class UserCreationComponent implements OnInit {
       EMAIL: ['', Validators.required],
       CONTACT: ['', Validators.required],
       PASSWORD: ['', Validators.required],
+      CONFPSWD: ['', Validators.required],
       EMP_CODE: ['', Validators.required],
       INOUT_TYPE: ['', Validators.required],
       CATEGORY: ['Internal'],
@@ -155,7 +158,7 @@ export class UserCreationComponent implements OnInit {
       DIVISION: [''],
 
       ACTIVITIES: this.fb.array([])
-    });
+    }, { validators: this.passwordMatchValidator }); 
   }
 
 
@@ -166,6 +169,10 @@ export class UserCreationComponent implements OnInit {
 
   togglePassword() {
     this.showPassword = !this.showPassword;
+  }
+
+    toggleConfirmPassword() {
+    this.showConfirmPassword = !this.showConfirmPassword;
   }
 
   isActivitySelected(activity: string): boolean {
@@ -187,6 +194,22 @@ export class UserCreationComponent implements OnInit {
       this.activitiesFormArray.push(this.fb.control(activity));
     });
   }
+  passwordMatchValidator(form: FormGroup) {
+  const password = form.get('PASSWORD')?.value;
+  const confirm = form.get('CONFPSWD')?.value;
+
+  if (password && confirm && password !== confirm) {
+    form.get('CONFPSWD')?.setErrors({ mismatch: true });
+  } else {
+    // Clear mismatch error only (keep required error if empty)
+    const errors = form.get('CONFPSWD')?.errors;
+    if (errors) {
+      delete errors['mismatch'];
+      form.get('CONFPSWD')?.setErrors(Object.keys(errors).length ? errors : null);
+    }
+  }
+  return null;
+}
 
   deselectAllActivities() {
     this.activitiesFormArray.clear();
@@ -363,6 +386,7 @@ export class UserCreationComponent implements OnInit {
       EMAIL: '',
       CONTACT: '',
       PASSWORD: '',
+      CONFPSWD: '',
       EMP_CODE: '',
       INOUT_TYPE: '',
       CATEGORY: 'Internal',
@@ -520,6 +544,7 @@ export class UserCreationComponent implements OnInit {
           EMAIL: u.EMAIL,
           CONTACT: u.CONTACT,
           PASSWORD: u.PASSWORD,
+          CONFPSWD: u.CONFPSWD,
           EMP_CODE: String(u.EMP_CODE),
           INOUT_TYPE: u.INOUT_TYPE,
           CATEGORY: u.CATEGORY,
@@ -574,6 +599,7 @@ export class UserCreationComponent implements OnInit {
         EMAIL: formValue.EMAIL,
         CONTACT: formValue.CONTACT,
         PASSWORD: formValue.PASSWORD,
+        CONFPSWD: formValue.CONFPSWD,
         EMP_CODE: formValue.EMP_CODE,
         INOUT_TYPE: formValue.INOUT_TYPE,
         CATEGORY: formValue.CATEGORY,
@@ -627,6 +653,7 @@ export class UserCreationComponent implements OnInit {
       EMAIL: user.EMAIL,
       CONTACT: user.CONTACT,
       PASSWORD: user.PASSWORD,
+      CONFPSWD: user.CONFPSWD,
       EMP_CODE: user.EMP_CODE,
       INOUT_TYPE: user.INOUT_TYPE,
       CATEGORY: user.CATEGORY,
@@ -677,6 +704,7 @@ export class UserCreationComponent implements OnInit {
         EMAIL: formValue.EMAIL,
         CONTACT: formValue.CONTACT,
         PASSWORD: formValue.PASSWORD,
+        CONFPSWD: formValue.CONFPSWD,
         STATUS: formValue.STATUS,
         EMP_CODE: formValue.EMP_CODE,
         INOUT_TYPE: formValue.INOUT_TYPE,

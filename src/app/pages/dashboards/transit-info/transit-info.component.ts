@@ -197,6 +197,9 @@ export class TransitInfoComponent implements OnInit {
     }
 
     this.previousSapType = this.sapType;
+    this.selectedType = '';
+    this.searchReference = '';
+    this.searchOptionsList = [];
 
     // ✅ Clear old data
     this.transitInfo.reset();

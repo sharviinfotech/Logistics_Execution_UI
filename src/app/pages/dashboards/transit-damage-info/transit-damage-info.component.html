@@ -111,7 +111,12 @@
           </div>
 
           <!-- PENDING & COMPLETED COUNTS -->
+
           <div *ngIf="orderType === 'Outward' && sapType" class="status-counts-container">
+            <div class="cases-box">
+              <i class="fas fa-clipboard-list"></i>
+              <span class="count-text">No.of Cases Reported: {{ casesCount }}</span>
+            </div>
             <div class="pending-box">
               <i class="fas fa-clock"></i>
               <span class="count-text">Pending: {{ pendingCount }}</span>
@@ -265,8 +270,9 @@
                     <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                   </select>
 
-                  <input type="text" class="search-input" style="width: 300px; flex: none; min-width: 0;" placeholder="Enter Reference / Invoice / ODN / SO Number"
-                    [(ngModel)]="searchReference" name="searchReference" (keyup.enter)="onSearchReference()" />
+                  <input type="text" class="search-input" style="width: 300px; flex: none; min-width: 0;"
+                    placeholder="Enter Reference / Invoice / ODN / SO Number" [(ngModel)]="searchReference"
+                    name="searchReference" (keyup.enter)="onSearchReference()" />
 
                   <button type="button" class="search-btn-global" (click)="onSearchReference()">
                     <i class="fas fa-search"></i>

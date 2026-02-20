@@ -99,7 +99,7 @@ export class TransitDamageInfoComponent implements OnInit {
   TransitdamageInfoData: any[] = [];
   filterSapType: string = '';
   invoiceF4List: string[] = [];
-  
+
 
   constructor(
     private fb: FormBuilder,
@@ -275,6 +275,9 @@ export class TransitDamageInfoComponent implements OnInit {
 
     }
     this.previousSapType = this.sapType;
+    this.selectedType = '';
+    this.searchReference = '';
+    this.searchOptionsList = [];
     if (this.orderType === 'Outward' && this.sapType) {
       this.fetchPendingAndCompletedCounts();
     }
@@ -314,7 +317,7 @@ export class TransitDamageInfoComponent implements OnInit {
     if (this.sapType !== 'Non-SAP') {
       this.showTable = false;
       this.ShowHeaderForm = false;
-      
+
       this.showForm = false;
       this.searchOptionsList = [];
     }
@@ -326,7 +329,7 @@ export class TransitDamageInfoComponent implements OnInit {
     this.selectedType = '';
     this.searchOptionsList = [];
     this.selectedItems = [];
-     this.invoiceF4List = [];
+    this.invoiceF4List = [];
     this.SavedDataShow = false;
     this.headerData = null;
     this.itemsList = [];
@@ -425,11 +428,11 @@ export class TransitDamageInfoComponent implements OnInit {
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
     this.invoiceF4List = [];   // 🔑 Reset F4 list
-      this.fullReferenceData = [];
- 
+    this.fullReferenceData = [];
+
 
     if (data && data.length > 0) {
-       this.fullReferenceData = data;
+      this.fullReferenceData = data;
       data.forEach(d => {
 
         // ✅ EXTRACT INVOICE NUMBERS FOR F4
@@ -526,33 +529,33 @@ export class TransitDamageInfoComponent implements OnInit {
 
     console.log('✅ Selected Items:', this.selectedItems);
   }
-updateInvoiceListForSelectedItems(): void {
-  this.invoiceF4List = [];
+  updateInvoiceListForSelectedItems(): void {
+    this.invoiceF4List = [];
 
-  if (this.selectedItems.length === 0) {
-    this.HeaderForm.get('VBELN')?.setValue('');
-    return;
-  }
-
-  const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
-
-  this.fullReferenceData.forEach(refItem => {
-    if (selectedMapIds.includes(refItem.MAPID)) {
-      if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
-        refItem.INV_NO.forEach((inv: any) => {
-          if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
-            this.invoiceF4List.push(inv.VBELN);
-          }
-        });
-      }
+    if (this.selectedItems.length === 0) {
+      this.HeaderForm.get('VBELN')?.setValue('');
+      return;
     }
-  });
+
+    const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
+
+    this.fullReferenceData.forEach(refItem => {
+      if (selectedMapIds.includes(refItem.MAPID)) {
+        if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
+          refItem.INV_NO.forEach((inv: any) => {
+            if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+              this.invoiceF4List.push(inv.VBELN);
+            }
+          });
+        }
+      }
+    });
 
 
-  this.HeaderForm.get('VBELN')?.setValue('');
+    this.HeaderForm.get('VBELN')?.setValue('');
 
-  console.log('📋 Filtered Invoice List:', this.invoiceF4List);
-}
+    console.log('📋 Filtered Invoice List:', this.invoiceF4List);
+  }
 
 
   isItemSelected(index: number): boolean {
@@ -565,7 +568,7 @@ updateInvoiceListForSelectedItems(): void {
         item.workOrderNumber === rowValue.workOrderNumber &&
         item.lrNumber === rowValue.lrNumber &&
         item.transporter === rowValue.transporter &&
-         item.lineNumber === rowValue.lineNumber 
+        item.lineNumber === rowValue.lineNumber
     );
   }
 
@@ -824,14 +827,14 @@ updateInvoiceListForSelectedItems(): void {
     this.service.TransitDamageInfofetch(payload).subscribe({
       next: (res: any) => {
         this.spinner.hide();
-       
+
 
         if (!res || res.length === 0) {
           Swal.fire("No data found", '', 'info');
           return;
         }
 
-         Swal.fire('Success', 'Invoice Details fetched successfully!', 'success');
+        Swal.fire('Success', 'Invoice Details fetched successfully!', 'success');
 
         const header = res[0].HEADER;
         const items = res[0].ITEM;
@@ -846,7 +849,7 @@ updateInvoiceListForSelectedItems(): void {
 
         this.HeaderForm.patchValue({
           INV_NO: header.INV_NO,
-         
+
           INV_DATE: header.INV_DATE,
           FSR_RPT_DT: header.FSR_RPT_DT,
           BASIC_VALUE: header.BASIC_VALUE,
@@ -1059,7 +1062,7 @@ updateInvoiceListForSelectedItems(): void {
       return;
     }
 
-   
+
     const dcRefNo = this.HeaderForm.get('VBELN')?.value;
 
     if (!dcRefNo || !dcRefNo.toString().trim()) {

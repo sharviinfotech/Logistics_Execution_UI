@@ -1642,7 +1642,7 @@ input[type="radio"]:checked ~ .toggle-text {
   top: auto;
   right: auto;
   width: 44px;
-  height: 44px;
+  height: 41px;
   background-color: #9b1c3a;
   border: none;
   border-radius: 8px; /* square-ish with slight rounding */
@@ -2341,7 +2341,7 @@ input[type="radio"]:checked ~ .toggle-text {
   max-width: 800px;
   max-height: 80vh;
   margin-top: 50px;
-  margin-left: 10%;
+  // margin-left: 10%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -2802,7 +2802,7 @@ input[type="radio"]:checked ~ .toggle-text {
   border-radius: 16px;
   width: 90%;
   max-width: 600px;
-  max-height: 80vh;
+  max-height: 74vh;
   display: flex;
   flex-direction: column;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);

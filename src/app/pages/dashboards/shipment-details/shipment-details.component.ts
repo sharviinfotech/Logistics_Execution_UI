@@ -209,6 +209,9 @@ export class ShipmentDetailsComponent implements OnInit {
     if (this.orderType === 'Outward' && this.sapType) {
       this.fetchPendingAndCompletedCounts();
     }
+    this.selectedType = '';
+  this.searchReference = '';
+  this.searchOptionsList = [];
 
     if (this.sapType === 'SAP') {
       this.showForm = false;

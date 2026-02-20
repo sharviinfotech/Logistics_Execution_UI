@@ -236,7 +236,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     // ✅ Clear all input fields and data
     this.invoicenumber = '';
     this.ponumber = '';
-     this.invoiceF4List = [];
+    this.invoiceF4List = [];
     this.searchReference = '';
     this.selectedType = '';
     this.searchOptionsList = [];
@@ -308,6 +308,9 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       this.resetConditionalFields();
     }
     this.previousSapType = this.sapType;
+    this.selectedType = '';
+    this.searchReference = '';
+    this.searchOptionsList = [];
     if (this.orderType === 'Outward' && this.sapType) {
       this.fetchPendingAndCompletedCounts();
     }
@@ -423,10 +426,10 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
     this.invoiceF4List = [];   // 🔑 Reset F4 list
-      this.fullReferenceData = [];
+    this.fullReferenceData = [];
 
     if (data && data.length > 0) {
-       this.fullReferenceData = data;
+      this.fullReferenceData = data;
       data.forEach(d => {
 
         // ✅ EXTRACT INVOICE NUMBERS FOR F4
@@ -482,7 +485,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         LR_NO: selectedObj.lrNumber || '',
         TRANSPORTER: selectedObj.transporter || '',
         ZMAPID: selectedObj.MAPID || '',
-         ZLINE_NO: selectedObj.lineNumber ?? null
+        ZLINE_NO: selectedObj.lineNumber ?? null
       });
     }
     console.log('Updated items form:', this.items.value);
@@ -506,7 +509,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       if (!exists) {
         this.selectedItems.push(rowValue);
       }
-        this.updateInvoiceListForSelectedItems();
+      this.updateInvoiceListForSelectedItems();
     } else {
       this.selectedItems = this.selectedItems.filter(
         item =>
@@ -519,40 +522,40 @@ export class InsuranceClaimTrackingComponent implements OnInit {
             item.lineNumber === rowValue.lineNumber
           )
       );
-        this.updateInvoiceListForSelectedItems();
+      this.updateInvoiceListForSelectedItems();
     }
 
     console.log('✅ Selected Items:', this.selectedItems);
   }
-   updateInvoiceListForSelectedItems(): void {
-  this.invoiceF4List = [];
- 
-  if (this.selectedItems.length === 0) {
-   this.HeaderForm.get('VBELN')?.setValue('');
-    return;
-  }
- 
-  // Get unique MAPIDs from selected items
-  const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
- 
-  console.log('🔍 Selected MAPIDs:', selectedMapIds);
- 
-  // Filter reference data for selected MAPIDs and extract invoices
-  this.fullReferenceData.forEach(refItem => {
-    if (selectedMapIds.includes(refItem.MAPID)) {
-      if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
-        refItem.INV_NO.forEach((inv: any) => {
-          if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
-            this.invoiceF4List.push(inv.VBELN);
-          }
-        });
-      }
+  updateInvoiceListForSelectedItems(): void {
+    this.invoiceF4List = [];
+
+    if (this.selectedItems.length === 0) {
+      this.HeaderForm.get('VBELN')?.setValue('');
+      return;
     }
-  });
-   this.HeaderForm.get('VBELN')?.setValue('');
- 
-  console.log('📋 Filtered Invoice List:', this.invoiceF4List);
-}
+
+    // Get unique MAPIDs from selected items
+    const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
+
+    console.log('🔍 Selected MAPIDs:', selectedMapIds);
+
+    // Filter reference data for selected MAPIDs and extract invoices
+    this.fullReferenceData.forEach(refItem => {
+      if (selectedMapIds.includes(refItem.MAPID)) {
+        if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
+          refItem.INV_NO.forEach((inv: any) => {
+            if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+              this.invoiceF4List.push(inv.VBELN);
+            }
+          });
+        }
+      }
+    });
+    this.HeaderForm.get('VBELN')?.setValue('');
+
+    console.log('📋 Filtered Invoice List:', this.invoiceF4List);
+  }
 
   isItemSelected(index: number): boolean {
     const rowValue = (this.referenceItems.at(index) as FormGroup).value;
@@ -563,7 +566,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         item.workOrderNumber === rowValue.workOrderNumber &&
         item.lrNumber === rowValue.lrNumber &&
         item.transporter === rowValue.transporter &&
-        item.lineNumber === rowValue.lineNumber 
+        item.lineNumber === rowValue.lineNumber
     );
   }
 
@@ -831,7 +834,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
           return;
         }
 
-      Swal.fire('Success', 'Invoice Details fetched successfully!', 'success');
+        Swal.fire('Success', 'Invoice Details fetched successfully!', 'success');
 
         const header = res[0].HEADER;
         const items = res[0].ITEM;
@@ -878,7 +881,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         items.forEach((x: any) => {
           const row = this.fb.group({
             selected: [false],
-           ZMAPID: [x.ZMAPID || x.MAPID || ''],
+            ZMAPID: [x.ZMAPID || x.MAPID || ''],
             ZREFNO: [x.ZREFNO],
             ZLINE_NO: [x.ZLINE_NO],
             INV_NO: [x.INV_NO],
@@ -1129,7 +1132,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
           return;
         }
 
-         Swal.fire('Success', 'Invoice Details fetched successfully!', 'success');
+        Swal.fire('Success', 'Invoice Details fetched successfully!', 'success');
 
         const header = res[0].HEADER;
         const items = res[0].ITEM;
@@ -1219,10 +1222,10 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
     headerValue.INV_NO = invoiceNo;
     headerValue.REFNO = refNo;
-    headerValue.LINE_NO = this.selectedItems[0]?.LINE_NO 
-                   || this.selectedItems[0]?.lineNo
-                   || this.selectedItems[0]?.ZLINE_NO
-                   || null;
+    headerValue.LINE_NO = this.selectedItems[0]?.LINE_NO
+      || this.selectedItems[0]?.lineNo
+      || this.selectedItems[0]?.ZLINE_NO
+      || null;
     const itemsPayload = this.items.controls
       .filter(ctrl => ctrl.value.selected === true)
       .map(ctrl => ({
@@ -1296,7 +1299,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   updateSearchRow(row: any): void {
     // Determine if this is a header row or an item row
     const isHeaderRow = row === this.headerData;
-    
+
     // For item rows, use just the item. For header rows, use header + items
     const headerRow = isHeaderRow ? row : this.headerData;
     const itemRows = isHeaderRow ? (this.itemsList || []) : [row];
@@ -2124,26 +2127,26 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   }
 
   onPaymentStatusChange(): void {
-  const paymentStatus = this.HeaderForm.get('PAY_ST')?.value;
-  
-  if (paymentStatus === 'Pending') {
-    // Auto-fill Payment Info and UTR with 'Pending'
-    this.HeaderForm.patchValue({
-      PAY_INFO: 'Pending',
-      UTR: 'Pending'
-    });
-    
-    
-  } else if (paymentStatus === 'Settled') {
-    // Clear the fields and enable manual entry
-    this.HeaderForm.patchValue({
-      PAY_INFO: '',
-      UTR: ''
-    });
-    
-    // Enable these fields for manual entry
-    this.HeaderForm.get('PAY_INFO')?.enable();
-    this.HeaderForm.get('UTR')?.enable();
+    const paymentStatus = this.HeaderForm.get('PAY_ST')?.value;
+
+    if (paymentStatus === 'Pending') {
+      // Auto-fill Payment Info and UTR with 'Pending'
+      this.HeaderForm.patchValue({
+        PAY_INFO: 'Pending',
+        UTR: 'Pending'
+      });
+
+
+    } else if (paymentStatus === 'Settled') {
+      // Clear the fields and enable manual entry
+      this.HeaderForm.patchValue({
+        PAY_INFO: '',
+        UTR: ''
+      });
+
+      // Enable these fields for manual entry
+      this.HeaderForm.get('PAY_INFO')?.enable();
+      this.HeaderForm.get('UTR')?.enable();
+    }
   }
-}
 }

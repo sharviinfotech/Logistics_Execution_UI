@@ -19,7 +19,7 @@
             <table class="user-table">
                 <thead>
                     <tr>
-                        <th>Username</th>
+                        <th>UserID</th>
                         <th>First Name</th>
                         <th>Last Name</th>
                         <th>Email</th>
@@ -163,11 +163,12 @@
                         <!-- Row 1 -->
                         <div class="form-row">
                             <div class="form-group">
-                                <label class="form-label">Username<span class="required">*</span></label>
-                                <input class="form-input" formControlName="USER" placeholder="Enter username">
+                                <label class="form-label">User ID<span class="required">*</span></label>
+                                <input class="form-input" formControlName="USER" maxlength="10"
+                                    placeholder="Enter user ID">
                                 <span class="error-message"
                                     *ngIf="userForm.get('USER')?.touched && userForm.get('USER')?.invalid">
-                                    Username is required
+                                    User ID is required
                                 </span>
                             </div>
 
@@ -184,10 +185,10 @@
                                 <label class="form-label">Last Name</label>
                                 <input class="form-input" formControlName="LAST_NAME" placeholder="Enter last name">
                             </div>
-                        </div>
 
-                        <!-- Row 2 -->
-                        <div class="form-row">
+
+                            <!-- Row 2 -->
+
                             <div class="form-group">
                                 <label class="form-label">Contact<span class="required">*</span></label>
                                 <input class="form-input" formControlName="CONTACT" placeholder="Enter contact number">
@@ -213,10 +214,12 @@
                                     <option value="External">External</option>
                                 </select>
                             </div>
-                        </div>
 
-                        <!-- Row 3 -->
-                        <div class="form-row">
+
+
+
+                            <!-- Row 3 -->
+
                             <!-- <div class="form-group">
                             <label class="form-label">Password<span class="required">*</span></label>
                             <input class="form-input" type="password" formControlName="PASSWORD"
@@ -226,11 +229,9 @@
                                 <label class="form-label">
                                     Password <span class="required">*</span>
                                 </label>
-
-
                                 <div class="password-wrapper">
                                     <input class="form-input" [type]="showPassword ? 'text' : 'password'"
-                                        formControlName="PASSWORD" placeholder="Enter password" />
+                                        formControlName="PASSWORD" maxlength="10" placeholder="Enter password" />
                                     <span class="toggle-eye" (click)="togglePassword()">
                                         <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
                                     </span>
@@ -238,6 +239,28 @@
                                         *ngIf="userForm.get('PASSWORD')?.touched && userForm.get('PASSWORD')?.invalid">
                                         Password is required
                                     </span>
+
+                                </div>
+                            </div>
+                            <div class="form-group password-group">
+                                <label class="form-label">
+                                    Confirm Password <span class="required">*</span>
+                                </label>
+                                <div class="password-wrapper">
+                                    <input class="form-input" [type]="showConfirmPassword ? 'text' : 'password'"
+                                        formControlName="CONFPSWD" maxlength="10" placeholder="Enter password" />
+                                    <span class="toggle-eye" (click)="toggleConfirmPassword()">
+                                        <i class="fa" [ngClass]="showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+                                    </span>
+                                    <span class="error-message"
+                                        *ngIf="userForm.get('CONFPSWD')?.touched && userForm.get('CONFPSWD')?.errors?.['required']">
+                                        Confirm Password is required
+                                    </span>
+                                    <span class="error-message"
+                                        *ngIf="userForm.get('CONFPSWD')?.touched && userForm.get('CONFPSWD')?.errors?.['mismatch']">
+                                        passwords do not match
+                                    </span>
+
 
                                 </div>
                             </div>
@@ -266,10 +289,10 @@
                                 </span>
 
                             </div>
-                        </div>
 
-                        <!-- Row 4 -->
-                        <div class="form-row">
+
+                            <!-- Row 4 -->
+
 
                             <!-- Plant -->
                             <div class="form-group">

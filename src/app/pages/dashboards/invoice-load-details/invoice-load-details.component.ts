@@ -232,6 +232,9 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     if (this.orderType === 'Outward' && this.sapType) {
       this.fetchPendingAndCompletedCounts();
     }
+    this.selectedType = '';
+  this.searchReference = '';
+  this.searchOptionsList = [];
 
     this.invoices.clear();
     this.addRow();

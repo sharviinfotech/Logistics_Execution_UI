@@ -215,6 +215,9 @@ export class FreightBillingComponent implements OnInit {
       this.resetConditionalFields();
     }
     this.previousSapType = this.sapType;
+    this.selectedType = '';
+    this.searchReference = '';
+    this.searchOptionsList = [];
 
 
     this.FreightBilling.reset();
@@ -561,7 +564,7 @@ export class FreightBillingComponent implements OnInit {
     console.log("ref", ref);
 
     console.log("formValue", formValue);
-    
+
     const record = {
       INV_NO: formValue.invoicenumber || formValue.ponumber || '',
       REFNO: ref.referenceNumber || '',
@@ -583,7 +586,7 @@ export class FreightBillingComponent implements OnInit {
       UNLOADAPP: formValue.UnloadingChargesApproval || '',
       DETENTUP: formValue.DetentionChargesUploading || '',
       WORDUP: formValue.WorkOrderUploading || '',
-      
+
       // ✅ Freight Charges Breakdown (when Account checkbox is checked)
       ZFC_BASIC: formValue.account ? (this.paFreightBreakdown.basicFreight || 0) : 0,
       ZFC_DELOAD: formValue.account ? (this.paFreightBreakdown.detentionLoading || 0) : 0,
@@ -594,7 +597,7 @@ export class FreightBillingComponent implements OnInit {
       ZFC_TSHIP: formValue.account ? (this.paFreightBreakdown.transhipmentCharges || 0) : 0,
       ZFC_OTHER: formValue.account ? (this.paFreightBreakdown.otherCharges || 0) : 0,
       ZFC_DEDUCT: formValue.account ? (this.paFreightBreakdown.deduction || 0) : 0,
-      
+
       // ✅ Provision Amount Breakdown (when Provision checkbox is checked)
       ZPR_BASIC: formValue.provision ? (this.paProvisionBreakdown.basicFreight || 0) : 0,
       ZPR_DELOAD: formValue.provision ? (this.paProvisionBreakdown.detentionLoading || 0) : 0,
@@ -606,7 +609,7 @@ export class FreightBillingComponent implements OnInit {
       ZPR_OTHER: formValue.provision ? (this.paProvisionBreakdown.otherCharges || 0) : 0,
       ZPR_DEDUCT: formValue.provision ? (this.paProvisionBreakdown.deduction || 0) : 0
     };
-    
+
     console.log("record", record);
 
     this.spinner.show();
@@ -740,7 +743,7 @@ export class FreightBillingComponent implements OnInit {
             ZUNLOADAPP: row.ZUNLOADAPP,
             ZDETENTUP: row.ZDETENTUP,
             ZWORDUP: row.ZWORDUP,
-            
+
             // ✅ Freight Charges Breakdown
             ZFC_BASIC: row.ZFC_BASIC || 0,
             ZFC_DELOAD: row.ZFC_DELOAD || 0,
@@ -751,7 +754,7 @@ export class FreightBillingComponent implements OnInit {
             ZFC_TSHIP: row.ZFC_TSHIP || 0,
             ZFC_OTHER: row.ZFC_OTHER || 0,
             ZFC_DEDUCT: row.ZFC_DEDUCT || 0,
-            
+
             // ✅ Provision Amount Breakdown
             ZPR_BASIC: row.ZPR_BASIC || 0,
             ZPR_DELOAD: row.ZPR_DELOAD || 0,
@@ -1687,7 +1690,7 @@ export class FreightBillingComponent implements OnInit {
       freightCharges: item.ZFRT_CHARGES || '',
       billSubmission: item.ZBILL_SUBMISSION || ''
     };
-    
+
     // ✅ Load Freight Breakdown from backend
     this.paFreightBreakdown = {
       basicFreight: item.ZFC_BASIC || 0,
@@ -1700,7 +1703,7 @@ export class FreightBillingComponent implements OnInit {
       otherCharges: item.ZFC_OTHER || 0,
       deduction: item.ZFC_DEDUCT || 0
     };
-    
+
     // ✅ Load Provision Breakdown from backend
     this.paProvisionBreakdown = {
       basicFreight: item.ZPR_BASIC || 0,
@@ -1739,7 +1742,7 @@ export class FreightBillingComponent implements OnInit {
       this.selectedPAItem.ZPRO_CHK = 'X';
       this.selectedPAItem.ZPROVAMT = this.paFormData.provisionAmount;
       this.selectedPAItem.ZPROVDT = this.paFormData.provisionDate;
-      
+
       // ✅ Store Provision Breakdown
       this.selectedPAItem.ZPR_BASIC = this.paProvisionBreakdown.basicFreight || 0;
       this.selectedPAItem.ZPR_DELOAD = this.paProvisionBreakdown.detentionLoading || 0;
@@ -1754,7 +1757,7 @@ export class FreightBillingComponent implements OnInit {
       this.selectedPAItem.ZPRO_CHK = '';
       this.selectedPAItem.ZPROVAMT = '';
       this.selectedPAItem.ZPROVDT = '';
-      
+
       // ✅ Clear Provision Breakdown
       this.selectedPAItem.ZPR_BASIC = 0;
       this.selectedPAItem.ZPR_DELOAD = 0;
@@ -1775,7 +1778,7 @@ export class FreightBillingComponent implements OnInit {
       this.selectedPAItem.ZPHY_DATE = this.paFormData.physicalSubmissionDate;
       this.selectedPAItem.ZFRT_CHARGES = this.paFormData.freightCharges;
       this.selectedPAItem.ZBILL_SUBMISSION = this.paFormData.billSubmission;
-      
+
       // ✅ Store Freight Breakdown
       this.selectedPAItem.ZFC_BASIC = this.paFreightBreakdown.basicFreight || 0;
       this.selectedPAItem.ZFC_DELOAD = this.paFreightBreakdown.detentionLoading || 0;
@@ -1793,7 +1796,7 @@ export class FreightBillingComponent implements OnInit {
       this.selectedPAItem.ZPHY_DATE = '';
       this.selectedPAItem.ZFRT_CHARGES = '';
       this.selectedPAItem.ZBILL_SUBMISSION = '';
-      
+
       // ✅ Clear Freight Breakdown
       this.selectedPAItem.ZFC_BASIC = 0;
       this.selectedPAItem.ZFC_DELOAD = 0;

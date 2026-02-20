@@ -166,12 +166,26 @@ export class DispatchComponent implements OnInit {
   }
 
   onSapTypeChange(): void {
-    this.dispatchForm.reset();
-    this.showForm = !!(this.orderType && this.sapType);
-    this.isUpdateMode = false;
-    
-    
-  }
+  this.dispatchForm.reset();
+  this.showForm = !!(this.orderType && this.sapType);
+  this.isUpdateMode = false;
+
+  // Reset search bar
+  this.selectedType = '';
+  this.searchValue = '';
+  this.searchPlaceholder = 'Select search type';
+
+  const rowsArray = this.dispatchForm.get('rows') as FormArray;
+  rowsArray.clear();
+  rowsArray.push(this.createRow(true));
+
+  this.showActionColumn = false;
+  this.maxLimitReached = false;
+  this.maxRowsAllowed = 0;
+  this.originalTotalTrucks = 0;
+
+  this.cd.detectChanges();
+}
 
   createRow(isFirstRow: boolean = false): FormGroup {
     const row = this.fb.group({

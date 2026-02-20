@@ -60,7 +60,7 @@
             <!-- WITH SAP -->
             <div class="sap-toggle-item">
               <label class="toggle-label">
-                <input type="radio" name="sapType" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeSelection()" />
+                <input type="radio" name="sapType" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
                 <span class="toggle-track">
                   <span class="toggle-circle"></span>
                 </span>
@@ -72,7 +72,7 @@
             <div class="sap-toggle-item">
               <label class="toggle-label">
                 <input type="radio" name="sapType" [(ngModel)]="sapType" value="Non-SAP"
-                  (change)="onSapTypeSelection()" />
+                  (change)="onSapTypeChange()" />
                 <span class="toggle-track">
                   <span class="toggle-circle"></span>
                 </span>
