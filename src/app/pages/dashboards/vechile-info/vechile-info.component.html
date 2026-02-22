@@ -294,7 +294,7 @@
             <label>Invoice Number</label>
           </div> -->
 
-          <div class="form-field" *ngIf="sapType === 'Non-SAP'">
+          <div class="form-field" *ngIf="sapType === 'Non-SAP' && searchOptionsList.length === 0">
             <select class="form-control" formControlName="VBELN" (change)="fetchDCReferenceNo()">
 
               <option value="" disabled>Select DC Reference</option>
