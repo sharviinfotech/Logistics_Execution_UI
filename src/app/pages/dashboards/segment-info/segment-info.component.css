@@ -60,18 +60,6 @@ input[type="radio"] {
 
 }
 
-.form-field label {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 15px;
-  color: #757575;
-  pointer-events: none;
-  transition: all 0.3s ease;
-  background: white;
-  padding: 0 4px;
-}
 
 
 
@@ -81,71 +69,12 @@ input[type="radio"] {
 
 
 
-.no-asterisk::after {
-  content: none !important;
-  /* Forces the removal of the pseudo-element content */
-}
-/* Add left border to ng-select container like other fields */
-.form-field .ng-select-container {
-  border: 1px solid #ccc;
-  border-left: 3px solid #2196f3;  /* Left blue border */
-  border-radius: 4px;
-  min-height: 46px;
-  height: 46px;
-  padding-top: 0;
-  display: flex;
-  align-items: center;
-  box-sizing: border-box;
-}
 
-/* When ng-select is focused - change left border color */
-.form-field .ng-select.ng-select-focused .ng-select-container {
-  border-color: #ccc;
-  border-left-color: #00A651;  /* Green border on focus */
-  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
-}
 
-/* ng-select value container */
-.form-field .ng-select .ng-value-container {
-  padding: 0 16px;
-  align-items: center;
-}
 
-/* ng-select input */
-.form-field .ng-select .ng-input {
-  padding: 0 16px;
-}
 
-/* Label position for ng-select */
-.form-field ng-select ~ label,
-.form-field .ng-select ~ label {
-  position: absolute;
-  left: 8px;
-  top: -8px;
 
-  transform: none;
-  font-size: 16px;
-  color: #4a90e2;
-  font-weight: 500;
-  background: white;
-  padding: 0 4px;
-  z-index: 1;
-}
 
-/* When focused label color */
-.form-field .ng-select.ng-select-focused ~ label {
-  color: #2196f3;
-}
-
-/* Filled state */
-.form-field.filled .ng-select ~ label {
-  color: #2196f3;
-}
-
-/* Hide ng-select placeholder */
-.form-field .ng-select .ng-placeholder {
-  display: none;
-}
 
 
 

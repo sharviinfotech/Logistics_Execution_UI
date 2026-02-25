@@ -564,7 +564,7 @@
               <ng-template #sapCustomer>
                 <input type="text" formControlName="Customer" readonly />
               </ng-template>
-              <label>Customer Name</label>
+              <label class="global-ng-select">Customer Name</label>
             </div>
 
             <!-- Customer Group -->
@@ -574,7 +574,7 @@
             </div>
 
             <!-- C/nee -->
-            <div class="form-field">
+            <div class="form-field" [class.filled]="OrderInfo.get('CNee')?.value">
               <ng-container *ngIf="!isSap(); else sapCnee">
                 <ng-select [items]="customerList" bindLabel="CUSTOMER_NAME" bindValue="CUSTOMER_NAME"
                   formControlName="CNee" [searchable]="true" [virtualScroll]="true" placeholder="Select Consignee"
@@ -587,7 +587,7 @@
               <ng-template #sapCnee>
                 <input type="text" formControlName="CNee" readonly />
               </ng-template>
-              <label>Consignee Name</label>
+              <label class="global-ng-select">Consignee Name</label>
             </div>
 
             <!-- Destination Location -->

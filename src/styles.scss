@@ -762,7 +762,7 @@ td {
   top: -8px;
   left: 8px;
   font-size: 12px;
-  color: #4a90e2;
+  color: #00a651;
   font-weight: 600;
 }
 
@@ -793,7 +793,7 @@ td {
   background-position: right 12px center;
   background-size: 16px;
   padding-right: 40px;
-  font-family: emoji;
+  
 }
 
 /* Select options styling */
@@ -808,7 +808,7 @@ td {
   top: -8px;
   left: 8px;
   font-size: 12px;
-  color: #4a90e2;
+  color: #00a651;
   font-weight: 600;
 }
 
@@ -819,7 +819,7 @@ td {
   top: -8px;
   left: 8px;
   font-size: 12px;
-  color: #4a90e2;
+  color: #00a651;
   font-weight: 600;
 }
 
@@ -1122,7 +1122,7 @@ td {
   top: -8px;
   left: 8px;
   font-size: 12px;
-  color: #2196f3;
+  color: #00a651;
   font-weight: 600;
 }
 
@@ -1177,7 +1177,7 @@ td {
 .form-field select.ng-valid+label {
   top: -8px;
   font-size: 12px;
-  color: #2196f3;
+  color: #00a651;
   font-weight: 600;
 }
 
@@ -3175,4 +3175,40 @@ input[type="radio"]:checked ~ .toggle-text {
 .refresh-btn:hover {
   background: #0d6efd;
   color: white;
+}
+
+/* 1. Target the internal container of ng-select */
+::ng-deep .form-field .ng-select .ng-select-container {
+  padding-top: 8px !important; /* Makes room for the label at the top */
+  min-height: 50px !important;
+  align-items: center !important;
+}
+ 
+/* 2. Position the Label */
+.form-field label.global-ng-select {
+  position: absolute;
+  left: 12px;
+  top: 14px; /* Manually center it for the empty state */
+  background: white;
+  padding: 0 4px;
+  z-index: 11; /* Sit above the ng-select */
+  transition: all 0.2s ease;
+  pointer-events: none;
+  color: #757575;
+}
+ 
+/* 3. Move label UP when value exists or focused */
+/* This targets the label when the parent has the .filled class OR is clicked */
+.form-field.filled label.global-ng-select,
+.form-field:focus-within label.global-ng-select {
+  top: -10px !important; /* Move it to the very top border */
+  left: 10px;
+  font-size: 12px;
+  color: #00a651;
+  font-weight: 600;
+}
+ 
+/* 4. Hide the internal placeholder so it doesn't fight with your label */
+::ng-deep .ng-select .ng-placeholder {
+  display: none !important;
 }
