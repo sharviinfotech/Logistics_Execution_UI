@@ -175,9 +175,7 @@ export class DispatchComponent implements OnInit {
   this.searchValue = '';
   this.searchPlaceholder = 'Select search type';
 
-  this.resetAll();
-
-  
+  // this.resetAll();
 }
 
   createRow(isFirstRow: boolean = false): FormGroup {
