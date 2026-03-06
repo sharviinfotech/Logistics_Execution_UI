@@ -59,7 +59,8 @@
     padding: 30px 0 30px 0;
     // margin-top: 85px !important;
     backdrop-filter: blur(0px) brightness(0.9);
-    background: #8f1e42 !important;
+    // background: #8f1e42 !important;
+     background:linear-gradient(135deg, #2E86C1 0%, #1F618D 100%);
     // background: url("/assets/images/flightAndSky.jpg") no-repeat center center / cover !important;
 
     .mm-active {
@@ -456,7 +457,8 @@ body[data-sidebar="dark"] {
 
                         &:hover {
                             >a {
-                              background: linear-gradient(135deg, #8f1e42 0%, #8f1e42 100%) center center / cover !important;
+                            //   background: linear-gradient(135deg, #8f1e42 0%, #8f1e42 100%) center center / cover !important;
+                            background: linear-gradient(135deg, #2E86C1 0%, #1F618D 100%);
 ;
                                 color: white !important;
 

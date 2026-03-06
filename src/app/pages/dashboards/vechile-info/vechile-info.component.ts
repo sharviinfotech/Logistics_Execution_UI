@@ -138,6 +138,10 @@ export class VechileInfoComponent implements OnInit {
       ZSO_NO: [data?.ZSONO || ''],
       ZODN_NO: [data?.ZODN_NO || ''],
       ZLINE_NO: [data?.ZLINE_NO || ''],
+      ZSPMAIL: ['', [Validators.required, Validators.email]],
+  ZCUSTMAIL: ['', [Validators.required, Validators.email]],
+      ZGPS: [data?.ZGPS || ''],
+
     });
   }
 
@@ -1067,7 +1071,10 @@ export class VechileInfoComponent implements OnInit {
           ZCREATED_DT: row.ZCREATED_DT,
           ZPLANT: row.ZPLANT,
           ZDIVISION: row.ZDIVISION,
-          ZVEH_TYPE: row.ZVEH_TYPE
+          ZVEH_TYPE: row.ZVEH_TYPE,
+          ZSPMAIL: row.ZSPMAIL,
+          ZCUSTMAIL: row.ZCUSTMAIL,
+          ZGPS: row.ZGPS
         }
       ]
     };
@@ -1112,7 +1119,10 @@ export class VechileInfoComponent implements OnInit {
           ZCREATED_DT: row.ZCREATED_DT,
           ZPLANT: row.ZPLANT,
           ZDIVISION: row.ZDIVISION,
-          ZVEH_TYPE: row.ZVEH_TYPE
+          ZVEH_TYPE: row.ZVEH_TYPE,
+          ZSPMAIL: row.ZSPMAIL,
+          ZCUSTMAIL: row.ZCUSTMAIL,
+          ZGPS: row.ZGPS
         }
       ]
     };
@@ -1771,7 +1781,10 @@ export class VechileInfoComponent implements OnInit {
         record.ZCREATED_DT
           ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB')
           : '',
-        record.ZVEH_TYPE || ''
+        record.ZVEH_TYPE || '',
+        record.ZSPMAIL || '',
+        record.ZCUSTMAIL || '',
+        record.ZGPS || ''
 
       ]));
     } else if (this.filterStatus === 'Pending') {

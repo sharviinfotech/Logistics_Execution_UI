@@ -113,20 +113,7 @@ input[type="radio"] {
   }
 }
 
-.form-field input[type="datetime-local"]:valid+label {
-  top: -8px;
-  left: 8px;
-  font-size: 12px;
-  color: #4a90e2;
-  font-weight: 500;
-}
-input:focus + label,
-input:not(:placeholder-shown) + label {
-  top: -8px;
-  font-size: 12px;
-  color: #2196f3;
-  font-weight: 600;
-}
+
 
 .no-asterisk::after {
   content: none !important;

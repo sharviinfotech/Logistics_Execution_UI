@@ -330,6 +330,9 @@
                 <th>No of Vehicles</th>
                 <th>Driver Name</th>
                 <th>Driver Mobile No</th>
+                <th>salesperson E-mail ID</th>
+                <th>Customer e-mail ID</th>
+                <th>GPS live location</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -362,6 +365,17 @@
                   <input type="tel" formControlName="ZDNUMBER" class="width-le" maxlength="10" minlength="10"
                     pattern="[0-9]{10}" inputmode="numeric" (input)="onMobileInput($event, i)" />
                 </td>
+                <td><input type="text" formControlName="ZSPMAIL" />
+                   <div *ngIf="VehicleForm.get('ZSPMAIL')?.invalid && VehicleForm.get('ZSPMAIL')?.touched">
+    Please enter valid email
+  </div>
+                </td>
+                <td><input type="text" formControlName="ZCUSTMAIL" />
+                   <div *ngIf="VehicleForm.get('ZCUSTMAIL')?.invalid && VehicleForm.get('ZCUSTMAIL')?.touched">
+    Please enter valid email
+  </div>
+                </td>
+                <td><input type="text" formControlName="ZGPS" /></td>
                 <td class="action-btns">
                   <button type="button" class="btn-add" (click)="addRow()">+</button>
                   <button type="button" class="btn-remove" (click)="removeRow(i)"
@@ -555,6 +569,9 @@
               <th>Division</th>
               <th>Created Date</th>
               <th>Vehicle Type</th>
+                 <th>salesperson E-mail ID</th>
+                <th>Customer e-mail ID</th>
+                <th>GPS live location</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -713,6 +730,9 @@
                   [(ngModel)]="item.ZVEH_TYPE">
                 <span *ngIf="!item.isEdit">{{ item.ZVEH_TYPE }}</span>
               </td>
+              <td>{{ item.ZSPMAIL }}</td>
+              <td>{{ item.ZCUSTMAIL }}</td>
+              <td>{{ item.ZGPS }}</td>
 
 
               <!-- ACTION -->

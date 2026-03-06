@@ -142,7 +142,8 @@
   padding: 5px !important;
   border-bottom: 0px solid #a9a9a9;
   // background-color:#722a40 !important;
-  background-color: #8f1e42 !important;
+  // background-color: #8f1e42 !important;
+  background: linear-gradient(135deg, #2E86C1 0%, #1F618D 100%);
   color: white;
   font-weight: 500;
   text-align: center !important;
@@ -1202,15 +1203,19 @@ td {
 .form-field input.ng-invalid.ng-dirty,
 .form-field select.ng-invalid.ng-touched,
 .form-field select.ng-invalid.ng-dirty {
-  border-left: 3px solid #8f1e42 !important;
-  box-shadow: 0 0 5px rgba(255, 59, 48, 0.25);
+  // border-left: 3px solid #8f1e42 !important;
+  // box-shadow: 0 0 5px rgba(255, 59, 48, 0.25);
+      box-shadow: 0 0 5px #8f1e42;
+    border: 3px solid #8f1e42 !important;
 }
 
 /* 🔴 For NG-SELECT invalid state */
 ng-select.ng-invalid.ng-touched .ng-select-container,
 ng-select.ng-invalid.ng-dirty .ng-select-container {
-  border-left: 3px solid #8f1e42 !important;
-  box-shadow: 0 0 5px rgba(255, 59, 48, 0.25);
+  // border-left: 3px solid #8f1e42 !important;
+  // box-shadow: 0 0 5px rgba(255, 59, 48, 0.25);
+      box-shadow: 0 0 5px #8f1e42 ;
+    border: 3px solid #8f1e42 !important;
 }
 
 /* 🟢 For NG-SELECT valid state (optional, if you want green for valid ones) */
@@ -1246,7 +1251,8 @@ input[type="radio"] {
   cursor: pointer;
   font-size: 16px;
   font-weight: 700;
-  color: #8B2332;
+  // color: #8B2332;
+ color: #2E86C1;
 }
 
 .form-radio.optional > label span {
@@ -1264,7 +1270,8 @@ input[type="radio"] {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  border: 2px solid #8B2332;
+  // border: 2px solid #8B2332;
+  border:2px solid #2E86C1;
   background: #fff;
 }
 
@@ -1278,7 +1285,8 @@ input[type="radio"] {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #8B2332;
+  // background: #8B2332;
+  background: linear-gradient(135deg, #2E86C1 0%, #1F618D 100%);
 }
 
 /* =============================== */
@@ -1357,7 +1365,9 @@ input[type="radio"] {
 
 /* Track goes dark maroon when selected */
 input[type="radio"]:checked ~ .toggle-track {
-  background: #8B2332;
+  // background: #8B2332;
+    background:linear-gradient(135deg, #2E86C1 0%, #1F618D 100%);
+
 }
 
 /* Circle slides right when selected */
@@ -1643,7 +1653,8 @@ input[type="radio"]:checked ~ .toggle-text {
   right: auto;
   width: 44px;
   height: 41px;
-  background-color: #9b1c3a;
+  // background-color: #9b1c3a;
+  background:linear-gradient(135deg, #2E86C1 0%, #1F618D 100%);
   border: none;
   border-radius: 8px; /* square-ish with slight rounding */
   cursor: pointer;
@@ -1659,7 +1670,8 @@ input[type="radio"]:checked ~ .toggle-text {
   }
 
   &:hover {
-    background-color: #7f1531;
+    // background-color: #7f1531;
+    background:linear-gradient(135deg, #2E86C1 0%, #1F618D 100%) ;
   }
 }
 
@@ -3098,8 +3110,10 @@ input[type="radio"]:checked ~ .toggle-text {
   font-size: 20px !important;
   font-weight: bold !important;
   padding: 15px 20px;
-  border-bottom: 2px solid #8f1e42;
-  color: #8f1e42;
+  // border-bottom: 2px solid #8f1e42;
+  border-bottom:2px solid #2E86C1;
+  // color: #8f1e42;
+  color:#2E86C1;
   background: transparent;
   text-align: center;
   font-family: 'Times New Roman', Times, serif !important;
@@ -3129,7 +3143,8 @@ input[type="radio"]:checked ~ .toggle-text {
 .header-title {
   font-size: 20px;
   font-weight: bold;
-  color: #8f1e42;
+  // color: #8f1e42;
+  color:#2E86C1;
 }
 
 /* Right Icons */
@@ -3143,9 +3158,11 @@ input[type="radio"]:checked ~ .toggle-text {
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  border: 1px solid #8f1e42;
+  // border: 1px solid #8f1e42;
+  border:1px solid #2E86C1;
   background: white;
-  color: #8f1e42;
+  // color: #8f1e42;
+  color:#2E86C1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3155,14 +3172,17 @@ input[type="radio"]:checked ~ .toggle-text {
 }
 
 .header-icon:hover {
-  background: #8f1e42;
+  // background: #8f1e42;
+  background:#2E86C1 ;
   color: white;
 }
 
 .header-icon.active {
-  background: #8f1e42;
+  // background: #8f1e42;
+  background: linear-gradient(135deg, #2E86C1 0%, #1F618D 100%);
   color: white;
-  border-color: #8f1e42;
+  // border-color: #8f1e42;
+  border-color: #2E86C1;
   box-shadow: 0 0 0 2px rgba(166, 28, 60, 0.2);
 }
 
