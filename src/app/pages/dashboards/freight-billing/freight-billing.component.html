@@ -202,8 +202,9 @@
                   <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                 </select>
 
-                <input type="text" class="search-input" style="width: 300px; flex: none; min-width: 0;" placeholder="Enter Reference / Invoice / ODN / SO Number"
-                  [(ngModel)]="searchReference" name="searchReference" (keyup.enter)="onSearchReference()" />
+                <input type="text" class="search-input" style="width: 300px; flex: none; min-width: 0;"
+                  placeholder="Enter Reference / Invoice / ODN / SO Number" [(ngModel)]="searchReference"
+                  name="searchReference" (keyup.enter)="onSearchReference()" />
 
                 <button type="button" class="search-btn-global" (click)="onSearchReference()">
                   <i class="fas fa-search"></i>
@@ -762,6 +763,15 @@
                 <th>Provision Amount</th>
                 <th>Provision Date</th>
                 <th>Account</th>
+                <th>Basic Amount</th>
+                <th>Deload Charges</th>
+                <th>DeUnload Charges</th>
+                <th>Load Charges</th>
+                <th>Unload Charges</th>
+                <th>Route Charges</th>
+                <th>Transshipment Charges</th>
+                <th>Other Charges</th>
+                <th>Deduction</th>
                 <th>Freight Bill No</th>
                 <th>Freight Bill Date</th>
                 <th>Physical Submission Date</th>
@@ -794,6 +804,15 @@
                 <td>{{ item.ZPROVAMT }}</td>
                 <td>{{ item.ZPROVDT | date:'dd-MM-yyyy' }}</td>
                 <td>{{ item.ZACC_CHK ? 'X' : 'No' }}</td>
+                <td>{{ item.ZPR_BASIC }}</td>
+                <td>{{ item.ZPR_DELOAD }}</td>
+                <td>{{ item.ZPR_DEUNLOAD }}</td>
+                <td>{{ item.ZPR_LOAD }}</td>
+                <td>{{ item.ZPR_UNLOAD }}</td>
+                <td>{{ item.ZPR_ROUTE }}</td>
+                <td>{{ item.ZPR_TSHIP }}</td>
+                <td>{{ item.ZPR_OTHER }}</td>
+                <td>{{ item.ZPR_DEDUCT }}</td>
                 <td>{{ item.ZBILLNO}}</td>
                 <td>{{ item.ZBILLDATE }}</td>
                 <td>{{ item.ZPHY_DATE}}</td>

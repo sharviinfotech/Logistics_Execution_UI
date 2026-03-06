@@ -35,7 +35,7 @@ export class Login2Component implements OnInit {
      'assets/images/loginbgimage 2.jpeg',
 
     // 'assets/images/HBL_background_resized_1330x780.png',
-     'assets/images/Gemini_Generated_Image_xyc4ctxyc4ctxyc4.png',
+     'assets/images/loginggimage 3.png',
      'assets/images/loginbgimage 4.jpg',
      'assets/images/loginbgimage 5.jpg',
     //  'assets/images/loginbgimage 2.png',

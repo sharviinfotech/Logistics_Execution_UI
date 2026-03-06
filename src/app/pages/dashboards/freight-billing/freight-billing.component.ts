@@ -1309,7 +1309,23 @@ export class FreightBillingComponent implements OnInit {
         'Created Date': record.ZCREATED_DT
           ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB')
           : '',
-        'Vehicle Type': record.ZVEH_TYPE || ''
+        'Vehicle Type': record.ZVEH_TYPE || '',
+       'Provision': record.ZPRO_CHK === 'X' ? 'Yes' : 'No',
+    'Provision Amount': record.ZPROVAMT || '',
+    'Provision Date': record.ZPROVDT || '',
+    'Account': record.ZACC_CHK === 'X' ? 'Yes' : 'No',
+
+   
+    'Basic Amount': record.ZPR_BASIC || '',
+    'Deload Charges': record.ZPR_DELOAD || '',
+    'DeUnload Charges': record.ZPR_DEUNLOAD || '',
+    'Load Charges': record.ZPR_LOAD || '',
+    'Unload Charges': record.ZPR_UNLOAD || '',
+    'Route Charges': record.ZPR_ROUTE || '',
+    'Transshipment Charges': record.ZPR_TSHIP || '',
+    'Other Charges': record.ZPR_OTHER || '',
+    'Deduction': record.ZPR_DEDUCT ||''
+
       }));
     } else if (this.filterStatus === 'Pending') {
       exportData = exportSource.map(record => ({
@@ -1420,7 +1436,21 @@ export class FreightBillingComponent implements OnInit {
         'LR No',
         'Transporter',
         'Created Date',
-        'Vehicle Type'
+        'Vehicle Type',
+         'Provision',
+    'Provision Amount',
+    'Provision Date',
+    'Account',
+    'Basic Amount',
+    'Deload Charges',
+    'DeUnload Charges',
+    'Load Charges',
+    'Unload Charges',
+    'Route Charges',
+    'Transshipment Charges',
+    'Other Charges',
+    'Deduction'
+
       ]];
 
 
@@ -1448,7 +1478,24 @@ export class FreightBillingComponent implements OnInit {
         record.ZCREATED_DT
           ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB')
           : '',
-        record.ZVEH_TYPE || ''
+        record.ZVEH_TYPE || '',
+         
+  record.ZPRO_CHK === 'X' ? 'Yes' : 'No',
+  record.ZPROVAMT || '',
+  record.ZPROVDT
+    ? new Date(record.ZPROVDT).toLocaleDateString('en-GB')
+    : '',
+  record.ZACC_CHK === 'X' ? 'Yes' : 'No',
+  record.ZPR_BASIC || '',
+  record.ZPR_DELOAD || '',
+  record.ZPR_DEUNLOAD || '',
+  record.ZPR_LOAD || '',
+  record.ZPR_UNLOAD || '',
+  record.ZPR_ROUTE || '',
+  record.ZPR_TSHIP || '',
+  record.ZPR_OTHER || '',
+  record.ZPR_DEDUCT || ''
+
       ]));
 
     } else if (this.filterStatus === 'Pending') {

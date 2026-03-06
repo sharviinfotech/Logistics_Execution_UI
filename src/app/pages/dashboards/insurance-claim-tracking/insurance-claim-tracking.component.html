@@ -347,7 +347,7 @@
         </div>
 
         <div class="form-field">
-          <input type="text" formControlName="CLM_RF" placeholder=" " />
+          <input type="date" formControlName="CLM_RF" placeholder=" " />
           <label>Claim Received</label>
         </div>
 
@@ -382,8 +382,19 @@
         </div>
 
         <div class="form-field">
-          <input type="text" formControlName="CLM_ST" placeholder=" " />
-          <label>Claim Status</label>
+       <select formControlName="CLM_ST">
+
+<option value="">Select Claim Status</option>
+
+<option value="Under preparation">Under preparation</option>
+
+<option value="Submitted">Submitted</option>
+
+<option value="Not submitted">Not submitted</option>
+
+</select>
+
+<label>Claim Status</label>
         </div>
 
         <div class="form-field">

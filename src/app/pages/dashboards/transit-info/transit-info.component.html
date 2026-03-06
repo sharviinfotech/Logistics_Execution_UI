@@ -269,7 +269,7 @@
         </div>
 
         <div class="form-field">
-          <input type="date" formControlName="physicalarrivedatdestinationdateandtime" placeholder="" />
+          <input type="datetime-local" formControlName="physicalarrivedatdestinationdateandtime" placeholder="" />
           <label>Physical arrived at destination date</label>
         </div>
 
@@ -522,7 +522,7 @@
                 </td>
 
                 <td>
-                  <input *ngIf="headerData.isEdit" type="date" class="form-control form-control-sm width-md"
+                  <input *ngIf="headerData.isEdit" type="datetime-local" class="form-control form-control-sm width-md"
                     [(ngModel)]="headerData.ZPY_ARRIVED_DEST">
                   <span *ngIf="!headerData.isEdit">
                     {{ headerData.ZPY_ARRIVED_DEST | date:'dd-MM-yyyy' }}

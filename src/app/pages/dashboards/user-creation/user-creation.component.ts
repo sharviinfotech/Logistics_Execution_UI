@@ -456,7 +456,7 @@ export class UserCreationComponent implements OnInit {
     this.userForm.patchValue({ STATUS: status });
   }
 
-  // ================= Plant / Division (UNCHANGED) =================
+  
   fetchPlantCodeList(): void {
     this.spinner.show();
     this.service.fetchVendorCode().subscribe(
@@ -580,7 +580,7 @@ export class UserCreationComponent implements OnInit {
 
 
 
-  // ================= Create / Edit =================
+ 
   createUser() {
     if (this.userForm.invalid) {
       this.userForm.markAllAsTouched();
@@ -628,8 +628,8 @@ export class UserCreationComponent implements OnInit {
         this.spinner.hide();
         if (res?.STATUS === 'TRUE') {
           Swal.fire('Success', 'User created successfully', 'success');
-          this.fetchUsers();      // refresh table
-          this.closeModal();      // close modal
+          this.fetchUsers();      
+          this.closeModal();     
         } else {
           Swal.fire('Failed', res?.MESSAGE || 'User creation failed', 'error');
         }
@@ -733,8 +733,8 @@ export class UserCreationComponent implements OnInit {
         this.spinner.hide();
         if (res?.STATUS === 'TRUE') {
           Swal.fire('Success', 'User updated successfully', 'success');
-          this.fetchUsers(); // refresh table
-          this.closeModal(); // close modal
+          this.fetchUsers();
+          this.closeModal(); 
         } else {
           Swal.fire('Failed', res?.MESSAGE || 'Update failed', 'error');
         }
@@ -755,19 +755,19 @@ export class UserCreationComponent implements OnInit {
     const selectedUser = this.users[index];
 
     const payload = {
-      DEL_USER: selectedUser.USER   // ✅ FIXED
+      DEL_USER: selectedUser.USER   
     };
 
     this.spinner.show();
 
     this.service.UserCreationDelete(payload).subscribe({
-      next: (res: any) => {   // ✅ FIXED
+      next: (res: any) => {   
         this.spinner.hide();
 
         if (res.STATUS === 'TRUE') {
           Swal.fire('Deleted!', res.MESSAGE, 'success');
 
-          // ✅ Remove from UI only after success
+         
           this.users.splice(index, 1);
         } else {
           Swal.fire('Failed!', res.MESSAGE, 'error');
