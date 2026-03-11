@@ -72,6 +72,7 @@ export class DispatchComponent implements OnInit {
   filterVehicleType: string = '';
   filteredData: any[] = [];
   filterApplied: boolean = false;
+  loggedInUser: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -87,6 +88,10 @@ export class DispatchComponent implements OnInit {
   }
 
   ngOnInit() {
+    const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+this.loggedInUser = userData.USER || '';
+console.log("Logged in user:", this.loggedInUser);
+
     this.rows.at(0).get('VehicleType')?.valueChanges.subscribe(val => {
       this.handleVehicleTypeChange(val);
     });
@@ -598,6 +603,8 @@ export class DispatchComponent implements OnInit {
       LR_NO: row.LRNumber || '',
       LOAD_PT: row.LoadingPoints || '',
       UNLOAD_PT: row.UnLoadingPoints || '',
+      ZUSER:row.ZUSER,
+      ZUSER_CH: this.loggedInUser
 
     }));
 
@@ -785,7 +792,9 @@ onFilterDivisionChange(): void {
         NO_LRS: row.get('NoOfLRs')?.value,
         lr_no: row.get('LRNumber')?.value,
         load_pt: row.get('LoadingPoints')?.value,
-        unload_Pt: row.get('UnLoadingPoints')?.value
+        unload_Pt: row.get('UnLoadingPoints')?.value,
+          ZUSER: this.loggedInUser,
+           ZUSER_CH:''
       }))
     };
 

@@ -75,6 +75,7 @@ export class VechileInfoComponent implements OnInit {
   invoiceF4List: string[] = [];
   vehicleApiData: any[] = [];
   fullReferenceData: any[] = [];
+   loggedInUser: string = '';
 
 
 
@@ -88,6 +89,9 @@ export class VechileInfoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+       const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+this.loggedInUser = userData.USER || '';
+console.log("Logged in user:", this.loggedInUser);
     this.VehicleForm = this.fb.group({
       VBELN: [''],
       vehicles: this.fb.array([]),
@@ -918,7 +922,9 @@ export class VechileInfoComponent implements OnInit {
       .map(({ selected, ...rest }, index) => ({
         ...rest,
         VBELN: vbeln,
-        POSNR: (index + 1) * 10
+        POSNR: (index + 1) * 10,
+           ZUSER: this.loggedInUser,
+    ZUSER_CH: ''
       }));
 
 
@@ -1034,7 +1040,7 @@ export class VechileInfoComponent implements OnInit {
   }
 
 
-  // Method to update the edited row
+  
   updateVehicleSap(row: any) {
 
     // 🔑 Mandatory PKs for SAP
@@ -1074,7 +1080,9 @@ export class VechileInfoComponent implements OnInit {
           ZVEH_TYPE: row.ZVEH_TYPE,
           ZSPMAIL: row.ZSPMAIL,
           ZCUSTMAIL: row.ZCUSTMAIL,
-          ZGPS: row.ZGPS
+          ZGPS: row.ZGPS,
+             ZUSER: row.ZUSER,        
+    ZUSER_CH: this.loggedInUser
         }
       ]
     };
@@ -1122,7 +1130,9 @@ export class VechileInfoComponent implements OnInit {
           ZVEH_TYPE: row.ZVEH_TYPE,
           ZSPMAIL: row.ZSPMAIL,
           ZCUSTMAIL: row.ZCUSTMAIL,
-          ZGPS: row.ZGPS
+          ZGPS: row.ZGPS,
+              ZUSER: row.ZUSER,         
+    ZUSER_CH: this.loggedInUser
         }
       ]
     };
@@ -1173,7 +1183,7 @@ export class VechileInfoComponent implements OnInit {
           if (res?.NUMBER === '200' || res?.STATUS === 'true') {
             Swal.fire({
               title: 'Success',
-              text: 'Vehicle updated successfully',
+              text: 'Vehicle updated successfully ',
               icon: 'success',
               confirmButtonText: 'Ok'
             }).then(() => {
