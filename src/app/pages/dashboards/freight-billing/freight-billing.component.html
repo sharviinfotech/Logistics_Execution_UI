@@ -253,7 +253,7 @@
         </div>
 
         <!-- ✅ Provision & Account Checkboxes -->
-        <div class="checkbox-row">
+        <div class="checkbox-row" *ngIf="loginData?.CATEGORY=='Internal'">
           <label class="custom-checkbox">
             <input type="checkbox" formControlName="provision" (change)="onProvisionChange()" />
             <span class="checkbox-custom"></span>
@@ -267,8 +267,18 @@
           </label>
         </div>
 
+        <div class="checkbox-row" *ngIf="loginData?.CATEGORY=='External'">
+
+
+          <label class="custom-checkbox">
+            <input type="checkbox" formControlName="account" (change)="onAccountChange()" />
+            <span class="checkbox-custom"></span>
+            <span class="checkbox-label">Account</span>
+          </label>
+        </div>
+
         <div class="form-field" *ngIf="showProvisionFields">
-          <input type="number" formControlName="ProvisionAmount" placeholder=" "
+          <input type="number" formControlName="ProvisionAmount" readonly
             (click)="openModal(calculateTotalpopup, 'provision')" />
           <label>Provision Amount</label>
         </div>
@@ -308,7 +318,7 @@
 
         <div class="form-field" *ngIf="showAccountFields">
           <input type="number" formControlName="FreightCharges" (click)="openModal(calculateTotalpopup, 'freight')"
-            placeholder=" " />
+            readonly />
           <label>Freight Charges</label>
         </div>
 
@@ -473,7 +483,28 @@
             </select>
             <label>Status</label>
           </div>
+          <div class="form-field" *ngIf="loginData?.CATEGORY=='Internal'">
+            <select [(ngModel)]="filterPACheck">
+              <option value="">Select P/A Check</option>
+              <option value="Provision">Provision</option>
+              <option value="Account">Account</option>
+              <option value="Both">Both</option>
+            </select>
+            <label>P/A Check</label>
+          </div>
+          <!-- <div class="form-field" *ngIf="loginData?.CATEGORY=='External'">
+            <select [(ngModel)]="filterPACheck">
+              <option value="">Select Account Data</option>
+
+              <option value="Account">Account</option>
+
+            </select>
+            <label>Account Data</label>
+          </div> -->
         </div>
+
+
+
 
 
 
@@ -504,8 +535,9 @@
         </div>
       </div>
     </div>
-    <!-- Search Results Table -->
-    <div class="card" style="margin-top: 10px;" *ngIf="searchOptionsList?.length > 0">
+    <!--Internal Search Results Table -->
+    <div class="card" style="margin-top: 10px;"
+      *ngIf="searchOptionsList?.length > 0 && loginData?.CATEGORY=='Internal'">
       <div class="card-body-LE">
         <div class="table-responsive">
           <table class="table table-bordered table-striped text-center">
@@ -675,11 +707,207 @@
                   <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
                 </td>
 
-                <!-- <td>
+
+
+                <td>
+                  <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZLOCATION">
+                  <span *ngIf="!item.isEdit">{{ item.ZLOCATION }}</span>
+                </td>
+
+                <td>
+                  <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZVEH_NUM">
+                  <span *ngIf="!item.isEdit">{{ item.ZVEH_NUM }}</span>
+                </td>
+
+
+                <td>{{ item.ZCREATED_DT ? (item.ZCREATED_DT | date:'dd-MM-yyyy') : '-' }}</td>
+
+
+
+                <td>
+                  <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZVEH_LINE">
+                  <span *ngIf="!item.isEdit">{{ item.ZVEH_LINE }}</span>
+                </td>
+
+                <!-- ACTION -->
+                <td>
+                  <div *ngIf="!item.isEdit" class="btn-group">
+                    <button class="btn btn-sm btn-primary me-1" (click)="editSearchRow(item)">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" (click)=" deleteRow(item, i)">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+
+                  <div *ngIf="item.isEdit" class="btn-group">
+                    <button class="btn btn-sm btn-success me-1" (click)="updateSearchRow(item, i)">
+                      <i class="fas fa-check"></i>
+                    </button>
+                    <button class="btn btn-sm btn-secondary" (click)="cancelSearchEdit(item)">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </td>
+
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!--External Search Results Table -->
+    <div class="card" style="margin-top: 10px;"
+      *ngIf="searchOptionsList?.length > 0 && loginData?.CATEGORY=='External'">
+      <div class="card-body-LE">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped text-center">
+            <thead>
+              <tr>
+                <th>Ref No</th>
+                <th>Invoice No</th>
+                <th>Line No</th>
+                <th>ODN No</th>
+                <th>SO NO</th>
+                <th>Sale Person</th>
+                <th>Account Check</th>
+
+                <th>Freight Bill No</th>
+                <th>Freight Bill Date</th>
+                <th>Physical Submission Date</th>
+                <th>Freight Charges</th>
+                <th>Work Order</th>
+                <th>Bill Submission</th>
+                <th>Freight Bill upload</th>
+                <th>Unloading Charges Approval</th>
+                <th>Detention Charges Uploading</th>
+                <th>Work Order Uploading</th>
+                <th>Work Order Type</th>
+                <th>LR No</th>
+                <th>Transporter</th>
+                <th>Location</th>
+                <th>Vehicle Number</th>
+                <th>Created Date</th>
+                <th>Vehicle Line</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let item of searchOptionsList; let i = index" [class.editing]="item.isEdit">
+
+
+                <td>{{ item.ZREFNO }}</td>
+
+
+                <td>{{ item.ZINV_NO }}</td>
+
+                <td>{{ item.ZLINE_NO }}</td>
+
+
+
+                <td>
+                  <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZODN_NO">
+                  <span *ngIf="!item.isEdit">{{ item.ZODN_NO }}</span>
+                </td>
+
+                <td>
+                  <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZSONO">
+                  <span *ngIf="!item.isEdit">{{ item.ZSONO }}</span>
+                </td>
+
+                <td>
+                  <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZSALE_PERSON">
+                  <span *ngIf="!item.isEdit">{{ item.ZSALE_PERSON }}</span>
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-info view-btn" (click)="openPACheckModal(pACheckModal, item, i)">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </td>
+
+
+
+                <td>
+                  <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZBILLNO">
+                  <span *ngIf="!item.isEdit">{{ item.ZBILLNO }}</span>
+                </td>
+
+
+                <td>
+                  <input *ngIf="item.isEdit" type="date" class="form-control form-control-sm"
+                    [(ngModel)]="item.ZBILLDATE">
+                  <span *ngIf="!item.isEdit">
+                    {{ item.ZBILLDATE | date:'dd-MM-yyyy' }}
+                  </span>
+                </td>
+
+                <td>
+                  <input *ngIf="item.isEdit" type="date" class="form-control form-control-sm"
+                    [(ngModel)]="item.ZPHY_DATE">
+                  <span *ngIf="!item.isEdit">
+                    {{ item.ZPHY_DATE | date:'dd-MM-yyyy' }}
+                  </span>
+                </td>
+
+                <td>
+                  <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm"
+                    [(ngModel)]="item.ZFRT_CHARGES">
+                  <span *ngIf="!item.isEdit">
+                    {{ item.ZFRT_CHARGES | number:'1.2-2' }}
+                  </span>
+                </td>
+
+                <td>
+                  <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZWORK_ORDER">
+                  <span *ngIf="!item.isEdit">{{ item.ZWORK_ORDER }}</span>
+                </td>
+
+                <td>
+                  <input *ngIf="item.isEdit" type="date" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZBILL_SUBMISSION">
+                  <span *ngIf="!item.isEdit">{{ item.ZBILL_SUBMISSION }}</span>
+                </td>
+
+                <td>
+                  <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZFRBILLUP">
+                  <span *ngIf="!item.isEdit">{{ item.ZFRBILLUP }}</span>
+                </td>
+
+                <td>
+                  <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZUNLOADAPP">
+                  <span *ngIf="!item.isEdit">{{ item.ZUNLOADAPP }}</span>
+                </td>
+
+                <td>
+                  <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZDETENTUP">
+                  <span *ngIf="!item.isEdit">{{ item.ZDETENTUP }}</span>
+                </td>
+
+                <td>
+                  <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md"
+                    [(ngModel)]="item.ZWORDUP">
+                  <span *ngIf="!item.isEdit">{{ item.ZWORDUP }}</span>
+                </td>
+
+                <td>
                   <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
                     [(ngModel)]="item.ZWORKORDER">
                   <span *ngIf="!item.isEdit">{{ item.ZWORKORDER }}</span>
                 </td>
+
 
                 <td>
                   <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
@@ -691,7 +919,9 @@
                   <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
                     [(ngModel)]="item.ZTRANSPORTER">
                   <span *ngIf="!item.isEdit">{{ item.ZTRANSPORTER }}</span>
-                </td> -->
+                </td>
+
+
 
                 <td>
                   <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
@@ -745,8 +975,10 @@
     </div>
 
 
+
+
     <div class="card" style="margin-top: 10px;"
-      *ngIf=" filterApplied && filterStatus === 'Completed' && FreightBillingData?.length > 0 && mainMode === 'filter'">
+      *ngIf="filterApplied && filterStatus === 'Completed' && FreightBillingData?.length > 0 && mainMode === 'filter' && loginData?.CATEGORY === 'Internal'">
       <div class="card-body-LE">
         <div class="table-responsive">
           <table class="table table-bordered table-striped text-center">
@@ -759,19 +991,149 @@
                 <th>Odn Number</th>
                 <th>SO Number</th>
                 <th>Sale Person</th>
-                <th>Provision</th>
-                <th>Provision Amount</th>
-                <th>Provision Date</th>
+
+                <!-- ✅ Provision columns - hidden when Account is selected -->
+                <ng-container *ngIf="filterPACheck !== 'Account'">
+                  <th>Provision</th>
+                  <th>Provision Amount</th>
+                  <th>Provision Date</th>
+                  <th>Provision <br> Basic Freight</th>
+                  <th>Provision<br> Detention loading</th>
+                  <th>Provision<br> Detention Unloading</th>
+                  <th>Provision <br> Loading Charges</th>
+                  <th>Provision<br> Unloading Charges</th>
+                  <th>Provision<br> Route Charges</th>
+                  <th>Provision<br> Transhipment Charges</th>
+                  <th>Provision<br> Other Charges</th>
+                  <th>Provision<br> Deduction</th>
+                </ng-container>
+
+                <!-- ✅ Account columns - hidden when Provision is selected -->
+                <ng-container *ngIf="filterPACheck !== 'Provision'">
+                  <th>Account</th>
+                  <th>Account<br> Basic Freight</th>
+                  <th>Account<br> Detention loading</th>
+                  <th>Account<br> Detention Unloading</th>
+                  <th>Account<br> Loading Charges</th>
+                  <th>Account<br> Unloading Charges</th>
+                  <th>Account<br> Route Charges</th>
+                  <th>Account<br> Transhipment Charges</th>
+                  <th>Account <br> Other Charges</th>
+                  <th>Account<br> Deduction</th>
+                  <th>Freight Bill No</th>
+                  <th>Freight Bill Date</th>
+                  <th>Physical Submission Date</th>
+                  <th>Freight Charges</th>
+                  <th>Bill Submission</th>
+                </ng-container>
+
+
+                <th>Work order type</th>
+
+                <th>Location</th>
+                <th>Vehicle Line</th>
+                <th>Vehicle Number</th>
+                <th>Plant</th>
+                <th>Division</th>
+                <th>Work Order</th>
+                <th>LR No</th>
+                <th>Transporter</th>
+                <th>Created date</th>
+                <th>Vehicle Type</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let item of FreightBillingData; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ item.ZREFNO }}</td>
+                <td>{{ item.ZINV_NO}}</td>
+                <td>{{ item.ZODN_NO }}</td>
+                <td>{{ item.ZSONO}}</td>
+                <td>{{ item.ZSALE_PERSON }}</td>
+
+                <!-- ✅ Provision cells - hidden when Account is selected -->
+                <ng-container *ngIf="filterPACheck !== 'Account'">
+                  <td>{{ item.ZPRO_CHK ? 'X' : 'No' }}</td>
+                  <td>{{ item.ZPROVAMT }}</td>
+                  <td>{{ item.ZPROVDT | date:'dd-MM-yyyy' }}</td>
+                  <td>{{ item.ZPR_BASIC }}</td>
+                  <td>{{ item.ZPR_DELOAD }}</td>
+                  <td>{{ item.ZPR_DEUNLOAD }}</td>
+                  <td>{{ item.ZPR_LOAD }}</td>
+                  <td>{{ item.ZPR_UNLOAD }}</td>
+                  <td>{{ item.ZPR_ROUTE }}</td>
+                  <td>{{ item.ZPR_TSHIP }}</td>
+                  <td>{{ item.ZPR_OTHER }}</td>
+                  <td>{{ item.ZPR_DEDUCT }}</td>
+                </ng-container>
+
+                <!-- ✅ Account cells - hidden when Provision is selected -->
+                <ng-container *ngIf="filterPACheck !== 'Provision'">
+                  <td>{{ item.ZACC_CHK ? 'X' : 'No' }}</td>
+                  <td>{{ item.ZFC_BASIC }}</td>
+                  <td>{{ item.ZFC_DELOAD }}</td>
+                  <td>{{ item.ZFC_DEUNLOAD }}</td>
+                  <td>{{ item.ZFC_LOAD }}</td>
+                  <td>{{ item.ZFC_UNLOAD }}</td>
+                  <td>{{ item.ZFC_ROUTE }}</td>
+                  <td>{{ item.ZFC_TSHIP }}</td>
+                  <td>{{ item.ZFC_OTHER }}</td>
+                  <td>{{ item.ZFC_DEDUCT }}</td>
+                  <td>{{ item.ZBILLNO}}</td>
+                  <td>{{ item.ZBILLDATE }}</td>
+                  <td>{{ item.ZPHY_DATE}}</td>
+                  <td>{{ item.ZFRT_CHARGES }}</td>
+                  <td>{{ item.ZBILL_SUBMISSION }}</td>
+                </ng-container>
+
+
+                <td>{{ item.ZWORKORDER }}</td>
+
+                <td>{{ item.ZLOCATION}}</td>
+                <td>{{ item.ZVEH_LINE }}</td>
+                <td>{{ item.ZVEH_NUM }}</td>
+                <td>{{ item.ZPLANT}}</td>
+                <td>{{ item.ZDIVISION }}</td>
+                <td>{{ item.ZWORK_ORDER }}</td>
+                <td>{{ item.ZLRNO}}</td>
+                <td>{{ item.ZTRANSPORTER}}</td>
+                <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
+                <td>{{ item.ZVEH_TYPE }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top: 10px;"
+      *ngIf="filterApplied && filterStatus === 'Completed' && FreightBillingData?.length > 0 && mainMode === 'filter' && loginData?.CATEGORY === 'External'">
+      <div class="card-body-LE">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped text-center">
+            <thead>
+              <tr>
+                <th>SI.No</th>
+                <th>REFNO</th>
+                <th>Invoice No</th>
+                <!-- <th>Line No</th> -->
+                <th>Odn Number</th>
+                <th>SO Number</th>
+                <th>Sale Person</th>
+
+
+                <!-- ✅ Account columns - hidden when Provision is selected -->
+
                 <th>Account</th>
-                <th>Basic Amount</th>
-                <th>Deload Charges</th>
-                <th>DeUnload Charges</th>
-                <th>Load Charges</th>
-                <th>Unload Charges</th>
-                <th>Route Charges</th>
-                <th>Transshipment Charges</th>
-                <th>Other Charges</th>
-                <th>Deduction</th>
+                <th>Account<br> Basic Freight</th>
+                <th>Account<br> Detention loading</th>
+                <th>Account<br> Detention Unloading</th>
+                <th>Account<br> Loading Charges</th>
+                <th>Account<br> Unloading Charges</th>
+                <th>Account<br> Route Charges</th>
+                <th>Account<br> Transhipment Charges</th>
+                <th>Account <br> Other Charges</th>
+                <th>Account<br> Deduction</th>
                 <th>Freight Bill No</th>
                 <th>Freight Bill Date</th>
                 <th>Physical Submission Date</th>
@@ -794,25 +1156,26 @@
             <tbody>
               <tr *ngFor="let item of FreightBillingData; let i = index">
                 <td>{{ i + 1 }}</td>
-
                 <td>{{ item.ZREFNO }}</td>
                 <td>{{ item.ZINV_NO}}</td>
                 <td>{{ item.ZODN_NO }}</td>
                 <td>{{ item.ZSONO}}</td>
                 <td>{{ item.ZSALE_PERSON }}</td>
-                <td>{{ item.ZPRO_CHK ? 'X' : 'No' }}</td>
-                <td>{{ item.ZPROVAMT }}</td>
-                <td>{{ item.ZPROVDT | date:'dd-MM-yyyy' }}</td>
+
+                <!-- ✅ Account cells - hidden when Provision is selected -->
+
                 <td>{{ item.ZACC_CHK ? 'X' : 'No' }}</td>
-                <td>{{ item.ZPR_BASIC }}</td>
-                <td>{{ item.ZPR_DELOAD }}</td>
-                <td>{{ item.ZPR_DEUNLOAD }}</td>
-                <td>{{ item.ZPR_LOAD }}</td>
-                <td>{{ item.ZPR_UNLOAD }}</td>
-                <td>{{ item.ZPR_ROUTE }}</td>
-                <td>{{ item.ZPR_TSHIP }}</td>
-                <td>{{ item.ZPR_OTHER }}</td>
-                <td>{{ item.ZPR_DEDUCT }}</td>
+                <td>{{ item.ZFC_BASIC }}</td>
+                <td>{{ item.ZFC_DELOAD }}</td>
+                <td>{{ item.ZFC_DEUNLOAD }}</td>
+                <td>{{ item.ZFC_LOAD }}</td>
+                <td>{{ item.ZFC_UNLOAD }}</td>
+                <td>{{ item.ZFC_ROUTE }}</td>
+                <td>{{ item.ZFC_TSHIP }}</td>
+                <td>{{ item.ZFC_OTHER }}</td>
+                <td>{{ item.ZFC_DEDUCT }}</td>
+
+
                 <td>{{ item.ZBILLNO}}</td>
                 <td>{{ item.ZBILLDATE }}</td>
                 <td>{{ item.ZPHY_DATE}}</td>
@@ -827,7 +1190,6 @@
                 <td>{{ item.ZWORK_ORDER }}</td>
                 <td>{{ item.ZLRNO}}</td>
                 <td>{{ item.ZTRANSPORTER}}</td>
-
                 <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
                 <td>{{ item.ZVEH_TYPE }}</td>
               </tr>
@@ -981,17 +1343,114 @@
 
     <!-- ✅ P/A CHECK VIEW & UPDATE MODAL -->
     <ng-template #pACheckModal let-c="close">
-      <div class="modal-header">
-        <h5>Provision / Account Details - Update</h5>
-        <button type="button" class="close" (click)="c('Cross click')">
-          <span>&times;</span>
-        </button>
+      <div *ngIf="loginData?.CATEGORY=='Internal'">
+        <div class="modal-header">
+          <h5>Provision / Account Details - Update</h5>
+          <button type="button" class="close" (click)="c('Cross click')">
+            <span>&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+
+          <!-- Provision Section -->
+          <div class="Provision-card">
+            <h6 class="section-title">
+              <i class="fas fa-check-circle"></i> Provision Details
+            </h6>
+
+            <div class="form-grid">
+              <div class="form-field">
+                <input type="checkbox" [(ngModel)]="paFormData.provisionChecked" (change)="onProvisionCheckChange()"
+                  id="provisionCheck" />
+                <label for="provisionCheck" style="display: inline; margin-left: 8px;">
+
+                </label>
+              </div>
+
+              <div class="form-field" *ngIf="paFormData.provisionChecked">
+                <input type="number" [(ngModel)]="paFormData.provisionAmount" placeholder=" "
+                  (click)="openPAModal(calculateTotalpopup, 'provision')" readonly />
+                <label>Provision Amount</label>
+                <i class="fas fa-edit edit-icon" (click)="openPAModal(calculateTotalpopup, 'provision')"
+                  title="Click to edit breakdown"></i>
+              </div>
+
+              <div class="form-field" *ngIf="paFormData.provisionChecked">
+                <input type="date" [(ngModel)]="paFormData.provisionDate" placeholder=" " />
+                <label>Provision Date</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Account Section -->
+          <div class="Account-card" style="margin-top: 20px;">
+            <h6 class="section-title">
+              <i class="fas fa-file-invoice"></i> Account Details
+            </h6>
+
+            <div class="form-grid">
+              <div class="form-field">
+                <input type="checkbox" [(ngModel)]="paFormData.accountChecked" (change)="onAccountCheckChange()"
+                  id="accountCheck" />
+                <label for="accountCheck" style="display: inline; margin-left: 8px; ">
+
+                </label>
+              </div>
+
+              <div class="form-field" *ngIf="paFormData.accountChecked">
+                <input type="text" [(ngModel)]="paFormData.freightBillNumber" placeholder=" " />
+                <label>Freight Bill Number</label>
+              </div>
+
+              <div class="form-field" *ngIf="paFormData.accountChecked">
+                <input type="date" [(ngModel)]="paFormData.freightBillDate" (change)="onPAFreightBillDateChange()"
+                  placeholder=" " />
+                <label>Freight Bill Date</label>
+              </div>
+
+              <div class="form-field" *ngIf="paFormData.accountChecked">
+                <input type="date" [(ngModel)]="paFormData.physicalSubmissionDate" [min]="minPhysicalDate"
+                  placeholder=" " />
+                <label>Physical Submission Date</label>
+              </div>
+
+              <div class="form-field" *ngIf="paFormData.accountChecked">
+                <input type="number" [(ngModel)]="paFormData.freightCharges" placeholder=" "
+                  (click)="openPAModal(calculateTotalpopup, 'freight')" readonly />
+                <label>Freight Charges</label>
+                <i class="fas fa-edit edit-icon" (click)="openPAModal(calculateTotalpopup, 'freight')"
+                  title="Click to edit breakdown"></i>
+              </div>
+
+              <div class="form-field" *ngIf="paFormData.accountChecked">
+                <input type="date" [(ngModel)]="paFormData.billSubmission" [min]="minPhysicalDate" placeholder=" " />
+                <label>Bill Submission To F&A</label>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="c('Close')">Cancel</button>
+          <button class="btn btn-primary" style="background-color: #8f1e42;" (click)="updatePADetails()">
+            <i class="fas fa-save"></i> Update
+          </button>
+        </div>
       </div>
+      <div *ngIf="loginData?.CATEGORY=='External'">
+        <div class="modal-header">
+          <h5> Account Details - Update</h5>
+          <button type="button" class="close" (click)="c('Cross click')">
+            <span>&times;</span>
+          </button>
+        </div>
 
-      <div class="modal-body">
+        <div class="modal-body">
 
-        <!-- Provision Section -->
-        <div class="Provision-card">
+          <!-- Provision Section -->
+          <!-- <div class="Provision-card">
           <h6 class="section-title">
             <i class="fas fa-check-circle"></i> Provision Details
           </h6>
@@ -1007,7 +1466,7 @@
 
             <div class="form-field" *ngIf="paFormData.provisionChecked">
               <input type="number" [(ngModel)]="paFormData.provisionAmount" placeholder=" "
-                (click)="openPAModal(calculateTotalpopup, 'provision')" />
+                (click)="openPAModal(calculateTotalpopup, 'provision')" readonly />
               <label>Provision Amount</label>
               <i class="fas fa-edit edit-icon" (click)="openPAModal(calculateTotalpopup, 'provision')"
                 title="Click to edit breakdown"></i>
@@ -1018,64 +1477,67 @@
               <label>Provision Date</label>
             </div>
           </div>
-        </div>
+        </div> -->
 
-        <!-- Account Section -->
-        <div class="Account-card" style="margin-top: 20px;">
-          <h6 class="section-title">
-            <i class="fas fa-file-invoice"></i> Account Details
-          </h6>
+          <!-- Account Section -->
+          <div class="Account-card" style="margin-top: 20px;">
+            <h6 class="section-title">
+              <i class="fas fa-file-invoice"></i> Account Details
+            </h6>
 
-          <div class="form-grid">
-            <div class="form-field">
-              <input type="checkbox" [(ngModel)]="paFormData.accountChecked" (change)="onAccountCheckChange()"
-                id="accountCheck" />
-              <label for="accountCheck" style="display: inline; margin-left: 8px; ">
+            <div class="form-grid">
+              <div class="form-field">
+                <input type="checkbox" [(ngModel)]="paFormData.accountChecked" (change)="onAccountCheckChange()"
+                  id="accountCheck" />
+                <label for="accountCheck" style="display: inline; margin-left: 8px; ">
 
-              </label>
-            </div>
+                </label>
+              </div>
 
-            <div class="form-field" *ngIf="paFormData.accountChecked">
-              <input type="text" [(ngModel)]="paFormData.freightBillNumber" placeholder=" " />
-              <label>Freight Bill Number</label>
-            </div>
+              <div class="form-field" *ngIf="paFormData.accountChecked">
+                <input type="text" [(ngModel)]="paFormData.freightBillNumber" placeholder=" " />
+                <label>Freight Bill Number</label>
+              </div>
 
-            <div class="form-field" *ngIf="paFormData.accountChecked">
-              <input type="date" [(ngModel)]="paFormData.freightBillDate" (change)="onPAFreightBillDateChange()"
-                placeholder=" " />
-              <label>Freight Bill Date</label>
-            </div>
+              <div class="form-field" *ngIf="paFormData.accountChecked">
+                <input type="date" [(ngModel)]="paFormData.freightBillDate" (change)="onPAFreightBillDateChange()"
+                  placeholder=" " />
+                <label>Freight Bill Date</label>
+              </div>
 
-            <div class="form-field" *ngIf="paFormData.accountChecked">
-              <input type="date" [(ngModel)]="paFormData.physicalSubmissionDate" [min]="minPhysicalDate"
-                placeholder=" " />
-              <label>Physical Submission Date</label>
-            </div>
+              <div class="form-field" *ngIf="paFormData.accountChecked">
+                <input type="date" [(ngModel)]="paFormData.physicalSubmissionDate" [min]="minPhysicalDate"
+                  placeholder=" " />
+                <label>Physical Submission Date</label>
+              </div>
 
-            <div class="form-field" *ngIf="paFormData.accountChecked">
-              <input type="number" [(ngModel)]="paFormData.freightCharges" placeholder=" "
-                (click)="openPAModal(calculateTotalpopup, 'freight')" readonly />
-              <label>Freight Charges</label>
-              <i class="fas fa-edit edit-icon" (click)="openPAModal(calculateTotalpopup, 'freight')"
-                title="Click to edit breakdown"></i>
-            </div>
+              <div class="form-field" *ngIf="paFormData.accountChecked">
+                <input type="number" [(ngModel)]="paFormData.freightCharges" placeholder=" "
+                  (click)="openPAModal(calculateTotalpopup, 'freight')" readonly />
+                <label>Freight Charges</label>
+                <i class="fas fa-edit edit-icon" (click)="openPAModal(calculateTotalpopup, 'freight')"
+                  title="Click to edit breakdown"></i>
+              </div>
 
-            <div class="form-field" *ngIf="paFormData.accountChecked">
-              <input type="date" [(ngModel)]="paFormData.billSubmission" [min]="minPhysicalDate" placeholder=" " />
-              <label>Bill Submission To F&A</label>
+              <div class="form-field" *ngIf="paFormData.accountChecked">
+                <input type="date" [(ngModel)]="paFormData.billSubmission" [min]="minPhysicalDate" placeholder=" " />
+                <label>Bill Submission To F&A</label>
+              </div>
             </div>
           </div>
+
         </div>
 
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="c('Close')">Cancel</button>
-        <button class="btn btn-primary" style="background-color: #8f1e42;" (click)="updatePADetails()">
-          <i class="fas fa-save"></i> Update
-        </button>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="c('Close')">Cancel</button>
+          <button class="btn btn-primary" style="background-color: #8f1e42;" (click)="updatePADetails()">
+            <i class="fas fa-save"></i> Update
+          </button>
+        </div>
       </div>
     </ng-template>
+
+
 
   </div>
 </div>

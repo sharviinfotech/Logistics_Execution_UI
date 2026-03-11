@@ -280,7 +280,7 @@ input[type="radio"] {
 /* P/A Check Modal Styles */
 .Provision-card {
   background: #f8f9fa;
-  border-left: 4px solid #8f1e42;
+  border-left: 3px solid #8f1e42;
   padding: 15px;
   margin-bottom: 15px;
   border-radius: 4px;
@@ -288,7 +288,7 @@ input[type="radio"] {
 }
 .Account-card{
   background: #f8f9fa;
-  border-left: 4px solid #8f1e42;
+  border-left: 3px solid #8f1e42;
   padding: 15px;
   margin-bottom: 15px;
   border-radius: 4px;

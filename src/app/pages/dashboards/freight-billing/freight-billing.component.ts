@@ -75,6 +75,8 @@ export class FreightBillingComponent implements OnInit {
     { key: "freight_billno", label: 'Freight Bill No' },
   ]
   selectedType: any = '';
+  loginData: any = null;
+
   searchOptionsList: any[] = [];
   dropdownOpen = false;
   provision: [false];
@@ -91,6 +93,7 @@ export class FreightBillingComponent implements OnInit {
   filterTransporter: string = '';
   filterVehicleType: string = '';
   filterStatus: string = '';
+  filterPACheck: string = '';
   filteredData: any[] = [];
   filterApplied: boolean = false;
 
@@ -130,6 +133,8 @@ export class FreightBillingComponent implements OnInit {
     // this.setupWorkOrderListener();
     this.fetchTransporter();
     this.fetchPlantCodeList();
+    this.loginData= this.service.getLoginResponse()
+   console.log("this.loginData",this.loginData);
   }
 
   initializeForm(): void {
@@ -986,6 +991,8 @@ export class FreightBillingComponent implements OnInit {
       }
     }
 
+    this.cd.detectChanges();
+
     // Close only the calculate total popup, not all modals
     if (this.currentCalculateModalRef) {
       this.currentCalculateModalRef.close();
@@ -1224,11 +1231,21 @@ export class FreightBillingComponent implements OnInit {
 
         this.filterApplied = true;
 
-        if (this.filterStatus === 'Completed') {
-          this.FreightBillingData = records;
-          this.dispatchData = [];
-          Swal.fire('Success', `Freight Billing records: ${records.length}`, 'success');
-        }
+      if (this.filterStatus === 'Completed') {
+  let filtered = records;
+
+  if (this.filterPACheck === 'Provision') {
+    filtered = records.filter((r: any) => r.ZPRO_CHK === 'X' && r.ZACC_CHK !== 'X');
+  } else if (this.filterPACheck === 'Account') {
+    filtered = records.filter((r: any) => r.ZACC_CHK === 'X' && r.ZPRO_CHK !== 'X');
+  } else if (this.filterPACheck === 'Both') {
+    filtered = records.filter((r: any) => r.ZPRO_CHK === 'X' && r.ZACC_CHK === 'X');
+  }
+
+  this.FreightBillingData = filtered;
+  this.dispatchData = [];
+  Swal.fire('Success', `Freight Billing records: ${filtered.length}`, 'success');
+}
         else if (this.filterStatus === 'Pending') {
           this.dispatchData = records;
           this.FreightBillingData = [];
@@ -1267,10 +1284,10 @@ export class FreightBillingComponent implements OnInit {
 
     if (this.filterStatus === 'Completed') {
       exportSource = this.FreightBillingData;
-      fileName = this.sapType === 'SAP' ? 'FreightBilling_Completed_SAP.xlsx' : 'FreightBilling_Completed_NonSAP.xlsx';
+      fileName = this.filterSapType === 'SAP' ? 'FreightBilling_Completed_SAP.xlsx' : 'FreightBilling_Completed_NonSAP.xlsx';
     } else if (this.filterStatus === 'Pending') {
       exportSource = this.dispatchData;
-      fileName = this.sapType === 'SAP' ? 'Dispatch_Pending_SAP.xlsx' : 'Dispatch_Pending_NonSAP.xlsx';
+      fileName = this.filterSapType === 'SAP' ? 'Dispatch_Pending_SAP.xlsx' : 'Dispatch_Pending_NonSAP.xlsx';
     } else {
       Swal.fire('Warning', 'Please select valid status before download', 'warning');
       return;
@@ -1310,21 +1327,31 @@ export class FreightBillingComponent implements OnInit {
           ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB')
           : '',
         'Vehicle Type': record.ZVEH_TYPE || '',
-       'Provision': record.ZPRO_CHK === 'X' ? 'Yes' : 'No',
-    'Provision Amount': record.ZPROVAMT || '',
-    'Provision Date': record.ZPROVDT || '',
-    'Account': record.ZACC_CHK === 'X' ? 'Yes' : 'No',
+        'Provision': record.ZPRO_CHK === 'X' ? 'Yes' : 'No',
+        'Provision Amount': record.ZPROVAMT || '',
+        'Provision Date': record.ZPROVDT || '',
+        'Provision Basic Freight': record.ZPR_BASIC || '',
+        'Provision Detention loading': record.ZPR_DELOAD || '',
+        'Provision Detention Unloading': record.ZPR_DEUNLOAD || '',
+        'Provision Loading Charges': record.ZPR_LOAD || '',
+        'Provision Unloading Charges': record.ZPR_UNLOAD || '',
+        'Provision Route Charges': record.ZPR_ROUTE || '',
+        'Provision Transhipment Charges': record.ZPR_TSHIP || '',
+        'Provision Other Charges': record.ZPR_OTHER || '',
+        'Provision Deduction': record.ZPR_DEDUCT || '',
+        'Account': record.ZACC_CHK === 'X' ? 'Yes' : 'No',
+        'Account Basic Freight': record.ZFC_BASIC || '',
+        'Account Detention loading': record.ZFC_DELOAD || '',
+        'Account Detention Unloading': record.ZFC_DEUNLOAD || '',
+        'Account Loading Charges': record.ZFC_LOAD || '',
+        'Account Unloading Charges': record.ZFC_UNLOAD || '',
+        'Account Route Charges': record.ZFC_ROUTE || '',
+        'Account Transhipment Charges': record.ZFC_TSHIP || '',
+        'Account Other Charges': record.ZFC_OTHER || '',
+        'Account Deduction': record.ZFC_DEDUCT || ''
 
-   
-    'Basic Amount': record.ZPR_BASIC || '',
-    'Deload Charges': record.ZPR_DELOAD || '',
-    'DeUnload Charges': record.ZPR_DEUNLOAD || '',
-    'Load Charges': record.ZPR_LOAD || '',
-    'Unload Charges': record.ZPR_UNLOAD || '',
-    'Route Charges': record.ZPR_ROUTE || '',
-    'Transshipment Charges': record.ZPR_TSHIP || '',
-    'Other Charges': record.ZPR_OTHER || '',
-    'Deduction': record.ZPR_DEDUCT ||''
+
+
 
       }));
     } else if (this.filterStatus === 'Pending') {
@@ -1369,11 +1396,11 @@ export class FreightBillingComponent implements OnInit {
 
     if (this.filterStatus === 'Completed') {
       exportSource = this.FreightBillingData;
-      fileName = this.sapType === 'SAP' ? 'Freight_Billing_Completed_SAP.pdf' : 'Freight_Billing_Completed_NonSAP.pdf';
+      fileName = this.filterSapType === 'SAP' ? 'Freight_Billing_Completed_SAP.pdf' : 'Freight_Billing_Completed_NonSAP.pdf';
       reportTitle = 'Freight Billing Records (Completed)';
     } else if (this.filterStatus === 'Pending') {
       exportSource = this.dispatchData;
-      fileName = this.sapType === 'SAP' ? 'Dispatch_Pending_SAP.pdf' : 'Dispatch_Pending_NonSAP.pdf';
+      fileName = this.filterSapType === 'SAP' ? 'Dispatch_Pending_SAP.pdf' : 'Dispatch_Pending_NonSAP.pdf';
       reportTitle = 'Dispatch Records (Pending)';
     } else {
       Swal.fire('Warning', 'Please select valid status before download', 'warning');
@@ -1437,19 +1464,29 @@ export class FreightBillingComponent implements OnInit {
         'Transporter',
         'Created Date',
         'Vehicle Type',
-         'Provision',
-    'Provision Amount',
-    'Provision Date',
-    'Account',
-    'Basic Amount',
-    'Deload Charges',
-    'DeUnload Charges',
-    'Load Charges',
-    'Unload Charges',
-    'Route Charges',
-    'Transshipment Charges',
-    'Other Charges',
-    'Deduction'
+        'Provision',
+        'Provision Amount',
+        'Provision Date',
+        'Provision Basic Amount',
+        'Provision Detention loading Charges',
+        'Provision Detention Unloading Charges',
+        'Provision Loading Charges',
+        'Provision Unloading Charges',
+        'Provision Route Charges',
+        'Provision Transhipment Charges',
+        'Provision Other Charges',
+        'Provision Deduction',
+        'Account',
+        'Account Basic Amount',
+        'Account Detention loading Charges',
+        'Account Detention Unloading Charges',
+        'Account Loading Charges',
+        'Account Unloading Charges',
+        'Account Route Charges',
+        'Account Transhipment Charges',
+        'Account Other Charges',
+        'Account Deduction',
+
 
       ]];
 
@@ -1479,22 +1516,31 @@ export class FreightBillingComponent implements OnInit {
           ? new Date(record.ZCREATED_DT).toLocaleDateString('en-GB')
           : '',
         record.ZVEH_TYPE || '',
-         
-  record.ZPRO_CHK === 'X' ? 'Yes' : 'No',
-  record.ZPROVAMT || '',
-  record.ZPROVDT
-    ? new Date(record.ZPROVDT).toLocaleDateString('en-GB')
-    : '',
-  record.ZACC_CHK === 'X' ? 'Yes' : 'No',
-  record.ZPR_BASIC || '',
-  record.ZPR_DELOAD || '',
-  record.ZPR_DEUNLOAD || '',
-  record.ZPR_LOAD || '',
-  record.ZPR_UNLOAD || '',
-  record.ZPR_ROUTE || '',
-  record.ZPR_TSHIP || '',
-  record.ZPR_OTHER || '',
-  record.ZPR_DEDUCT || ''
+
+        record.ZPRO_CHK === 'X' ? 'Yes' : 'No',
+        record.ZPROVAMT || '',
+        record.ZPROVDT
+          ? new Date(record.ZPROVDT).toLocaleDateString('en-GB')
+          : '',
+        record.ZPR_BASIC || '',
+        record.ZPR_DELOAD || '',
+        record.ZPR_DEUNLOAD || '',
+        record.ZPR_LOAD || '',
+        record.ZPR_UNLOAD || '',
+        record.ZPR_ROUTE || '',
+        record.ZPR_TSHIP || '',
+        record.ZPR_OTHER || '',
+        record.ZPR_DEDUCT || '',
+        record.ZACC_CHK === 'X' ? 'Yes' : 'No',
+        record.ZFC_BASIC || '',
+        record.ZFC_DELOAD || '',
+        record.ZFC_DEUNLOAD || '',
+        record.ZFC_LOAD || '',
+        record.ZFC_UNLOAD || '',
+        record.ZFC_ROUTE || '',
+        record.ZFC_TSHIP || '',
+        record.ZFC_OTHER || '',
+        record.ZFC_DEDUCT || ''
 
       ]));
 
@@ -1728,14 +1774,14 @@ export class FreightBillingComponent implements OnInit {
     // Load existing data into form
     this.paFormData = {
       provisionChecked: item.ZPRO_CHK === 'X',
-      provisionAmount: item.ZPROVAMT || '',
-      provisionDate: item.ZPROVDT || '',
-      accountChecked: item.ZACC_CHK === 'X',
-      freightBillNumber: item.ZBILLNO || '',
-      freightBillDate: item.ZBILLDATE || '',
-      physicalSubmissionDate: item.ZPHY_DATE || '',
-      freightCharges: item.ZFRT_CHARGES || '',
-      billSubmission: item.ZBILL_SUBMISSION || ''
+    provisionAmount: item.ZPROVAMT || '',
+    provisionDate: item.ZPROVDT || '',
+    accountChecked: item.ZACC_CHK === 'X',
+    freightBillNumber: item.ZBILLNO || '',
+    freightBillDate: item.ZBILLDATE || '',
+    physicalSubmissionDate: item.ZPHY_DATE || '',
+    freightCharges: item.ZFRT_CHARGES || '',
+    billSubmission: item.ZBILL_SUBMISSION || ''
     };
 
     // ✅ Load Freight Breakdown from backend
