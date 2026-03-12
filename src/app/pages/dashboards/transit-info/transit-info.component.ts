@@ -78,6 +78,7 @@ export class TransitInfoComponent implements OnInit {
   filterSapType: string = '';
   invoiceF4List: string[] = [];
   fullReferenceData: any[] = [];
+   loggedInUser: string = '';
 
 
 
@@ -90,6 +91,9 @@ export class TransitInfoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+           const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+this.loggedInUser = userData.USER || '';
+console.log("Logged in user:", this.loggedInUser);
     this.initializeForm();
     this.fetchTransporter();
     this.fetchPlantCodeList();
@@ -280,7 +284,8 @@ export class TransitInfoComponent implements OnInit {
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
-      LINE_NO: values.lineNumber || ''
+      LINE_NO: values.lineNumber || '',
+       ZUSER: this.loggedInUser
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -644,7 +649,9 @@ export class TransitInfoComponent implements OnInit {
       PY_ARRIVED_DEST: this.formatDate(f.physicalarrivedatdestinationdateandtime),
       UNLOADING_DT: this.formatDateTime(f.unloadingdateandtime),
       POD_SCAN: this.formatDateTime(f.podscanreceiveddateandtime),
-      SIT_SALE: f.sit || ''
+      SIT_SALE: f.sit || '',
+      ZUSER: this.loggedInUser,
+      ZUSER_CH: '',
     };
 
 
@@ -757,14 +764,14 @@ export class TransitInfoComponent implements OnInit {
         return;
       }
 
-      // 🔑 Validate mandatory ITEM fields
+     
       const invalidItems = itemRows.filter(item => !item.ZREFNO || !item.ZLINE_NO);
       if (invalidItems.length > 0) {
         Swal.fire('Error', 'Missing mandatory keys in items (ZREFNO/ZLINE_NO)', 'error');
         return;
       }
 
-      // 📦 Build HEADER payload
+     
       const headerPayload = {
         ZREFNO: headerRow.ZREFNO,
         ZINV_NO: headerRow.ZINV_NO || '',
@@ -779,10 +786,12 @@ export class TransitInfoComponent implements OnInit {
         ZCREATED_DT: headerRow.ZCREATED_DT || '',
         ZPLANT: headerRow.ZPLANT || '',
         ZDIVISION: headerRow.ZDIVISION || '',
-        ZVEH_TYPE: headerRow.ZVEH_TYPE || ''
+        ZVEH_TYPE: headerRow.ZVEH_TYPE || '',
+        ZUSER:'',
+        ZUSER_CH: this.loggedInUser,
       };
 
-      // 📦 Build ITEM payload (multiple items)
+     
       const itemPayload = itemRows.map(item => ({
         ZREFNO: String(item.ZREFNO),
         ZLINE_NO: String(item.ZLINE_NO),
@@ -792,7 +801,10 @@ export class TransitInfoComponent implements OnInit {
         ZVEH_NUM: item.ZVEH_NUM || '',
         ZLRNO: item.ZLRNO || '',
         ZWORK_ORDER: item.ZWORK_ORDER || '',
-        ZTRANSPORTER: item.ZTRANSPORTER || ''
+        ZTRANSPORTER: item.ZTRANSPORTER || '',
+          ZUSER:'',
+        ZUSER_CH: this.loggedInUser,
+
       }));
 
       // 🎯 Final payload with HEADER + ITEM

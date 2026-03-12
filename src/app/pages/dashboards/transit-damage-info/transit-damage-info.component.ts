@@ -99,7 +99,7 @@ export class TransitDamageInfoComponent implements OnInit {
   TransitdamageInfoData: any[] = [];
   filterSapType: string = '';
   invoiceF4List: string[] = [];
-
+ loggedInUser: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -110,6 +110,9 @@ export class TransitDamageInfoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+      const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+this.loggedInUser = userData.USER || '';
+console.log("Logged in user:", this.loggedInUser);
     this.buildHeaderForm();
     this.buildItemForm();
     this.fetchTransporter();
@@ -369,7 +372,8 @@ export class TransitDamageInfoComponent implements OnInit {
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
-      LINE_NO: values.lineNumber || ''
+      LINE_NO: values.lineNumber || '',
+       ZUSER: this.loggedInUser
 
     };
 
@@ -931,10 +935,13 @@ export class TransitDamageInfoComponent implements OnInit {
     headerValue.LINE_NO = selectedItems[0]?.ZLINE_NO || null;
     headerValue.INC_DATE = headerValue.INC_DATE || null;
     headerValue.CLOSING_DT = headerValue.CLOSING_DT || null;
-    headerValue.ROUTE = headerValue.ROUTE ||
+    headerValue.ROUTE = headerValue.ROUTE || null;
+    headerValue.ZUSER = this.loggedInUser;
+headerValue.ZUSER_CH = ''
       selectedItems.forEach((row: any) => {
         row.INV_NO = invoiceNo;
         row.REFNO = headerValue.REFNO;
+     
       });
 
 
@@ -1161,6 +1168,9 @@ export class TransitDamageInfoComponent implements OnInit {
     headerValue.INV_NO = invoiceNo;
     headerValue.REFNO = refNo;
     headerValue.LINE_NO = this.selectedItems[0]?.lineNumber || null;
+      headerValue.ZUSER = this.loggedInUser;
+headerValue.ZUSER_CH = ''
+    
 
     /* ITEMS */
     const itemsPayload = this.items.controls
@@ -1168,7 +1178,9 @@ export class TransitDamageInfoComponent implements OnInit {
       .map(ctrl => ({
         ...ctrl.value,
         INV_NO: invoiceNo,
-        REFNO: refNo
+        REFNO: refNo,
+        ZUSER: this.loggedInUser,
+        ZUSER_CH: '',
       }));
 
     const payload = {
@@ -1258,7 +1270,9 @@ export class TransitDamageInfoComponent implements OnInit {
         ZPLANT: headerRow.ZPLANT || null,
         ZDIVISION: headerRow.ZDIVISION || null,
         ZVEH_TYPE: headerRow.ZVEH_TYPE || null,
-        ZCREATED_DT: headerRow.ZCREATED_DT || null
+        ZCREATED_DT: headerRow.ZCREATED_DT || null,
+        ZUSER: '',
+        ZUSER_CH: this.loggedInUser
       };
 
       /* ---------------- ITEM PAYLOAD ---------------- */
@@ -1274,7 +1288,9 @@ export class TransitDamageInfoComponent implements OnInit {
         ZTRANSPORTER: item.ZTRANSPORTER || null,
         ZWORK_ORDER: item.ZWORK_ORDER || null,
         ZBILLNO: item.ZBILLNO || null,
-        ZPRODUCT: item.ZPRODUCT || null
+        ZPRODUCT: item.ZPRODUCT || null,
+          ZUSER: '',
+        ZUSER_CH: this.loggedInUser
       }));
 
       // 🎯 Final payload with HEADER + ITEM

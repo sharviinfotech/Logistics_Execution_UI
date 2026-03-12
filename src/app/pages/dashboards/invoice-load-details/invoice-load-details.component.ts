@@ -73,6 +73,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   showForm: boolean = false;
   invoiceF4List: string[] = [];
   fullReferenceData: any[] = [];
+  loggedInUser: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -88,6 +89,9 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       invoices: this.fb.array([]),
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
+    const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+this.loggedInUser = userData.USER || '';
+console.log("Logged in user:", this.loggedInUser);
 
     this.addRow();
     this.getVehicleTypes();
@@ -304,7 +308,8 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
-      LINE_NO: values.lineNumber || ''
+      LINE_NO: values.lineNumber || '',
+       ZUSER: this.loggedInUser
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -696,7 +701,8 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   const loggedInUser = this.getCurrentUser();
   const payloadWithUser = filtered.map((item: any) => ({
     ...item,
-    ZUSER: loggedInUser
+    ZUSER: loggedInUser,
+    ZUSER_CH:''
   }));
 
   this.spinner.show();
@@ -790,7 +796,8 @@ export class InvoiceLoadDetailsComponent implements OnInit {
         ZEWAYBILL_NO: inv.ZEWAYBILL_NO,
         ZEWAYBILL_DT: inv.ZEWAYBILL_DT,
         ZMAPID: inv.ZMAPID || "",
-        ZUSER: this.getCurrentUser()
+        ZUSER: this.getCurrentUser(),
+        ZUSER_CH:''
       })),
     };
 
@@ -878,7 +885,9 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       ZLF_WT: row.ZLF_WT,
       ZWEEK_SF: row.ZWEEK_SF,
       ZEWAYBILL_NO: row.ZEWAYBILL_NO,
-      ZEWAYBILL_DT: row.ZEWAYBILL_DT
+      ZEWAYBILL_DT: row.ZEWAYBILL_DT,
+      ZUSER:'',
+      ZUSER_CH: this.getCurrentUser()
     }];
 
     return this.service.InvoiceloaddetailsSave(payload);
@@ -909,7 +918,9 @@ export class InvoiceLoadDetailsComponent implements OnInit {
         ZLF_WT: row.ZLF_WT,
         ZWEEK_SF: row.ZWEEK_SF,
         ZEWAYBILL_NO: row.ZEWAYBILL_NO,
-        ZEWAYBILL_DT: row.ZEWAYBILL_DT
+        ZEWAYBILL_DT: row.ZEWAYBILL_DT,
+            ZUSER:'',
+      ZUSER_CH: this.getCurrentUser()
       }]
     };
 

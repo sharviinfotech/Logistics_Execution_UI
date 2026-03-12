@@ -84,6 +84,7 @@ export class SegmentInfoComponent implements OnInit {
   filterSapType: string = '';
   invoiceF4List: string[] = [];
   fullReferenceData: any[] = [];
+   loggedInUser: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -107,6 +108,9 @@ export class SegmentInfoComponent implements OnInit {
       ETA_DATE: ['', Validators.required],
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
+     const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+this.loggedInUser = userData.USER || '';
+console.log("Logged in user:", this.loggedInUser);
 
     this.fetchDropdownData();
     this.fetchTransporter();
@@ -323,7 +327,8 @@ export class SegmentInfoComponent implements OnInit {
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
-      LINE_NO: values.lineNumber || ''
+      LINE_NO: values.lineNumber || '',
+       ZUSER: this.loggedInUser
 
 
     };
@@ -684,7 +689,9 @@ export class SegmentInfoComponent implements OnInit {
           BRANCH_ZONE: formValue.BRANCH_ZONE || '',
           TAT_TYPE: formValue.TAT_Type || '',
           TAT: formValue.TAT_DAYS || '',
-          ETA: formValue.ETA_DATE || ''
+          ETA: formValue.ETA_DATE || '',
+          ZUSER: this.loggedInUser ,
+          ZUSER_CH:'',
         });
       });
     }
@@ -793,7 +800,9 @@ export class SegmentInfoComponent implements OnInit {
         ZCREATED_DT: row.ZCREATED_DT || '',
         ZPLANT: row.ZPLANT || '',
         ZDIVISION: row.ZDIVISION || '',
-        ZVEH_TYPE: row.ZVEH_TYPE || ''
+        ZVEH_TYPE: row.ZVEH_TYPE || '',
+        ZUSER: '',
+          ZUSER_CH: this.loggedInUser ,
       };
 
       const payload = {

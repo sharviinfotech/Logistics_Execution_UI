@@ -96,6 +96,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   InsuranceClaimTrackingData: any[] = [];
   filterSapType: string = '';
   invoiceF4List: string[] = [];
+    loggedInUser: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -106,6 +107,9 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+        const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+this.loggedInUser = userData.USER || '';
+console.log("Logged in user:", this.loggedInUser);
     this.buildHeaderForm();
     this.buildItemForm();
     this.fetchTransporter();
@@ -370,7 +374,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
-      LINE_NO: values.lineNumber || ''
+      LINE_NO: values.lineNumber || '',
+       ZUSER: this.loggedInUser
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -959,6 +964,9 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       // Ensure backend receives z-prefixed bill/workorder keys as well
       row.ZBILLNO = row.BILLNO || row.ZBILLNO || '';
       row.ZWORK_ORDER = row.WORK_ORDER || row.ZWORK_ORDER || '';
+        headerValue.ZUSER = this.loggedInUser;
+  headerValue.ZUSER = this.loggedInUser;
+headerValue.ZUSER_CH = ''
     });
 
     // 6️⃣ Final payload
@@ -1226,6 +1234,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       || this.selectedItems[0]?.lineNo
       || this.selectedItems[0]?.ZLINE_NO
       || null;
+        headerValue.ZUSER = this.loggedInUser;
+headerValue.ZUSER_CH = ''
     const itemsPayload = this.items.controls
       .filter(ctrl => ctrl.value.selected === true)
       .map(ctrl => ({
@@ -1356,8 +1366,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         ZPAY_INFO: headerRow.ZPAY_INFO,
         ZUTR: headerRow.ZUTR,
         ZCLM_SET_DT: headerRow.ZCLM_SET_DT,
-
-        // 🔥 IMPORTANT
+ZUSER:'',
+ZUSER_CH:this.loggedInUser,
 
       };
 
@@ -1378,6 +1388,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         ZTRANSPORTER: item.ZTRANSPORTER || null,
         ZWORK_ORDER: item.ZWORK_ORDER || null,
         ZBILLNO: item.ZBILLNO || null,
+        ZUSER:'',
+ZUSER_CH:this.loggedInUser,
 
       }));
 

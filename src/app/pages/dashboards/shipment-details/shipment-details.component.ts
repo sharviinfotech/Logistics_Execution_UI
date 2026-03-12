@@ -81,6 +81,7 @@ export class ShipmentDetailsComponent implements OnInit {
   showDispatchTable = false;
   invoiceF4List: string[] = [];
   fullReferenceData: any[] = [];
+  loggedInUser: string = '';
 
 
   constructor(
@@ -101,7 +102,9 @@ export class ShipmentDetailsComponent implements OnInit {
       items: this.fb.array([this.createItemRow()]),
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
-
+ const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+this.loggedInUser = userData.USER || '';
+console.log("Logged in user:", this.loggedInUser);
     this.fetchIncoterms();
     this.fetchTransporter();
     this.fetchPlantCodeList();
@@ -300,7 +303,8 @@ export class ShipmentDetailsComponent implements OnInit {
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
-      LINE_NO: values.lineNumber || ''
+      LINE_NO: values.lineNumber || '',
+      ZUSER: this.loggedInUser
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -823,9 +827,11 @@ export class ShipmentDetailsComponent implements OnInit {
         ZKM: itemZkm,
         ZINCO: itemZinco,
         VBELN: itemVBELN,
-        ZSETS: row.ZSETS ?? 0,
-        ZAH: row.ZAH ?? 0,
-        ZSHIP_WT: row.ZSHIP_WT ?? 0,
+        ZSETS: row.ZSETS,
+        ZAH: row.ZAH,
+        ZSHIP_WT: row.ZSHIP_WT,
+        ZUSER: this.loggedInUser,
+        ZUSER_CH:'',
       };
     });
 
@@ -973,7 +979,9 @@ export class ShipmentDetailsComponent implements OnInit {
           ZPLANT: row.ZPLANT,
           ZDIVISION: row.ZDIVISION,
           ZCREATED_DT: row.ZCREATED_DT,
-          ZVEH_TYPE: row.ZVEH_TYPE
+          ZVEH_TYPE: row.ZVEH_TYPE,
+          ZUSER:'',
+            ZUSER_CH: this.loggedInUser
         }
       ]
     };
@@ -998,7 +1006,7 @@ export class ShipmentDetailsComponent implements OnInit {
     const payload = {
       CHANGE: [{
         ZREFNO: row.ZREFNO,
-        ZLINE_NO: row.ZLINE_NO,   // backend expects STRING
+        ZLINE_NO: row.ZLINE_NO,   
         VBELN: row.VBELN,
         POSNR: row.POSNR,
         ZMAPID: row.ZMAPID,
@@ -1020,7 +1028,9 @@ export class ShipmentDetailsComponent implements OnInit {
         ZPLANT: row.ZPLANT || '',
         ZDIVISION: row.ZDIVISION || '',
         ZCREATED_DT: row.ZCREATED_DT || '',
-        ZVEH_TYPE: row.ZVEH_TYPE || ''
+        ZVEH_TYPE: row.ZVEH_TYPE || '',
+          ZUSER:'',
+            ZUSER_CH: this.loggedInUser
       }
       ]
     };

@@ -70,11 +70,13 @@ export class OrderInfoComponent implements OnInit {
   VendorCodeList: any[] = [];
   orderInfoData: any[] = [];
   dispatchData: any[] = [];
+   loggedInUser: string = '';
 
   filterSapType: string = '';
   showOrderInfoTable = false;
   showDispatchTable = false;
   formArray: any;
+ 
 
   constructor(
     private fb: FormBuilder,
@@ -115,6 +117,14 @@ export class OrderInfoComponent implements OnInit {
 
     this.initialFormValues = this.OrderInfo.value;
     this.setupPhysicalDispatch();
+    const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+this.loggedInUser = userData.USER || '';
+console.log("Logged in user:", this.loggedInUser);
+
+
+  console.log("User Plants:", this.plantList);
+  console.log("User Divisions:", this.divisionList);
+
     // this.fetchCustomers();  //Due to 404 error pradeep comment this line this one cant use in this screen any where
     this.fetchTransporter();
   }
@@ -178,7 +188,7 @@ export class OrderInfoComponent implements OnInit {
   }
 
   editRow(row: any) {
-    row._backup = { ...row }; // backup for cancel
+    row._backup = { ...row }; 
     row.isEdit = true;
   }
 
@@ -652,7 +662,9 @@ export class OrderInfoComponent implements OnInit {
       CNEE_NAME: formValue.CNee,
       DEST_LOC: formValue.DestinationLocation,
       DEST_STATE: formValue.DestinationState,
-      DEST_ZONE: formValue.DestinationZone
+      DEST_ZONE: formValue.DestinationZone,
+      ZUSER: this.loggedInUser,
+      ZUSER_CH:'',
     }));
 
     console.log("💾 Final SAVE Payload:", record);
@@ -811,7 +823,9 @@ export class OrderInfoComponent implements OnInit {
         CNEE_NAME: row.ZCONSIGN_NAME || "",
         DEST_LOC: row.ZDES_LOC || "",
         DEST_STATE: row.ZSTATE || "",
-        DEST_ZONE: row.ZZONE || ""
+        DEST_ZONE: row.ZZONE || "",
+        ZUSER: '',
+        ZUSER_CH: this.loggedInUser
       };
 
       console.log("🛠 UPDATE RECORD:", updatePayload);
@@ -1196,7 +1210,8 @@ export class OrderInfoComponent implements OnInit {
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
-      LINE_NO: values.lineNumber || ''
+      LINE_NO: values.lineNumber || '',
+      ZUSER: this.loggedInUser
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -1502,6 +1517,7 @@ export class OrderInfoComponent implements OnInit {
       );
     }
   }
+
 
   fetchTransporter(): void {
     this.spinner.show();

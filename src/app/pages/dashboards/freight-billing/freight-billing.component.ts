@@ -103,6 +103,7 @@ export class FreightBillingComponent implements OnInit {
   filterSapType: string = '';
   invoiceF4List: string[] = [];
   minPhysicalDate: string = '';
+   loggedInUser: string = '';
 
   paFormData: any = {
     provisionChecked: false,
@@ -129,6 +130,9 @@ export class FreightBillingComponent implements OnInit {
   }
 
   ngOnInit(): void {
+     const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+this.loggedInUser = userData.USER || '';
+console.log("Logged in user:", this.loggedInUser);
     this.initializeForm();
     // this.setupWorkOrderListener();
     this.fetchTransporter();
@@ -285,7 +289,8 @@ export class FreightBillingComponent implements OnInit {
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
-      LINE_NO: values.lineNumber || ''
+      LINE_NO: values.lineNumber || '',
+       ZUSER: this.loggedInUser
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -591,6 +596,8 @@ export class FreightBillingComponent implements OnInit {
       UNLOADAPP: formValue.UnloadingChargesApproval || '',
       DETENTUP: formValue.DetentionChargesUploading || '',
       WORDUP: formValue.WorkOrderUploading || '',
+      ZUSER:this.loggedInUser,
+        ZUSER_CH: '',
 
       // ✅ Freight Charges Breakdown (when Account checkbox is checked)
       ZFC_BASIC: formValue.account ? (this.paFreightBreakdown.basicFreight || 0) : 0,
@@ -748,6 +755,8 @@ export class FreightBillingComponent implements OnInit {
             ZUNLOADAPP: row.ZUNLOADAPP,
             ZDETENTUP: row.ZDETENTUP,
             ZWORDUP: row.ZWORDUP,
+            ZUSER: '',
+              ZUSER_CH: this.loggedInUser,
 
             // ✅ Freight Charges Breakdown
             ZFC_BASIC: row.ZFC_BASIC || 0,
