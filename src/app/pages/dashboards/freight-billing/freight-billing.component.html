@@ -268,8 +268,6 @@
         </div>
 
         <div class="checkbox-row" *ngIf="loginData?.CATEGORY=='External'">
-
-
           <label class="custom-checkbox">
             <input type="checkbox" formControlName="account" (change)="onAccountChange()" />
             <span class="checkbox-custom"></span>
@@ -278,7 +276,7 @@
         </div>
 
         <div class="form-field" *ngIf="showProvisionFields">
-          <input type="number" formControlName="ProvisionAmount" readonly
+          <input type="text" formControlName="ProvisionAmount" readonly
             (click)="openModal(calculateTotalpopup, 'provision')" />
           <label>Provision Amount</label>
         </div>
@@ -292,7 +290,7 @@
 
 
         <div class="form-field" *ngIf="showAccountFields">
-          <input type="number" formControlName="FreightBillNumber" placeholder=" " />
+          <input type="text" formControlName="FreightBillNumber" placeholder=" " />
           <label>Freight Bill Number</label>
         </div>
 
@@ -317,7 +315,7 @@
 
 
         <div class="form-field" *ngIf="showAccountFields">
-          <input type="number" formControlName="FreightCharges" (click)="openModal(calculateTotalpopup, 'freight')"
+          <input type="text" formControlName="FreightCharges" (click)="openModal(calculateTotalpopup, 'freight')"
             readonly />
           <label>Freight Charges</label>
         </div>
@@ -1369,7 +1367,7 @@
               </div>
 
               <div class="form-field" *ngIf="paFormData.provisionChecked">
-                <input type="number" [(ngModel)]="paFormData.provisionAmount" placeholder=" "
+                <input type="text" [(ngModel)]="paFormData.provisionAmount" placeholder=" "
                   (click)="openPAModal(calculateTotalpopup, 'provision')" readonly />
                 <label>Provision Amount</label>
                 <i class="fas fa-edit edit-icon" (click)="openPAModal(calculateTotalpopup, 'provision')"
@@ -1416,7 +1414,7 @@
               </div>
 
               <div class="form-field" *ngIf="paFormData.accountChecked">
-                <input type="number" [(ngModel)]="paFormData.freightCharges" placeholder=" "
+                <input type="text" [(ngModel)]="paFormData.freightCharges" placeholder=" "
                   (click)="openPAModal(calculateTotalpopup, 'freight')" readonly />
                 <label>Freight Charges</label>
                 <i class="fas fa-edit edit-icon" (click)="openPAModal(calculateTotalpopup, 'freight')"
@@ -1512,7 +1510,7 @@
               </div>
 
               <div class="form-field" *ngIf="paFormData.accountChecked">
-                <input type="number" [(ngModel)]="paFormData.freightCharges" placeholder=" "
+                <input type="text" [(ngModel)]="paFormData.freightCharges" placeholder=" "
                   (click)="openPAModal(calculateTotalpopup, 'freight')" readonly />
                 <label>Freight Charges</label>
                 <i class="fas fa-edit edit-icon" (click)="openPAModal(calculateTotalpopup, 'freight')"

@@ -651,7 +651,7 @@ fetchPlantCodeList(): void {
       EMAIL: user.EMAIL,
       CONTACT: user.CONTACT,
       PASSWORD: user.PASSWORD,
-      CONFPSWD: user.CONFPSWD,
+      CONFPSWD: user.PASSWORD,
       EMP_CODE: user.EMP_CODE,
       INOUT_TYPE: user.INOUT_TYPE,
       CATEGORY: user.CATEGORY,
