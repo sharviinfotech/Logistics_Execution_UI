@@ -13,9 +13,6 @@ import * as jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 
-
-
-
 @Component({
   selector: 'app-dispatch',
   standalone: true,
@@ -41,7 +38,6 @@ export class DispatchComponent implements OnInit {
   isUpdateMode: boolean = false;
   fetchedLineNumbers: number[] = [];
 
-  
   originalTotalTrucks: number = 0;
   originalTotalInvoices: number = 0;
   originalTotalLRs: number = 0;
@@ -73,6 +69,8 @@ export class DispatchComponent implements OnInit {
   filteredData: any[] = [];
   filterApplied: boolean = false;
   loggedInUser: string = '';
+  plantList: any;
+  divisionList: any;
 
   constructor(
     private fb: FormBuilder,
@@ -89,8 +87,15 @@ export class DispatchComponent implements OnInit {
 
   ngOnInit() {
     const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
-this.loggedInUser = userData.USER || '';
-console.log("Logged in user:", this.loggedInUser);
+    this.loggedInUser = userData.USER || '';
+    console.log("Logged in user:", this.loggedInUser);
+    this.plantList = userData.PLANTS || [];
+ 
+  // ✅ Divisions from login response
+  this.divisionList = userData.DIV || [];
+ 
+  console.log("Plants:", this.plantList);
+  console.log("Divisions:", this.divisionList);
 
     this.rows.at(0).get('VehicleType')?.valueChanges.subscribe(val => {
       this.handleVehicleTypeChange(val);
@@ -102,34 +107,30 @@ console.log("Logged in user:", this.loggedInUser);
 
     const firstRow = this.rows.at(0) as FormGroup;
 
-    // Watch for NoOfTrucks changes in first row to update original value
-    firstRow.get('NoOfTrucks', )?.valueChanges.subscribe(val => {
+    // Watch first row value changes to update original totals
+    firstRow.get('NoOfTrucks')?.valueChanges.subscribe(val => {
       this.originalTotalTrucks = +val || 0;
-      this.redistributeNoOfTrucks();
+      this.redistributeAll();
     });
 
-    // Watch for NoOfInvoices changes in first row to update original value
     firstRow.get('NoOfInvoices')?.valueChanges.subscribe(val => {
       this.originalTotalInvoices = +val || 0;
-      this.redistributeInvoices();
+      this.redistributeAll();
     });
 
-    // Watch for NoOfLRs changes in first row to update original value
     firstRow.get('NoOfLRs')?.valueChanges.subscribe(val => {
       this.originalTotalLRs = +val || 0;
-      this.redistributeLRs();
+      this.redistributeAll();
     });
 
-    // Watch for LoadingPoints changes in first row to update original value
     firstRow.get('LoadingPoints')?.valueChanges.subscribe(val => {
       this.originalTotalLoadingPoints = +val || 0;
-      this.redistributeLoadingPoints();
+      this.redistributeAll();
     });
 
-    // Watch for UnLoadingPoints changes in first row to update original value
     firstRow.get('UnLoadingPoints')?.valueChanges.subscribe(val => {
       this.originalTotalUnLoadingPoints = +val || 0;
-      this.redistributeUnLoadingPoints();
+      this.redistributeAll();
     });
 
     ['VehicleType', 'NoOfInvoices', 'NoOfLRs', 'LoadingPoints', 'UnLoadingPoints']
@@ -140,8 +141,71 @@ console.log("Logged in user:", this.loggedInUser);
       });
 
     this.fetchVendorCodeList();
-    this.fetchPlantCodeList();
+    // this.fetchPlantCodeList();
   }
+
+  // ============================================================
+  // SPLIT HELPER — floor divide + remainder to first rows
+  // ============================================================
+
+  splitValue(total: number, totalRows: number, index: number): number {
+    const perRow = Math.floor(total / totalRows);
+    const remainder = total % totalRows;
+    return perRow + (index < remainder ? 1 : 0);
+  }
+
+  // ============================================================
+  // GET TOTAL — use originalValue OR fallback to first row value
+  // ============================================================
+
+  getTotal(originalValue: number, fieldName: string): number {
+    return originalValue || (+this.rows.at(0).get(fieldName)?.value || 0);
+  }
+
+  // ============================================================
+  // REDISTRIBUTE ALL FIELDS — single function for everything
+  // ============================================================
+
+  redistributeAll() {
+    const totalRows = this.rows.length;
+    if (totalRows === 0) return;
+
+    // Get totals for all fields
+    const totals = {
+      NoOfTrucks:      this.getTotal(this.originalTotalTrucks,         'NoOfTrucks'),
+      NoOfInvoices:    this.getTotal(this.originalTotalInvoices,       'NoOfInvoices'),
+      NoOfLRs:         this.getTotal(this.originalTotalLRs,            'NoOfLRs'),
+      LoadingPoints:   this.getTotal(this.originalTotalLoadingPoints,  'LoadingPoints'),
+      UnLoadingPoints: this.getTotal(this.originalTotalUnLoadingPoints,'UnLoadingPoints'),
+    };
+
+    // Distribute each field across all rows
+    this.rows.controls.forEach((row, index) => {
+      row.get('NoOfTrucks')?.setValue(
+        this.splitValue(totals.NoOfTrucks, totalRows, index), { emitEvent: false }
+      );
+      row.get('NoOfInvoices')?.setValue(
+        this.splitValue(totals.NoOfInvoices, totalRows, index), { emitEvent: false }
+      );
+      row.get('NoOfLRs')?.setValue(
+        this.splitValue(totals.NoOfLRs, totalRows, index), { emitEvent: false }
+      );
+      row.get('LoadingPoints')?.setValue(
+        this.splitValue(totals.LoadingPoints, totalRows, index), { emitEvent: false }
+      );
+      row.get('UnLoadingPoints')?.setValue(
+        this.splitValue(totals.UnLoadingPoints, totalRows, index), { emitEvent: false }
+      );
+    });
+
+    // Max rows = biggest value among all fields
+    this.maxRowsAllowed = Math.max(...Object.values(totals));
+    this.maxLimitReached = this.rows.length >= this.maxRowsAllowed && this.maxRowsAllowed > 0;
+    this.checkActionColumnVisibility();
+    this.cd.detectChanges();
+  }
+
+  // ============================================================
 
   onMainModeChange(): void {
     this.orderType = '';
@@ -171,17 +235,13 @@ console.log("Logged in user:", this.loggedInUser);
   }
 
   onSapTypeChange(): void {
-  this.dispatchForm.reset();
-  this.showForm = !!(this.orderType && this.sapType);
-  this.isUpdateMode = false;
-
-  // Reset search bar
-  this.selectedType = '';
-  this.searchValue = '';
-  this.searchPlaceholder = 'Select search type';
-
-  // this.resetAll();
-}
+    this.dispatchForm.reset();
+    this.showForm = !!(this.orderType && this.sapType);
+    this.isUpdateMode = false;
+    this.selectedType = '';
+    this.searchValue = '';
+    this.searchPlaceholder = 'Select search type';
+  }
 
   createRow(isFirstRow: boolean = false): FormGroup {
     const row = this.fb.group({
@@ -212,8 +272,8 @@ console.log("Logged in user:", this.loggedInUser);
           Plant: '',
           Division: '',
           NoOfLRs: '',
-          LoadingPoints: '',
           LRNumber: '',
+          LoadingPoints: '',
           UnLoadingPoints: ''
         }, { emitEvent: false });
         this.originalTotalTrucks = 0;
@@ -248,113 +308,29 @@ console.log("Logged in user:", this.loggedInUser);
     this.cd.detectChanges();
   }
 
-  checkActionColumnVisibility() {
-    const firstType = this.rows.at(0).get('VehicleType')?.value;
+ checkActionColumnVisibility() {
+  const firstType = this.rows.at(0).get('VehicleType')?.value;
 
-    if (firstType === 'Full Truck Load') {
-      this.showActionColumn = true;
-      this.cd.detectChanges();
-      return;
-    }
-
-    this.showActionColumn = this.rows.controls.some((row: any) => {
-      const trucks = +row.get('NoOfTrucks')?.value || 0;
-      const lrs = +row.get('NoOfLRs')?.value || 0;
-      const loadPts = +row.get('LoadingPoints')?.value || 0;
-      const unloadPts = +row.get('UnLoadingPoints')?.value || 0;
-      return trucks > 1 || lrs > 1 || loadPts > 1 || unloadPts > 1;
-    });
-
+  if (firstType === 'Full Truck Load') {
+    this.showActionColumn = true;
     this.cd.detectChanges();
+    return;
   }
 
-  redistributeNoOfTrucks() {
-    if (this.originalTotalTrucks === 0 || this.rows.length === 0) return;
-
-    const totalRows = this.rows.length;
-    const trucksPerRow = Math.floor(this.originalTotalTrucks / totalRows);
-    const remainder = this.originalTotalTrucks % totalRows;
-
-    this.rows.controls.forEach((row, index) => {
-      const splitValue = trucksPerRow + (index < remainder ? 1 : 0);
-      row.get('NoOfTrucks',)?.setValue(splitValue, { emitEvent: false });
-    });
-
-    this.updateMaxRowsAllowed();
-    this.cd.detectChanges();
-  }
-
-  redistributeInvoices() {
-    if (this.originalTotalInvoices === 0 || this.rows.length === 0) return;
-
-    const totalRows = this.rows.length;
-    const invoicesPerRow = Math.floor(this.originalTotalInvoices / totalRows);
-    const remainder = this.originalTotalInvoices % totalRows;
-
-    this.rows.controls.forEach((row, index) => {
-      const splitValue = invoicesPerRow + (index < remainder ? 1 : 0);
-      row.get('NoOfInvoices')?.setValue(splitValue, { emitEvent: false });
-    });
-
-    this.cd.detectChanges();
-  }
-
-  redistributeLRs() {
-    if (this.originalTotalLRs === 0 || this.rows.length === 0) return;
-
-    const totalRows = this.rows.length;
-    const lrsPerRow = Math.floor(this.originalTotalLRs / totalRows);
-    const remainder = this.originalTotalLRs % totalRows;
-
-    this.rows.controls.forEach((row, index) => {
-      const splitValue = lrsPerRow + (index < remainder ? 1 : 0);
-      row.get('NoOfLRs')?.setValue(splitValue, { emitEvent: false });
-    });
-
-    this.cd.detectChanges();
-  }
-
-  redistributeLoadingPoints() {
-    if (this.originalTotalLoadingPoints === 0 || this.rows.length === 0) return;
-
-    const totalRows = this.rows.length;
-    const loadingPointsPerRow = Math.floor(this.originalTotalLoadingPoints / totalRows);
-    const remainder = this.originalTotalLoadingPoints % totalRows;
-
-    this.rows.controls.forEach((row, index) => {
-      const splitValue = loadingPointsPerRow + (index < remainder ? 1 : 0);
-      row.get('LoadingPoints')?.setValue(splitValue, { emitEvent: false });
-    });
-
-    this.cd.detectChanges();
-  }
-
-  redistributeUnLoadingPoints() {
-    if (this.originalTotalUnLoadingPoints === 0 || this.rows.length === 0) return;
-
-    const totalRows = this.rows.length;
-    const unloadingPointsPerRow = Math.floor(this.originalTotalUnLoadingPoints / totalRows);
-    const remainder = this.originalTotalUnLoadingPoints % totalRows;
-
-    this.rows.controls.forEach((row, index) => {
-      const splitValue = unloadingPointsPerRow + (index < remainder ? 1 : 0);
-      row.get('UnLoadingPoints')?.setValue(splitValue, { emitEvent: false });
-    });
-
-    this.cd.detectChanges();
-  }
+  // ✅ Only this line needed
+  this.showActionColumn = this.rows.length > 1 || this.maxRowsAllowed > 1;
+  
+  this.cd.detectChanges();
+}
 
   applyFirstRowValuesToAll() {
     const firstRow = this.rows.at(0) as FormGroup;
 
     const fixedValues = {
       VehicleType: firstRow.get('VehicleType')?.value,
-      workorder: firstRow.get('workorder')?.value,
-      VendorCode: firstRow.get('VendorCode')?.value,
+      workorder:   firstRow.get('workorder')?.value,
+      VendorCode:  firstRow.get('VendorCode')?.value,
       Transporter: firstRow.get('Transporter')?.value,
-      // NoOfLRs: firstRow.get('NoOfLRs')?.value,
-      // LoadingPoints: firstRow.get('LoadingPoints')?.value,
-      // UnLoadingPoints: firstRow.get('UnLoadingPoints')?.value
     };
 
     this.rows.controls.forEach((row, index) => {
@@ -364,9 +340,6 @@ console.log("Logged in user:", this.loggedInUser);
       row.get('workorder')?.enable({ emitEvent: false });
       row.get('VendorCode')?.enable({ emitEvent: false });
       row.get('Transporter')?.enable({ emitEvent: false });
-      // row.get('NoOfLRs')?.enable({ emitEvent: false });
-      // row.get('LoadingPoints')?.enable({ emitEvent: false });
-      // row.get('UnLoadingPoints')?.enable({ emitEvent: false });
 
       row.patchValue(fixedValues, { emitEvent: false });
 
@@ -374,12 +347,9 @@ console.log("Logged in user:", this.loggedInUser);
       row.get('workorder')?.disable({ emitEvent: false });
       row.get('VendorCode')?.disable({ emitEvent: false });
       row.get('Transporter')?.disable({ emitEvent: false });
-      // row.get('NoOfLRs')?.disable({ emitEvent: false });
-      // row.get('LoadingPoints')?.disable({ emitEvent: false });
-      // row.get('UnLoadingPoints')?.disable({ emitEvent: false });
     });
 
-    this.redistributeNoOfTrucks();
+    this.redistributeAll();
   }
 
   resetRowsForNonFTL(type: string) {
@@ -403,6 +373,10 @@ console.log("Logged in user:", this.loggedInUser);
     }
 
     this.originalTotalTrucks = 0;
+    this.originalTotalInvoices = 0;
+    this.originalTotalLRs = 0;
+    this.originalTotalLoadingPoints = 0;
+    this.originalTotalUnLoadingPoints = 0;
     this.showActionColumn = false;
     this.cd.detectChanges();
   }
@@ -423,37 +397,15 @@ console.log("Logged in user:", this.loggedInUser);
     this.watchRowFields(newRow, this.rows.length - 1);
     this.isAddingRow = false;
 
-    // Redistribute values after adding row
-    this.redistributeNoOfTrucks();
-    this.redistributeInvoices();
-    this.redistributeLRs();
-    this.redistributeLoadingPoints();
-    this.redistributeUnLoadingPoints();
+    this.redistributeAll();         // ✅ single call handles everything
     this.applyFirstRowValuesToAll();
-  }
-
-  updateMaxRowsAllowed() {
-    const firstRow = this.rows.at(0);
-    const trucks = this.originalTotalTrucks || (+firstRow.get('NoOfTrucks')?.value || 0);
-    const lrs = +firstRow.get('NoOfLRs')?.value || 0;
-    const loadPts = +firstRow.get('LoadingPoints')?.value || 0;
-    const unloadPts = +firstRow.get('UnLoadingPoints')?.value || 0;
-
-    this.maxRowsAllowed = Math.max(trucks, lrs, loadPts, unloadPts);
-    this.maxLimitReached = this.rows.length >= this.maxRowsAllowed && this.maxRowsAllowed > 0;
   }
 
   removeRow(index: number) {
     if (this.rows.length > 1) {
       this.rows.removeAt(index);
-
-      // Redistribute values after removing row
-      this.redistributeNoOfTrucks();
-      this.redistributeInvoices();
-      this.redistributeLRs();
-      this.redistributeLoadingPoints();
-      this.redistributeUnLoadingPoints();
-      this.checkActionColumnVisibility();
+      this.redistributeAll();       // ✅ single call handles everything
+      this.checkActionColumnVisibility(); 
       this.cd.detectChanges();
     }
   }
@@ -471,6 +423,10 @@ console.log("Logged in user:", this.loggedInUser);
     this.maxLimitReached = false;
     this.maxRowsAllowed = 0;
     this.originalTotalTrucks = 0;
+    this.originalTotalInvoices = 0;
+    this.originalTotalLRs = 0;
+    this.originalTotalLoadingPoints = 0;
+    this.originalTotalUnLoadingPoints = 0;
 
     const selected = this.searchOptions.find(opt => opt.key === this.selectedType);
     this.searchPlaceholder = selected ? `Search by ${selected.label}` : 'Select search type';
@@ -515,7 +471,6 @@ console.log("Logged in user:", this.loggedInUser);
 
         if (records.length > 0) {
           this.searchReference = records[0].ZREFNO || records[0].REFNO || records[0].RNO || records[0].REF_NO || '';
-
           console.log('✅ Captured Reference Number:', this.searchReference);
           this.populateDispatchForm(records);
           this.isUpdateMode = true;
@@ -536,39 +491,38 @@ console.log("Logged in user:", this.loggedInUser);
     const rowsArray = this.dispatchForm.get('rows') as FormArray;
     rowsArray.clear();
 
-    // Calculate total trucks from all records
-    let totalTrucks = 0;
-    records.forEach(item => {
-      totalTrucks += (+item.NO_TRUCKS || 0);
-    });
-    this.originalTotalTrucks = totalTrucks;
+    // Calculate original totals from all records
+    this.originalTotalTrucks      = records.reduce((sum, item) => sum + (+item.NO_TRUCKS   || 0), 0);
+    this.originalTotalInvoices    = records.reduce((sum, item) => sum + (+item.NO_INVOICES || 0), 0);
+    this.originalTotalLRs         = records.reduce((sum, item) => sum + (+item.NO_LRS      || 0), 0);
+    this.originalTotalLoadingPoints   = records.reduce((sum, item) => sum + (+item.LOAD_PT  || 0), 0);
+    this.originalTotalUnLoadingPoints = records.reduce((sum, item) => sum + (+item.UNLOAD_PT|| 0), 0);
 
     records.forEach((item, index) => {
       const row = this.fb.group({
-        LINE_NO: [item.LINE_NO || ''],
-        CREATED_DT: [item.CREATED_DT || ''],
-        workorder: [item.WORK_ORDER || ''],
-        VehicleType: [item.VEH_TYPE || '', Validators.required],
-        NoOfTrucks: [item.NO_TRUCKS || '', Validators.required],
-        NoOfInvoices: [item.NO_INVOICES || '', Validators.required],
-        VendorCode: [item.VENDOR_CD || ''],
-        Transporter: [item.TRANSPORTER || '', Validators.required],
-        Plant: [item.WERKS || ''],
-        Division: [item.DIVISION || '', Validators.required],
-        NoOfLRs: [item.NO_LRS || '', Validators.required],
-        LRNumber: [item.LR_NO || '', Validators.required],
-        LoadingPoints: [item.LOAD_PT || '', Validators.required],
-        UnLoadingPoints: [item.UNLOAD_PT || '', Validators.required],
+        LINE_NO:        [item.LINE_NO        || ''],
+        CREATED_DT:     [item.CREATED_DT     || ''],
+        workorder:      [item.WORK_ORDER     || ''],
+        VehicleType:    [item.VEH_TYPE       || '', Validators.required],
+        NoOfTrucks:     [item.NO_TRUCKS      || '', Validators.required],
+        NoOfInvoices:   [item.NO_INVOICES    || '', Validators.required],
+        VendorCode:     [item.VENDOR_CD      || ''],
+        Transporter:    [item.TRANSPORTER    || '', Validators.required],
+        Plant:          [item.WERKS          || ''],
+        Division:       [item.DIVISION       || '', Validators.required],
+        NoOfLRs:        [item.NO_LRS         || '', Validators.required],
+        LRNumber:       [item.LR_NO          || '', Validators.required],
+        LoadingPoints:  [item.LOAD_PT        || '', Validators.required],
+        UnLoadingPoints:[item.UNLOAD_PT      || '', Validators.required],
       });
 
       row.get('LINE_NO')?.disable();
-      
       rowsArray.push(row);
       if (index !== 0) row.get('VehicleType')?.disable();
     });
 
     this.checkActionColumnVisibility();
-    this.updateMaxRowsAllowed();
+    this.redistributeAll();
     this.cd.detectChanges();
   }
 
@@ -588,24 +542,23 @@ console.log("Logged in user:", this.loggedInUser);
     const rawRows = rowsArray.getRawValue();
 
     const payload = rawRows.map((row: any) => ({
-      REFNO: Number(this.searchReference),
-      LINE_NO: Number(row.LINE_NO),
+      REFNO:      Number(this.searchReference),
+      LINE_NO:    Number(row.LINE_NO),
       CREATED_DT: row.CREATED_DT || '',
-      VEH_TYPE: row.VehicleType,
-      NO_TRUCKS: Number(row.NoOfTrucks),
-      NO_INVOICES: Number(row.NoOfInvoices),
-      WORK_ORDER: row.workorder || '',
-      VENDOR_CD: Number(row.VendorCode) || 0,
-      TRANSPORTER: row.Transporter || '',
-      WERKS: row.Plant || '',
-      DIVISION: row.Division || '',
-      NO_LRS: Number(row.NoOfLRs) || 0,
-      LR_NO: row.LRNumber || '',
-      LOAD_PT: row.LoadingPoints || '',
-      UNLOAD_PT: row.UnLoadingPoints || '',
-      ZUSER:row.ZUSER,
-      ZUSER_CH: this.loggedInUser
-
+      VEH_TYPE:   row.VehicleType,
+      NO_TRUCKS:  Number(row.NoOfTrucks),
+      NO_INVOICES:Number(row.NoOfInvoices),
+      WORK_ORDER: row.workorder    || '',
+      VENDOR_CD:  Number(row.VendorCode) || 0,
+      TRANSPORTER:row.Transporter  || '',
+      WERKS:      row.Plant        || '',
+      DIVISION:   row.Division     || '',
+      NO_LRS:     Number(row.NoOfLRs) || 0,
+      LR_NO:      row.LRNumber     || '',
+      LOAD_PT:    row.LoadingPoints || '',
+      UNLOAD_PT:  row.UnLoadingPoints || '',
+      ZUSER:      row.ZUSER,
+      ZUSER_CH:   this.loggedInUser
     }));
 
     console.log("📤 Update payload:", payload);
@@ -688,72 +641,60 @@ console.log("Logged in user:", this.loggedInUser);
     }
   }
 
-  fetchPlantCodeList(): void {
-    this.spinner.show();
-    this.service.fetchVendorCode().subscribe(
-      (res: any) => {
-        if (res && res[0]?.PLANT) {
-          this.PlantCodeList = res[0].PLANT;
-          this.spinner.hide();
-        } else {
-          Swal.fire("No Plant Found", "", "warning");
-        }
-      },
-      error => {
-        this.spinner.hide();
-      }
-    );
-  }
+  // fetchPlantCodeList(): void {
+  //   this.spinner.show();
+  //   this.service.fetchVendorCode().subscribe(
+  //     (res: any) => {
+  //       if (res && res[0]?.PLANT) {
+  //         this.PlantCodeList = res[0].PLANT;
+  //         this.spinner.hide();
+  //       } else {
+  //         Swal.fire("No Plant Found", "", "warning");
+  //       }
+  //     },
+  //     error => {
+  //       this.spinner.hide();
+  //     }
+  //   );
+  // }
 
-  onchangePlantCode(index: number) {
-  const rowsArray = this.dispatchForm.get('rows') as FormArray;
-  const currentRow = rowsArray.at(index);
-  const selectedPlantText = currentRow.get('Plant')?.value;  
-  
-  
-  const plantObj = this.PlantCodeList.find(item => item.PLANT_TEXT === selectedPlantText);
+  // onchangePlantCode(index: number) {
+  //   const rowsArray = this.dispatchForm.get('rows') as FormArray;
+  //   const currentRow = rowsArray.at(index);
+  //   const selectedPlantText = currentRow.get('Plant')?.value;
+  //   const plantObj = this.PlantCodeList.find(item => item.PLANT_TEXT === selectedPlantText);
 
-  if (plantObj) {
-    currentRow.patchValue({ Division: plantObj.DIVISION });
-  } else {
-    currentRow.patchValue({ Division: '' });
-  }
-}
+  //   if (plantObj) {
+  //     currentRow.patchValue({ Division: plantObj.DIVISION });
+  //   } else {
+  //     currentRow.patchValue({ Division: '' });
+  //   }
+  // }
 
- onchangeDivisionCode(index: number) {
-  const rowsArray = this.dispatchForm.get('rows') as FormArray;
-  const currentRow = rowsArray.at(index);
-  const selectedDivision = currentRow.get('Division')?.value;
-  const plantObj = this.PlantCodeList.find(item => item.DIVISION === selectedDivision);
+  // onchangeDivisionCode(index: number) {
+  //   const rowsArray = this.dispatchForm.get('rows') as FormArray;
+  //   const currentRow = rowsArray.at(index);
+  //   const selectedDivision = currentRow.get('Division')?.value;
+  //   const plantObj = this.PlantCodeList.find(item => item.DIVISION === selectedDivision);
 
-  if (plantObj) {
-    currentRow.patchValue({ Plant: plantObj.PLANT_TEXT }); 
-  } else {
-    currentRow.patchValue({ Plant: '' });
-  }
-}
+  //   if (plantObj) {
+  //     currentRow.patchValue({ Plant: plantObj.PLANT_TEXT });
+  //   } else {
+  //     currentRow.patchValue({ Plant: '' });
+  //   }
+  // }
 
-onFilterPlantChange(): void {
-  const plantObj = this.PlantCodeList.find(item => item.PLANT_TEXT === this.filterPlant);  // ✅ Changed
+  // onFilterPlantChange(): void {
+  //   const plantObj = this.PlantCodeList.find(item => item.PLANT_TEXT === this.filterPlant);
+  //   this.filterDivision = plantObj ? plantObj.DIVISION : '';
+  //   this.cd.detectChanges();
+  // }
 
-  if (plantObj) {
-    this.filterDivision = plantObj.DIVISION;
-  } else {
-    this.filterDivision = '';
-  }
-  this.cd.detectChanges();
-}
-
-onFilterDivisionChange(): void {
-  const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
-
-  if (plantObj) {
-    this.filterPlant = plantObj.PLANT_TEXT;  // ✅ Set full text
-  } else {
-    this.filterPlant = '';
-  }
-  this.cd.detectChanges();
-}
+  // onFilterDivisionChange(): void {
+  //   const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
+  //   this.filterPlant = plantObj ? plantObj.PLANT_TEXT : '';
+  //   this.cd.detectChanges();
+  // }
 
   onFilterTransporterChange(): void {
     this.cd.detectChanges();
@@ -781,20 +722,20 @@ onFilterDivisionChange(): void {
 
     const payload = {
       DISPATCH: this.rows.controls.map((row: any) => ({
-        NO_TRUCKS: row.get('NoOfTrucks')?.value,
+        NO_TRUCKS:   row.get('NoOfTrucks')?.value,
         NO_INVOICES: row.get('NoOfInvoices')?.value,
-        veh_type: row.get('VehicleType')?.value,
-        work_order: row.get('workorder')?.value,
-        VENDOR_CD: row.get('VendorCode')?.value,
+        veh_type:    row.get('VehicleType')?.value,
+        work_order:  row.get('workorder')?.value,
+        VENDOR_CD:   row.get('VendorCode')?.value,
         transporter: row.get('Transporter')?.value,
-        WERKS: row.get('Plant')?.value,
-        DIVISION: row.get('Division')?.value,
-        NO_LRS: row.get('NoOfLRs')?.value,
-        lr_no: row.get('LRNumber')?.value,
-        load_pt: row.get('LoadingPoints')?.value,
-        unload_Pt: row.get('UnLoadingPoints')?.value,
-          ZUSER: this.loggedInUser,
-           ZUSER_CH:''
+        WERKS:       row.get('Plant')?.value,
+        DIVISION:    row.get('Division')?.value,
+        NO_LRS:      row.get('NoOfLRs')?.value,
+        lr_no:       row.get('LRNumber')?.value,
+        load_pt:     row.get('LoadingPoints')?.value,
+        unload_Pt:   row.get('UnLoadingPoints')?.value,
+        ZUSER:       this.loggedInUser,
+        ZUSER_CH:    ''
       }))
     };
 
@@ -853,86 +794,84 @@ onFilterDivisionChange(): void {
     this.rows.push(this.createRow(true));
     this.showActionColumn = false;
     this.originalTotalTrucks = 0;
+    this.originalTotalInvoices = 0;
+    this.originalTotalLRs = 0;
+    this.originalTotalLoadingPoints = 0;
+    this.originalTotalUnLoadingPoints = 0;
+    this.maxRowsAllowed = 0;
+    this.maxLimitReached = false;
     this.dispatchForm.markAsPristine();
     this.dispatchForm.markAsUntouched();
     this.dispatchForm.updateValueAndValidity();
     this.cd.detectChanges();
   }
-    
 
-   onFilterSapTypeChange(): void {
-  // Reset all filter fields
-  this.filterFromDate = '';
-  this.filterToDate = '';
-  this.filterPlant = '';
-  this.filterDivision = '';
-  this.filterTransporter = '';
-  this.filterVehicleType = '';
-  
-  // Clear filtered data and results
-  this.filteredData = [];
-  this.filterApplied = false;
-  
-  this.cd.detectChanges();
-}
-
-
+  onFilterSapTypeChange(): void {
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterVehicleType = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+    this.cd.detectChanges();
+  }
 
   applyFilter() {
-  if (!this.filterSapType) {
-    Swal.fire('Warning', 'Please select SAP Type (With SAP / Without SAP)', 'warning');
-    return;
-  }
-
-  if (!this.filterFromDate || !this.filterToDate) {
-    Swal.fire('Warning', 'Please select From Date and To Date', 'warning');
-    return;
-  }
-
-  const payload: any = {
-    DATE_FROM: this.filterFromDate,
-    DATE_TO: this.filterToDate,
-    PLANT: this.filterPlant || '',
-    DIVISION: this.filterDivision || '',
-    TRANSPORTER: this.filterTransporter || '',
-    VEHICLE_TYPE: this.filterVehicleType || ''
-  };
-
-  this.spinner.show();
-
-  // Choose service based on SAP type
-  let request$;
-  if (this.filterSapType === 'SAP') {
-    request$ = this.service.fetchDispatchFiltered(payload);
-  } else if (this.filterSapType === 'Non-SAP') {
-    request$ = this.service.fetchDispatchFilteredNonSap(payload);
-  } else {
-    this.spinner.hide();
-    Swal.fire('Error', 'Invalid SAP Type selected', 'error');
-    return;
-  }
-
-  request$.subscribe({
-    next: (res: any) => {
-      this.spinner.hide();
-      const records = Array.isArray(res) ? res : res?.data || [];
-
-      if (records.length > 0) {
-        this.filteredData = records;
-        this.filterApplied = true;
-        Swal.fire('Success', `Found ${records.length} records`, 'success');
-      } else {
-        this.filteredData = [];
-        this.filterApplied = true;
-        Swal.fire('No Records', 'No records found matching the filters', 'info');
-      }
-    },
-    error: (err) => {
-      this.spinner.hide();
-      Swal.fire('Error', 'Failed to fetch filtered data', 'error');
+    if (!this.filterSapType) {
+      Swal.fire('Warning', 'Please select SAP Type (With SAP / Without SAP)', 'warning');
+      return;
     }
-  });
-}
+
+    if (!this.filterFromDate || !this.filterToDate) {
+      Swal.fire('Warning', 'Please select From Date and To Date', 'warning');
+      return;
+    }
+
+    const payload: any = {
+      DATE_FROM:    this.filterFromDate,
+      DATE_TO:      this.filterToDate,
+      PLANT:        this.filterPlant       || '',
+      DIVISION:     this.filterDivision    || '',
+      TRANSPORTER:  this.filterTransporter || '',
+      VEHICLE_TYPE: this.filterVehicleType || ''
+    };
+
+    this.spinner.show();
+
+    let request$;
+    if (this.filterSapType === 'SAP') {
+      request$ = this.service.fetchDispatchFiltered(payload);
+    } else if (this.filterSapType === 'Non-SAP') {
+      request$ = this.service.fetchDispatchFilteredNonSap(payload);
+    } else {
+      this.spinner.hide();
+      Swal.fire('Error', 'Invalid SAP Type selected', 'error');
+      return;
+    }
+
+    request$.subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        const records = Array.isArray(res) ? res : res?.data || [];
+
+        if (records.length > 0) {
+          this.filteredData = records;
+          this.filterApplied = true;
+          Swal.fire('Success', `Found ${records.length} records`, 'success');
+        } else {
+          this.filteredData = [];
+          this.filterApplied = true;
+          Swal.fire('No Records', 'No records found matching the filters', 'info');
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        Swal.fire('Error', 'Failed to fetch filtered data', 'error');
+      }
+    });
+  }
 
   clearFilters() {
     this.filterFromDate = '';
@@ -953,153 +892,116 @@ onFilterDivisionChange(): void {
     }
 
     const exportData = this.filteredData.map((record) => ({
-      "Reference No": record.ZREFNO || '',
-      "Date": record.ZCREATED_DT || '',
-      "Vehicle Type": record.ZVEH_TYPE || '',
-      "Work Order": record.ZWORK_ORDER || '',
-      "Vendor Code": record.ZVENDOR_CD || '',
-      "Transporter": record.ZTRANSPORTER || '',
-      "Plant": record.ZWERKS || '',
-      "Division": record.ZDIVISION || '',
-      "No. of Trucks": record.ZNO_TRUCKS || '',
-      "No. of LRs": record.ZNO_LRS || '',
-      "LR Number": record.ZLR_NO || '',
-      "Loading Points": record.ZLOAD_PT || '',
-      "Unloading Points": record.ZUNLOAD_PT || '',
-      "No. of Invoices": record.ZNO_INVOICES || '',
-      "Created date": record.ZCREATED_DT || ''
+      "Reference No":    record.ZREFNO        || '',
+      "Date":            record.ZCREATED_DT   || '',
+      "Vehicle Type":    record.ZVEH_TYPE     || '',
+      "Work Order":      record.ZWORK_ORDER   || '',
+      "Vendor Code":     record.ZVENDOR_CD    || '',
+      "Transporter":     record.ZTRANSPORTER  || '',
+      "Plant":           record.ZWERKS        || '',
+      "Division":        record.ZDIVISION     || '',
+      "No. of Trucks":   record.ZNO_TRUCKS    || '',
+      "No. of LRs":      record.ZNO_LRS       || '',
+      "LR Number":       record.ZLR_NO        || '',
+      "Loading Points":  record.ZLOAD_PT      || '',
+      "Unloading Points":record.ZUNLOAD_PT    || '',
+      "No. of Invoices": record.ZNO_INVOICES  || '',
+      "Created date":    record.ZCREATED_DT   || ''
     }));
 
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Dispatch Records');
 
-    // Auto column width
     const colWidths = Object.keys(exportData[0]).map(key => ({
       wch: Math.max(key.length + 5, 15)
     }));
     ws['!cols'] = colWidths;
 
     XLSX.writeFile(wb, 'Dispatch_Records.xlsx');
-     Swal.fire('Success', `Excel file downloaded: Dispatch_Records.xlsx`, 'success');
+    Swal.fire('Success', `Excel file downloaded: Dispatch_Records.xlsx`, 'success');
   }
 
   downloadPDF() {
-  if (!this.filteredData || this.filteredData.length === 0) {
-    Swal.fire('Warning', 'No data to download. Please apply filters first.', 'warning');
-    return;
+    if (!this.filteredData || this.filteredData.length === 0) {
+      Swal.fire('Warning', 'No data to download. Please apply filters first.', 'warning');
+      return;
+    }
+
+    const doc = new (jsPDF as any).default('l', 'mm', 'a3');
+
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Dispatch Records Report', doc.internal.pageSize.getWidth() / 2, 12, { align: 'center' });
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, doc.internal.pageSize.getWidth() / 2, 18, { align: 'center' });
+
+    const headers = [[
+      'Reference No', 'Date', 'Vehicle Type', 'Work Order', 'Vendor Code',
+      'Transporter', 'Plant', 'Division', 'No. of Trucks', 'No. of LRs',
+      'LR Number', 'Loading Points', 'Unloading Points', 'No. of Invoices', 'Created date'
+    ]];
+
+    const data = this.filteredData.map(record => ([
+      record.ZREFNO       || '',
+      record.ZCREATED_DT  || '',
+      record.ZVEH_TYPE    || '',
+      record.ZWORK_ORDER  || '',
+      record.ZVENDOR_CD   || '',
+      record.ZTRANSPORTER || '',
+      record.ZWERKS       || '',
+      record.ZDIVISION    || '',
+      record.ZNO_TRUCKS   || '',
+      record.ZNO_LRS      || '',
+      record.ZLR_NO       || '',
+      record.ZLOAD_PT     || '',
+      record.ZUNLOAD_PT   || '',
+      record.ZNO_INVOICES || '',
+      record.ZCREATED_DT  || ''
+    ]));
+
+    autoTable(doc, {
+      head: headers,
+      body: data,
+      startY: 25,
+      styles: { fontSize: 8, cellPadding: 3 },
+      headStyles: { fillColor: [52, 152, 219] }
+    });
+
+    doc.save('Dispatch_Records.pdf');
+    Swal.fire('Success', `PDF file downloaded: Dispatch_Records.pdf`, 'success');
   }
 
-  const doc = new (jsPDF as any).default('l', 'mm', 'a3'); // landscape
+  refreshScreen() {
+    this.orderType = '';
+    this.sapType = '';
+    this.showForm = false;
+    this.isUpdateMode = false;
+    this.searchReference = '';
+    this.selectedType = '';
+    this.searchValue = '';
+    this.searchPlaceholder = 'Select search type';
+    this.filterFromDate = '';
+    this.filterToDate = '';
+    this.filterPlant = '';
+    this.filterDivision = '';
+    this.filterTransporter = '';
+    this.filterSapType = '';
+    this.filterVehicleType = '';
+    this.filteredData = [];
+    this.filterApplied = false;
+    this.resetAll();
 
-  /* ===== PDF HEADING ===== */
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Dispatch Records Report', doc.internal.pageSize.getWidth() / 2, 12, {
-    align: 'center'
-  });
+    Swal.fire({
+      text: 'Screen refreshed successfully',
+      icon: 'success',
+      confirmButtonText: 'Ok',
+      timer: 4000
+    });
 
-  /* Optional subtitle */
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`Generated on: ${new Date().toLocaleDateString()}`,
-    doc.internal.pageSize.getWidth() / 2,
-    18,
-    { align: 'center' }
-  );
-
-  const headers = [[
-    'Reference No',
-    'Date',
-    'Vehicle Type',
-    'Work Order',
-    'Vendor Code',
-    'Transporter',
-    'Plant',
-    'Division',
-    'No. of Trucks',
-    'No. of LRs',
-    'LR Number',
-    'Loading Points',
-    'Unloading Points',
-    'No. of Invoices',
-    'Created date'
-  ]];
-
-  const data = this.filteredData.map(record => ([
-    record.ZREFNO || '',
-    record.ZCREATED_DT || '',
-    record.ZVEH_TYPE || '',
-    record.ZWORK_ORDER || '',
-    record.ZVENDOR_CD || '',
-    record.ZTRANSPORTER || '',
-    record.ZWERKS || '',
-    record.ZDIVISION || '',
-    record.ZNO_TRUCKS || '',
-    record.ZNO_LRS || '',
-    record.ZLR_NO || '',
-    record.ZLOAD_PT || '',
-    record.ZUNLOAD_PT || '',
-    record.ZNO_INVOICES || '',
-    record.ZCREATED_DT || ''
-  ]));
-
-  
-
-  autoTable(doc, {
-    head: headers,
-    body: data,
-    startY: 25, // ⬅️ important: start after heading
-    styles: {
-      fontSize: 8,
-      cellPadding: 3
-    },
-    headStyles: {
-      fillColor: [52, 152, 219]
-    }
-  });
-
-  doc.save('Dispatch_Records.pdf');
-   Swal.fire('Success', `PDF file downloaded: Dispatch_Records.pdf  `, 'success');
-}
-refreshScreen() {
- 
-  // Reset order type and SAP type
-  this.orderType = '';
-  this.sapType = '';
-  this.showForm = false;
-  this.isUpdateMode = false;
-  
-  // Reset search fields
-  this.searchReference = '';
-  this.selectedType = '';
-  this.searchValue = '';
-  this.searchPlaceholder = 'Select search type';
-  
-  // Reset filter fields
-  this.filterFromDate = '';
-  this.filterToDate = '';
-  this.filterPlant = '';
-  this.filterDivision = '';
-  this.filterTransporter = '';
-  this.filterSapType = '';
-  this.filterVehicleType = '';
-  this.filteredData = [];
-  this.filterApplied = false;
-  
-  // Reset form
-  this.resetAll();
-  
-  // Show success message
-  Swal.fire({
-    text: 'Screen refreshed successfully',
-    icon: 'success',
-   
-     confirmButtonText: 'Ok',
-    timer: 4000
-  });
-  
-  this.cd.detectChanges();
-}
+    this.cd.detectChanges();
+  }
 
 }

@@ -96,7 +96,9 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   InsuranceClaimTrackingData: any[] = [];
   filterSapType: string = '';
   invoiceF4List: string[] = [];
-    loggedInUser: string = '';
+  loggedInUser: string = '';
+  plantList: any;
+  divisionList: any;
 
   constructor(
     private fb: FormBuilder,
@@ -107,9 +109,16 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-        const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
-this.loggedInUser = userData.USER || '';
-console.log("Logged in user:", this.loggedInUser);
+    const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    this.loggedInUser = userData.USER || '';
+    console.log("Logged in user:", this.loggedInUser);
+    this.plantList = userData.PLANTS || [];
+ 
+  // ✅ Divisions from login response
+  this.divisionList = userData.DIV || [];
+ 
+  console.log("Plants:", this.plantList);
+  console.log("Divisions:", this.divisionList);
     this.buildHeaderForm();
     this.buildItemForm();
     this.fetchTransporter();
@@ -375,7 +384,7 @@ console.log("Logged in user:", this.loggedInUser);
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
       LINE_NO: values.lineNumber || '',
-       ZUSER: this.loggedInUser
+      ZUSER: this.loggedInUser
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -826,24 +835,35 @@ console.log("Logged in user:", this.loggedInUser);
       Swal.fire('Warning', `Please enter ${this.orderType === 'Inward' ? 'PO' : 'Invoice'} number`, 'warning');
       return;
     }
+    // ✅ Get selected reference row values
+    const selectedRef = this.selectedItems[0] || {};
 
-    const payload = { VBELN: referenceNumber };
+    const payload = {
+      VBELN: referenceNumber,
+      ZREFNO: selectedRef.referenceNumber || '',
+      ZMAPID: selectedRef.MAPID || ''
+    };
+    console.log('With Sap Invoice Fetch Payload:', payload);
+
 
     this.spinner.show();
     this.service.InsuranceClaimTrackingfetch(payload).subscribe({
       next: (res: any) => {
         this.spinner.hide();
+        console.log('With Sap Invoice Fetch Response:', res);
 
-        if (!res || res.length === 0) {
-          Swal.fire('No data found', '', 'info');
+        if (res?.STATUS === 'False') {
+          Swal.fire('Info', res.MESSAGE, 'info');
           return;
         }
 
         Swal.fire('Success', 'Invoice Details fetched successfully!', 'success');
 
-        const header = res[0].HEADER;
-        const items = res[0].ITEM;
+        const header = res[0]?.HEADER;
+        const items = res[0]?.ITEM || [];
 
+        console.log("Header:", header);
+        console.log("Items:", items);
         // ✅ Hide search results when showing invoice data
         this.SavedDataShow = false;
         this.searchOptionsList = [];
@@ -964,9 +984,9 @@ console.log("Logged in user:", this.loggedInUser);
       // Ensure backend receives z-prefixed bill/workorder keys as well
       row.ZBILLNO = row.BILLNO || row.ZBILLNO || '';
       row.ZWORK_ORDER = row.WORK_ORDER || row.ZWORK_ORDER || '';
-        headerValue.ZUSER = this.loggedInUser;
-  headerValue.ZUSER = this.loggedInUser;
-headerValue.ZUSER_CH = ''
+      headerValue.ZUSER = this.loggedInUser;
+      headerValue.ZUSER = this.loggedInUser;
+      headerValue.ZUSER_CH = ''
     });
 
     // 6️⃣ Final payload
@@ -1122,9 +1142,12 @@ headerValue.ZUSER_CH = ''
       Swal.fire('Warning', 'Please select DC Reference Number', 'warning');
       return;
     }
-
+    const selectedRef = this.selectedItems[0] || {};
     const payload = {
-      VBELN: dcRefNo.toString().trim()
+      VBELN: dcRefNo.toString().trim(),
+      ZREFNO: selectedRef.referenceNumber || '',
+      ZMAPID: selectedRef.MAPID || ''
+
     };
 
     console.log('📤 Non-SAP Fetch Payload:', payload);
@@ -1132,18 +1155,21 @@ headerValue.ZUSER_CH = ''
     this.spinner.show();
 
     this.service.fetchinvoicelistnonsap(payload).subscribe({
-      next: (res: any[]) => {
+      next: (res: any) => {
         this.spinner.hide();
 
-        if (!res || res.length === 0) {
-          Swal.fire('No data found', '', 'info');
+        if (res?.STATUS === 'False') {
+          Swal.fire('Info', res.MESSAGE, 'info');
           return;
         }
 
         Swal.fire('Success', 'Invoice Details fetched successfully!', 'success');
 
-        const header = res[0].HEADER;
-        const items = res[0].ITEM;
+        const header = res[0]?.HEADER;
+        const items = res[0]?.ITEM || [];
+
+        console.log("Header:", header);
+        console.log("Items:", items);
 
         this.showTable = true;
         this.ShowHeaderForm = true;
@@ -1234,8 +1260,8 @@ headerValue.ZUSER_CH = ''
       || this.selectedItems[0]?.lineNo
       || this.selectedItems[0]?.ZLINE_NO
       || null;
-        headerValue.ZUSER = this.loggedInUser;
-headerValue.ZUSER_CH = ''
+    headerValue.ZUSER = this.loggedInUser;
+    headerValue.ZUSER_CH = ''
     const itemsPayload = this.items.controls
       .filter(ctrl => ctrl.value.selected === true)
       .map(ctrl => ({
@@ -1366,8 +1392,8 @@ headerValue.ZUSER_CH = ''
         ZPAY_INFO: headerRow.ZPAY_INFO,
         ZUTR: headerRow.ZUTR,
         ZCLM_SET_DT: headerRow.ZCLM_SET_DT,
-ZUSER:'',
-ZUSER_CH:this.loggedInUser,
+        ZUSER: '',
+        ZUSER_CH: this.loggedInUser,
 
       };
 
@@ -1388,8 +1414,8 @@ ZUSER_CH:this.loggedInUser,
         ZTRANSPORTER: item.ZTRANSPORTER || null,
         ZWORK_ORDER: item.ZWORK_ORDER || null,
         ZBILLNO: item.ZBILLNO || null,
-        ZUSER:'',
-ZUSER_CH:this.loggedInUser,
+        ZUSER: '',
+        ZUSER_CH: this.loggedInUser,
 
       }));
 
@@ -1447,7 +1473,7 @@ ZUSER_CH:this.loggedInUser,
     });
   }
 
-  deleteRow(array: any[], index: number): void {
+   deleteRow(array: any[], index: number): void {
     const row = array[index];
 
     Swal.fire({
@@ -1472,8 +1498,8 @@ ZUSER_CH:this.loggedInUser,
       };
 
       const apiCall = this.sapType === 'SAP'
-        ? this.service.InvoiceloaddetailsDeleteWithsap(payload)
-        : this.service.InvoiceloaddetailsDeleteWithoutsap(payload);
+        ? this.service.InsuranceClaimTrackingDeleteWithSap(payload)
+        : this.service.InsuranceClaimTrackingDeleteWithoutSap(payload);
 
       apiCall.subscribe({
         next: (res: any) => {
@@ -1508,6 +1534,8 @@ ZUSER_CH:this.loggedInUser,
       });
     });
   }
+
+
 
 
 
@@ -1582,27 +1610,27 @@ ZUSER_CH:this.loggedInUser,
     );
   }
 
-  onFilterPlantChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.PLANT_TEXT === this.filterPlant);  // ✅ Changed
+  // onFilterPlantChange(): void {
+  //   const plantObj = this.PlantCodeList.find(item => item.PLANT_TEXT === this.filterPlant);  // ✅ Changed
 
-    if (plantObj) {
-      this.filterDivision = plantObj.DIVISION;
-    } else {
-      this.filterDivision = '';
-    }
-    this.cd.detectChanges();
-  }
+  //   if (plantObj) {
+  //     this.filterDivision = plantObj.DIVISION;
+  //   } else {
+  //     this.filterDivision = '';
+  //   }
+  //   this.cd.detectChanges();
+  // }
 
-  onFilterDivisionChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
+  // onFilterDivisionChange(): void {
+  //   const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
 
-    if (plantObj) {
-      this.filterPlant = plantObj.PLANT_TEXT;  // ✅ Set full text
-    } else {
-      this.filterPlant = '';
-    }
-    this.cd.detectChanges();
-  }
+  //   if (plantObj) {
+  //     this.filterPlant = plantObj.PLANT_TEXT;  // ✅ Set full text
+  //   } else {
+  //     this.filterPlant = '';
+  //   }
+  //   this.cd.detectChanges();
+  // }
 
   onFilterSapTypeChange(): void {
     // Reset all filter fields

@@ -218,9 +218,9 @@
                   <div class="d-flex align-items-center">
                     <select formControlName="Plant" (change)="onchangePlantCode(i)">
                       <option value="">Select Plant</option>
-                      <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT_TEXT">
-                        {{plant.PLANT_TEXT}}
-                      </option>
+                    <option *ngFor="let p of plantList" [value]="p.WERKS">
+                  {{p.PLANT_TEXT}}
+                    </option>
                     </select>
                   </div>
                 </td>
@@ -230,9 +230,9 @@
                   <div class="d-flex align-items-center">
                     <select formControlName="Division" (change)="onchangeDivisionCode(i)">
                       <option value="">Select Division</option>
-                      <option *ngFor="let plant of PlantCodeList" [value]="plant.DIVISION">
-                        {{ plant.DIVISION }}
-                      </option>
+                        <option *ngFor="let d of divisionList" [value]="d.DIVISION">
+                  {{ d.DIV_TEXT }}
+                </option>
                     </select>
                   </div>
                 </td>
@@ -330,27 +330,32 @@
           </div>
 
           <!-- Plant -->
-          <div class="form-field">
-            <select [(ngModel)]="filterPlant" (change)="onFilterPlantChange()">
-              <option value="">Select Plant</option>
-              <option *ngFor="let plant of PlantCodeList" [value]="plant.PLANT_TEXT">
-                {{ plant.PLANT_TEXT }}
-              </option>
-            </select>
-            <label>Plant</label>
-          </div>
+<div class="form-field">
+              <select [(ngModel)]="filterPlant">
+                <option value="">Select Plant</option>
+ 
+                <option *ngFor="let p of plantList" [value]="p.WERKS">
+                  {{p.PLANT_TEXT}}
+                </option>
+ 
+              </select>
+              <label>Plant</label>
+            </div>
 
 
           <!-- Division (Auto-filled from Plant OR select to fill Plant) -->
-          <div class="form-field">
-            <select [(ngModel)]="filterDivision" (change)="onFilterDivisionChange()">
-              <option value="">Select Division</option>
-              <option *ngFor="let plant of PlantCodeList" [value]="plant.DIVISION">
-                {{ plant.DIVISION }}
-              </option>
-            </select>
-            <label>Division</label>
-          </div>
+<div class="form-field">
+              <select [(ngModel)]="filterDivision">
+ 
+                <option value="">Select Division</option>
+ 
+                <option *ngFor="let d of divisionList" [value]="d.DIVISION">
+                  {{ d.DIV_TEXT }}
+                </option>
+ 
+              </select>
+              <label>Division</label>
+            </div>
 
           <!-- Transporter -->
           <div class="form-field">

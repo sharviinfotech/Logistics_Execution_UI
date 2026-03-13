@@ -99,7 +99,9 @@ export class TransitDamageInfoComponent implements OnInit {
   TransitdamageInfoData: any[] = [];
   filterSapType: string = '';
   invoiceF4List: string[] = [];
- loggedInUser: string = '';
+  loggedInUser: string = '';
+  plantList: any;
+  divisionList: any;
 
   constructor(
     private fb: FormBuilder,
@@ -110,9 +112,16 @@ export class TransitDamageInfoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-      const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
-this.loggedInUser = userData.USER || '';
-console.log("Logged in user:", this.loggedInUser);
+    const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    this.loggedInUser = userData.USER || '';
+    console.log("Logged in user:", this.loggedInUser);
+    this.plantList = userData.PLANTS || [];
+ 
+  // ✅ Divisions from login response
+  this.divisionList = userData.DIV || [];
+ 
+  console.log("Plants:", this.plantList);
+  console.log("Divisions:", this.divisionList);
     this.buildHeaderForm();
     this.buildItemForm();
     this.fetchTransporter();
@@ -373,7 +382,7 @@ console.log("Logged in user:", this.loggedInUser);
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
       LINE_NO: values.lineNumber || '',
-       ZUSER: this.loggedInUser
+      ZUSER: this.loggedInUser
 
     };
 
@@ -816,44 +825,60 @@ console.log("Logged in user:", this.loggedInUser);
   }
 
   fetchInvoiceDetails() {
-    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+
+    const referenceNumber =
+      this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
 
     if (!referenceNumber) {
-      Swal.fire('Warning', `Please enter ${this.orderType === 'Inward' ? 'PO' : 'Invoice'} number`, 'warning');
+      Swal.fire(
+        'Warning',
+        `Please enter ${this.orderType === 'Inward' ? 'PO' : 'Invoice'} number`,
+        'warning'
+      );
       return;
     }
 
+    // ✅ Get selected reference row values
+    const selectedRef = this.selectedItems[0] || {};
+
     const payload = {
-      VBELN: referenceNumber
+      VBELN: referenceNumber,
+      ZREFNO: selectedRef.referenceNumber || '',
+      ZMAPID: selectedRef.MAPID || ''
     };
 
+    console.log('📤 Invoice Fetch Payload:', payload);
+
     this.spinner.show();
+
     this.service.TransitDamageInfofetch(payload).subscribe({
       next: (res: any) => {
         this.spinner.hide();
 
+        console.log('📥 Invoice Fetch Response:', res);
 
-        if (!res || res.length === 0) {
-          Swal.fire("No data found", '', 'info');
+        if (res?.STATUS === 'False') {
+          Swal.fire('Info', res.MESSAGE, 'info');
           return;
         }
 
         Swal.fire('Success', 'Invoice Details fetched successfully!', 'success');
 
-        const header = res[0].HEADER;
-        const items = res[0].ITEM;
-        // ✅ Hide search results when showing invoice data
+        const header = res[0]?.HEADER;
+        const items = res[0]?.ITEM || [];
+
+        console.log("Header:", header);
+        console.log("Items:", items);
+
         this.SavedDataShow = false;
         this.searchOptionsList = [];
         this.showTable = false;
-
 
         this.ShowHeaderForm = true;
         this.showForm = true;
 
         this.HeaderForm.patchValue({
           INV_NO: header.INV_NO,
-
           INV_DATE: header.INV_DATE,
           FSR_RPT_DT: header.FSR_RPT_DT,
           BASIC_VALUE: header.BASIC_VALUE,
@@ -869,14 +894,13 @@ console.log("Logged in user:", this.loggedInUser);
           SALE_PERSON: header.SALE_PERSON,
           LOCATION: header.LOCATION,
           ROUTE: header.ROUTE,
-          REFNO: header.REFNO,
+          REFNO: header.REFNO
         });
 
-        while (this.items.length !== 0) {
-          this.items.removeAt(0);
-        }
+        this.items.clear();
 
         items.forEach((x: any) => {
+
           const row = this.fb.group({
             selected: [false],
             ZMAPID: [x.ZMAPID || x.MAPID || ''],
@@ -894,7 +918,9 @@ console.log("Logged in user:", this.loggedInUser);
           });
 
           this.items.push(row);
+
         });
+
       },
       error: (err) => {
         this.spinner.hide();
@@ -902,6 +928,7 @@ console.log("Logged in user:", this.loggedInUser);
         Swal.fire("Error fetching data", '', 'error');
       }
     });
+
   }
 
   onSaveActionSap(action: 'stay' | 'next' | 'previous' = 'stay') {
@@ -937,12 +964,12 @@ console.log("Logged in user:", this.loggedInUser);
     headerValue.CLOSING_DT = headerValue.CLOSING_DT || null;
     headerValue.ROUTE = headerValue.ROUTE || null;
     headerValue.ZUSER = this.loggedInUser;
-headerValue.ZUSER_CH = ''
-      selectedItems.forEach((row: any) => {
-        row.INV_NO = invoiceNo;
-        row.REFNO = headerValue.REFNO;
-     
-      });
+    headerValue.ZUSER_CH = ''
+    selectedItems.forEach((row: any) => {
+      row.INV_NO = invoiceNo;
+      row.REFNO = headerValue.REFNO;
+
+    });
 
 
     const payload = {
@@ -1077,8 +1104,13 @@ headerValue.ZUSER_CH = ''
       return;
     }
 
+    const selectedRef = this.selectedItems[0] || {};
+
     const payload = {
-      VBELN: dcRefNo.toString().trim()
+      VBELN: dcRefNo.toString().trim(),
+      ZREFNO: selectedRef.referenceNumber || '',
+      ZMAPID: selectedRef.MAPID || ''
+
     };
 
     console.log('📤 Non-SAP Fetch Payload:', payload);
@@ -1086,16 +1118,29 @@ headerValue.ZUSER_CH = ''
     this.spinner.show();
 
     this.service.TransitDamageinfofetchNonsap(payload).subscribe({
-      next: (res: any[]) => {
+      next: (res: any) => {
         this.spinner.hide();
 
-        if (!res || res.length === 0) {
-          Swal.fire('No data found', '', 'info');
+        // if (!res || res.length === 0) {
+        //   Swal.fire('No data found', '', 'info');
+        //   return;
+        // }
+
+        // const header = res[0].HEADER;
+        // const items = res[0].ITEM;
+
+                if (res?.STATUS === 'False') {
+          Swal.fire('Info', res.MESSAGE, 'info');
           return;
         }
 
-        const header = res[0].HEADER;
-        const items = res[0].ITEM;
+        Swal.fire('Success', 'Invoice Details fetched successfully!', 'success');
+
+        const header = res[0]?.HEADER;
+        const items = res[0]?.ITEM || [];
+
+        console.log("Header:", header);
+        console.log("Items:", items);
 
         this.showTable = true;
         this.ShowHeaderForm = true;
@@ -1168,9 +1213,9 @@ headerValue.ZUSER_CH = ''
     headerValue.INV_NO = invoiceNo;
     headerValue.REFNO = refNo;
     headerValue.LINE_NO = this.selectedItems[0]?.lineNumber || null;
-      headerValue.ZUSER = this.loggedInUser;
-headerValue.ZUSER_CH = ''
-    
+    headerValue.ZUSER = this.loggedInUser;
+    headerValue.ZUSER_CH = ''
+
 
     /* ITEMS */
     const itemsPayload = this.items.controls
@@ -1289,7 +1334,7 @@ headerValue.ZUSER_CH = ''
         ZWORK_ORDER: item.ZWORK_ORDER || null,
         ZBILLNO: item.ZBILLNO || null,
         ZPRODUCT: item.ZPRODUCT || null,
-          ZUSER: '',
+        ZUSER: '',
         ZUSER_CH: this.loggedInUser
       }));
 
@@ -1504,27 +1549,27 @@ headerValue.ZUSER_CH = ''
     );
   }
 
-  onFilterPlantChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.PLANT_TEXT === this.filterPlant);  // ✅ Changed
+  // onFilterPlantChange(): void {
+  //   const plantObj = this.PlantCodeList.find(item => item.PLANT_TEXT === this.filterPlant);  // ✅ Changed
 
-    if (plantObj) {
-      this.filterDivision = plantObj.DIVISION;
-    } else {
-      this.filterDivision = '';
-    }
-    this.cd.detectChanges();
-  }
+  //   if (plantObj) {
+  //     this.filterDivision = plantObj.DIVISION;
+  //   } else {
+  //     this.filterDivision = '';
+  //   }
+  //   this.cd.detectChanges();
+  // }
 
-  onFilterDivisionChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
+  // onFilterDivisionChange(): void {
+  //   const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
 
-    if (plantObj) {
-      this.filterPlant = plantObj.PLANT_TEXT;  // ✅ Set full text
-    } else {
-      this.filterPlant = '';
-    }
-    this.cd.detectChanges();
-  }
+  //   if (plantObj) {
+  //     this.filterPlant = plantObj.PLANT_TEXT;  // ✅ Set full text
+  //   } else {
+  //     this.filterPlant = '';
+  //   }
+  //   this.cd.detectChanges();
+  // }
 
   onFilterSapTypeChange(): void {
     // Reset all filter fields
