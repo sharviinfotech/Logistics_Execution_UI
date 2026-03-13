@@ -82,6 +82,8 @@ export class ShipmentDetailsComponent implements OnInit {
   invoiceF4List: string[] = [];
   fullReferenceData: any[] = [];
   loggedInUser: string = '';
+   plantList: any;
+  divisionList: any;
 
 
   constructor(
@@ -105,6 +107,13 @@ export class ShipmentDetailsComponent implements OnInit {
  const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
 this.loggedInUser = userData.USER || '';
 console.log("Logged in user:", this.loggedInUser);
+ this.plantList = userData.PLANTS || [];
+
+  // ✅ Divisions from login response
+  this.divisionList = userData.DIV || [];
+
+  console.log("Plants:", this.plantList);
+  console.log("Divisions:", this.divisionList);
     this.fetchIncoterms();
     this.fetchTransporter();
     this.fetchPlantCodeList();
@@ -1288,30 +1297,30 @@ console.log("Logged in user:", this.loggedInUser);
     );
   }
 
-  onFilterDivisionChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
+  // onFilterDivisionChange(): void {
+  //   const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
 
-    if (plantObj) {
-      this.filterPlant = plantObj.PLANT + '_' + plantObj.PLANT_DESC;
-    } else {
-      this.filterPlant = '';
-    }
-    this.cd.detectChanges();
-  }
+  //   if (plantObj) {
+  //     this.filterPlant = plantObj.PLANT + '_' + plantObj.PLANT_DESC;
+  //   } else {
+  //     this.filterPlant = '';
+  //   }
+  //   this.cd.detectChanges();
+  // }
 
-  onFilterPlantChange(): void {
-    // Extract the plant code from the combined value
-    const plantCode = this.filterPlant.split('_')[0];
+  // onFilterPlantChange(): void {
+  //   // Extract the plant code from the combined value
+  //   const plantCode = this.filterPlant.split('_')[0];
 
-    const plantObj = this.PlantCodeList.find(item => item.PLANT === plantCode);
+  //   const plantObj = this.PlantCodeList.find(item => item.PLANT === plantCode);
 
-    if (plantObj) {
-      this.filterDivision = plantObj.DIVISION;
-    } else {
-      this.filterDivision = '';
-    }
-    this.cd.detectChanges();
-  }
+  //   if (plantObj) {
+  //     this.filterDivision = plantObj.DIVISION;
+  //   } else {
+  //     this.filterDivision = '';
+  //   }
+  //   this.cd.detectChanges();
+  // }
 
   onFilterSapTypeChange(): void {
     // Reset all filter fields

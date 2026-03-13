@@ -79,6 +79,8 @@ export class TransitInfoComponent implements OnInit {
   invoiceF4List: string[] = [];
   fullReferenceData: any[] = [];
    loggedInUser: string = '';
+     plantList: any;
+  divisionList: any;
 
 
 
@@ -94,6 +96,14 @@ export class TransitInfoComponent implements OnInit {
            const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
 this.loggedInUser = userData.USER || '';
 console.log("Logged in user:", this.loggedInUser);
+ this.plantList = userData.PLANTS || [];
+
+  // ✅ Divisions from login response
+  this.divisionList = userData.DIV || [];
+
+  console.log("Plants:", this.plantList);
+  console.log("Divisions:", this.divisionList);
+
     this.initializeForm();
     this.fetchTransporter();
     this.fetchPlantCodeList();
@@ -995,27 +1005,27 @@ console.log("Logged in user:", this.loggedInUser);
     );
   }
 
-  onFilterPlantChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.PLANT_TEXT === this.filterPlant);  // ✅ Changed
+  // onFilterPlantChange(): void {
+  //   const plantObj = this.PlantCodeList.find(item => item.PLANT_TEXT === this.filterPlant);  // ✅ Changed
 
-    if (plantObj) {
-      this.filterDivision = plantObj.DIVISION;
-    } else {
-      this.filterDivision = '';
-    }
-    this.cd.detectChanges();
-  }
+  //   if (plantObj) {
+  //     this.filterDivision = plantObj.DIVISION;
+  //   } else {
+  //     this.filterDivision = '';
+  //   }
+  //   this.cd.detectChanges();
+  // }
 
-  onFilterDivisionChange(): void {
-    const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
+  // onFilterDivisionChange(): void {
+  //   const plantObj = this.PlantCodeList.find(item => item.DIVISION === this.filterDivision);
 
-    if (plantObj) {
-      this.filterPlant = plantObj.PLANT_TEXT;  // ✅ Set full text
-    } else {
-      this.filterPlant = '';
-    }
-    this.cd.detectChanges();
-  }
+  //   if (plantObj) {
+  //     this.filterPlant = plantObj.PLANT_TEXT;  // ✅ Set full text
+  //   } else {
+  //     this.filterPlant = '';
+  //   }
+  //   this.cd.detectChanges();
+  // }
 
   onFilterSapTypeChange(): void {
     // Reset all filter fields

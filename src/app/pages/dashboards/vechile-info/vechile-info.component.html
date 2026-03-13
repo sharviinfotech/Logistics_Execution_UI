@@ -446,7 +446,7 @@
             <input type="date" [(ngModel)]="filterToDate" />
             <label>To Date</label>
           </div>
-
+<!-- 
           <div class="form-field">
             <select [(ngModel)]="filterPlant" (change)="onFilterPlantChange()">
               <option value="">Select Plant</option>
@@ -455,17 +455,40 @@
               </option>
             </select>
             <label>Plant</label>
-          </div>
+          </div> -->
+           <div class="form-field">
+              <select [(ngModel)]="filterPlant">
+                <option value="">Select Plant</option>
+
+                <option *ngFor="let p of plantList" [value]="p.WERKS">
+                  {{p.PLANT_TEXT}}
+                </option>
+
+              </select>
+              <label>Plant</label>
+            </div>
 
           <!-- Division -->
-          <div class="form-field">
+          <!-- <div class="form-field">
             <select [(ngModel)]="filterDivision" (change)="onFilterDivisionChange()">
               <option value="">Select Division</option>
               <option *ngFor="let plant of PlantCodeList" [value]="plant.DIVISION">{{ plant.DIVISION }}
               </option>
             </select>
             <label>Division</label>
-          </div>
+          </div> -->
+              <div class="form-field">
+              <select [(ngModel)]="filterDivision">
+
+                <option value="">Select Division</option>
+
+                <option *ngFor="let d of divisionList" [value]="d.DIVISION">
+                  {{ d.DIV_TEXT }}
+                </option>
+
+              </select>
+              <label>Division</label>
+            </div>
 
           <!-- Customer -->
           <div class="form-field">

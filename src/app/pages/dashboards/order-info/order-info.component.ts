@@ -71,6 +71,8 @@ export class OrderInfoComponent implements OnInit {
   orderInfoData: any[] = [];
   dispatchData: any[] = [];
    loggedInUser: string = '';
+   filteredDivisions:any[]=[];
+ 
 
   filterSapType: string = '';
   showOrderInfoTable = false;
@@ -120,10 +122,16 @@ export class OrderInfoComponent implements OnInit {
     const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
 this.loggedInUser = userData.USER || '';
 console.log("Logged in user:", this.loggedInUser);
+   this.plantList = userData.PLANTS || [];
+
+  // ✅ Divisions from login response
+  this.divisionList = userData.DIV || [];
+
+  console.log("Plants:", this.plantList);
+  console.log("Divisions:", this.divisionList);
 
 
-  console.log("User Plants:", this.plantList);
-  console.log("User Divisions:", this.divisionList);
+
 
     // this.fetchCustomers();  //Due to 404 error pradeep comment this line this one cant use in this screen any where
     this.fetchTransporter();
@@ -258,75 +266,75 @@ console.log("Logged in user:", this.loggedInUser);
     console.log('✅ Validators set successfully');
   }
 
-  onPlantChange(): void {
-    const selectedPlant = this.OrderInfo.get('Plant')?.value;
-    console.log("🌱 Plant selected:", selectedPlant);
+  // onPlantChange(): void {
+  //   const selectedPlant = this.OrderInfo.get('Plant')?.value;
+  //   console.log("🌱 Plant selected:", selectedPlant);
 
-    // Only fetch division for Non-SAP mode
-    if (!this.isSap() && selectedPlant) {
-      // Find the selected plant object from plantList
-      const plantObj = this.plantList?.find(
-        (p: any) => p.PLANT_DESC === selectedPlant
-      );
+  //   // Only fetch division for Non-SAP mode
+  //   if (!this.isSap() && selectedPlant) {
+  //     // Find the selected plant object from plantList
+  //     const plantObj = this.plantList?.find(
+  //       (p: any) => p.PLANT_DESC === selectedPlant
+  //     );
 
-      if (plantObj && plantObj.PLANT) {
-        const payload = {
-          WERKS: plantObj.PLANT
-        };
+  //     if (plantObj && plantObj.PLANT) {
+  //       const payload = {
+  //         WERKS: plantObj.PLANT
+  //       };
 
-        console.log("📤 Fetching division for plant code:", plantObj.PLANT);
-        this.spinner.show();
+  //       console.log("📤 Fetching division for plant code:", plantObj.PLANT);
+  //       this.spinner.show();
 
-        this.service.PlantBasedDivison(payload).subscribe(
-          (res: any) => {
-            console.log("✅ Division Response:", res);
-            this.spinner.hide();
+  //       this.service.PlantBasedDivison(payload).subscribe(
+  //         (res: any) => {
+  //           console.log("✅ Division Response:", res);
+  //           this.spinner.hide();
 
-            if (res && res.DIVISION) {
-              // Find matching division from divisionList
-              const divisionObj = this.divisionList?.find(
-                (d: any) => d.DIVISION === res.DIVISION
-              );
+  //           if (res && res.DIVISION) {
+  //             // Find matching division from divisionList
+  //             const divisionObj = this.divisionList?.find(
+  //               (d: any) => d.DIVISION === res.DIVISION
+  //             );
 
-              if (divisionObj) {
-                // Set the full division description (same as dropdown shows)
-                this.OrderInfo.patchValue({
-                  Division: divisionObj.DIVISION_DESC
-                });
-                console.log("✅ Division set to:", divisionObj.DIVISION_DESC);
-              } else {
-                // Fallback: set just the division code if no match found
-                this.OrderInfo.patchValue({
-                  Division: res.DIVISION
-                });
-                console.log("⚠️ Division set to code:", res.DIVISION);
-              }
-            } else {
-              console.warn("⚠️ No DIVISION in response");
-            }
-          },
-          (error) => {
-            console.error("❌ Error fetching division:", error);
-            this.spinner.hide();
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Failed to fetch division for selected plant',
-              timer: 2000
-            });
-          }
-        );
-      } else {
-        console.warn("⚠️ Plant object not found for:", selectedPlant);
-        // Clear division if plant is invalid
-        this.OrderInfo.patchValue({
-          Division: ''
-        });
-      }
-    } else {
-      console.log("ℹ️ Skipping division fetch - SAP mode or no plant selected");
-    }
-  }
+  //             if (divisionObj) {
+  //               // Set the full division description (same as dropdown shows)
+  //               this.OrderInfo.patchValue({
+  //                 Division: divisionObj.DIVISION_DESC
+  //               });
+  //               console.log("✅ Division set to:", divisionObj.DIVISION_DESC);
+  //             } else {
+  //               // Fallback: set just the division code if no match found
+  //               this.OrderInfo.patchValue({
+  //                 Division: res.DIVISION
+  //               });
+  //               console.log("⚠️ Division set to code:", res.DIVISION);
+  //             }
+  //           } else {
+  //             console.warn("⚠️ No DIVISION in response");
+  //           }
+  //         },
+  //         (error) => {
+  //           console.error("❌ Error fetching division:", error);
+  //           this.spinner.hide();
+  //           Swal.fire({
+  //             icon: 'error',
+  //             title: 'Error',
+  //             text: 'Failed to fetch division for selected plant',
+  //             timer: 2000
+  //           });
+  //         }
+  //       );
+  //     } else {
+  //       console.warn("⚠️ Plant object not found for:", selectedPlant);
+  //       // Clear division if plant is invalid
+  //       this.OrderInfo.patchValue({
+  //         Division: ''
+  //       });
+  //     }
+  //   } else {
+  //     console.log("ℹ️ Skipping division fetch - SAP mode or no plant selected");
+  //   }
+  // }
 
 
   onDivisionChange(): void {
@@ -1128,23 +1136,47 @@ console.log("Logged in user:", this.loggedInUser);
   }
 
   fetchpdb(): void {
-    this.spinner.show();
-    this.service.getpdb().subscribe(
-      (res: any) => {
-        console.log("📦 PDB Data:", res);
-        this.plantList = res[0].PLANT;
-        this.divisionList = res[0].DIVISION;
-        this.billintypeList = res[0].BILLING_TYPE;
-        this.customerList = res[0].CUSTOMER || [];
-        this.statesList = res[0].STATES;
-        this.spinner.hide();
-      },
-      error => {
-        console.error("❌ PDB Fetch Error:", error);
-        this.spinner.hide();
-      }
-    );
-  }
+  this.spinner.show();
+  this.service.getpdb().subscribe(
+    (res: any) => {
+
+      console.log("📦 PDB Data:", res);
+
+      // ❌ Remove these
+      // this.plantList = res[0].PLANT;
+      // this.divisionList = res[0].DIVISION;
+
+      // ✅ Keep other dropdowns
+      this.billintypeList = res[0].BILLING_TYPE;
+      this.customerList = res[0].CUSTOMER || [];
+      this.statesList = res[0].STATES;
+
+      this.spinner.hide();
+    },
+    error => {
+      console.error("❌ PDB Fetch Error:", error);
+      this.spinner.hide();
+    }
+  );
+}
+  // fetchpdb(): void {
+  //   this.spinner.show();
+  //   this.service.getpdb().subscribe(
+  //     (res: any) => {
+  //       console.log("📦 PDB Data:", res);
+  //       this.plantList = res[0].PLANT;
+  //       this.divisionList = res[0].DIVISION;
+  //       this.billintypeList = res[0].BILLING_TYPE;
+  //       this.customerList = res[0].CUSTOMER || [];
+  //       this.statesList = res[0].STATES;
+  //       this.spinner.hide();
+  //     },
+  //     error => {
+  //       console.error("❌ PDB Fetch Error:", error);
+  //       this.spinner.hide();
+  //     }
+  //   );
+  // }
   //Due to 404 error pradeep comment this line this one cant use in this screen any where
   // fetchCustomers(): void {
   //   this.spinner.show();
@@ -1480,43 +1512,46 @@ console.log("Logged in user:", this.loggedInUser);
     this.dropdownOpen = false;
   }
 
-  onFilterPlantChange(): void {
-    if (!this.filterPlant) {
-      this.filterDivision = '';
-      return;
-    }
+  // onFilterPlantChange(): void {
+  //   if (!this.filterPlant) {
+  //     this.filterDivision = '';
+  //     return;
+  //   }
 
-    const plantObj = this.plantList?.find(
-      (p: any) => p.PLANT_DESC === this.filterPlant
-    );
+  //   const plantObj = this.plantList?.find(
+  //     (p: any) => p.PLANT_DESC === this.filterPlant
+  //   );
 
-    if (plantObj?.PLANT) {
-      const payload = { WERKS: plantObj.PLANT };
+  //   if (plantObj?.PLANT) {
+  //     const payload = { WERKS: plantObj.PLANT };
 
-      this.spinner.show();
-      this.service.PlantBasedDivison(payload).subscribe(
+  //     this.spinner.show();
+  //     this.service.PlantBasedDivison(payload).subscribe(
 
-        (res: any) => {
-          this.spinner.hide();
-          if (res?.DIVISION) {
-            console.log("✅ Filter Division Response:", res);
-            const divisionObj = this.divisionList?.find(
-              (d: any) => d.DIVISION === res.DIVISION
-            );
-            this.filterDivision = divisionObj
-              ? divisionObj.DIVISION_DESC
-              : res.DIVISION;
+  //       (res: any) => {
+  //         this.spinner.hide();
+  //         if (res?.DIVISION) {
+  //           console.log("✅ Filter Division Response:", res);
+  //           const divisionObj = this.divisionList?.find(
+  //             (d: any) => d.DIVISION === res.DIVISION
+  //           );
+  //           this.filterDivision = divisionObj
+  //             ? divisionObj.DIVISION_DESC
+  //             : res.DIVISION;
 
-            console.log("✅ Filter Division set to:", this.filterDivision);
-          }
-        },
-        (error) => {
-          console.error("❌ Error fetching division for filter:", error);
-          this.spinner.hide();
-        }
-      );
-    }
-  }
+  //           console.log("✅ Filter Division set to:", this.filterDivision);
+  //         }
+  //       },
+  //       (error) => {
+  //         console.error("❌ Error fetching division for filter:", error);
+  //         this.spinner.hide();
+  //       }
+  //     );
+  //   }
+  // }
+
+
+
 
 
   fetchTransporter(): void {
