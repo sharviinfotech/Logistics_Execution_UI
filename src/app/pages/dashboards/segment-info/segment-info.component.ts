@@ -812,7 +812,7 @@ console.log("Logged in user:", this.loggedInUser);
         ZPLANT: row.ZPLANT || '',
         ZDIVISION: row.ZDIVISION || '',
         ZVEH_TYPE: row.ZVEH_TYPE || '',
-        ZUSER: '',
+        ZUSER: row.ZUSER ,
           ZUSER_CH: this.loggedInUser ,
       };
 

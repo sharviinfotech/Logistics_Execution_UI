@@ -504,7 +504,7 @@
               <select formControlName="Plant" >
                 <option value="">Select Plant</option>
 
-                <option *ngFor="let p of plantList" [value]="p.WERKS">
+                <option *ngFor="let p of plantList" [value]="p.PLANT_TEXT">
                   {{ p.WERKS }} - {{ p.PLANT_DESC }}
                 </option>
 

@@ -382,6 +382,11 @@
           <label>Branch Zone</label>
         </div>
 
+         <div class="form-field" [class.filled]="segmentInfo.get('TAT_DAYS')?.value">
+          <input type="text" formControlName="TAT_DAYS" placeholder=" " />
+          <label>Destination State</label>
+        </div>
+
 
         <!-- TAT Type -->
         <div class="form-field" [class.filled]="segmentInfo.get('TAT_Type')?.value">

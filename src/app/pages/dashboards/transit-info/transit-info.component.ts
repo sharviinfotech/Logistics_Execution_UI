@@ -797,7 +797,7 @@ console.log("Logged in user:", this.loggedInUser);
         ZPLANT: headerRow.ZPLANT || '',
         ZDIVISION: headerRow.ZDIVISION || '',
         ZVEH_TYPE: headerRow.ZVEH_TYPE || '',
-        ZUSER:'',
+        ZUSER:headerRow.ZUSER || '',
         ZUSER_CH: this.loggedInUser,
       };
 
@@ -812,7 +812,7 @@ console.log("Logged in user:", this.loggedInUser);
         ZLRNO: item.ZLRNO || '',
         ZWORK_ORDER: item.ZWORK_ORDER || '',
         ZTRANSPORTER: item.ZTRANSPORTER || '',
-          ZUSER:'',
+          ZUSER:item.ZUSER || '',
         ZUSER_CH: this.loggedInUser,
 
       }));

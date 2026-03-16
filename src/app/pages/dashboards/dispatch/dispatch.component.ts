@@ -555,6 +555,7 @@ export class DispatchComponent implements OnInit {
       DIVISION:   row.Division     || '',
       NO_LRS:     Number(row.NoOfLRs) || 0,
       LR_NO:      row.LRNumber     || '',
+      zlrspec:    row.zlrspec,
       LOAD_PT:    row.LoadingPoints || '',
       UNLOAD_PT:  row.UnLoadingPoints || '',
       ZUSER:      row.ZUSER,

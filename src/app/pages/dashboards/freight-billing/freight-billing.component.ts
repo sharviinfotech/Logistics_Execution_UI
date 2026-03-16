@@ -765,7 +765,7 @@ console.log("Logged in user:", this.loggedInUser);
             ZUNLOADAPP: row.ZUNLOADAPP,
             ZDETENTUP: row.ZDETENTUP,
             ZWORDUP: row.ZWORDUP,
-            ZUSER: '',
+            ZUSER: row.ZUSER,
               ZUSER_CH: this.loggedInUser,
 
             // ✅ Freight Charges Breakdown

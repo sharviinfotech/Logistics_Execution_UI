@@ -832,7 +832,7 @@ console.log("Logged in user:", this.loggedInUser);
         DEST_LOC: row.ZDES_LOC || "",
         DEST_STATE: row.ZSTATE || "",
         DEST_ZONE: row.ZZONE || "",
-        ZUSER: '',
+        ZUSER: row.ZUSER,
         ZUSER_CH: this.loggedInUser
       };
 
@@ -1459,7 +1459,8 @@ console.log("Logged in user:", this.loggedInUser);
         "vehicle_no": "",
         "freight_billno": "",
         "nature_damage": "",
-        "claim_status": ""
+        "claim_status": "",
+        ZUSER: this.loggedInUser
 
       }
     };

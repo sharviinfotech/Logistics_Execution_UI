@@ -989,7 +989,7 @@ console.log("Logged in user:", this.loggedInUser);
           ZDIVISION: row.ZDIVISION,
           ZCREATED_DT: row.ZCREATED_DT,
           ZVEH_TYPE: row.ZVEH_TYPE,
-          ZUSER:'',
+          ZUSER:row.ZUSER,
             ZUSER_CH: this.loggedInUser
         }
       ]
@@ -1038,7 +1038,7 @@ console.log("Logged in user:", this.loggedInUser);
         ZDIVISION: row.ZDIVISION || '',
         ZCREATED_DT: row.ZCREATED_DT || '',
         ZVEH_TYPE: row.ZVEH_TYPE || '',
-          ZUSER:'',
+          ZUSER: row.ZUSER,
             ZUSER_CH: this.loggedInUser
       }
       ]

@@ -895,7 +895,7 @@ console.log("Logged in user:", this.loggedInUser);
       ZWEEK_SF: row.ZWEEK_SF,
       ZEWAYBILL_NO: row.ZEWAYBILL_NO,
       ZEWAYBILL_DT: row.ZEWAYBILL_DT,
-      ZUSER:'',
+      ZUSER:row.ZUSER,
       ZUSER_CH: this.getCurrentUser()
     }];
 
@@ -928,7 +928,7 @@ console.log("Logged in user:", this.loggedInUser);
         ZWEEK_SF: row.ZWEEK_SF,
         ZEWAYBILL_NO: row.ZEWAYBILL_NO,
         ZEWAYBILL_DT: row.ZEWAYBILL_DT,
-            ZUSER:'',
+            ZUSER:row.ZUSER,
       ZUSER_CH: this.getCurrentUser()
       }]
     };

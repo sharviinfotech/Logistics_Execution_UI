@@ -1392,7 +1392,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         ZPAY_INFO: headerRow.ZPAY_INFO,
         ZUTR: headerRow.ZUTR,
         ZCLM_SET_DT: headerRow.ZCLM_SET_DT,
-        ZUSER: '',
+        ZUSER: headerRow.ZUSER,
         ZUSER_CH: this.loggedInUser,
 
       };
@@ -1414,7 +1414,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         ZTRANSPORTER: item.ZTRANSPORTER || null,
         ZWORK_ORDER: item.ZWORK_ORDER || null,
         ZBILLNO: item.ZBILLNO || null,
-        ZUSER: '',
+        ZUSER: item.ZUSER,
         ZUSER_CH: this.loggedInUser,
 
       }));

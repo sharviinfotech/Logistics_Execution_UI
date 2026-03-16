@@ -1316,7 +1316,7 @@ export class TransitDamageInfoComponent implements OnInit {
         ZDIVISION: headerRow.ZDIVISION || null,
         ZVEH_TYPE: headerRow.ZVEH_TYPE || null,
         ZCREATED_DT: headerRow.ZCREATED_DT || null,
-        ZUSER: '',
+        ZUSER: headerRow.ZUSER,
         ZUSER_CH: this.loggedInUser
       };
 
@@ -1334,7 +1334,7 @@ export class TransitDamageInfoComponent implements OnInit {
         ZWORK_ORDER: item.ZWORK_ORDER || null,
         ZBILLNO: item.ZBILLNO || null,
         ZPRODUCT: item.ZPRODUCT || null,
-        ZUSER: '',
+        ZUSER: item.ZUSER,
         ZUSER_CH: this.loggedInUser
       }));
 
