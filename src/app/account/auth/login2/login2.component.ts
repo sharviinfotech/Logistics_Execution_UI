@@ -33,11 +33,12 @@ export class Login2Component implements OnInit {
     // 'assets/images/AircraftFlight.png',
     'assets/images/1.png',
      'assets/images/2.jpeg',
-
+      'assets/images/Le1 image 6.png',
     // 'assets/images/HBL_background_resized_1330x780.png',
      'assets/images/LE image (3).png',
      'assets/images/4.jpg',
      'assets/images/5.jpg',
+     
     //  'assets/images/loginbgimage 2.png',
    
   ];
