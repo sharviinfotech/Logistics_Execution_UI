@@ -300,6 +300,8 @@ console.log("Logged in user:", this.loggedInUser);
       CUST_PROF: data.CUST_PROFILE || '',
       BRANCH: data.BRANCH || '',
       BRANCH_ZONE: data.BRANCH_ZONE || '',
+      ZSTATE: data.ZSTATE || '',
+      ZZONE: data.ZZONE || '',
       TAT_Type: data.TAT_TYPE || '',
       TAT_DAYS: data.TAT || '',
       ETA_DATE: data.ETA || ''
@@ -338,8 +340,8 @@ console.log("Logged in user:", this.loggedInUser);
       WORK_ORDER_NO: fieldKey === 'WORK_ORDER_NO' ? values.workOrderNumber : '',
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
-      LINE_NO: values.lineNumber || '',
-       ZUSER: this.loggedInUser
+      LINE_NO: values.lineNumber || ''
+     
 
 
     };
@@ -555,6 +557,7 @@ console.log("Logged in user:", this.loggedInUser);
     let payload1: any = {
 
       "global": "SEGMENT INFO",
+        ZUSER: this.loggedInUser,
       "data": {
         "ref_no": "",
         "inv_no": "",
@@ -568,7 +571,7 @@ console.log("Logged in user:", this.loggedInUser);
         "vehicle_no": "",
         "freight_billno": "",
         "nature_damage": "",
-        "claim_status": ""
+        "claim_status": "",
       }
     };
     payload1.data[this.selectedType] = this.searchReference.trim();
@@ -698,6 +701,8 @@ console.log("Logged in user:", this.loggedInUser);
           CUST_PROFILE: formValue.CUST_PROF || '',
           BRANCH: formValue.BRANCH || '',
           BRANCH_ZONE: formValue.BRANCH_ZONE || '',
+          ZSTATE: formValue.ZSTATE || '',
+          ZZONE: formValue.ZZONE || '',
           TAT_TYPE: formValue.TAT_Type || '',
           TAT: formValue.TAT_DAYS || '',
           ETA: formValue.ETA_DATE || '',
@@ -1018,6 +1023,8 @@ console.log("Logged in user:", this.loggedInUser);
         CUST_PROF: formValue.CUST_PROF || '',
         BRANCH: formValue.BRANCH || '',
         BRANCH_ZONE: formValue.BRANCH_ZONE || '',
+        ZSTATE: formValue.ZSTATE || '',
+         ZZONE: formValue.ZZONE || '',
         TAT_TYPE: formValue.TAT_Type || '',
         TAT: formValue.TAT_DAYS || '',
         ETA: formValue.ETA_DATE || ''

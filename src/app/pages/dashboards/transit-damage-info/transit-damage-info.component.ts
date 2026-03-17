@@ -716,6 +716,7 @@ export class TransitDamageInfoComponent implements OnInit {
 
     let payload1: any = {
       "global": "TRANSIT DAMAGE INFO",
+       ZUSER: this.loggedInUser,
       "data": {
         "REF_NO": "",
         "INV_NO": "",
@@ -731,7 +732,7 @@ export class TransitDamageInfoComponent implements OnInit {
         "PRODUCT": "",
         "ROUTE": "",
         "NATURE_DAMAGE": "",
-        "CLAIM_STATUS": ""
+        "CLAIM_STATUS": "",
       }
     };
 

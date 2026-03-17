@@ -444,7 +444,7 @@ export class DispatchComponent implements OnInit {
       RNO: '',
       LR_NO: '',
       TRANSPORTER: '',
-      WORK_ORDER: ''
+      WORK_ORDER: '',
     };
 
     payload[this.selectedType] = this.searchValue;

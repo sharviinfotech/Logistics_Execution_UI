@@ -1446,6 +1446,7 @@ console.log("Logged in user:", this.loggedInUser);
     let payload1: any = {
 
       "global": "ORDER INFO",
+        "ZUSER": this.loggedInUser,
       "data": {
         "ref_no": "",
         "inv_no": "",
@@ -1460,7 +1461,6 @@ console.log("Logged in user:", this.loggedInUser);
         "freight_billno": "",
         "nature_damage": "",
         "claim_status": "",
-        ZUSER: this.loggedInUser
 
       }
     };

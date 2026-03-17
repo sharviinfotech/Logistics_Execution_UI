@@ -568,6 +568,7 @@ console.log("Logged in user:", this.loggedInUser);
     let payload1: any = {
 
       "global": "SHIPMENT DETAILS",
+       ZUSER: this.loggedInUser,
       "data": {
         "ref_no": "",
         "inv_no": "",
@@ -581,7 +582,7 @@ console.log("Logged in user:", this.loggedInUser);
         "vehicle_no": "",
         "freight_billno": "",
         "nature_damage": "",
-        "claim_status": ""
+        "claim_status": "",
       }
     };
     payload1.data[this.selectedType] = this.searchReference.trim();

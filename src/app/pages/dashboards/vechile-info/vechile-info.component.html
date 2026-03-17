@@ -591,7 +591,7 @@
               <th>Plant</th>
               <th>Division</th>
               <th>Created Date</th>
-              <th>Vehicle Type</th>
+              <!-- <th>Vehicle Type</th> -->
                  <th>salesperson E-mail ID</th>
                 <th>Customer e-mail ID</th>
                 <th>GPS live location</th>
@@ -748,11 +748,11 @@
               </td>
 
 
-              <td>
+               <!-- <td>
                 <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
                   [(ngModel)]="item.ZVEH_TYPE">
-                <span *ngIf="!item.isEdit">{{ item.ZVEH_TYPE }}</span>
-              </td>
+                <span *ngIf="!item.isEdit">{{ item.ZVEH_TYPE }}</span> 
+              </td> -->
               <td>{{ item.ZSPMAIL }}</td>
               <td>{{ item.ZCUSTMAIL }}</td>
               <td>{{ item.ZGPS }}</td>
@@ -817,7 +817,7 @@
                 <th>LR No</th>
                 <th>Transporter</th>
                 <th>Created date</th>
-                <th>Vehicle Type</th>
+                <!-- <th>Vehicle Type</th> -->
               </tr>
             </thead>
 
@@ -846,7 +846,7 @@
                 <td>{{ item.ZLRNO }}</td>
                 <td>{{ item.ZTRANSPORTER }}</td>
                 <td>{{ item.ZCREATED_DT | date:'dd-MM-yyyy' }}</td>
-                <td>{{ item.ZVEH_TYPE }}</td>
+                <!-- <td>{{ item.ZVEH_TYPE }}</td> -->
               </tr>
             </tbody>
           </table>

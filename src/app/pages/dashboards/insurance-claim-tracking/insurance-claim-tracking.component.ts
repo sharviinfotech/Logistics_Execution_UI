@@ -740,6 +740,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
     let payload1: any = {
       "global": "INSURANCE CLAIM STATUS",
+       ZUSER: this.loggedInUser,
       "data": {
         "REF_NO": "",
         "INV_NO": "",
@@ -755,7 +756,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         "PRODUCT": "",
         "ROUTE": "",
         "NATURE_DAMAGE": "",
-        "CLAIM_STATUS": ""
+        "CLAIM_STATUS": "",
+      
       }
     };
 
