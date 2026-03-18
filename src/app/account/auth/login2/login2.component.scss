@@ -213,10 +213,11 @@ body {
   }
 }
 
-.login-container{
-  display:flex;
-  // height:100vh;
-  // width:100%;
+.login-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
 }
 
 .login-left{
@@ -227,12 +228,20 @@ body {
   flex-direction:column;
   justify-content:center;
 }
+.login-card{
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+  padding: 10px;
+}
 
-.login-right{
-  width:70%;
- 
-  position:relative;
-  overflow:hidden;
+.login-right {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
 }
 
 // .login-image{
