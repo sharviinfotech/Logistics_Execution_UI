@@ -36,12 +36,17 @@ import { ChartModule } from './chart/chart.module';
 import { CalendarComponent } from './calendar/calendar.component';
 import { MapsModule } from './maps/maps.module';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { ReportsComponent } from './reports/reports.component';
+import { TransitReportsComponent } from './reports/transit-reports/transit-reports.component';
 
 
 @NgModule(
         {
                 declarations: [
  
+  
+    ReportsComponent,
+          TransitReportsComponent
   ],
                 imports: [CommonModule,
                         FormsModule,

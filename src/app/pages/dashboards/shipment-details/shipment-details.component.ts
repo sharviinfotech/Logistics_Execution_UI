@@ -1352,6 +1352,7 @@ console.log("Logged in user:", this.loggedInUser);
 
     const payload = {
       GLOBAL: 'SHIPMENT DETAILS',
+      ZUSER: this.loggedInUser,
       DATE_FROM: this.filterFromDate,
       DATE_TO: this.filterToDate,
       PLANT: this.filterPlant || '',

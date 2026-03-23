@@ -246,6 +246,7 @@ export class DispatchComponent implements OnInit {
   createRow(isFirstRow: boolean = false): FormGroup {
     const row = this.fb.group({
       LINE_NO: [''],
+      ZMAPID: [''],
       CREATED_DT: [''],
       workorder: [''],
       VehicleType: ['', Validators.required],
@@ -258,7 +259,8 @@ export class DispatchComponent implements OnInit {
       NoOfLRs: ['', Validators.required],
       LRNumber: ['', Validators.required],
       LoadingPoints: ['', Validators.required],
-      UnLoadingPoints: ['', Validators.required]
+      UnLoadingPoints: ['', Validators.required],
+       ZLRSPEC: ['']
     });
 
     row.get('VehicleType')?.valueChanges.subscribe(() => {
@@ -445,6 +447,7 @@ export class DispatchComponent implements OnInit {
       LR_NO: '',
       TRANSPORTER: '',
       WORK_ORDER: '',
+      zuser: this.loggedInUser
     };
 
     payload[this.selectedType] = this.searchValue;
@@ -501,6 +504,7 @@ export class DispatchComponent implements OnInit {
     records.forEach((item, index) => {
       const row = this.fb.group({
         LINE_NO:        [item.LINE_NO        || ''],
+        ZMAPID:         [item.ZMAPID         || ''],
         CREATED_DT:     [item.CREATED_DT     || ''],
         workorder:      [item.WORK_ORDER     || ''],
         VehicleType:    [item.VEH_TYPE       || '', Validators.required],
@@ -514,6 +518,7 @@ export class DispatchComponent implements OnInit {
         LRNumber:       [item.LR_NO          || '', Validators.required],
         LoadingPoints:  [item.LOAD_PT        || '', Validators.required],
         UnLoadingPoints:[item.UNLOAD_PT      || '', Validators.required],
+          ZLRSPEC:       [item.ZLRSPEC        || '']
       });
 
       row.get('LINE_NO')?.disable();
@@ -542,6 +547,7 @@ export class DispatchComponent implements OnInit {
     const rawRows = rowsArray.getRawValue();
 
     const payload = rawRows.map((row: any) => ({
+      ZMAPID:     row.ZMAPID     || '',
       REFNO:      Number(this.searchReference),
       LINE_NO:    Number(row.LINE_NO),
       CREATED_DT: row.CREATED_DT || '',
@@ -555,7 +561,7 @@ export class DispatchComponent implements OnInit {
       DIVISION:   row.Division     || '',
       NO_LRS:     Number(row.NoOfLRs) || 0,
       LR_NO:      row.LRNumber     || '',
-      zlrspec:    row.zlrspec,
+      ZLRSPEC:    row.ZLRSPEC   || '',
       LOAD_PT:    row.LoadingPoints || '',
       UNLOAD_PT:  row.UnLoadingPoints || '',
       ZUSER:      row.ZUSER,
@@ -735,6 +741,7 @@ export class DispatchComponent implements OnInit {
         lr_no:       row.get('LRNumber')?.value,
         load_pt:     row.get('LoadingPoints')?.value,
         unload_Pt:   row.get('UnLoadingPoints')?.value,
+          ZLRSPEC: row.get('ZLRSPEC')?.value,
         ZUSER:       this.loggedInUser,
         ZUSER_CH:    ''
       }))
@@ -831,6 +838,7 @@ export class DispatchComponent implements OnInit {
     }
 
     const payload: any = {
+      ZUSER: this.loggedInUser,
       DATE_FROM:    this.filterFromDate,
       DATE_TO:      this.filterToDate,
       PLANT:        this.filterPlant       || '',

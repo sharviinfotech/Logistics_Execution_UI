@@ -305,15 +305,21 @@
 
                                 <!-- Dropdown -->
                                 <div class="multi-select-dropdown" *ngIf="showPlantDropdown">
-                                  <div *ngFor="let plant of PlantCodeList">
-  <label class="dropdown-option">
-    <input type="checkbox"
-      [checked]="isPlantSelected(plant.PLANT)"
-      (change)="onPlantToggle(plant.PLANT, $event)" />
+                                    <!-- ✅ Select All -->
+                                    <label class="dropdown-option">
+                                        <input type="checkbox" [checked]="isAllPlantsSelected()"
+                                            (change)="toggleAllPlants($event)" />
+                                        Select All Plants
+                                    </label>
 
-    {{ plant.PLANT }} - {{ plant.PLANT_DESC }}
-  </label>
-</div>
+                                    <div *ngFor="let plant of PlantCodeList">
+                                        <label class="dropdown-option">
+                                            <input type="checkbox" [checked]="isPlantSelected(plant.PLANT)"
+                                                (change)="onPlantToggle(plant.PLANT, $event)" />
+
+                                            {{ plant.PLANT }} - {{ plant.PLANT_DESC }}
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
 
@@ -330,17 +336,21 @@
 
                                 <!-- Dropdown -->
                                 <div class="multi-select-dropdown" *ngIf="showDivisionDropdown">
- <div *ngFor="let div of DivisionList">
-  <label class="dropdown-option">
+                                    <label class="dropdown-option">
+                                        <input type="checkbox" [checked]="isAllDivisionsSelected()"
+                                            (change)="toggleAllDivisions($event)" />
+                                        Select All Divisions
+                                    </label>
+                                    <div *ngFor="let div of DivisionList">
+                                        <label class="dropdown-option">
 
-    <input type="checkbox"
-      [checked]="isDivisionSelected(div.DIVISION_DESC)"
-      (change)="onDivisionToggle(div, $event)" />
+                                            <input type="checkbox" [checked]="isDivisionSelected(div.DIVISION_DESC)"
+                                                (change)="onDivisionToggle(div, $event)" />
 
-    {{ div.DIVISION_DESC }}
+                                            {{ div.DIVISION_DESC }}
 
-  </label>
-</div>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
 

@@ -911,9 +911,9 @@ console.log("Logged in user:", this.loggedInUser);
       NSAP_LOAD: [{
         MANDT: '',
         ZMAPID: row.ZMAPID,
-        VBELN: row.VBELN,        // 🔑 same
-        POSNR: row.POSNR,        // 🔑 same
-        ZLINE_NO: row.ZLINE_NO,  // 🔑 same
+        VBELN: row.VBELN,        
+        POSNR: row.POSNR,        
+        ZLINE_NO: row.ZLINE_NO,  
 
         ZREFNO: row.ZREFNO,
         ZWORK_ORDER: row.ZWORK_ORDER,
@@ -1340,6 +1340,7 @@ console.log("Logged in user:", this.loggedInUser);
 
     const payload = {
       GLOBAL: 'INVOICE LOAD DETAILS',
+      ZUSER: this.loggedInUser,
       DATE_FROM: this.filterFromDate,
       DATE_TO: this.filterToDate,
       PLANT: this.filterPlant || '',

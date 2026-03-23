@@ -175,12 +175,13 @@ console.log("Logged in user:", this.loggedInUser);
   }
 
   updateSIT(): void {
+      const physicalArrived = this.transitInfo.get('physicalarrivedatdestinationdateandtime')?.value;
     const field2 = this.transitInfo.get('unloadingdateandtime')?.value;
     const field3 = this.transitInfo.get('podscanreceiveddateandtime')?.value;
 
-    if (field2 && field3) {
+    if (field2 || field3) {
       this.transitInfo.get('sit')?.setValue('Sale');
-    } else if (!field2 && field3) {
+    } else if (physicalArrived) {
       this.transitInfo.get('sit')?.setValue('SIT');
     } else {
       this.transitInfo.get('sit')?.setValue('');
@@ -1055,6 +1056,7 @@ console.log("Logged in user:", this.loggedInUser);
 
     const payload = {
       GLOBAL: 'TRANSIT INFO',
+        ZUSER: this.loggedInUser,
       DATE_FROM: this.filterFromDate,
       DATE_TO: this.filterToDate,
       PLANT: this.filterPlant || '',

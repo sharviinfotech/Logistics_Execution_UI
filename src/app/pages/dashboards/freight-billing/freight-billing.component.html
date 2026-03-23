@@ -438,7 +438,7 @@
               <select [(ngModel)]="filterPlant">
                 <option value="">Select Plant</option>
 
-                <option *ngFor="let p of plantList" [value]="p.WERKS">
+                <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">
                   {{p.PLANT_TEXT}}
                 </option>
 

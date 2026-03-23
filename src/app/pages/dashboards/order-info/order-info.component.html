@@ -330,10 +330,9 @@
               <select [(ngModel)]="filterPlant">
                 <option value="">Select Plant</option>
 
-                <option *ngFor="let p of plantList" [value]="p.WERKS">
+                <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">
                   {{p.PLANT_TEXT}}
                 </option>
-
               </select>
               <label>Plant</label>
             </div>
@@ -504,7 +503,7 @@
               <select formControlName="Plant" >
                 <option value="">Select Plant</option>
 
-                <option *ngFor="let p of plantList" [value]="p.PLANT_TEXT">
+                <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">
                   {{ p.WERKS }} - {{ p.PLANT_DESC }}
                 </option>
 
@@ -520,7 +519,7 @@
           <div class="form-field">
             <select formControlName="TransactionType" [searchable]="true" [clearable]="false">
               <option value="">Select Mode of Transport</option>
-              <option value="FULLTRUCKLOAD">FULL TRUCK LOAD</option>
+              <option value="FULL TRUCK LOAD">FULL TRUCK LOAD</option>
               <option value="CARGO">CARGO</option>
               <option value="RATECONTRACT">RATE CONTRACT</option>
               <option value="LOCALTRANSPORTATION">LOCAL TRANSPORTATION</option>

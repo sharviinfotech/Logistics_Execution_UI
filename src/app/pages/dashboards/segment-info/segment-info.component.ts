@@ -105,6 +105,8 @@ export class SegmentInfoComponent implements OnInit {
       CUST_PROF: [''],
       BRANCH: ['', Validators.required],
       BRANCH_ZONE: [''],
+      ZSTATE: [''], 
+      ZZONE: [''],
       TAT_Type: ['', Validators.required],
       TAT_DAYS: ['', Validators.required],
       ETA_DATE: ['', Validators.required],
@@ -113,8 +115,7 @@ export class SegmentInfoComponent implements OnInit {
      const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
 this.loggedInUser = userData.USER || '';
 console.log("Logged in user:", this.loggedInUser);
-this.loggedInUser = userData.USER || '';
-console.log("Logged in user:", this.loggedInUser);
+
  this.plantList = userData.PLANTS || [];
 
   // ✅ Divisions from login response
@@ -702,7 +703,7 @@ console.log("Logged in user:", this.loggedInUser);
           BRANCH: formValue.BRANCH || '',
           BRANCH_ZONE: formValue.BRANCH_ZONE || '',
           ZSTATE: formValue.ZSTATE || '',
-          ZZONE: formValue.ZZONE || '',
+          ZZONE: formValue.ZZONE|| '',
           TAT_TYPE: formValue.TAT_Type || '',
           TAT: formValue.TAT_DAYS || '',
           ETA: formValue.ETA_DATE || '',
@@ -1212,6 +1213,7 @@ console.log("Logged in user:", this.loggedInUser);
 
     const payload = {
       GLOBAL: 'SEGMENT INFO',
+      ZUSER: this.loggedInUser,
       DATE_FROM: this.filterFromDate,
       DATE_TO: this.filterToDate,
       PLANT: this.filterPlant || '',

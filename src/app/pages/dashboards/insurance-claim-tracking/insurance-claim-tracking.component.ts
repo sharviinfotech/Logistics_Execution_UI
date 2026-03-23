@@ -1660,6 +1660,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
     const payload = {
       GLOBAL: 'INSURANCE CLAIM STATUS',
+      ZUSER: this.loggedInUser,
       DATE_FROM: this.filterFromDate,
       DATE_TO: this.filterToDate,
       PLANT: this.filterPlant || '',

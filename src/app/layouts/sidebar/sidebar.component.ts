@@ -166,31 +166,73 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
   'Outward-InsuranceClaimTracking': '/insurance-claim-tracking',
   'Outward-UserCreation': '/user-creation',
 
+'Outward-TransitReport': '/transit-report'
 
-  
 };
 
-  initialize(): void {
+//   initialize(): void {
+//   console.log('Original MENU:', MENU);
+//   console.log('Login data:', this.loginData);
+
+//   // 1️⃣ Extract allowed routes from loginData
+//   const allowedRoutes = this.loginData.ACTIVITIES
+//     .map((a: any) => this.ACTIVITY_ROUTE_MAP[a.ACTIVITY])
+//     .filter(Boolean); // removes undefined
+
+//   console.log('Allowed routes:', allowedRoutes);
+
+//   // 2️⃣ Filter MENU based on allowed routes
+//   this.menuItems = MENU.filter(menu =>
+//     menu.link === '/dashboard' || // always allow dashboard
+//     allowedRoutes.includes(menu.link)
+//   );
+
+//   console.log('Filtered menuItems:', this.menuItems);
+// }
+
+initialize(): void {
   console.log('Original MENU:', MENU);
   console.log('Login data:', this.loginData);
 
-  // 1️⃣ Extract allowed routes from loginData
+  // 1️⃣ Extract allowed routes
   const allowedRoutes = this.loginData.ACTIVITIES
     .map((a: any) => this.ACTIVITY_ROUTE_MAP[a.ACTIVITY])
-    .filter(Boolean); // removes undefined
+    .filter(Boolean);
 
   console.log('Allowed routes:', allowedRoutes);
 
-  // 2️⃣ Filter MENU based on allowed routes
-  this.menuItems = MENU.filter(menu =>
-    menu.link === '/dashboard' || // always allow dashboard
-    allowedRoutes.includes(menu.link)
-  );
+  // ✅ 2️⃣ FIXED FILTER LOGIC
+  this.menuItems = MENU
+    .map(menu => {
+
+      // 👉 If menu has subItems (like Reports)
+      if (menu.subItems) {
+        const filteredSubItems = menu.subItems.filter(sub =>
+          allowedRoutes.includes(sub.link)
+        );
+
+        // 👉 show parent only if at least one child allowed
+        if (filteredSubItems.length > 0) {
+          return {
+            ...menu,
+            subItems: filteredSubItems
+          };
+        }
+
+        return null;
+      }
+
+      // 👉 Normal menu items
+      if (menu.link === '/dashboard' || allowedRoutes.includes(menu.link)) {
+        return menu;
+      }
+
+      return null;
+    })
+    .filter(Boolean);
 
   console.log('Filtered menuItems:', this.menuItems);
 }
-
-
 
 
   /**

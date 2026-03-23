@@ -1599,6 +1599,7 @@ export class TransitDamageInfoComponent implements OnInit {
 
     const payload = {
       GLOBAL: 'TRANSIT DAMAGE INFO',
+      ZUSER: this.loggedInUser,
       DATE_FROM: this.filterFromDate,
       DATE_TO: this.filterToDate,
       PLANT: this.filterPlant || '',

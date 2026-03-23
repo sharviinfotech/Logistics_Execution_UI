@@ -124,7 +124,8 @@ divisionPlantMap: any = {};
     'Outward-FreightBilling',
     'Outward-TransitDamageInfo',
     'Outward-InsuranceClaimTracking',
-    'Outward-UserCreation'
+    'Outward-UserCreation',
+    'Outward-TransitReport'
   ];
 
   // ===== Non-form arrays (kept same for Plant/Division) =====
@@ -252,6 +253,47 @@ divisionPlantMap: any = {};
     this.showPlantDropdown = !this.showPlantDropdown;
   }
 
+  isAllPlantsSelected(): boolean {
+  return this.selectedPlants.length === this.PlantCodeList.length;
+}
+
+toggleAllPlants(event: any) {
+  if (event.target.checked) {
+    // Select all
+    this.selectedPlants = this.PlantCodeList.map(p => p.PLANT);
+
+    this.newUser.PLANTS = this.selectedPlants.map(p => ({
+      WERKS: p
+    }));
+
+    // Also auto-select divisions
+    this.selectedDivisions = [];
+    this.newUser.DIVISIONS = [];
+
+    this.selectedPlants.forEach(plant => {
+      const divisions = this.plantDivisionMap[plant] || [];
+
+      divisions.forEach((div: string) => {
+        if (!this.selectedDivisions.includes(div)) {
+          this.selectedDivisions.push(div);
+
+          this.newUser.DIVISIONS.push({
+            WERKS: plant,
+            DIVISION: div
+          });
+        }
+      });
+    });
+
+  } else {
+    // Unselect all
+    this.selectedPlants = [];
+    this.selectedDivisions = [];
+
+    this.newUser.PLANTS = [];
+    this.newUser.DIVISIONS = [];
+  }
+}
 
 
 onPlantToggle(plant: string, event: any) {
@@ -364,6 +406,24 @@ onDivisionToggle(div: Division, event: any) {
 
   }
 
+}
+isAllDivisionsSelected(): boolean {
+  return this.selectedDivisions.length === this.DivisionList.length;
+}
+
+toggleAllDivisions(event: any) {
+  if (event.target.checked) {
+    this.selectedDivisions = this.DivisionList.map(d => d.DIVISION_DESC);
+
+    this.newUser.DIVISIONS = this.selectedDivisions.map(div => ({
+      WERKS: '',
+      DIVISION: div
+    }));
+
+  } else {
+    this.selectedDivisions = [];
+    this.newUser.DIVISIONS = [];
+  }
 }
 
 

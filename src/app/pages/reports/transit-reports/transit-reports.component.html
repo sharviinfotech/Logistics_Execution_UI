@@ -1,0 +1,178 @@
+<div class="layout">
+    <div class="main">
+        <div class="page-header">
+            <div>
+                <h2>Transit Reports</h2>
+                <p>Transit & E-way bill Reports</p>
+            </div>
+        </div>
+
+        <!-- FILTER CARD -->
+        <div class="pe-card">
+            <div class="pe-card-header d-flex align-items-center gap-2">
+                <span>
+                    <i class='bx bx-filter-alt'></i>
+                    Transit Filter
+                </span>
+            </div>
+
+            <div class="pe-card-body">
+
+                <div class="form-scroll">
+                    <form>
+                        <div class="row g-3">
+
+                            <div class="col-md-3">
+                                <label class="form-label font-weight-bold">Inward/Outward</label>
+                                <input type="text" class="form-control form-control-sm">
+                                <!-- <div class="invalid-feedback">
+                                Plant is required.
+                            </div> -->
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Sap/Nonsap</label>
+                                <input type="text" class="form-control form-control-sm">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">From DATE</label>
+                                <input type="date" class="form-control form-control-sm">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">To DATE</label>
+                                <input type="date" class="form-control form-control-sm">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Transporter Group</label>
+                                <input type="text" class="form-control form-control-sm">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Transporter</label>
+                                <input type="text" class="form-control form-control-sm">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">plant</label>
+                                <input type="text" class="form-control form-control-sm">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Product</label>
+                                <input type="number" class="form-control form-control-sm">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Division</label>
+                                <input type="number" class="form-control form-control-sm">
+                            </div>
+
+
+                            <div class="col-md-3">
+                                <label class="form-label">Customer</label>
+                                <input type="text" class="form-control form-control-sm">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Branch</label>
+                                <input type="text" class="form-control form-control-sm">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Branch Zone</label>
+                                <input type="text" class="form-control form-control-sm">
+                            </div>
+
+
+                            <div class="col-md-3">
+                                <label class="form-label">Destination Location</label>
+                                <input type="text" class="form-control form-control-sm">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Destination State</label>
+                                <input type="text" class="form-control form-control-sm">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Destination Zone</label>
+                                <input type="text" class="form-control form-control-sm">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Incoterms</label>
+                                <input type="text" class="form-control form-control-sm">
+                            </div>
+
+
+                            <div class="col-12 mt-3 d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-md btn-raised btnclear">
+                                    Clear Filters <i class='bx bx-reset ml-1'></i>
+                                </button>
+                                <button type="button" class="btn btn-md btn-raised btnExecuteReports">
+                                    Execute Report <i class='bx bx-search ml-1'></i>
+                                </button>
+                            </div>
+
+                        </div>
+                    </form>
+
+                    <div class="form-scroll">
+                    </div>
+                </div>
+
+                <!-- TABLE CARD -->
+                <div class="pe-card mt-4">
+                    <div class="pe-card-header d-flex justify-content-between align-items-center">
+                        <span>
+                            <i class='bx bx-list-check'></i> Order Headers Detailed
+                        </span>
+                    </div>
+
+                    <div class="pe-card-body">
+
+                        <div class="text-center py-5">
+                            <p class="text-muted">Fill filters and click execute to see results.</p>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th>Plant</th>
+                                        <th>Sales Order No</th>
+                                        <th>Sales Order Item</th>
+                                        <th>Material</th>
+                                        <th>Description</th>
+                                        <th>Production Order</th>
+                                        <th>Order Type</th>
+                                        <th>System Status Text</th>
+                                        <th>GR Qty</th>
+                                        <th>Total Qty</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1000</td>
+                                        <td>50000123</td>
+                                        <td>10</td>
+                                        <td>MAT001</td>
+                                        <td>Sample Material</td>
+                                        <td>20001234</td>
+                                        <td>PP01</td>
+                                        <td>Released</td>
+                                        <td>50</td>
+                                        <td>100</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>

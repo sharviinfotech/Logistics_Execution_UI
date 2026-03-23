@@ -28,6 +28,7 @@ import { TransitDamageInfoComponent } from './transit-damage-info/transit-damage
 import { InsuranceClaimTrackingComponent } from './insurance-claim-tracking/insurance-claim-tracking.component';
 import { DispatchComponent } from './dispatch/dispatch.component';
 import { UserCreationComponent } from './user-creation/user-creation.component';
+import { TransitReportsComponent } from '../reports/transit-reports/transit-reports.component';
 
 // import { CooisComponent } from './coois/coois.component';
 // import { Co11Component } from './co11/co11.component';
@@ -140,6 +141,11 @@ const routes: Routes = [
         path: 'user-creation',
         component: UserCreationComponent
     },
+
+      {
+    path: "transit-report",
+    component: TransitReportsComponent,
+  },
     // {
     //     path: 'co11',
     //     component: Co11Component
