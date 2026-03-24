@@ -269,7 +269,7 @@
         </div>
 
         <div class="form-field">
-          <input type="datetime-local" formControlName="physicalarrivedatdestinationdateandtime" placeholder="" />
+          <input type="datetime-local" formControlName="physicalarrivedatdestinationdateandtime" (change)="updateSIT()" placeholder="" />
           <label>Physical arrived at destination date</label>
         </div>
 

@@ -472,7 +472,11 @@ console.log("Logged in user:", this.loggedInUser);
   }
 
   fetchSAPData(type: 'purchase' | 'invoice'): void {
-    const obj = { VBELN: this.invoicenumber };
+      const ZDATA = this.selectedItems.map(item => ({
+      ZREFNO: item.referenceNumber,
+      LINENO: item.lineNumber
+    }));
+    const obj = { VBELN: this.invoicenumber,ZDATA: ZDATA};
 
     this.spinner.show();
     this.service.OrderinfoOutward(obj).subscribe(

@@ -599,6 +599,7 @@ console.log("Logged in user:", this.loggedInUser);
             for (let i = 0; i < truckCount; i++) {
               this.addRow({
                 VBELN: referenceNumber,
+                 POSNR: res[0]?.POSNR || '', 
 
                 // Map from selected reference
                 ZMAPID: ref.MAPID || '',

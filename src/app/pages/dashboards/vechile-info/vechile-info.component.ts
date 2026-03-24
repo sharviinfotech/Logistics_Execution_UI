@@ -75,8 +75,8 @@ export class VechileInfoComponent implements OnInit {
   invoiceF4List: string[] = [];
   vehicleApiData: any[] = [];
   fullReferenceData: any[] = [];
-   loggedInUser: string = '';
-     plantList: any;
+  loggedInUser: string = '';
+  plantList: any;
   divisionList: any;
 
 
@@ -91,16 +91,16 @@ export class VechileInfoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-       const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
-this.loggedInUser = userData.USER || '';
-console.log("Logged in user:", this.loggedInUser);
- this.plantList = userData.PLANTS || [];
+    const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    this.loggedInUser = userData.USER || '';
+    console.log("Logged in user:", this.loggedInUser);
+    this.plantList = userData.PLANTS || [];
 
-  // ✅ Divisions from login response
-  this.divisionList = userData.DIV || [];
+    // ✅ Divisions from login response
+    this.divisionList = userData.DIV || [];
 
-  console.log("Plants:", this.plantList);
-  console.log("Divisions:", this.divisionList);
+    console.log("Plants:", this.plantList);
+    console.log("Divisions:", this.divisionList);
     this.VehicleForm = this.fb.group({
       VBELN: [''],
       vehicles: this.fb.array([]),
@@ -152,7 +152,7 @@ console.log("Logged in user:", this.loggedInUser);
       ZODN_NO: [data?.ZODN_NO || ''],
       ZLINE_NO: [data?.ZLINE_NO || ''],
       ZSPMAIL: ['', [Validators.required, Validators.email]],
-  ZCUSTMAIL: ['', [Validators.required, Validators.email]],
+      ZCUSTMAIL: ['', [Validators.required, Validators.email]],
       ZGPS: [data?.ZGPS || ''],
 
     });
@@ -408,7 +408,7 @@ console.log("Logged in user:", this.loggedInUser);
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
       LINE_NO: values.lineNumber || '',
-       ZUSER: this.loggedInUser
+      ZUSER: this.loggedInUser
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -645,7 +645,7 @@ console.log("Logged in user:", this.loggedInUser);
     let payload1: any = {
 
       "global": "VEHICLE INFO",
-        ZUSER: this.loggedInUser,
+      ZUSER: this.loggedInUser,
       "data": {
         "ref_no": "",
         "inv_no": "",
@@ -840,15 +840,24 @@ console.log("Logged in user:", this.loggedInUser);
       return;
     }
 
-
+    console.log('se')
     if (!this.selectedItems || this.selectedItems.length === 0) {
+
       Swal.fire('Warning', 'Please select at least one reference row', 'warning');
       return;
     }
+    const ZDATA = this.selectedItems.map(item => ({
+      ZREFNO: item.referenceNumber,
+      LINENO: item.lineNumber
+    }));
 
     const payload = {
       INV_GET: referenceNumber.trim(),
-      SCREEN: 'WITHSAP'
+      SCREEN: 'WITHSAP',
+      // ZREFNO: this.selectedItems,
+      // ZLINE_NO: this.selectedItems
+      ZDATA: ZDATA
+
     };
 
     this.spinner.show();
@@ -883,6 +892,8 @@ console.log("Logged in user:", this.loggedInUser);
 
                 // ✅ GET FROM API RESPONSE
                 ZTRX_TYPE: matchingData?.ZTRX_TYPE || '',
+                ZSALE_PERSON: matchingData?.ZSALE_PERSON,
+                ZLOCATION: matchingData?.ZLOCATION,
               }));
             }
           });
@@ -934,8 +945,8 @@ console.log("Logged in user:", this.loggedInUser);
         ...rest,
         VBELN: vbeln,
         POSNR: (index + 1) * 10,
-           ZUSER: this.loggedInUser,
-    ZUSER_CH: ''
+        ZUSER: this.loggedInUser,
+        ZUSER_CH: ''
       }));
 
 
@@ -1051,7 +1062,7 @@ console.log("Logged in user:", this.loggedInUser);
   }
 
 
-  
+
   updateVehicleSap(row: any) {
 
     // 🔑 Mandatory PKs for SAP
@@ -1092,8 +1103,8 @@ console.log("Logged in user:", this.loggedInUser);
           ZSPMAIL: row.ZSPMAIL,
           ZCUSTMAIL: row.ZCUSTMAIL,
           ZGPS: row.ZGPS,
-             ZUSER: row.ZUSER,        
-    ZUSER_CH: this.loggedInUser
+          ZUSER: row.ZUSER,
+          ZUSER_CH: this.loggedInUser
         }
       ]
     };
@@ -1142,8 +1153,8 @@ console.log("Logged in user:", this.loggedInUser);
           ZSPMAIL: row.ZSPMAIL,
           ZCUSTMAIL: row.ZCUSTMAIL,
           ZGPS: row.ZGPS,
-              ZUSER: row.ZUSER,         
-    ZUSER_CH: this.loggedInUser
+          ZUSER: row.ZUSER,
+          ZUSER_CH: this.loggedInUser
         }
       ]
     };
@@ -1528,7 +1539,10 @@ console.log("Logged in user:", this.loggedInUser);
       return;
     }
 
-    const payload = { INV_NO: invoiceNo, SCREEN: 'WITHOUTSAP' };
+    const payload = {
+      INV_NO: invoiceNo, SCREEN: 'WITHOUTSAP', ZREFNO: this.selectedItems[0]?.referenceNumber,
+      ZLINE_NO: this.selectedItems[0]?.lineNumber
+    };
 
     this.spinner.show();
 

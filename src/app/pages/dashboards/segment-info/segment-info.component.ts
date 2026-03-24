@@ -937,8 +937,8 @@ console.log("Logged in user:", this.loggedInUser);
 
     // ✅ Build payload based on SAP type
     let payload: any = {
-      BRANCH: formValue.BRANCH,
-      BRANCH_ZONE: formValue.BRANCH_ZONE,
+      BRANCH: formValue.ZSTATE,
+      BRANCH_ZONE: formValue.ZZONE,
       TAT_TYPE: formValue.TAT_Type
     };
 

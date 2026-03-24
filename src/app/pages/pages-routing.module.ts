@@ -8,12 +8,14 @@ import { FilemanagerComponent } from './filemanager/filemanager.component';
 import { InvoiceComponent } from './dashboards/invoice/invoice.component';
 import { DispatchComponent } from './dashboards/dispatch/dispatch.component';
 
+
 const routes: Routes = [
   // { path: '', redirectTo: 'dashboard' },
-  {
-    path: "",
-    component: DispatchComponent
-  },
+  // {
+  //   path: "",
+  //   component: DispatchComponent
+  // },
+  { path: "", redirectTo: "login", pathMatch: "full" },
   { path: 'dashboard', component: DefaultComponent },
   // { path: 'Invoice', component: InvoiceComponent },
   { path: 'calendar', component: CalendarComponent },
