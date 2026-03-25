@@ -2168,7 +2168,7 @@ input[type="radio"]:checked ~ .toggle-text {
 .form-row {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
+  gap: 15px;
 }
 
 .dropdown-input {
@@ -2409,7 +2409,7 @@ input[type="radio"]:checked ~ .toggle-text {
 }
 
 .modal-body {
-  padding: 32px;
+  padding: 15px;
   overflow-y: auto;
 }
 
@@ -3231,4 +3231,10 @@ input[type="radio"]:checked ~ .toggle-text {
 /* 4. Hide the internal placeholder so it doesn't fight with your label */
 ::ng-deep .ng-select .ng-placeholder {
   display: none !important;
+}
+.form-input:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+  border: 1px solid #dcdcdc;
 }
