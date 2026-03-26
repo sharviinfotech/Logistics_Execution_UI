@@ -71,6 +71,7 @@ export class UserCreationComponent implements OnInit {
 
   PlantCodeList: Plant[] = [];
   DivisionList: { DIVISION: string; PLANT: string }[] = [];
+  viewCardAvailableActivities: string[] = [];
   showActivityModal = false;
 
 
@@ -187,7 +188,7 @@ export class UserCreationComponent implements OnInit {
   }
   selectAllActivities() {
     this.activitiesFormArray.clear();
-    this.availableActivities.forEach(activity => {
+    this.filteredActivities.forEach(activity => {
       this.activitiesFormArray.push(this.fb.control(activity));
     });
   }
@@ -216,6 +217,19 @@ export class UserCreationComponent implements OnInit {
     this.showActivityModal = !this.showActivityModal;
   }
 
+  get filteredActivities() {
+  const category = this.userForm.get('CATEGORY')?.value;
+
+  if (category == 'External') {
+    return [
+      'Outward-TransitInfo',
+      'Outward-FreightBilling'
+    ];
+  }
+
+  return this.availableActivities;
+}
+
   openPlantCard(plants: { WERKS: string }[]) {
     this.viewCardTitle = 'Selected Plants';
     this.viewCardData = plants.map(p => p.WERKS);
@@ -230,11 +244,17 @@ export class UserCreationComponent implements OnInit {
     this.showViewCard = true;
   }
 
-  openActivityCard(activities: Activity[]) {
-    this.viewCardTitle = 'Selected Activities';
-    this.viewCardData = activities.map(a => a.ACT);
-    this.showViewCard = true;
-  }
+openActivityCard(activities: Activity[], category?: string) {
+  this.viewCardTitle = 'Selected Activities';
+  this.viewCardData = activities.map(a => a.ACT);
+
+  // ✅ Only show allowed screens for External users
+  this.viewCardAvailableActivities = category === 'External'
+    ? ['Outward-TransitInfo', 'Outward-FreightBilling']
+    : [...this.availableActivities];
+
+  this.showViewCard = true;
+}
 
   closeViewCard() {
     this.showViewCard = false;
@@ -780,39 +800,91 @@ export class UserCreationComponent implements OnInit {
   }
 
 
-  deleteUser(index: number) {
-    if (!confirm('Are you sure you want to delete this user?')) {
-      return;
+//   deleteUser(index: number) {
+//     Swal.fire({
+//         title: 'Are you sure?',
+//         text: 'Do you want to delete this record? This action cannot be undone.',
+//         icon: 'warning',
+//         showCancelButton: true,
+//         confirmButtonText: 'Yes, Delete',
+//         cancelButtonText: 'Cancel',
+//         confirmButtonColor: '#d33'
+//       }).then((result) => {
+
+//     if (result.isConfirmed) {
+//       const selectedUser = this.users[index];
+
+//     const selectedUser = this.users[index];
+
+//     const payload = {
+//       DEL_USER: selectedUser.USER
+//     };
+
+//     this.spinner.show();
+
+//     this.service.UserCreationDelete(payload).subscribe({
+//       next: (res: any) => {
+//         this.spinner.hide();
+
+//         if (res.STATUS === 'TRUE') {
+//           Swal.fire('Deleted!', res.MESSAGE, 'success');
+
+
+//           this.users.splice(index, 1);
+//         } else {
+//           Swal.fire('Failed!', res.MESSAGE, 'error');
+//         }
+//       },
+//       error: (err) => {
+//         this.spinner.hide();
+//         console.error('Delete API Error:', err);
+//         Swal.fire('Error!', 'Something went wrong while deleting user.', 'error');
+//       }
+//     });
+//   }
+
+//  });
+// }
+
+deleteUser(index: number) {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'Do you want to delete this record? This action cannot be undone.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Delete',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#d33'
+  }).then((result) => {
+
+    if (result.isConfirmed) {
+      const selectedUser = this.users[index];
+
+      const payload = {
+        DEL_USER: selectedUser.USER
+      };
+
+      this.spinner.show();
+
+      this.service.UserCreationDelete(payload).subscribe({
+        next: (res: any) => {
+          this.spinner.hide();
+
+          if (res.STATUS === 'TRUE') {
+            Swal.fire('Deleted!', res.MESSAGE, 'success');
+            this.users.splice(index, 1);
+          } else {
+            Swal.fire('Failed!', res.MESSAGE, 'error');
+          }
+        },
+        error: (err) => {
+          this.spinner.hide();
+          console.error('Delete API Error:', err);
+          Swal.fire('Error!', 'Something went wrong while deleting user.', 'error');
+        }
+      });
     }
 
-    const selectedUser = this.users[index];
-
-    const payload = {
-      DEL_USER: selectedUser.USER
-    };
-
-    this.spinner.show();
-
-    this.service.UserCreationDelete(payload).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-
-        if (res.STATUS === 'TRUE') {
-          Swal.fire('Deleted!', res.MESSAGE, 'success');
-
-
-          this.users.splice(index, 1);
-        } else {
-          Swal.fire('Failed!', res.MESSAGE, 'error');
-        }
-      },
-      error: (err) => {
-        this.spinner.hide();
-        console.error('Delete API Error:', err);
-        Swal.fire('Error!', 'Something went wrong while deleting user.', 'error');
-      }
-    });
-  }
-
-
+  });
+}
 }
