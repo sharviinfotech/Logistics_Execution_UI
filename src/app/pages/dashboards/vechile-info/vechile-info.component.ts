@@ -566,6 +566,11 @@ export class VechileInfoComponent implements OnInit {
             item.lineNumber === rowValue.lineNumber
           )
       );
+      this.vehicles.clear();
+      this.showForm = false;
+      this.VehicleForm.patchValue({
+        VBELN: ''
+      });
       this.updateInvoiceListForSelectedItems();
     }
 
@@ -1505,14 +1510,14 @@ export class VechileInfoComponent implements OnInit {
   //   this.service.DCReferenceNo(payload).subscribe({
   //     next: (res: any) => {
   //       this.spinner.hide();
-  //       console.log('✅ DC Response:', res);
+  //       console.log(' DC Response:', res);
 
   //       if (res?.ZTRANS_TYPE) {
 
-  //         // 🔥 STORE GLOBALLY
+  //         //  STORE GLOBALLY
   //         this.shipmentType = res.ZTRANS_TYPE;
 
-  //         // 🔥 APPLY TO ALL EXISTING ROWS
+  //         //  APPLY TO ALL EXISTING ROWS
   //         this.applyShipmentTypeToAllRows();
   //       }
   //     },
@@ -1539,9 +1544,13 @@ export class VechileInfoComponent implements OnInit {
       return;
     }
 
+    const ZDATA = this.selectedItems.map(item => ({
+      ZREFNO: item.referenceNumber,
+      LINENO: item.lineNumber
+    }));
+
     const payload = {
-      INV_NO: invoiceNo, SCREEN: 'WITHOUTSAP', ZREFNO: this.selectedItems[0]?.referenceNumber,
-      ZLINE_NO: this.selectedItems[0]?.lineNumber
+      INV_NO: invoiceNo, SCREEN: 'WITHOUTSAP', ZDATA: ZDATA
     };
 
     this.spinner.show();
@@ -1549,7 +1558,7 @@ export class VechileInfoComponent implements OnInit {
     this.service.DCReferenceNo(payload).subscribe({
       next: (res: any) => {
         this.spinner.hide();
-        console.log('✅ DC Response:', res);
+        console.log(' DC Response:', res);
 
         const firstRef = Array.isArray(res) ? res[0] : res;
 
@@ -1559,7 +1568,7 @@ export class VechileInfoComponent implements OnInit {
 
         this.vehicles.clear();
 
-        console.log('✅ Selected Items for row creation:', this.selectedItems);
+        console.log(' Selected Items for row creation:', this.selectedItems);
 
 
         this.selectedItems.forEach((ref: any) => {
@@ -1581,7 +1590,7 @@ export class VechileInfoComponent implements OnInit {
 
         this.showTable = true;
 
-        console.log('✅ Total Vehicle Rows Created:', this.vehicles.length);
+        console.log(' Total Vehicle Rows Created:', this.vehicles.length);
 
         Swal.fire(
           'Success',

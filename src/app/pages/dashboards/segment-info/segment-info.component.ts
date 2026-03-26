@@ -263,7 +263,7 @@ console.log("Logged in user:", this.loggedInUser);
   }
 
   fetchSAPData(type: 'purchase' | 'invoice') {
-    const obj = type === 'purchase' ? { VBELN: this.ponumber } : { VBELN: this.invoicenumber };
+    const obj = type === 'purchase' ? { VBELN: this.ponumber } : { VBELN: this.invoicenumber, SCREEN: 'WITHSAP', };
     this.spinner.show();
     this.service.SegmentInfoOutwardFetch(obj).subscribe({
       next: (res: any) => {

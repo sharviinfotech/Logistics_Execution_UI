@@ -74,7 +74,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   invoiceF4List: string[] = [];
   fullReferenceData: any[] = [];
   loggedInUser: string = '';
-    plantList: any;
+  plantList: any;
   divisionList: any;
 
   constructor(
@@ -92,15 +92,15 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
     const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
-this.loggedInUser = userData.USER || '';
-console.log("Logged in user:", this.loggedInUser);
- this.plantList = userData.PLANTS || [];
+    this.loggedInUser = userData.USER || '';
+    console.log("Logged in user:", this.loggedInUser);
+    this.plantList = userData.PLANTS || [];
 
-  // ✅ Divisions from login response
-  this.divisionList = userData.DIV || [];
+    // ✅ Divisions from login response
+    this.divisionList = userData.DIV || [];
 
-  console.log("Plants:", this.plantList);
-  console.log("Divisions:", this.divisionList);
+    console.log("Plants:", this.plantList);
+    console.log("Divisions:", this.divisionList);
 
     this.addRow();
     this.getVehicleTypes();
@@ -167,8 +167,8 @@ console.log("Logged in user:", this.loggedInUser);
     this.isAllSelected = this.allSelected();
     console.log('All Selected:', this.invoices.value);
   }
-  onClickRow(){
-    console.log("this.invoices.value",this.invoices.value)
+  onClickRow() {
+    console.log("this.invoices.value", this.invoices.value)
   }
 
   allSelected(): boolean {
@@ -246,8 +246,8 @@ console.log("Logged in user:", this.loggedInUser);
       this.fetchPendingAndCompletedCounts();
     }
     this.selectedType = '';
-  this.searchReference = '';
-  this.searchOptionsList = [];
+    this.searchReference = '';
+    this.searchOptionsList = [];
 
     this.invoices.clear();
     this.addRow();
@@ -283,7 +283,7 @@ console.log("Logged in user:", this.loggedInUser);
         ZLRNO: selectedObj.lrNumber || "",
         ZTRANSPORTER: selectedObj.transporter || "",
         ZMAPID: selectedObj.MAPID || "",
-      ZLINE_NO: selectedObj.lineNumber ?? null
+        ZLINE_NO: selectedObj.lineNumber ?? null
       });
     }
     console.log("Updated invoices form:", this.invoices.value);
@@ -318,7 +318,7 @@ console.log("Logged in user:", this.loggedInUser);
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
       LINE_NO: values.lineNumber || '',
-       ZUSER: this.loggedInUser
+      ZUSER: this.loggedInUser
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -378,11 +378,11 @@ console.log("Logged in user:", this.loggedInUser);
 
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
-    this.invoiceF4List = [];   
-       this.fullReferenceData = []; 
+    this.invoiceF4List = [];
+    this.fullReferenceData = [];
 
     if (data && data.length > 0) {
-        this.fullReferenceData = data;
+      this.fullReferenceData = data;
       data.forEach(d => {
 
         // ✅ PUSH FORM ROW
@@ -440,12 +440,12 @@ console.log("Logged in user:", this.loggedInUser);
           item.transporter === rowValue.transporter &&
           item.soNumber === rowValue.soNumber &&
           item.odnNumber === rowValue.odnNumber &&
-          item.lineNumber === rowValue.lineNumber 
+          item.lineNumber === rowValue.lineNumber
       );
       if (!exists) {
         this.selectedItems.push(rowValue);
       }
-        this.updateInvoiceListForSelectedItems();
+      this.updateInvoiceListForSelectedItems();
     } else {
       this.selectedItems = this.selectedItems.filter(
         (item) =>
@@ -457,13 +457,18 @@ console.log("Logged in user:", this.loggedInUser);
             item.transporter === rowValue.transporter &&
             item.soNumber === rowValue.soNumber &&
             item.odnNumber === rowValue.odnNumber &&
-            item.lineNumber === rowValue.lineNumber 
+            item.lineNumber === rowValue.lineNumber
           )
       );
-        this.updateInvoiceListForSelectedItems();
+      this.invoices.clear();         
+      this.showForm = false;          
+      this.InvoiceForm.patchValue({
+        INV_VBELN: ''                 
+      });
+      this.updateInvoiceListForSelectedItems();
     }
 
-    console.log('✅ Selected Items:', this.selectedItems);
+    console.log(' Selected Items:', this.selectedItems);
   }
 
 
@@ -479,40 +484,40 @@ console.log("Logged in user:", this.loggedInUser);
         item.transporter === rowValue.transporter &&
         item.soNumber === rowValue.soNumber &&
         item.odnNumber === rowValue.odnNumber &&
-         item.lineNumber === rowValue.lineNumber 
+        item.lineNumber === rowValue.lineNumber
 
     );
   }
 
-    updateInvoiceListForSelectedItems(): void {
-  this.invoiceF4List = [];
+  updateInvoiceListForSelectedItems(): void {
+    this.invoiceF4List = [];
 
-  if (this.selectedItems.length === 0) {
-    // No items selected, clear invoice list
-    console.log('⚠️ No items selected, invoice list cleared');
-    return;
-  }
-
-  // Get unique MAPIDs from selected items
-  const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
-
-  console.log('🔍 Selected MAPIDs:', selectedMapIds);
-
-  // Filter reference data for selected MAPIDs and extract invoices
-  this.fullReferenceData.forEach(refItem => {
-    if (selectedMapIds.includes(refItem.MAPID)) {
-      if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
-        refItem.INV_NO.forEach((inv: any) => {
-          if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
-            this.invoiceF4List.push(inv.VBELN);
-          }
-        });
-      }
+    if (this.selectedItems.length === 0) {
+      // No items selected, clear invoice list
+      console.log('⚠️ No items selected, invoice list cleared');
+      return;
     }
-  });
 
-  console.log('📋 Filtered Invoice List:', this.invoiceF4List);
-}
+    // Get unique MAPIDs from selected items
+    const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
+
+    console.log('🔍 Selected MAPIDs:', selectedMapIds);
+
+    // Filter reference data for selected MAPIDs and extract invoices
+    this.fullReferenceData.forEach(refItem => {
+      if (selectedMapIds.includes(refItem.MAPID)) {
+        if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
+          refItem.INV_NO.forEach((inv: any) => {
+            if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+              this.invoiceF4List.push(inv.VBELN);
+            }
+          });
+        }
+      }
+    });
+
+    console.log('📋 Filtered Invoice List:', this.invoiceF4List);
+  }
 
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
@@ -577,9 +582,9 @@ console.log("Logged in user:", this.loggedInUser);
     }
 
     const payload = {
-    INV_GET: referenceNumber.trim(),
-    SCREEN: 'WITHSAP'
-  };
+      INV_GET: referenceNumber.trim(),
+      SCREEN: 'WITHSAP'
+    };
 
     this.spinner.show();
 
@@ -599,7 +604,7 @@ console.log("Logged in user:", this.loggedInUser);
             for (let i = 0; i < truckCount; i++) {
               this.addRow({
                 VBELN: referenceNumber,
-                 POSNR: res[0]?.POSNR || '', 
+                POSNR: res[0]?.POSNR || '',
 
                 // Map from selected reference
                 ZMAPID: ref.MAPID || '',
@@ -607,7 +612,7 @@ console.log("Logged in user:", this.loggedInUser);
                 ZWORK_ORDER: ref.workOrderNumber || '',
                 ZLRNO: ref.lrNumber || '',
                 ZTRANSPORTER: ref.transporter || '',
-                ZLINE_NO: ref.lineNumber || '', 
+                ZLINE_NO: ref.lineNumber || '',
 
                 ZTRUCK_LINE: i + 1,
 
@@ -675,75 +680,75 @@ console.log("Logged in user:", this.loggedInUser);
   }
 
   // ✅ SAVE FOR SAP
- saveInvoiceDetails(action: 'stay' | 'next' | 'previous' = 'stay'): void {
-  const filtered = this.invoices.value
-    .filter((row: any) => row.selected === true)
-    .map(({ selected, ...rest }) => rest);
+  saveInvoiceDetails(action: 'stay' | 'next' | 'previous' = 'stay'): void {
+    const filtered = this.invoices.value
+      .filter((row: any) => row.selected === true)
+      .map(({ selected, ...rest }) => rest);
 
-  if (filtered.length === 0) {
-    Swal.fire({
-      title: 'Warning',
-      text: 'Please select at least one row to save.',
-      icon: 'warning',
-      timer: 3000,
-      confirmButtonText: 'Ok',
-    });
-    return;
-  }
-
-  this.InvoiceForm.markAllAsTouched();
-  if (this.InvoiceForm.invalid) {
-    Swal.fire('Error', 'Please fill all required fields', 'error');
-    return;
-  }
-
-  if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
-    Swal.fire({
-      icon: 'warning',
-      text: 'Please select at least one reference row before saving'
-    });
-    return;
-  }
-
-  const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
-
-  // ✅ ADD ZUSER TO EACH ITEM
-  const loggedInUser = this.getCurrentUser();
-  const payloadWithUser = filtered.map((item: any) => ({
-    ...item,
-    ZUSER: loggedInUser,
-    ZUSER_CH:''
-  }));
-
-  this.spinner.show();
-  this.service.InvoiceloaddetailsSave(payloadWithUser).subscribe({
-    next: (res: any) => {
-      this.spinner.hide();
-      if (res?.NUMBER === '200') {
-        Swal.fire({
-          title: 'Success',
-          text: res.MSG || 'Saved Successfully',
-          icon: 'success',
-          confirmButtonText: 'Ok'
-        }).then(() => {
-          if (action === 'next') {
-            this.router.navigate(['/segment-info']);
-          } else if (action === 'previous') {
-            this.router.navigate(['/shipment-details']);
-          } else {
-            this.resetForm();
-          }
-        });
-      } else {
-        Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
-      }
-    },
-    error: () => {
-      this.spinner.hide();
-      Swal.fire('Error', 'Save failed', 'error');
+    if (filtered.length === 0) {
+      Swal.fire({
+        title: 'Warning',
+        text: 'Please select at least one row to save.',
+        icon: 'warning',
+        timer: 3000,
+        confirmButtonText: 'Ok',
+      });
+      return;
     }
-  });
-}
+
+    this.InvoiceForm.markAllAsTouched();
+    if (this.InvoiceForm.invalid) {
+      Swal.fire('Error', 'Please fill all required fields', 'error');
+      return;
+    }
+
+    if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        text: 'Please select at least one reference row before saving'
+      });
+      return;
+    }
+
+    const referenceNumber = this.orderType === 'Inward' ? this.ponumber : this.invoicenumber;
+
+    // ✅ ADD ZUSER TO EACH ITEM
+    const loggedInUser = this.getCurrentUser();
+    const payloadWithUser = filtered.map((item: any) => ({
+      ...item,
+      ZUSER: loggedInUser,
+      ZUSER_CH: ''
+    }));
+
+    this.spinner.show();
+    this.service.InvoiceloaddetailsSave(payloadWithUser).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+        if (res?.NUMBER === '200') {
+          Swal.fire({
+            title: 'Success',
+            text: res.MSG || 'Saved Successfully',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          }).then(() => {
+            if (action === 'next') {
+              this.router.navigate(['/segment-info']);
+            } else if (action === 'previous') {
+              this.router.navigate(['/shipment-details']);
+            } else {
+              this.resetForm();
+            }
+          });
+        } else {
+          Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
+        }
+      },
+      error: () => {
+        this.spinner.hide();
+        Swal.fire('Error', 'Save failed', 'error');
+      }
+    });
+  }
 
   // 8. ✅ Update saveInvoiceNonsapDetails similarly
   saveInvoiceNonsapDetails(action: 'stay' | 'next' | 'previous' = 'stay'): void {
@@ -800,14 +805,14 @@ console.log("Logged in user:", this.loggedInUser);
         ZACT_VOL: inv.ZACT_VOL,
         ZLF_VOL: inv.ZLF_VOL,
         ZLF_WT: inv.ZLF_WT,
-        ZODN_NO:inv.ZODN_NO,
+        ZODN_NO: inv.ZODN_NO,
         ZSO_NO: inv.ZSO_NO,
         ZWEEK_SF: inv.ZWEEK_SF,
         ZEWAYBILL_NO: inv.ZEWAYBILL_NO,
         ZEWAYBILL_DT: inv.ZEWAYBILL_DT,
         ZMAPID: inv.ZMAPID || "",
         ZUSER: this.getCurrentUser(),
-        ZUSER_CH:''
+        ZUSER_CH: ''
       })),
     };
 
@@ -871,7 +876,7 @@ console.log("Logged in user:", this.loggedInUser);
   // Method to update the edited row
 
   updateInvoiceSap(row: any) {
-    if (!row.ZREFNO || !row.VBELN ||  !row.ZMAPID || !row.ZLINE_NO) {
+    if (!row.ZREFNO || !row.VBELN || !row.ZMAPID || !row.ZLINE_NO) {
       Swal.fire('Error', 'Primary key missing', 'error');
       return null;
     }
@@ -896,14 +901,14 @@ console.log("Logged in user:", this.loggedInUser);
       ZWEEK_SF: row.ZWEEK_SF,
       ZEWAYBILL_NO: row.ZEWAYBILL_NO,
       ZEWAYBILL_DT: row.ZEWAYBILL_DT,
-      ZUSER:row.ZUSER,
+      ZUSER: row.ZUSER,
       ZUSER_CH: this.getCurrentUser()
     }];
 
     return this.service.InvoiceloaddetailsSave(payload);
   }
   updateInvoiceNonSap(row: any) {
-    if (!row.ZMAPID || !row.VBELN ||  !row.ZREFNO || !row.ZLINE_NO) {
+    if (!row.ZMAPID || !row.VBELN || !row.ZREFNO || !row.ZLINE_NO) {
       Swal.fire('Error', 'Primary key missing', 'error');
       return null;
     }
@@ -912,9 +917,9 @@ console.log("Logged in user:", this.loggedInUser);
       NSAP_LOAD: [{
         MANDT: '',
         ZMAPID: row.ZMAPID,
-        VBELN: row.VBELN,        
-        POSNR: row.POSNR,        
-        ZLINE_NO: row.ZLINE_NO,  
+        VBELN: row.VBELN,
+        POSNR: row.POSNR,
+        ZLINE_NO: row.ZLINE_NO,
 
         ZREFNO: row.ZREFNO,
         ZWORK_ORDER: row.ZWORK_ORDER,
@@ -929,8 +934,8 @@ console.log("Logged in user:", this.loggedInUser);
         ZWEEK_SF: row.ZWEEK_SF,
         ZEWAYBILL_NO: row.ZEWAYBILL_NO,
         ZEWAYBILL_DT: row.ZEWAYBILL_DT,
-            ZUSER:row.ZUSER,
-      ZUSER_CH: this.getCurrentUser()
+        ZUSER: row.ZUSER,
+        ZUSER_CH: this.getCurrentUser()
       }]
     };
 
@@ -1129,39 +1134,39 @@ console.log("Logged in user:", this.loggedInUser);
   }
 
   onVehicleTypeChange(i: number): void {
-  const row = this.invoices.at(i);
-  const selectedTruck = row.get('ZTRUC_TYPE')?.value;
+    const row = this.invoices.at(i);
+    const selectedTruck = row.get('ZTRUC_TYPE')?.value;
 
-  if (!selectedTruck) {
-    // Clear ZTRUC_WT if no truck type selected
-    row.patchValue({
-      ZTRUC_WT: ''
-    });
-    return;
+    if (!selectedTruck) {
+      // Clear ZTRUC_WT if no truck type selected
+      row.patchValue({
+        ZTRUC_WT: ''
+      });
+      return;
+    }
+
+    // Find the matching vehicle type from the loaded list
+    const matchedVehicle = this.vehicleTypes.find(
+      v => v.ZTRUC_TYPE === selectedTruck
+    );
+
+    if (matchedVehicle) {
+      // Patch the passing weight directly from local data
+      row.patchValue({
+        ZTRUC_WT: matchedVehicle.ZTRUC_WT || ''
+      }, { emitEvent: false });
+
+      console.log(`✅ Patched ZTRUC_WT: ${matchedVehicle.ZTRUC_WT} for ${selectedTruck}`);
+    } else {
+      // If not found in local list, clear the weight
+      row.patchValue({
+        ZTRUC_WT: ''
+      });
+      console.warn(`⚠️ No matching weight found for: ${selectedTruck}`);
+    }
   }
 
-  // Find the matching vehicle type from the loaded list
-  const matchedVehicle = this.vehicleTypes.find(
-    v => v.ZTRUC_TYPE === selectedTruck
-  );
 
-  if (matchedVehicle) {
-    // Patch the passing weight directly from local data
-    row.patchValue({
-      ZTRUC_WT: matchedVehicle.ZTRUC_WT || ''
-    }, { emitEvent: false });
-    
-    console.log(`✅ Patched ZTRUC_WT: ${matchedVehicle.ZTRUC_WT} for ${selectedTruck}`);
-  } else {
-    // If not found in local list, clear the weight
-    row.patchValue({
-      ZTRUC_WT: ''
-    });
-    console.warn(`⚠️ No matching weight found for: ${selectedTruck}`);
-  }
-}
-
-  
 
   isSap(): boolean {
     return this.sapType === 'SAP';
@@ -1190,7 +1195,7 @@ console.log("Logged in user:", this.loggedInUser);
 
     let payload1: any = {
       "global": "INVOICE LOAD DETAILS",
-       ZUSER: this.loggedInUser,
+      ZUSER: this.loggedInUser,
       "data": {
         "ref_no": "",
         "inv_no": "",
@@ -1205,7 +1210,7 @@ console.log("Logged in user:", this.loggedInUser);
         "freight_billno": "",
         "nature_damage": "",
         "claim_status": "",
-       
+
       }
     };
     payload1.data[this.selectedType] = this.searchReference.trim();
@@ -1777,86 +1782,85 @@ console.log("Logged in user:", this.loggedInUser);
 
   fetchDcRef(): void {
     const referenceNumber =
-      this.InvoiceForm.get('INV_VBELN')?.value; // ✅ correct value
-
+      this.InvoiceForm.get('INV_VBELN')?.value;
     if (!referenceNumber || !referenceNumber.trim()) {
-    Swal.fire(
-      'Warning',
-      `Please enter ${this.orderType === 'Inward' ? 'PO' : 'invoice'} number`,
-      'warning'
-    );
-    return;
-  }
+      Swal.fire(
+        'Warning',
+        `Please enter ${this.orderType === 'Inward' ? 'PO' : 'invoice'} number`,
+        'warning'
+      );
+      return;
+    }
 
-  if (!this.selectedItems || this.selectedItems.length === 0) {
-    Swal.fire(
-      'Warning',
-      'Please select at least one reference row',
-      'warning'
-    );
-    return;
-  }
+    if (!this.selectedItems || this.selectedItems.length === 0) {
+      Swal.fire(
+        'Warning',
+        'Please select at least one reference row',
+        'warning'
+      );
+      return;
+    }
 
-  const payload = {
-    INV_GET: referenceNumber.trim(),
-    SCREEN: 'WITHOUTSAP'
-  };
+    const payload = {
+      INV_GET: referenceNumber.trim(),
+      SCREEN: 'WITHOUTSAP'
+    };
 
-  this.spinner.show();
+    this.spinner.show();
 
-  this.service.Invoiceloaddetailsfetch(payload).subscribe({
-    next: (res: any) => {
-      this.spinner.hide();
+    this.service.Invoiceloaddetailsfetch(payload).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
 
-      if (Array.isArray(res) && res.length > 0) {
-        this.invoices.clear();
+        if (Array.isArray(res) && res.length > 0) {
+          this.invoices.clear();
 
-        this.selectedItems.forEach((ref: any) => {
-          const truckCount = Number(ref.ZNO_TRUCKS) || 1;
+          this.selectedItems.forEach((ref: any) => {
+            const truckCount = Number(ref.ZNO_TRUCKS) || 1;
 
-          for (let i = 0; i < truckCount; i++) {
-            this.addRow({
-              VBELN: referenceNumber,
-              ZMAPID: ref.MAPID || '',
-              ZREFNO: ref.referenceNumber || '',
-              ZWORK_ORDER: ref.workOrderNumber || '',
-              ZLRNO: ref.lrNumber || '',
-              ZTRANSPORTER: ref.transporter || '',
-              ZTRUCK_LINE: i + 1,
+            for (let i = 0; i < truckCount; i++) {
+              this.addRow({
+                VBELN: referenceNumber,
+                ZMAPID: ref.MAPID || '',
+                ZREFNO: ref.referenceNumber || '',
+                ZWORK_ORDER: ref.workOrderNumber || '',
+                ZLRNO: ref.lrNumber || '',
+                ZTRANSPORTER: ref.transporter || '',
+                ZTRUCK_LINE: i + 1,
 
-               ZWEEK_SF: res[0]?.ZWEEK_SF || ''
-            });
-          }
-        });
+                ZWEEK_SF: res[0]?.ZWEEK_SF || ''
+              });
+            }
+          });
 
-        this.showForm = true;
-        this.searchOptionsList = [];
+          this.showForm = true;
+          this.searchOptionsList = [];
 
-        Swal.fire(
-          'Success',
-          'Invoice rows created based on No of Trucks',
-          'success'
-        );
-      } else {
-        Swal.fire('Info', 'No records found for this invoice', 'info');
-      }
-    },
-    error: (err) => {
-      this.spinner.hide();
-      Swal.fire('Error', 'Fetch failed', 'error');
-      console.error(err);
+          Swal.fire(
+            'Success',
+            'Invoice rows created based on No of Trucks',
+            'success'
+          );
+        } else {
+          Swal.fire('Info', 'No records found for this invoice', 'info');
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        Swal.fire('Error', 'Fetch failed', 'error');
+        console.error(err);
       }
     });
   }
 
   getCurrentUser(): string {
-  const currentUser = localStorage.getItem('currentUser');
-  if (currentUser) {
-    const user = JSON.parse(currentUser);
-    return user.USER || '';
+    const currentUser = localStorage.getItem('currentUser');
+    if (currentUser) {
+      const user = JSON.parse(currentUser);
+      return user.USER || '';
+    }
+    return '';
   }
-  return '';
-}
 
 
 

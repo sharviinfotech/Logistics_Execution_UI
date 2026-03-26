@@ -170,21 +170,21 @@
                 <td>
                   <select formControlName="VehicleType">
                     <option value="" disabled>Select Vehicle Type</option>
-                    <option value="Cargo">Cargo</option>
-                    <option value="Rate Contract">Rate Contract</option>
-                    <option value="Local Transportation">Local Transportation</option>
-                    <option value="Customer Transporter">Customer Transporter</option>
-                    <option value="Company Vehicle">Company Vehicle</option>
-                    <option value="Courier">Courier</option>
-                    <option value="By Hand">By Hand</option>
-                    <option value="Full Truck Load">Full Truck Load</option>
+                    <option value="CARGO">CARGO</option>
+                    <option value="RATE CONTRACT">RATE CONTRACT</option>
+                    <option value="LOCAL TRANSPORTATION">LOCAL TRANSPORTATION</option>
+                    <option value="CUSTOMER TRANSPORTER">CUSTOMER TRANSPORTER</option>
+                    <option value="COMPANY VEHICLE">COMPANY VEHICLE</option>
+                    <option value="COURIER">COURIER</option>
+                    <option value="BY HAND">BY HAND</option>
+                    <option value="FULL TRUCK LOAD">FULL TRUCK LOAD</option>
                   </select>
                 </td>
 
                 <td>
-                  <input *ngIf="row.get('VehicleType')?.value === 'Full Truck Load'" type="text"
+                  <input *ngIf="row.get('VehicleType')?.value === 'FULL TRUCK LOAD'" type="text"
                     formControlName="workorder" class="width-le" />
-                  <span *ngIf="row.get('VehicleType')?.value !== 'Full Truck Load'">
+                  <span *ngIf="row.get('VehicleType')?.value !== 'FULL TRUCK LOAD'">
                   </span>
                 </td>
 
@@ -372,14 +372,14 @@
           <div class="form-field">
             <select [(ngModel)]="filterVehicleType">
               <option value="">Select Vehicle Type</option>
-              <option value="Cargo">Cargo</option>
-              <option value="Rate Contract">Rate Contract</option>
-              <option value="Local Transportation">Local Transportation</option>
-              <option value="Customer Transporter">Customer Transporter</option>
-              <option value="Company Vehicle">Company Vehicle</option>
-              <option value="Courier">Courier</option>
-              <option value="By Hand">By Hand</option>
-              <option value="Full Truck Load">Full Truck Load</option>
+              <option value="CARGO">CARGO</option>
+              <option value="RATE CONTRACT">RATE CONTRACT</option>
+              <option value="LOCAL TRANSPORTATION">LOCAL TRANSPORTATION</option>
+              <option value="CUSTOMER TRANSPORTER">CUSTOMER TRANSPORTER</option>
+              <option value="COMPANY VEHICLE">COMPANY VEHICLE</option>
+              <option value="COURIER">COURIER</option>
+              <option value="BY HAND">BY HAND</option>
+              <option value="FULL TRUCK LOAD">FULL TRUCK LOAD</option>
             </select>
             <label>Vehicle Type</label>
           </div>
