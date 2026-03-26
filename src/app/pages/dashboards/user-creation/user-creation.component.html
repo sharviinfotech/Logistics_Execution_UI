@@ -15,8 +15,8 @@
     </div>
     <div class="card-body-LE">
         <!-- User Table -->
-        <div class="table-container">
-            <table class="user-table">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped text-center">
                 <thead>
                     <tr>
                         <th>UserID</th>
@@ -84,7 +84,7 @@
                         <td>
 
                             <button *ngIf="user.ACTIVITIES?.length" class="btn-Screens"
-                                (click)="openActivityCard(user.ACTIVITIES)">
+                                (click)="openActivityCard(user.ACTIVITIES, user.CATEGORY)">
 
                                 <i class="ri-shield-check-line"></i>
                                 🛡 Screens ({{ user.ACTIVITIES.length }})
@@ -93,7 +93,7 @@
 
                         <td>
                             <button class="btn-action btn-edit" (click)="editUser(user, i)">✎</button>
-                            <button class="btn-action btn-danger" (click)="deleteUser(i)">
+                            <button class="btn-action btn-delete" (click)="deleteUser(i)">
                                 <i class="fa fa-trash"></i>
                             </button>
                         </td>
@@ -117,7 +117,7 @@
 
                     <ng-container *ngIf="viewCardTitle === 'Selected Activities'; else plainList">
                         <div class="activities-grid-new">
-                            <div *ngFor="let activity of availableActivities" class="activity-pill view-only"
+                            <div *ngFor="let activity of viewCardAvailableActivities" class="activity-pill view-only"
                                 [class.selected]="viewCardData.includes(activity)">
                                 <span class="activity-name">{{ activity }}</span>
                                 <span class="activity-check" *ngIf="viewCardData.includes(activity)">✔</span>
@@ -151,7 +151,7 @@
 
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h2 class="modal-title">Create New User</h2>
+                    <h2 class="modal-title">{{ editingIndex !== null ? 'Edit User' : 'Create New User' }}</h2>
                     <button class="btn-close" (click)="closeModal()">×</button>
                 </div>
 
@@ -398,7 +398,7 @@
                                     <!-- Modal Body -->
                                     <div class="activity-modal-body">
                                         <div class="activities-grid-new">
-                                            <div *ngFor="let activity of availableActivities" class="activity-pill"
+                                            <div *ngFor="let activity of filteredActivities" class="activity-pill"
                                                 [class.selected]="isActivitySelected(activity)"
                                                 (click)="selectActivity(activity)">
                                                 <span class="activity-name">{{ activity }}</span>
