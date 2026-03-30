@@ -58,6 +58,18 @@ export class UserCreationComponent implements OnInit {
 
   ngOnInit() {
     this.fetchUsers();
+
+    this.userForm.get('ROLES')?.valueChanges.subscribe(role => {
+
+      if (role === 'ADMIN') {
+
+        this.selectAllActivities();
+      } else {
+
+        this.activitiesFormArray.clear();
+      }
+
+    });
   }
 
   userForm!: FormGroup;
@@ -109,6 +121,16 @@ export class UserCreationComponent implements OnInit {
     { name: 'TRANSPORTER' }
   ];
 
+  get filteredRoles(): Role[] {
+    const category = this.userForm.get('CATEGORY')?.value;
+
+    if (category === 'External') {
+      return this.availableRoles.filter(role => role.name === 'TRANSPORTER');
+    }
+
+    return this.availableRoles;
+  }
+
   availableActivities: string[] = [
     'Outward-Dashboard',
     'Outward-Dispatch',
@@ -142,10 +164,28 @@ export class UserCreationComponent implements OnInit {
       USER: ['', Validators.required],
       FIRST_NAME: ['', Validators.required],
       LAST_NAME: [''],
-      EMAIL: ['', [Validators.required, Validators.email]],
+      EMAIL: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$')
+        ]
+      ],
       CONTACT: ['', [Validators.required, Validators.pattern('[0-9]{10}')]],
-      PASSWORD: ['', Validators.required],
-      CONFPSWD: ['', Validators.required],
+      PASSWORD: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern('^[^&*%]*$'),
+        ]
+      ],
+      CONFPSWD: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern('^[^&*%]*$')
+        ]
+      ],
       EMP_CODE: ['', Validators.required],
       INOUT_TYPE: ['', Validators.required],
       CATEGORY: ['Internal'],
@@ -218,17 +258,17 @@ export class UserCreationComponent implements OnInit {
   }
 
   get filteredActivities() {
-  const category = this.userForm.get('CATEGORY')?.value;
+    const category = this.userForm.get('CATEGORY')?.value;
 
-  if (category == 'External') {
-    return [
-      'Outward-TransitInfo',
-      'Outward-FreightBilling'
-    ];
+    if (category == 'External') {
+      return [
+        'Outward-TransitInfo',
+        'Outward-FreightBilling'
+      ];
+    }
+
+    return this.availableActivities;
   }
-
-  return this.availableActivities;
-}
 
   openPlantCard(plants: { WERKS: string }[]) {
     this.viewCardTitle = 'Selected Plants';
@@ -244,17 +284,17 @@ export class UserCreationComponent implements OnInit {
     this.showViewCard = true;
   }
 
-openActivityCard(activities: Activity[], category?: string) {
-  this.viewCardTitle = 'Selected Activities';
-  this.viewCardData = activities.map(a => a.ACT);
+  openActivityCard(activities: Activity[], category?: string) {
+    this.viewCardTitle = 'Selected Activities';
+    this.viewCardData = activities.map(a => a.ACT);
 
-  // ✅ Only show allowed screens for External users
-  this.viewCardAvailableActivities = category === 'External'
-    ? ['Outward-TransitInfo', 'Outward-FreightBilling']
-    : [...this.availableActivities];
+    // ✅ Only show allowed screens for External users
+    this.viewCardAvailableActivities = category === 'External'
+      ? ['Outward-TransitInfo', 'Outward-FreightBilling']
+      : [...this.availableActivities];
 
-  this.showViewCard = true;
-}
+    this.showViewCard = true;
+  }
 
   closeViewCard() {
     this.showViewCard = false;
@@ -402,11 +442,12 @@ openActivityCard(activities: Activity[], category?: string) {
         EMP_CODE: userId
       });
       this.userForm.get('EMP_CODE').disable();
-       this.activitiesFormArray.clear();
+      this.activitiesFormArray.clear();
     } else {
       this.userForm.get('EMP_CODE').enable();
       this.userForm.patchValue({
-        EMP_CODE: ''
+        EMP_CODE: '',
+        ROLES: ''
       });
     }
   }
@@ -696,7 +737,7 @@ openActivityCard(activities: Activity[], category?: string) {
       EMAIL: user.EMAIL,
       CONTACT: user.CONTACT,
       PASSWORD: user.PASSWORD,
-      CONFPSWD: user.CONFPSWD,
+      CONFPSWD: user.PASSWORD,
       EMP_CODE: user.EMP_CODE,
       INOUT_TYPE: user.INOUT_TYPE,
       CATEGORY: user.CATEGORY,
@@ -801,91 +842,91 @@ openActivityCard(activities: Activity[], category?: string) {
   }
 
 
-//   deleteUser(index: number) {
-//     Swal.fire({
-//         title: 'Are you sure?',
-//         text: 'Do you want to delete this record? This action cannot be undone.',
-//         icon: 'warning',
-//         showCancelButton: true,
-//         confirmButtonText: 'Yes, Delete',
-//         cancelButtonText: 'Cancel',
-//         confirmButtonColor: '#d33'
-//       }).then((result) => {
+  //   deleteUser(index: number) {
+  //     Swal.fire({
+  //         title: 'Are you sure?',
+  //         text: 'Do you want to delete this record? This action cannot be undone.',
+  //         icon: 'warning',
+  //         showCancelButton: true,
+  //         confirmButtonText: 'Yes, Delete',
+  //         cancelButtonText: 'Cancel',
+  //         confirmButtonColor: '#d33'
+  //       }).then((result) => {
 
-//     if (result.isConfirmed) {
-//       const selectedUser = this.users[index];
+  //     if (result.isConfirmed) {
+  //       const selectedUser = this.users[index];
 
-//     const selectedUser = this.users[index];
+  //     const selectedUser = this.users[index];
 
-//     const payload = {
-//       DEL_USER: selectedUser.USER
-//     };
+  //     const payload = {
+  //       DEL_USER: selectedUser.USER
+  //     };
 
-//     this.spinner.show();
+  //     this.spinner.show();
 
-//     this.service.UserCreationDelete(payload).subscribe({
-//       next: (res: any) => {
-//         this.spinner.hide();
+  //     this.service.UserCreationDelete(payload).subscribe({
+  //       next: (res: any) => {
+  //         this.spinner.hide();
 
-//         if (res.STATUS === 'TRUE') {
-//           Swal.fire('Deleted!', res.MESSAGE, 'success');
+  //         if (res.STATUS === 'TRUE') {
+  //           Swal.fire('Deleted!', res.MESSAGE, 'success');
 
 
-//           this.users.splice(index, 1);
-//         } else {
-//           Swal.fire('Failed!', res.MESSAGE, 'error');
-//         }
-//       },
-//       error: (err) => {
-//         this.spinner.hide();
-//         console.error('Delete API Error:', err);
-//         Swal.fire('Error!', 'Something went wrong while deleting user.', 'error');
-//       }
-//     });
-//   }
+  //           this.users.splice(index, 1);
+  //         } else {
+  //           Swal.fire('Failed!', res.MESSAGE, 'error');
+  //         }
+  //       },
+  //       error: (err) => {
+  //         this.spinner.hide();
+  //         console.error('Delete API Error:', err);
+  //         Swal.fire('Error!', 'Something went wrong while deleting user.', 'error');
+  //       }
+  //     });
+  //   }
 
-//  });
-// }
+  //  });
+  // }
 
-deleteUser(index: number) {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'Do you want to delete this record? This action cannot be undone.',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, Delete',
-    cancelButtonText: 'Cancel',
-    confirmButtonColor: '#d33'
-  }).then((result) => {
+  deleteUser(index: number) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this record? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
 
-    if (result.isConfirmed) {
-      const selectedUser = this.users[index];
+      if (result.isConfirmed) {
+        const selectedUser = this.users[index];
 
-      const payload = {
-        DEL_USER: selectedUser.USER
-      };
+        const payload = {
+          DEL_USER: selectedUser.USER
+        };
 
-      this.spinner.show();
+        this.spinner.show();
 
-      this.service.UserCreationDelete(payload).subscribe({
-        next: (res: any) => {
-          this.spinner.hide();
+        this.service.UserCreationDelete(payload).subscribe({
+          next: (res: any) => {
+            this.spinner.hide();
 
-          if (res.STATUS === 'TRUE') {
-            Swal.fire('Deleted!', res.MESSAGE, 'success');
-            this.users.splice(index, 1);
-          } else {
-            Swal.fire('Failed!', res.MESSAGE, 'error');
+            if (res.STATUS === 'TRUE') {
+              Swal.fire('Deleted!', res.MESSAGE, 'success');
+              this.users.splice(index, 1);
+            } else {
+              Swal.fire('Failed!', res.MESSAGE, 'error');
+            }
+          },
+          error: (err) => {
+            this.spinner.hide();
+            console.error('Delete API Error:', err);
+            Swal.fire('Error!', 'Something went wrong while deleting user.', 'error');
           }
-        },
-        error: (err) => {
-          this.spinner.hide();
-          console.error('Delete API Error:', err);
-          Swal.fire('Error!', 'Something went wrong while deleting user.', 'error');
-        }
-      });
-    }
+        });
+      }
 
-  });
-}
+    });
+  }
 }

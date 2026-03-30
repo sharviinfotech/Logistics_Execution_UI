@@ -214,8 +214,9 @@
                     <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                   </select>
 
-                  <input type="text" class="search-input" style="width: 300px; flex: none; min-width: 0;" placeholder="Enter Reference / Invoice / ODN / SO Number"
-                    [(ngModel)]="searchReference" name="searchReference" (keyup.enter)="onSearchReference()" />
+                  <input type="text" class="search-input" style="width: 300px; flex: none; min-width: 0;"
+                    placeholder="Enter Reference / Invoice / ODN / SO Number" [(ngModel)]="searchReference"
+                    name="searchReference" (keyup.enter)="onSearchReference()" />
 
                   <button type="button" class="search-btn-global" (click)="onSearchReference()">
                     <i class="fas fa-search"></i>
@@ -269,7 +270,8 @@
         </div>
 
         <div class="form-field">
-          <input type="datetime-local" formControlName="physicalarrivedatdestinationdateandtime" (change)="updateSIT()" placeholder="" />
+          <input type="datetime-local" formControlName="physicalarrivedatdestinationdateandtime" (change)="updateSIT()"
+            placeholder="" />
           <label>Physical arrived at destination date</label>
         </div>
 
@@ -290,9 +292,11 @@
         </div>
 
         <div class="form-field">
-          <input type="file" formControlName="PODSCAN" id="imagesuploading"
-            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx" />
+          <input type="file" formControlName="PODSCAN" id="imagesuploading" accept=".jpg,.jpeg,.png" />
           <label>POD Scan</label>
+          <span class="error-message" *ngIf="podScanError">
+            Only .jpg, .jpeg, .png files are allowed
+          </span>
         </div>
 
 
@@ -370,7 +374,7 @@
             <input type="date" [(ngModel)]="filterToDate" />
             <label>To Date</label>
           </div>
-<!-- 
+          <!-- 
           <div class="form-field">
             <select [(ngModel)]="filterPlant" (change)="onFilterPlantChange()">
               <option value="">Select Plant</option>
@@ -380,17 +384,17 @@
             </select>
             <label>Plant</label>
           </div> -->
-           <div class="form-field">
-              <select [(ngModel)]="filterPlant">
-                <option value="">Select Plant</option>
+          <div class="form-field">
+            <select [(ngModel)]="filterPlant">
+              <option value="">Select Plant</option>
 
-                <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">
-                  {{p.PLANT_TEXT}}
-                </option>
+              <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">
+                {{p.PLANT_TEXT}}
+              </option>
 
-              </select>
-              <label>Plant</label>
-            </div>
+            </select>
+            <label>Plant</label>
+          </div>
 
           <!-- Division -->
           <!-- <div class="form-field">
@@ -402,18 +406,18 @@
             <label>Division</label>
           </div> -->
 
-             <div class="form-field">
-              <select [(ngModel)]="filterDivision">
+          <div class="form-field">
+            <select [(ngModel)]="filterDivision">
 
-                <option value="">Select Division</option>
+              <option value="">Select Division</option>
 
-                <option *ngFor="let d of divisionList" [value]="d.DIVISION">
-                  {{ d.DIV_TEXT }}
-                </option>
+              <option *ngFor="let d of divisionList" [value]="d.DIVISION">
+                {{ d.DIV_TEXT }}
+              </option>
 
-              </select>
-              <label>Division</label>
-            </div>
+            </select>
+            <label>Division</label>
+          </div>
 
 
           <!-- Customer -->

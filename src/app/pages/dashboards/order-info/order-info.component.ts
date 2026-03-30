@@ -483,6 +483,16 @@ console.log("Logged in user:", this.loggedInUser);
       (res: any) => {
         console.log("✅ SAP Fetch Response:", res);
 
+           if (Array.isArray(res) && res[0]?.STATUS === 'FALSE') {
+              this.spinner.hide();
+        Swal.fire({
+          icon: 'error',
+          title: 'Invoice Error',
+          text: res[0].MESSAGE
+        });
+        return;
+      }
+
         if (res && res.length > 0) {
           this.patchForm(res[0]);
           this.showForm = true;

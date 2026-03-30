@@ -953,6 +953,8 @@ export class TransitDamageInfoComponent implements OnInit {
       return;
     }
 
+     const selectedRef = this.selectedItems[0] || {};
+
     /* 3️⃣ HEADER preparation */
     const headerValue: any = { ...this.HeaderForm.value };
     delete headerValue.referenceItems;
@@ -960,7 +962,9 @@ export class TransitDamageInfoComponent implements OnInit {
     headerValue.INV_NO = invoiceNo;
 
     headerValue.REFNO = selectedItems[0]?.REFNO || null;
-    headerValue.LINE_NO = selectedItems[0]?.ZLINE_NO || null;
+  headerValue.LINE_NO = selectedRef.lineNumber           
+    || selectedItems[0]?.ZLINE_NO
+    || null;
     headerValue.INC_DATE = headerValue.INC_DATE || null;
     headerValue.CLOSING_DT = headerValue.CLOSING_DT || null;
     headerValue.ROUTE = headerValue.ROUTE || null;
@@ -969,6 +973,7 @@ export class TransitDamageInfoComponent implements OnInit {
     selectedItems.forEach((row: any) => {
       row.INV_NO = invoiceNo;
       row.REFNO = headerValue.REFNO;
+   row.ZLINE_NO = row.ZLINE_NO || selectedRef.lineNumber || null;
 
     });
 
@@ -1206,6 +1211,7 @@ export class TransitDamageInfoComponent implements OnInit {
       this.selectedItems.length > 0
         ? this.selectedItems[0].referenceNumber
         : null;
+         const selectedRef = this.selectedItems[0] || {};  
 
     /* HEADER */
     const headerValue: any = { ...this.HeaderForm.value };
@@ -1227,6 +1233,7 @@ export class TransitDamageInfoComponent implements OnInit {
         REFNO: refNo,
         ZUSER: this.loggedInUser,
         ZUSER_CH: '',
+          ZLINE_NO: selectedRef.lineNumber || null
       }));
 
     const payload = {

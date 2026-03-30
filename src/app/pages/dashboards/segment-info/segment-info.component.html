@@ -261,7 +261,7 @@
       <form class="form-grid" [formGroup]="segmentInfo" *ngIf="showForm">
 
         <div class="form-field" *ngIf="sapType === 'Non-SAP'">
-          <select class="form-control" formControlName="INV_VBELN" (change)="onInvoiceChange($event)" >
+          <select class="form-control" formControlName="INV_VBELN" (change)="onInvoiceChange($event)">    >
             <option value="" disabled>Select Invoice Number</option>
 
             <option *ngFor="let inv of invoiceF4List" [value]="inv">

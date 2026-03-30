@@ -231,10 +231,10 @@
                                     *ngIf="userForm.get('EMAIL')?.touched && userForm.get('EMAIL')?.errors?.['required']">
                                     Email is required
                                 </span>
-
+                                <!-- Invalid -->
                                 <span class="error-message"
-                                    *ngIf="userForm.get('EMAIL')?.touched && userForm.get('EMAIL')?.errors?.['email']">
-                                    Enter valid email format
+                                    *ngIf="userForm.get('EMAIL')?.touched && userForm.get('EMAIL')?.errors?.['pattern']">
+                                    Email must contain &#64; and valid format
                                 </span>
                             </div>
 
@@ -263,13 +263,19 @@
                                 </label>
                                 <div class="password-wrapper">
                                     <input class="form-input" [type]="showPassword ? 'text' : 'password'"
-                                        formControlName="PASSWORD" maxlength="10" placeholder="Enter password" />
+                                        formControlName="PASSWORD" placeholder="Enter password" />
                                     <span class="toggle-eye" (click)="togglePassword()">
                                         <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
                                     </span>
                                     <span class="error-message"
                                         *ngIf="userForm.get('PASSWORD')?.touched && userForm.get('PASSWORD')?.invalid">
                                         Password is required
+                                    </span>
+                
+
+                                    <span class="error-message"
+                                        *ngIf="userForm.get('PASSWORD')?.touched && userForm.get('PASSWORD')?.errors?.['pattern']">
+                                        & * % symbols are not allowed
                                     </span>
 
                                 </div>
@@ -376,7 +382,10 @@
                                 <label class="form-label">Role</label>
                                 <select class="form-select" formControlName="ROLES">
                                     <option value="">Select role</option>
-                                    <option *ngFor="let role of availableRoles" [value]="role.name">
+                                    <!-- <option *ngFor="let role of availableRoles" [value]="role.name">
+                                        {{ role.name }}
+                                    </option> -->
+                                    <option *ngFor="let role of filteredRoles" [value]="role.name">
                                         {{ role.name }}
                                     </option>
                                 </select>
@@ -405,7 +414,8 @@
                                         <div class="activities-header-new">
                                             <h3 class="modal-title">Screen Permissions</h3>
                                             <div class="activity-count">
-                                              {{ activitiesFormArray.length }} of {{ filteredActivities.length }} assigned
+                                                {{ activitiesFormArray.length }} of {{ filteredActivities.length }}
+                                                assigned
                                             </div>
                                         </div>
                                         <button type="button" class="btn-close-modal"

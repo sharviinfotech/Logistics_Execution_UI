@@ -965,11 +965,13 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     // 3️⃣ HEADER value
     const headerValue = { ...this.HeaderForm.value };
     delete headerValue.referenceItems;
+      const selectedRef = this.selectedItems[0] || {};
 
     headerValue.INV_NO = referenceNumber;
-    headerValue.LINE_NO = filtered[0]?.ZLINE_NO || filtered[0]?.LINE_NO || null;
+   headerValue.LINE_NO = selectedRef.lineNumber        // ✅ from reference selection
+    || filtered[0]?.LINE_NO;
 
-    // 🔥 IMPORTANT: Set REFNO explicitly
+    //  IMPORTANT: Set REFNO explicitly
     headerValue.REFNO =
       this.referenceItems.at(0)?.value?.referenceNumber || 0;
 
@@ -981,12 +983,11 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     // 5️⃣ Apply common values to ITEM
     filtered.forEach(row => {
       row.INV_NO = referenceNumber;
-      row.LINE_NO = row.ZLINE_NO || row.LINE_NO || null;
+     row.LINE_NO = selectedRef.lineNumber || row.LINE_NO || null; 
       row.REFNO = headerValue.REFNO; // ✅ same REFNO
       // Ensure backend receives z-prefixed bill/workorder keys as well
       row.ZBILLNO = row.BILLNO || row.ZBILLNO || '';
       row.ZWORK_ORDER = row.WORK_ORDER || row.ZWORK_ORDER || '';
-      headerValue.ZUSER = this.loggedInUser;
       headerValue.ZUSER = this.loggedInUser;
       headerValue.ZUSER_CH = ''
     });
@@ -1255,13 +1256,11 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
     const headerValue = { ...this.HeaderForm.value };
     delete headerValue.referenceItems;
+      const selectedRef = this.selectedItems[0] || {};
 
     headerValue.INV_NO = invoiceNo;
     headerValue.REFNO = refNo;
-    headerValue.LINE_NO = this.selectedItems[0]?.LINE_NO
-      || this.selectedItems[0]?.lineNo
-      || this.selectedItems[0]?.ZLINE_NO
-      || null;
+    headerValue.LINE_NO = selectedRef.lineNumber || null;
     headerValue.ZUSER = this.loggedInUser;
     headerValue.ZUSER_CH = ''
     const itemsPayload = this.items.controls
@@ -1270,7 +1269,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         ...ctrl.value,
         INV_NO: invoiceNo,
         REFNO: refNo,
-        LINE_NO: ctrl.value.LINE_NO || ctrl.value.ZLINE_NO || null
+        LINE_NO: selectedRef.lineNumber || null
       }));
 
     const payload = {

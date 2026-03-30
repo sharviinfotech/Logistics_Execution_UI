@@ -272,8 +272,9 @@
                     <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                   </select>
 
-                  <input type="text" class="search-input" style="width: 300px; flex: none; min-width: 0;" placeholder="Enter Reference / Invoice / ODN / SO Number"
-                    [(ngModel)]="searchReference" name="searchReference" (keyup.enter)="onSearchReference()" />
+                  <input type="text" class="search-input" style="width: 300px; flex: none; min-width: 0;"
+                    placeholder="Enter Reference / Invoice / ODN / SO Number" [(ngModel)]="searchReference"
+                    name="searchReference" (keyup.enter)="onSearchReference()" />
 
                   <button type="button" class="search-btn-global" (click)="onSearchReference()">
                     <i class="fas fa-search"></i>
@@ -366,14 +367,17 @@
                     pattern="[0-9]{10}" inputmode="numeric" (input)="onMobileInput($event, i)" />
                 </td>
                 <td><input type="text" formControlName="ZSPMAIL" />
-                   <div *ngIf="VehicleForm.get('ZSPMAIL')?.invalid && VehicleForm.get('ZSPMAIL')?.touched">
-    Please enter valid email
-  </div>
+                  <div *ngIf="VehicleForm.get('ZSPMAIL')?.invalid && VehicleForm.get('ZSPMAIL')?.touched">
+                    Please enter valid email
+                  </div>
                 </td>
                 <td><input type="text" formControlName="ZCUSTMAIL" />
-                   <div *ngIf="VehicleForm.get('ZCUSTMAIL')?.invalid && VehicleForm.get('ZCUSTMAIL')?.touched">
-    Please enter valid email
-  </div>
+                  <div *ngIf="VehicleForm.get('ZCUSTMAIL')?.invalid && VehicleForm.get('ZCUSTMAIL')?.touched">
+                    Please enter valid email
+                  </div>
+                  <div *ngIf="VehicleForm.get('ZCUSTMAIL')?.errors?.['email']">
+                    Email must contain &#64;
+                  </div>
                 </td>
                 <td><input type="text" formControlName="ZGPS" /></td>
                 <td class="action-btns">
@@ -446,7 +450,7 @@
             <input type="date" [(ngModel)]="filterToDate" />
             <label>To Date</label>
           </div>
-<!-- 
+          <!-- 
           <div class="form-field">
             <select [(ngModel)]="filterPlant" (change)="onFilterPlantChange()">
               <option value="">Select Plant</option>
@@ -456,17 +460,17 @@
             </select>
             <label>Plant</label>
           </div> -->
-           <div class="form-field">
-              <select [(ngModel)]="filterPlant">
-                <option value="">Select Plant</option>
+          <div class="form-field">
+            <select [(ngModel)]="filterPlant">
+              <option value="">Select Plant</option>
 
-                <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">
-                  {{p.PLANT_TEXT}}
-                </option>
+              <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">
+                {{p.PLANT_TEXT}}
+              </option>
 
-              </select>
-              <label>Plant</label>
-            </div>
+            </select>
+            <label>Plant</label>
+          </div>
 
           <!-- Division -->
           <!-- <div class="form-field">
@@ -477,18 +481,18 @@
             </select>
             <label>Division</label>
           </div> -->
-              <div class="form-field">
-              <select [(ngModel)]="filterDivision">
+          <div class="form-field">
+            <select [(ngModel)]="filterDivision">
 
-                <option value="">Select Division</option>
+              <option value="">Select Division</option>
 
-                <option *ngFor="let d of divisionList" [value]="d.DIVISION">
-                  {{ d.DIV_TEXT }}
-                </option>
+              <option *ngFor="let d of divisionList" [value]="d.DIVISION">
+                {{ d.DIV_TEXT }}
+              </option>
 
-              </select>
-              <label>Division</label>
-            </div>
+            </select>
+            <label>Division</label>
+          </div>
 
           <!-- Customer -->
           <div class="form-field">
@@ -592,9 +596,9 @@
               <th>Division</th>
               <th>Created Date</th>
               <!-- <th>Vehicle Type</th> -->
-                 <th>salesperson E-mail ID</th>
-                <th>Customer e-mail ID</th>
-                <th>GPS live location</th>
+              <th>salesperson E-mail ID</th>
+              <th>Customer e-mail ID</th>
+              <th>GPS live location</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -748,7 +752,7 @@
               </td>
 
 
-               <!-- <td>
+              <!-- <td>
                 <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
                   [(ngModel)]="item.ZVEH_TYPE">
                 <span *ngIf="!item.isEdit">{{ item.ZVEH_TYPE }}</span> 
