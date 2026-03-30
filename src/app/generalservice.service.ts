@@ -66,9 +66,7 @@ export class GeneralserviceService {
   invoiceApprovedOrRejected(obj) {
     return this.http.post(environment.baseUrl + 'api/invoice/invoiceApprovedOrRejected', obj);
   }
-  forgotPassword(obj) {
-    return this.http.post(environment.baseUrl + 'api/invoice/forgotPassword', obj);
-  }
+ 
   getAllCustomerList() {
     return this.http.get(environment.baseUrl + 'api/invoice/getAllCustomerList');
   }
@@ -425,7 +423,9 @@ export class GeneralserviceService {
   UserCreationDelete(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/UserCreationDelete', obj);
   }
-
+ forgotPassword(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/send-credentials', obj);
+  }
 
 
 

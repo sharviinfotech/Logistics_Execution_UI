@@ -150,15 +150,16 @@ export class Login2Component implements OnInit {
     if (this.forgotPasswordForm.invalid) return;
 
     const payload = {
-      userEmail: this.forgotPasswordForm.value.email
+      ZMAIL: this.forgotPasswordForm.value.email
     };
-
+    this.spinner.show();
     this.service.forgotPassword(payload).subscribe((res: any) => {
       const response = res
       console.log("this.response", response)
       // if (this.response.MSGTXT) {
       this.isForgotPassword = false
-      if (response.status === 200) {
+      if (response.status === true) {
+            this.spinner.hide();
         Swal.fire({
           icon: 'success',
           title: 'Success',
@@ -167,8 +168,10 @@ export class Login2Component implements OnInit {
         }).then(() => {
 
         });
+
       }
       else {
+          this.spinner.hide();
         Swal.fire('Login Failed', `${response.message} `, 'error');
         // Swal.fire("",dummy, "success")
         this.submitted = false;
@@ -177,7 +180,7 @@ export class Login2Component implements OnInit {
     }, error => {
       console.log("error", error)
       this.toaster.error(error)
-
+  this.spinner.hide();
     });
   }
 
