@@ -116,12 +116,12 @@ export class TransitDamageInfoComponent implements OnInit {
     this.loggedInUser = userData.USER || '';
     console.log("Logged in user:", this.loggedInUser);
     this.plantList = userData.PLANTS || [];
- 
-  // ✅ Divisions from login response
-  this.divisionList = userData.DIV || [];
- 
-  console.log("Plants:", this.plantList);
-  console.log("Divisions:", this.divisionList);
+
+    // ✅ Divisions from login response
+    this.divisionList = userData.DIV || [];
+
+    console.log("Plants:", this.plantList);
+    console.log("Divisions:", this.divisionList);
     this.buildHeaderForm();
     this.buildItemForm();
     this.fetchTransporter();
@@ -500,7 +500,7 @@ export class TransitDamageInfoComponent implements OnInit {
         LR_NO: selectedObj.lrNumber || "",
         TRANSPORTER: selectedObj.transporter || "",
         ZMAPID: selectedObj.MAPID || "",
-        ZLINE_NO: selectedObj.lineNumber ?? null
+        ZLINE_NO: selectedObj.LINE_NO,
       });
     }
     console.log("Updated items form:", this.items.value);
@@ -716,7 +716,7 @@ export class TransitDamageInfoComponent implements OnInit {
 
     let payload1: any = {
       "global": "TRANSIT DAMAGE INFO",
-       ZUSER: this.loggedInUser,
+      ZUSER: this.loggedInUser,
       "data": {
         "REF_NO": "",
         "INV_NO": "",
@@ -1130,7 +1130,7 @@ export class TransitDamageInfoComponent implements OnInit {
         // const header = res[0].HEADER;
         // const items = res[0].ITEM;
 
-                if (res?.STATUS === 'False') {
+        if (res?.STATUS === 'False') {
           Swal.fire('Info', res.MESSAGE, 'info');
           return;
         }

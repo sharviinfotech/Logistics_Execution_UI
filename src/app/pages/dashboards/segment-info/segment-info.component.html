@@ -71,8 +71,7 @@
             <!-- WITHOUT SAP -->
             <div class="sap-toggle-item">
               <label class="toggle-label">
-                <input type="radio" name="sapType" [(ngModel)]="sapType" value="Non-SAP"
-                  (change)="onSapTypeChange()" />
+                <input type="radio" name="sapType" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
                 <span class="toggle-track">
                   <span class="toggle-circle"></span>
                 </span>
@@ -242,8 +241,9 @@
                     <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                   </select>
 
-                  <input type="text" class="search-input" style="width: 300px; flex: none; min-width: 0;" placeholder="Enter Reference / Invoice / ODN / SO Number"
-                    [(ngModel)]="searchReference" name="searchReference" (keyup.enter)="onSearchReference()" />
+                  <input type="text" class="search-input" style="width: 300px; flex: none; min-width: 0;"
+                    placeholder="Enter Reference / Invoice / ODN / SO Number" [(ngModel)]="searchReference"
+                    name="searchReference" (keyup.enter)="onSearchReference()" />
 
                   <button type="button" class="search-btn-global" (click)="onSearchReference()">
                     <i class="fas fa-search"></i>
@@ -261,8 +261,7 @@
       <form class="form-grid" [formGroup]="segmentInfo" *ngIf="showForm">
 
         <div class="form-field" *ngIf="sapType === 'Non-SAP'">
-          <select class="form-control" formControlName="INV_VBELN">
-
+          <select class="form-control" formControlName="INV_VBELN" (change)="onInvoiceChange($event)" >
             <option value="" disabled>Select Invoice Number</option>
 
             <option *ngFor="let inv of invoiceF4List" [value]="inv">
@@ -382,11 +381,11 @@
           <label>Branch Zone</label>
         </div>
 
-         <div class="form-field" [class.filled]="segmentInfo.get('ZSTATE')?.value">
+        <div class="form-field" [class.filled]="segmentInfo.get('ZSTATE')?.value">
           <input type="text" formControlName="ZSTATE" placeholder=" " />
           <label>Destination State</label>
         </div>
-         <div class="form-field" [class.filled]="segmentInfo.get('ZZONE')?.value">
+        <div class="form-field" [class.filled]="segmentInfo.get('ZZONE')?.value">
           <input type="text" formControlName="ZZONE" placeholder=" " />
           <label>Destination Zone</label>
         </div>
@@ -489,17 +488,17 @@
             </select>
             <label>Plant</label>
           </div> -->
-             <div class="form-field">
-              <select [(ngModel)]="filterPlant">
-                <option value="">Select Plant</option>
+          <div class="form-field">
+            <select [(ngModel)]="filterPlant">
+              <option value="">Select Plant</option>
 
-                <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">
-                  {{p.PLANT_TEXT}}
-                </option>
+              <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">
+                {{p.PLANT_TEXT}}
+              </option>
 
-              </select>
-              <label>Plant</label>
-            </div>
+            </select>
+            <label>Plant</label>
+          </div>
 
           <!-- Division -->
           <!-- <div class="form-field">
@@ -510,18 +509,18 @@
             </select>
             <label>Division</label>
           </div> -->
-             <div class="form-field">
-              <select [(ngModel)]="filterDivision">
+          <div class="form-field">
+            <select [(ngModel)]="filterDivision">
 
-                <option value="">Select Division</option>
+              <option value="">Select Division</option>
 
-                <option *ngFor="let d of divisionList" [value]="d.DIVISION">
-                  {{ d.DIV_TEXT }}
-                </option>
+              <option *ngFor="let d of divisionList" [value]="d.DIVISION">
+                {{ d.DIV_TEXT }}
+              </option>
 
-              </select>
-              <label>Division</label>
-            </div>
+            </select>
+            <label>Division</label>
+          </div>
 
           <!-- Customer -->
           <div class="form-field">

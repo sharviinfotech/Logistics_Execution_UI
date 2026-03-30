@@ -182,6 +182,9 @@ export class GeneralserviceService {
   SegmentInfoOutwardFetch(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/fetchInvoiceList', obj);
   }
+ SegmentInfoOutwardwithoutSapFetch(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/WithoutSap/fetchInvoiceList', obj);
+  }
   SegmentInfoOutwardSave(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/withsap/Save', obj);
   }

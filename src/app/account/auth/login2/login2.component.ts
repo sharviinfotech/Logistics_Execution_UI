@@ -1,11 +1,11 @@
-import { Component, OnInit,Inject } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { AuthenticationService } from '../../../core/services/auth.service';
 import { AuthfakeauthenticationService } from '../../../core/services/authfake.service';
 import { login } from 'src/app/store/Authentication/authentication.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { FormBuilder, FormGroup} from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { SlickCarouselModule } from 'ngx-slick-carousel';
 import { HttpClient } from '@angular/common/http';
@@ -14,12 +14,27 @@ import { GeneralserviceService } from 'src/app/generalservice.service';
 import Swal from 'sweetalert2';
 import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+
+const activityRouteMap: { [key: string]: string } = {
+  'Outward-Dispatch': '/dispatch',
+  'Outward-OrderInfo': '/order-info',
+  'Outward-ShipmentDetails': '/shipment-details',
+  'Outward-InvoiceLoadDetails': '/invoice-load-details',
+  'Outward-SegmentInfo': '/segment-info',
+  'Outward-VehicleInfo': '/vechile-info',
+  'Outward-TransitInfo': '/transit-info',
+  'Outward-FreightBilling': '/freight-billing',
+  'Outward-TransitDamageInfo': '/transit-damage-info',
+  'Outward-InsuranceClaimTracking': '/insurance-claim-tracking',
+  'Outward-UserCreation': '/user-creation',
+};
+
 @Component({
   selector: 'app-login2',
   templateUrl: './login2.component.html',
   styleUrls: ['./login2.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, SlickCarouselModule,NgxSpinnerModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, SlickCarouselModule, NgxSpinnerModule],
   providers: [NgxSpinnerService]
 })
 /**
@@ -27,37 +42,37 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
  */
 export class Login2Component implements OnInit {
   // fieldTextType !: boolean;
-  
+
   images = [
-    
+
     // 'assets/images/AircraftFlight.png',
     'assets/images/1.png',
-     'assets/images/2.jpeg',
-      'assets/images/Le1 image 6.png',
+    'assets/images/2.jpeg',
+    'assets/images/Le1 image 6.png',
     // 'assets/images/HBL_background_resized_1330x780.png',
-     'assets/images/LE image (3).png',
-     'assets/images/4.jpg',
-     'assets/images/5.jpg',
-     
+    'assets/images/LE image (3).png',
+    'assets/images/4.jpg',
+    'assets/images/5.jpg',
+
     //  'assets/images/loginbgimage 2.png',
-   
+
   ];
   currentIndex = 0;
   successMessage: string;
   errorMessage: string;
-  constructor(@Inject(DOCUMENT) private document: any,private formBuilder: UntypedFormBuilder, private route: ActivatedRoute, private router: Router, private authenticationService: AuthenticationService,
-    private authFackservice: AuthfakeauthenticationService, public store: Store, private service: GeneralserviceService, private toaster: ToastrService,private spinner: NgxSpinnerService) { }
-    loginForm: FormGroup;
-    forgotPasswordForm: FormGroup;
-    submitted = false;
-    submittedForgot = false;
-    isForgotPassword = false;
-    showForgotPassword = false;
-    
-    fieldTextType = false;
-    year = new Date().getFullYear();
-    interval: any;
-    element: any;
+  constructor(@Inject(DOCUMENT) private document: any, private formBuilder: UntypedFormBuilder, private route: ActivatedRoute, private router: Router, private authenticationService: AuthenticationService,
+    private authFackservice: AuthfakeauthenticationService, public store: Store, private service: GeneralserviceService, private toaster: ToastrService, private spinner: NgxSpinnerService) { }
+  loginForm: FormGroup;
+  forgotPasswordForm: FormGroup;
+  submitted = false;
+  submittedForgot = false;
+  isForgotPassword = false;
+  showForgotPassword = false;
+
+  fieldTextType = false;
+  year = new Date().getFullYear();
+  interval: any;
+  element: any;
   ngOnInit(): void {
     document.body.classList.add("auth-body-bg");
     this.loginForm = this.formBuilder.group({
@@ -68,7 +83,7 @@ export class Login2Component implements OnInit {
       email: ['', [Validators.required, Validators.email]]
     });
     this.startSlideshow();
-// Change image every 5 seconds
+    // Change image every 5 seconds
   }
   // showSpinner() {
   //   this.spinner.show();
@@ -100,24 +115,24 @@ export class Login2Component implements OnInit {
    */
   // dynamic login below 
   onSubmit() {
- 
-    if(this.loginForm.invalid == true){
+
+    if (this.loginForm.invalid == true) {
       this.submitted = true;
-    }else{
+    } else {
       const userName = this.f['userName'].value; // Get the username from the form
       const password = this.f['password'].value; // Get the password from the form
- 
+
       // Login Api
       // this.store.dispatch(login({ userName: userName, password: password }));
-   
+
       this.login(userName, password)
     }
-   
- 
-   
+
+
+
   }
   showForgotPasswordScreen() {
-    this.showForgotPassword = true; 
+    this.showForgotPassword = true;
     this.successMessage = '';
     this.errorMessage = '';
   }
@@ -134,8 +149,8 @@ export class Login2Component implements OnInit {
     this.submittedForgot = true;
     if (this.forgotPasswordForm.invalid) return;
 
-    const payload = { 
-      userEmail: this.forgotPasswordForm.value.email 
+    const payload = {
+      userEmail: this.forgotPasswordForm.value.email
     };
 
     this.service.forgotPassword(payload).subscribe((res: any) => {
@@ -148,37 +163,37 @@ export class Login2Component implements OnInit {
           icon: 'success',
           title: 'Success',
           text: res.message,
-          timer:5000
+          timer: 5000
         }).then(() => {
-          
+
         });
       }
-      else{
+      else {
         Swal.fire('Login Failed', `${response.message} `, 'error');
         // Swal.fire("",dummy, "success")
         this.submitted = false;
       }
-      
-  },error=>{
-    console.log("error",error)
-    this.toaster.error(error)
-   
-  });
+
+    }, error => {
+      console.log("error", error)
+      this.toaster.error(error)
+
+    });
   }
 
 
   // Toggle password visibility
- 
+
 
   // local login without API
   // onSubmit() {
- 
+
   //   if(this.loginForm.invalid == true){
   //     this.submitted = true;
   //   }else{
   //     const userName = this.f['userName'].value; // Get the username from the form
   //     const password = this.f['password'].value; // Get the password from the form
- 
+
   //     // Login Api
   //     // this.store.dispatch(login({ userName: userName, password: password }));
   //    this.fullscreen()
@@ -207,16 +222,16 @@ export class Login2Component implements OnInit {
   //           }, 500); // wait a second for layout to render
   //     // this.login(userName, password)
   //   }
-   
- 
-   
+
+
+
   // }
   // goBackToLogin() {
   //   this.showForgotPassword = false;
   //   this.successMessage = '';
   //   this.errorMessage = '';
   // }
- 
+
   toggleFieldTextType() {
     this.fieldTextType = !this.fieldTextType;
   }
@@ -277,106 +292,132 @@ export class Login2Component implements OnInit {
 
 
   login(userName, password) {
-  this.spinner.show();
-  this.submitted = true;
+    this.spinner.show();
+    this.submitted = true;
 
-  if (this.loginForm.invalid) {
-    this.spinner.hide();
-    return;
-  }
-
-  // this.fullscreen();
-  
-  // ✅ CORRECT payload structure
-  const loginPayload = {
-    LOGIN: {
-      USER: userName,
-      PASSWORD: password
-    }
-  };
-
-  this.service.GlobalUserAuth(loginPayload).subscribe(
-    (res: any) => {
-      const response = res;
-
-      // Stop the spinner
+    if (this.loginForm.invalid) {
       this.spinner.hide();
+      return;
+    }
 
-      // Ensure UI update completes before showing Swal
-      setTimeout(() => {
-        // ✅ CORRECT: Check if USER exists and STATUS is Active
-        if (response.USER && response.STATUS === 'Active') {
-          
-          localStorage.setItem('currentUser', JSON.stringify(response));
-          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-          this.router.navigate([returnUrl], { skipLocationChange: true });
-          this.service.setLoginResponse(response);
+    // this.fullscreen();
 
-          // ✅ CORRECT: Use WARNMSG, FIRST_NAME, LAST_NAME
-          Swal.fire({
-            title: response.WARNMSG || 'Login Successful',
-            text: `Welcome ${response.FIRST_NAME} ${response.LAST_NAME}`,
-            icon: 'success',
-            timer: 5000,
-            timerProgressBar: true,
-          });
-          
-          setTimeout(() => {
-            const menuButton = document.getElementById('vertical-menu-btn');
-            if (menuButton) {
-              menuButton.click();
+    // ✅ CORRECT payload structure
+    const loginPayload = {
+      LOGIN: {
+        USER: userName,
+        PASSWORD: password
+      }
+    };
+
+    this.service.GlobalUserAuth(loginPayload).subscribe(
+      (res: any) => {
+        const response = res;
+
+        // Stop the spinner
+        this.spinner.hide();
+
+        // Ensure UI update completes before showing Swal
+        setTimeout(() => {
+          // ✅ CORRECT: Check if USER exists and STATUS is Active
+          if (response.USER && response.STATUS === 'Active') {
+
+            localStorage.setItem('currentUser', JSON.stringify(response));
+            // const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+            // this.router.navigate([returnUrl], { skipLocationChange: true });
+            this.service.setLoginResponse(response);
+            const activities = response.ACTIVITIES;
+
+            if (activities && activities.length > 0) {
+
+              let route = null;
+
+              // Sidebar order follow avvali
+              for (const key of Object.keys(activityRouteMap)) {
+
+                const found = activities.find((a: any) => a.ACTIVITY === key);
+
+                if (found) {
+                  route = activityRouteMap[key];
+                  break;
+                }
+              }
+
+              if (route) {
+                this.router.navigate([route]);
+              } else {
+                this.router.navigate(['/dispatch']);
+              }
+
+            } else {
+              this.router.navigate(['/dispatch']);
             }
-          }, 1000);
-          
-        } 
-        else if (response.USER && response.STATUS === 'Inactive') {
-          Swal.fire('Login Failed', 'Your account is inactive', 'error');
-        } 
-        else {
-          Swal.fire('', 'Invalid login credentials!', 'error');
-        }
 
-        this.submitted = false;
-      }, 0);
-    },
-    (error) => {
-      this.spinner.hide();
+            // ✅ CORRECT: Use WARNMSG, FIRST_NAME, LAST_NAME
+            Swal.fire({
+              title: response.WARNMSG || 'Login Successful',
+              text: `Welcome ${response.FIRST_NAME} ${response.LAST_NAME}`,
+              icon: 'success',
+              timer: 5000,
+              timerProgressBar: true,
+            });
 
-      setTimeout(() => {
-        console.log('error', error);
-        Swal.fire('Error', 'Login failed. Please try again.', 'error');
-        this.toaster.error('Login failed');
-      }, 0);
-    }
-  );
-}
-fullscreen() {
-  const elem = document.documentElement; // or document.body
+            setTimeout(() => {
+              const menuButton = document.getElementById('vertical-menu-btn');
+              if (menuButton) {
+                menuButton.click();
+              }
+            }, 1000);
 
-  if (!document.fullscreenElement) {
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen();
-    } else if ((elem as any).mozRequestFullScreen) {
-      (elem as any).mozRequestFullScreen();
-    } else if ((elem as any).webkitRequestFullscreen) {
-      (elem as any).webkitRequestFullscreen();
-    } else if ((elem as any).msRequestFullscreen) {
-      (elem as any).msRequestFullscreen();
-    }
-  } else {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if ((document as any).mozCancelFullScreen) {
-      (document as any).mozCancelFullScreen();
-    } else if ((document as any).webkitExitFullscreen) {
-      (document as any).webkitExitFullscreen();
-    } else if ((document as any).msExitFullscreen) {
-      (document as any).msExitFullscreen();
+          }
+          else if (response.USER && response.STATUS === 'Inactive') {
+            Swal.fire('Login Failed', 'Your account is inactive', 'error');
+          }
+          else {
+            Swal.fire('', 'Invalid login credentials!', 'error');
+          }
+
+          this.submitted = false;
+        }, 0);
+      },
+      (error) => {
+        this.spinner.hide();
+
+        setTimeout(() => {
+          console.log('error', error);
+          Swal.fire('Error', 'Login failed. Please try again.', 'error');
+          this.toaster.error('Login failed');
+        }, 0);
+      }
+    );
+  }
+  fullscreen() {
+    const elem = document.documentElement; // or document.body
+
+    if (!document.fullscreenElement) {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if ((elem as any).mozRequestFullScreen) {
+        (elem as any).mozRequestFullScreen();
+      } else if ((elem as any).webkitRequestFullscreen) {
+        (elem as any).webkitRequestFullscreen();
+      } else if ((elem as any).msRequestFullscreen) {
+        (elem as any).msRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if ((document as any).mozCancelFullScreen) {
+        (document as any).mozCancelFullScreen();
+      } else if ((document as any).webkitExitFullscreen) {
+        (document as any).webkitExitFullscreen();
+      } else if ((document as any).msExitFullscreen) {
+        (document as any).msExitFullscreen();
+      }
     }
   }
-}
 
-  
-  
+
+
 
 }

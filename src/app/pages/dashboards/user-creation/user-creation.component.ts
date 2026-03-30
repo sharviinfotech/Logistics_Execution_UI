@@ -142,8 +142,8 @@ export class UserCreationComponent implements OnInit {
       USER: ['', Validators.required],
       FIRST_NAME: ['', Validators.required],
       LAST_NAME: [''],
-      EMAIL: ['', Validators.required],
-      CONTACT: ['', Validators.required],
+      EMAIL: ['', [Validators.required, Validators.email]],
+      CONTACT: ['', [Validators.required, Validators.pattern('[0-9]{10}')]],
       PASSWORD: ['', Validators.required],
       CONFPSWD: ['', Validators.required],
       EMP_CODE: ['', Validators.required],
@@ -402,6 +402,7 @@ openActivityCard(activities: Activity[], category?: string) {
         EMP_CODE: userId
       });
       this.userForm.get('EMP_CODE').disable();
+       this.activitiesFormArray.clear();
     } else {
       this.userForm.get('EMP_CODE').enable();
       this.userForm.patchValue({

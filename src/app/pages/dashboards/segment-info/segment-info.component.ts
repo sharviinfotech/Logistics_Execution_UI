@@ -84,8 +84,8 @@ export class SegmentInfoComponent implements OnInit {
   filterSapType: string = '';
   invoiceF4List: string[] = [];
   fullReferenceData: any[] = [];
-   loggedInUser: string = '';
-    plantList: any;
+  loggedInUser: string = '';
+  plantList: any;
   divisionList: any;
 
   constructor(
@@ -105,24 +105,24 @@ export class SegmentInfoComponent implements OnInit {
       CUST_PROF: [''],
       BRANCH: ['', Validators.required],
       BRANCH_ZONE: [''],
-      ZSTATE: [''], 
+      ZSTATE: [''],
       ZZONE: [''],
       TAT_Type: ['', Validators.required],
       TAT_DAYS: ['', Validators.required],
       ETA_DATE: ['', Validators.required],
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
-     const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
-this.loggedInUser = userData.USER || '';
-console.log("Logged in user:", this.loggedInUser);
+    const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    this.loggedInUser = userData.USER || '';
+    console.log("Logged in user:", this.loggedInUser);
 
- this.plantList = userData.PLANTS || [];
+    this.plantList = userData.PLANTS || [];
 
-  // ✅ Divisions from login response
-  this.divisionList = userData.DIV || [];
+    // ✅ Divisions from login response
+    this.divisionList = userData.DIV || [];
 
-  console.log("Plants:", this.plantList);
-  console.log("Divisions:", this.divisionList);
+    console.log("Plants:", this.plantList);
+    console.log("Divisions:", this.divisionList);
 
     this.fetchDropdownData();
     this.fetchTransporter();
@@ -342,7 +342,7 @@ console.log("Logged in user:", this.loggedInUser);
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
       LINE_NO: values.lineNumber || ''
-     
+
 
 
     };
@@ -532,6 +532,10 @@ console.log("Logged in user:", this.loggedInUser);
         }
       }
     });
+      this.segmentInfo.patchValue({
+    INV_VBELN: ''
+  });
+
 
     console.log('📋 Filtered Invoice List:', this.invoiceF4List);
   }
@@ -558,7 +562,7 @@ console.log("Logged in user:", this.loggedInUser);
     let payload1: any = {
 
       "global": "SEGMENT INFO",
-        ZUSER: this.loggedInUser,
+      ZUSER: this.loggedInUser,
       "data": {
         "ref_no": "",
         "inv_no": "",
@@ -703,12 +707,12 @@ console.log("Logged in user:", this.loggedInUser);
           BRANCH: formValue.BRANCH || '',
           BRANCH_ZONE: formValue.BRANCH_ZONE || '',
           ZSTATE: formValue.ZSTATE || '',
-          ZZONE: formValue.ZZONE|| '',
+          ZZONE: formValue.ZZONE || '',
           TAT_TYPE: formValue.TAT_Type || '',
           TAT: formValue.TAT_DAYS || '',
           ETA: formValue.ETA_DATE || '',
-          ZUSER: this.loggedInUser ,
-          ZUSER_CH:'',
+          ZUSER: this.loggedInUser,
+          ZUSER_CH: '',
         });
       });
     }
@@ -818,8 +822,8 @@ console.log("Logged in user:", this.loggedInUser);
         ZPLANT: row.ZPLANT || '',
         ZDIVISION: row.ZDIVISION || '',
         ZVEH_TYPE: row.ZVEH_TYPE || '',
-        ZUSER: row.ZUSER ,
-          ZUSER_CH: this.loggedInUser ,
+        ZUSER: row.ZUSER,
+        ZUSER_CH: this.loggedInUser,
       };
 
       const payload = {
@@ -979,8 +983,56 @@ console.log("Logged in user:", this.loggedInUser);
 
 
 
+ onInvoiceChange(event: any) {
 
+  const invoiceNo = event.target.value;
 
+  if (!invoiceNo) return;
+
+  const payload = {
+    INV_VBELN: invoiceNo,
+    SCREEN: 'WITHOUTSAP'
+  };
+
+  console.log('🚀 Without SAP Invoice Payload:', payload);
+
+  this.spinner.show();
+
+  this.service.SegmentInfoOutwardwithoutSapFetch(payload)
+    .subscribe({
+
+      next: (res: any) => {
+
+        this.spinner.hide();
+
+        console.log('✅ Without SAP Invoice Response:', res);
+
+        if (res) {
+
+          this.segmentInfo.patchValue({
+
+            ZSTATE: res.ZSTATE || '',
+            ZZONE: res.ZZONE || '',
+            // BRANCH: res.ZSTATE || '',
+            // BRANCH_ZONE: res.ZZONE || ''
+
+          });
+
+        } else {
+          Swal.fire('No Data Found', '', 'info');
+        }
+
+      },
+
+      error: () => {
+
+        this.spinner.hide();
+        Swal.fire('Error fetching invoice details', '', 'error');
+
+      }
+    });
+
+}
 
   saveSegmentInfoWithoutSAP(
     action: 'stay' | 'next' | 'previous' = 'stay'
@@ -1025,7 +1077,7 @@ console.log("Logged in user:", this.loggedInUser);
         BRANCH: formValue.BRANCH || '',
         BRANCH_ZONE: formValue.BRANCH_ZONE || '',
         ZSTATE: formValue.ZSTATE || '',
-         ZZONE: formValue.ZZONE || '',
+        ZZONE: formValue.ZZONE || '',
         TAT_TYPE: formValue.TAT_Type || '',
         TAT: formValue.TAT_DAYS || '',
         ETA: formValue.ETA_DATE || ''
