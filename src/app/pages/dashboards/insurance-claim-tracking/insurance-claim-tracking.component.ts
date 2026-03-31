@@ -100,7 +100,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   plantList: any;
   divisionList: any;
   supportingDocError = false;
-approveDocError = false;
+  approveDocError = false;
 
 
   constructor(
@@ -116,12 +116,12 @@ approveDocError = false;
     this.loggedInUser = userData.USER || '';
     console.log("Logged in user:", this.loggedInUser);
     this.plantList = userData.PLANTS || [];
- 
-  // ✅ Divisions from login response
-  this.divisionList = userData.DIV || [];
- 
-  console.log("Plants:", this.plantList);
-  console.log("Divisions:", this.divisionList);
+
+    // ✅ Divisions from login response
+    this.divisionList = userData.DIV || [];
+
+    console.log("Plants:", this.plantList);
+    console.log("Divisions:", this.divisionList);
     this.buildHeaderForm();
     this.buildItemForm();
     this.fetchTransporter();
@@ -743,7 +743,7 @@ approveDocError = false;
 
     let payload1: any = {
       "global": "INSURANCE CLAIM STATUS",
-       ZUSER: this.loggedInUser,
+      ZUSER: this.loggedInUser,
       "data": {
         "REF_NO": "",
         "INV_NO": "",
@@ -760,7 +760,7 @@ approveDocError = false;
         "ROUTE": "",
         "NATURE_DAMAGE": "",
         "CLAIM_STATUS": "",
-      
+
       }
     };
 
@@ -923,8 +923,8 @@ approveDocError = false;
             AH: [x.AH],
             NO_SETS: [x.NO_SETS],
             TRANSPORTER: [x.TRANSPORTER],
-            ZWORK_ORDER: [x.ZWORK_ORDER],
-            ZBILLNO: [x.ZBILLNO]
+            WORK_ORDER: [x.WORK_ORDER],
+            BILLNO: [x.BILLNO]
           });
 
           this.items.push(row);
@@ -946,8 +946,8 @@ approveDocError = false;
       .filter((row: any) => row.selected === true)
       .map(({ selected, ...row }) => ({
         ...row,
-        WORK_ORDER: row.ZWORK_ORDER,
-        BILLNO: row.ZBILLNO,
+        // WORK_ORDER: row.ZWORK_ORDER,
+        // BILLNO: row.ZBILLNO,
       }));
 
     if (filtered.length === 0) {
@@ -968,11 +968,11 @@ approveDocError = false;
     // 3️⃣ HEADER value
     const headerValue = { ...this.HeaderForm.value };
     delete headerValue.referenceItems;
-      const selectedRef = this.selectedItems[0] || {};
+    const selectedRef = this.selectedItems[0] || {};
 
     headerValue.INV_NO = referenceNumber;
-   headerValue.LINE_NO = selectedRef.lineNumber        // ✅ from reference selection
-    || filtered[0]?.LINE_NO;
+    headerValue.LINE_NO = selectedRef.lineNumber
+      || filtered[0]?.LINE_NO;
 
     //  IMPORTANT: Set REFNO explicitly
     headerValue.REFNO =
@@ -986,11 +986,13 @@ approveDocError = false;
     // 5️⃣ Apply common values to ITEM
     filtered.forEach(row => {
       row.INV_NO = referenceNumber;
-     row.LINE_NO = selectedRef.lineNumber || row.LINE_NO || null; 
-      row.REFNO = headerValue.REFNO; // ✅ same REFNO
+      row.LINE_NO = selectedRef.lineNumber || row.LINE_NO || null;
+      row.REFNO = headerValue.REFNO;
       // Ensure backend receives z-prefixed bill/workorder keys as well
-      row.ZBILLNO = row.BILLNO || row.ZBILLNO || '';
-      row.ZWORK_ORDER = row.WORK_ORDER || row.ZWORK_ORDER || '';
+      // row.ZBILLNO = row.BILLNO || row.ZBILLNO || '';
+      // row.ZWORK_ORDER = row.WORK_ORDER || row.ZWORK_ORDER || '';
+      // row.WORK_ORDER = row.WORK_ORDER || '';
+      // row.BILLNO = row.BILLNO || '';
       headerValue.ZUSER = this.loggedInUser;
       headerValue.ZUSER_CH = ''
     });
@@ -1223,7 +1225,7 @@ approveDocError = false;
             AH: [x.AH],
             NO_SETS: [x.NO_SETS],
             TRANSPORTER: [x.TRANSPORTER],
-            ZWORK_ORDER: [x.WORK_ORDER],
+            WORK_ORDER: [x.WORK_ORDER],
             ZBILLNO: [x.BILLNO]
 
           }));
@@ -1259,7 +1261,7 @@ approveDocError = false;
 
     const headerValue = { ...this.HeaderForm.value };
     delete headerValue.referenceItems;
-      const selectedRef = this.selectedItems[0] || {};
+    const selectedRef = this.selectedItems[0] || {};
 
     headerValue.INV_NO = invoiceNo;
     headerValue.REFNO = refNo;
@@ -1376,6 +1378,7 @@ approveDocError = false;
         ZINV_NO: headerRow.ZINV_NO,
         ZREFNO: headerRow.ZREFNO,
         ZLINE_NO: headerRow.ZLINE_NO,
+        ZODN_NO: headerRow.ZODN_NO,
         ZFI: headerRow.ZFI,
         ZREP_DATE: headerRow.ZREP_DATE,
         ZCLAIM_REF: headerRow.ZCLAIM_REF,
@@ -1393,9 +1396,14 @@ approveDocError = false;
         ZCLM_DOC_ST: headerRow.ZCLM_DOC_ST,
         ZCOURIER_DET: headerRow.ZCOURIER_DET,
         ZPAY_ST: headerRow.ZPAY_ST,
+        ZPLANT: headerRow.ZPLANT,
+        ZDIVISION: headerRow.ZDIVISION,
+        ZSALE_PERSON: headerRow.ZSALE_PERSON,
+        ZVEH_TYPE: headerRow.ZVEH_TYPE,
         ZPAY_INFO: headerRow.ZPAY_INFO,
         ZUTR: headerRow.ZUTR,
         ZCLM_SET_DT: headerRow.ZCLM_SET_DT,
+           ZCREATED_DT: headerRow.ZCREATED_DT || null,
         ZUSER: headerRow.ZUSER,
         ZUSER_CH: this.loggedInUser,
 
@@ -1407,14 +1415,14 @@ approveDocError = false;
         ZINV_NO: item.ZINV_NO || null,
         ZREFNO: String(item.ZREFNO),
         ZLINE_NO: String(item.ZLINE_NO),
-        ZPOSNR: item.ZLINE_NO || null,
+        ZPOSNR: item.ZPOSNR || null,
         ZVEH_LINE: item.ZVEH_LINE || null,
         ZTRUCK_NO: item.ZTRUCK_NO || null,
         ZVEHICLE: item.ZVEHICLE || null,
 
         ZAH: item.ZAH || null,
         ZNO_SETS: item.ZNO_SETS || null,
-        ZLR_NO: item.ZLRNO || null,
+        ZLRNO: item.ZLRNO || null,
         ZTRANSPORTER: item.ZTRANSPORTER || null,
         ZWORK_ORDER: item.ZWORK_ORDER || null,
         ZBILLNO: item.ZBILLNO || null,
@@ -1477,7 +1485,7 @@ approveDocError = false;
     });
   }
 
-   deleteRow(array: any[], index: number): void {
+  deleteRow(array: any[], index: number): void {
     const row = array[index];
 
     Swal.fire({
@@ -2196,36 +2204,36 @@ approveDocError = false;
   }
 
 
-onFileChange(event: any, fieldName: string) {
+  onFileChange(event: any, fieldName: string) {
 
-  const file = event.target.files[0];
+    const file = event.target.files[0];
 
-  // reset errors
-  this.supportingDocError = false;
-  this.approveDocError = false;
+    // reset errors
+    this.supportingDocError = false;
+    this.approveDocError = false;
 
-  if (!file) {
-    this.HeaderForm.get(fieldName)?.setValue(null);
-    return;
-  }
-
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-
-  if (!allowedTypes.includes(file.type)) {
-
-    if (fieldName === 'SupportingDocument') {
-      this.supportingDocError = true;
+    if (!file) {
+      this.HeaderForm.get(fieldName)?.setValue(null);
+      return;
     }
 
-    if (fieldName === 'ApproveDocument') {
-      this.approveDocError = true;
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+
+    if (!allowedTypes.includes(file.type)) {
+
+      if (fieldName === 'SupportingDocument') {
+        this.supportingDocError = true;
+      }
+
+      if (fieldName === 'ApproveDocument') {
+        this.approveDocError = true;
+      }
+
+      this.HeaderForm.get(fieldName)?.setValue(null);
+      event.target.value = '';
+      return;
     }
 
-    this.HeaderForm.get(fieldName)?.setValue(null);
-    event.target.value = '';
-    return;
+    this.HeaderForm.get(fieldName)?.setValue(file);
   }
-
-  this.HeaderForm.get(fieldName)?.setValue(file);
-}
 }

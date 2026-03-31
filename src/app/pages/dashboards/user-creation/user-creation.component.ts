@@ -172,12 +172,14 @@ export class UserCreationComponent implements OnInit {
         ]
       ],
       CONTACT: ['', [Validators.required, Validators.pattern('[0-9]{10}')]],
-      PASSWORD: [
+   PASSWORD: [
         '',
         [
-          Validators.required,
-          Validators.pattern('^[^&*%]*$'),
-        ]
+      Validators.required,
+      Validators.minLength(8),
+       Validators.maxLength(10),
+      Validators.pattern(/^(?=.*[A-Z])(?=.*\d)[^&*%]*$/)
+    ]
       ],
       CONFPSWD: [
         '',
@@ -887,6 +889,17 @@ export class UserCreationComponent implements OnInit {
 
   //  });
   // }
+
+  blockSpecialChars(event: KeyboardEvent) {
+  const forbidden = ['&', '*', '%'];
+  if (forbidden.includes(event.key)) {
+    event.preventDefault();
+  }
+}
+hasForbiddenChars(): boolean {
+  const value = this.userForm.get('PASSWORD')?.value || '';
+  return /[&*%]/.test(value);
+}
 
   deleteUser(index: number) {
     Swal.fire({

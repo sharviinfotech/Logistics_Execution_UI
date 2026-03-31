@@ -1342,7 +1342,7 @@ cofError = false;
         ZPOSNR: item.ZPOSNR || item.POSNR || null,
         ZVEH_LINE: item.ZVEH_LINE || null,
         ZTRUCK_NO: item.ZTRUCK_NO || null,
-        ZLR_NO: item.ZLRNO || null,
+        ZLRNO: item.ZLRNO || null,
         ZTRANSPORTER: item.ZTRANSPORTER || null,
         ZWORK_ORDER: item.ZWORK_ORDER || null,
         ZBILLNO: item.ZBILLNO || null,

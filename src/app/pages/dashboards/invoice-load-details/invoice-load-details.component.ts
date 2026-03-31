@@ -1823,6 +1823,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
                 VBELN: referenceNumber,
                 ZMAPID: ref.MAPID || '',
                 ZREFNO: ref.referenceNumber || '',
+                 ZLINE_NO: ref.lineNumber || '',
                 ZWORK_ORDER: ref.workOrderNumber || '',
                 ZLRNO: ref.lrNumber || '',
                 ZTRANSPORTER: ref.transporter || '',

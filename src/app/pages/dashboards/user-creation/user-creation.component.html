@@ -263,18 +263,41 @@
                                 </label>
                                 <div class="password-wrapper">
                                     <input class="form-input" [type]="showPassword ? 'text' : 'password'"
-                                        formControlName="PASSWORD" placeholder="Enter password" />
+                                        formControlName="PASSWORD" (keypress)="blockSpecialChars($event)"
+                                        placeholder="Enter password" />
                                     <span class="toggle-eye" (click)="togglePassword()">
                                         <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
                                     </span>
+                                    <!-- Required -->
                                     <span class="error-message"
-                                        *ngIf="userForm.get('PASSWORD')?.touched && userForm.get('PASSWORD')?.invalid">
+                                        *ngIf="userForm.get('PASSWORD')?.touched && userForm.get('PASSWORD')?.errors?.['required']">
                                         Password is required
                                     </span>
-                
 
+                                    <!-- Min Length -->
                                     <span class="error-message"
-                                        *ngIf="userForm.get('PASSWORD')?.touched && userForm.get('PASSWORD')?.errors?.['pattern']">
+                                        *ngIf="userForm.get('PASSWORD')?.touched && userForm.get('PASSWORD')?.errors?.['minlength']">
+                                        Minimum 8 characters required
+                                    </span>
+
+                                    <!-- Max Length -->
+                                    <span class="error-message" *ngIf="userForm.get('PASSWORD')?.touched
+         && !userForm.get('PASSWORD')?.errors?.['minlength']
+         && userForm.get('PASSWORD')?.errors?.['maxlength']">
+                                        Maximum 10 characters allowed
+                                    </span>
+
+                                    <!-- Pattern -->
+                                    <span class="error-message" *ngIf="userForm.get('PASSWORD')?.touched
+         && !userForm.get('PASSWORD')?.errors?.['minlength']
+         && !userForm.get('PASSWORD')?.errors?.['maxlength']
+         && userForm.get('PASSWORD')?.errors?.['pattern']">
+                                        Must contain 1 uppercase letter and 1 number
+                                    </span>
+
+                                    <!-- Forbidden chars -->
+                                    <span class="error-message"
+                                        *ngIf="userForm.get('PASSWORD')?.touched && hasForbiddenChars()">
                                         & * % symbols are not allowed
                                     </span>
 
