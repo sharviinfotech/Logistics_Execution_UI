@@ -99,6 +99,9 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   loggedInUser: string = '';
   plantList: any;
   divisionList: any;
+  supportingDocError = false;
+approveDocError = false;
+
 
   constructor(
     private fb: FormBuilder,
@@ -2191,4 +2194,38 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       this.HeaderForm.get('UTR')?.enable();
     }
   }
+
+
+onFileChange(event: any, fieldName: string) {
+
+  const file = event.target.files[0];
+
+  // reset errors
+  this.supportingDocError = false;
+  this.approveDocError = false;
+
+  if (!file) {
+    this.HeaderForm.get(fieldName)?.setValue(null);
+    return;
+  }
+
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+
+  if (!allowedTypes.includes(file.type)) {
+
+    if (fieldName === 'SupportingDocument') {
+      this.supportingDocError = true;
+    }
+
+    if (fieldName === 'ApproveDocument') {
+      this.approveDocError = true;
+    }
+
+    this.HeaderForm.get(fieldName)?.setValue(null);
+    event.target.value = '';
+    return;
+  }
+
+  this.HeaderForm.get(fieldName)?.setValue(file);
+}
 }

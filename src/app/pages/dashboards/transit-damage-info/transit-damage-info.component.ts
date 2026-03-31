@@ -102,6 +102,11 @@ export class TransitDamageInfoComponent implements OnInit {
   loggedInUser: string = '';
   plantList: any;
   divisionList: any;
+  imagesError = false;
+fsrReportError = false;
+firReportError = false;
+cofError = false;
+
 
   constructor(
     private fb: FormBuilder,
@@ -2129,6 +2134,53 @@ export class TransitDamageInfoComponent implements OnInit {
     // Trigger change detection
     this.cd.detectChanges();
   }
+
+
+
+
+
+onFileChange(event: any, field: string) {
+
+  const file = event.target.files[0];
+
+  // reset all errors
+  this.imagesError = false;
+  this.fsrReportError = false;
+  this.firReportError = false;
+  this.cofError = false;
+
+  if (!file) {
+    this.HeaderForm.get(field)?.setValue('');
+    return;
+  }
+
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+
+  if (!allowedTypes.includes(file.type)) {
+
+    if (field === 'IMAGES') {
+      this.imagesError = true;
+    }
+
+    if (field === 'FSRREPORT') {
+      this.fsrReportError = true;
+    }
+
+    if (field === 'FIRREPORT') {
+      this.firReportError = true;
+    }
+
+    if (field === 'COF') {
+      this.cofError = true;
+    }
+
+    event.target.value = '';
+    this.HeaderForm.get(field)?.setValue('');
+    return;
+  }
+
+  this.HeaderForm.get(field)?.setValue(file);
+}
 
 
 }

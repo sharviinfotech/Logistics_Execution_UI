@@ -78,7 +78,8 @@
           <span>Inward</span>
         </label> -->
         <label>
-          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)=" onOrderTypeSelection()" />
+          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward"
+            (change)=" onOrderTypeSelection()" />
           <span>Outward</span>
         </label>
         <div *ngIf="orderType" class="sap-row">
@@ -382,19 +383,19 @@
         </div>
 
         <div class="form-field">
-       <select formControlName="CLM_ST">
+          <select formControlName="CLM_ST">
 
-<option value="">Select Claim Status</option>
+            <option value="">Select Claim Status</option>
 
-<option value="Under preparation">Under preparation</option>
+            <option value="Under preparation">Under preparation</option>
 
-<option value="Submitted">Submitted</option>
+            <option value="Submitted">Submitted</option>
 
-<option value="Not submitted">Not submitted</option>
+            <option value="Not submitted">Not submitted</option>
 
-</select>
+          </select>
 
-<label>Claim Status</label>
+          <label>Claim Status</label>
         </div>
 
         <div class="form-field">
@@ -438,16 +439,22 @@
 
         <div class="form-field ">
 
-          <input type="file" formControlName="SupportingDocument" id="imagesuploading"
-            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx" />
+          <input type="file" formControlName="SupportingDocument" id="imagesuploading" accept=".jpg,.jpeg,.png"
+            (change)="onFileChange($event, 'SupportingDocument')" />
           <label>Supporting Document</label>
+          <span class="error-message" *ngIf="supportingDocError">
+            Only .jpg, .jpeg, .png files are allowed
+          </span>
         </div>
 
         <div class="form-field ">
 
-          <input type="file" formControlName="ApproveDocument" id="imagesuploading"
-            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx" />
+          <input type="file" formControlName="ApproveDocument" id="imagesuploading" accept=".jpg,.jpeg,.png"
+            (change)="onFileChange($event, 'ApproveDocument')" />
           <label>Approve Document</label>
+          <span class="error-message" *ngIf="approveDocError">
+            Only .jpg, .jpeg, .png files are allowed
+          </span>
         </div>
 
       </form>
@@ -606,17 +613,17 @@
             </select>
             <label>Plant</label>
           </div> -->
-             <div class="form-field">
-              <select [(ngModel)]="filterPlant">
-                <option value="">Select Plant</option>
+          <div class="form-field">
+            <select [(ngModel)]="filterPlant">
+              <option value="">Select Plant</option>
 
-                <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">
-                  {{p.PLANT_TEXT}}
-                </option>
+              <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">
+                {{p.PLANT_TEXT}}
+              </option>
 
-              </select>
-              <label>Plant</label>
-            </div>
+            </select>
+            <label>Plant</label>
+          </div>
 
           <!-- Division -->
           <!-- <div class="form-field">
@@ -627,18 +634,18 @@
             </select>
             <label>Division</label>
           </div> -->
-               <div class="form-field">
-              <select [(ngModel)]="filterDivision">
+          <div class="form-field">
+            <select [(ngModel)]="filterDivision">
 
-                <option value="">Select Division</option>
+              <option value="">Select Division</option>
 
-                <option *ngFor="let d of divisionList" [value]="d.DIVISION">
-                  {{ d.DIV_TEXT }}
-                </option>
+              <option *ngFor="let d of divisionList" [value]="d.DIVISION">
+                {{ d.DIV_TEXT }}
+              </option>
 
-              </select>
-              <label>Division</label>
-            </div>
+            </select>
+            <label>Division</label>
+          </div>
 
           <!-- Customer -->
           <div class="form-field">
@@ -950,8 +957,7 @@
                     <button class="btn btn-sm btn-primary" (click)="editSearchRow(headerData)">
                       <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-sm btn-danger" (click)="deleteRow(headerData, i)"
- >
+                    <button class="btn btn-sm btn-danger" (click)="deleteRow(headerData, i)">
                       <i class="fas fa-trash"></i>
                     </button>
                   </div>

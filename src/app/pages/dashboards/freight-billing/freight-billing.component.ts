@@ -106,6 +106,10 @@ export class FreightBillingComponent implements OnInit {
    loggedInUser: string = '';
      plantList: any;
   divisionList: any;
+  freightBillError = false;
+unloadingError = false;
+detentionError = false;
+workOrderError = false;
 
   paFormData: any = {
     provisionChecked: false,
@@ -680,24 +684,60 @@ console.log("Logged in user:", this.loggedInUser);
     });
   }
 
-  onFileChange(event: any, controlName: string) {
-    const file = event.target.files[0];
 
-    if (!file) return;
 
-    const reader = new FileReader();
+onFileChange(event: any, controlName: string) {
 
-    reader.onload = () => {
-      const base64String = reader.result?.toString().split(',')[1];
-      this.FreightBilling.patchValue({
-        [controlName]: base64String
-      });
+  const file = event.target.files[0];
 
-      console.log(controlName, base64String);
-    };
 
-    reader.readAsDataURL(file);
+  this.freightBillError = false;
+  this.unloadingError = false;
+  this.detentionError = false;
+  this.workOrderError = false;
+
+  if (!file) {
+    this.FreightBilling.get(controlName)?.setValue(null);
+    return;
   }
+
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+
+  if (!allowedTypes.includes(file.type)) {
+
+    if (controlName === 'FreightBillupload') {
+      this.freightBillError = true;
+    }
+
+    if (controlName === 'UnloadingChargesApproval') {
+      this.unloadingError = true;
+    }
+
+    if (controlName === 'DetentionChargesUploading') {
+      this.detentionError = true;
+    }
+
+    if (controlName === 'WorkOrderUploading') {
+      this.workOrderError = true;
+    }
+
+    this.FreightBilling.get(controlName)?.setValue(null);
+    event.target.value = '';
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    const base64String = reader.result?.toString().split(',')[1];
+
+    this.FreightBilling.patchValue({
+      [controlName]: base64String
+    });
+  };
+
+  reader.readAsDataURL(file);
+}
 
   editSearchRow(row: any): void {
     // Backup original data

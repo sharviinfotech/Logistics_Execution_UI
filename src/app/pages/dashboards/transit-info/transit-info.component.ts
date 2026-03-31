@@ -81,6 +81,7 @@ export class TransitInfoComponent implements OnInit {
    loggedInUser: string = '';
      plantList: any;
   divisionList: any;
+  podScanError = false;
 
 
 
@@ -1519,6 +1520,30 @@ console.log("Logged in user:", this.loggedInUser);
     val = val.replace(/[^A-Z0-9\/]/g, '');
     item.ZVEH_NUM = val;
   }
+
+ 
+
+onFileSelected(event: Event): void {
+  this.podScanError = false;
+  const input = event.target as HTMLInputElement;
+  
+  if (!input.files || input.files.length === 0) {
+    this.transitInfo.get('PODSCAN')?.setValue(null);
+    return;
+  }
+
+  const file = input.files[0];
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+
+  if (!allowedTypes.includes(file.type)) {
+    this.podScanError = true;
+    this.transitInfo.get('PODSCAN')?.setValue(null);
+    return;
+  }
+
+  // ✅ Valid file: update form control
+  this.transitInfo.get('PODSCAN')?.setValue(file);
+}
 
 
 

@@ -79,7 +79,8 @@
           <span>Inward</span>
         </label> -->
         <label>
-          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)=" onOrderTypeSelection()" />
+          <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward"
+            (change)=" onOrderTypeSelection()" />
           <span>Outward</span>
         </label>
         <div *ngIf="orderType" class="sap-row">
@@ -383,28 +384,40 @@
         </div>
 
         <div class="form-field ">
-          <input type="file" formControlName="IMAGES" id="imagesuploading" accept=".jpg,.jpeg,.png,.pdf,.xls,.xlsx" />
+          <input type="file" formControlName="IMAGES" id="imagesuploading" accept=".jpg,.jpeg,.png" (change)="onFileChange($event, 'IMAGES')"/>
           <label>Images</label>
+          <span class="error-message" *ngIf="imagesError">
+            Only .jpg, .jpeg, .png files are allowed
+          </span>
         </div>
 
         <div class="form-field ">
-          <input type="file" formControlName="FSRREPORT" id="imagesuploading"
-            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx" />
+          <input type="file" formControlName="FSRREPORT" id="imagesuploading" accept=".jpg,.jpeg,.png"
+             (change)="onFileChange($event, 'FSRREPORT')"/>
           <label>FSR Report</label>
+          <span class="error-message" *ngIf="fsrReportError">
+            Only .jpg, .jpeg, .png files are allowed
+          </span>
         </div>
 
         <div class="form-field ">
 
-          <input type="file" formControlName="FIRREPORT" id="imagesuploading"
-            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx" />
+          <input type="file" formControlName="FIRREPORT" id="imagesuploading" accept=".jpg,.jpeg,.png"
+            (change)="onFileChange($event, 'FIRREPORT')" />
           <label>FIR Report</label>
+          <span class="error-message" *ngIf="firReportError">
+            Only .jpg, .jpeg, .png files are allowed
+          </span>
         </div>
 
         <div class="form-field ">
 
-          <input type="file" formControlName="COF" id="imagesuploading"
-            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx" />
+          <input type="file" formControlName="COF" id="imagesuploading" accept=".jpg,.jpeg,.png"
+            (change)="onFileChange($event, 'COF')" />
           <label>COF</label>
+          <span class="error-message" *ngIf="cofError">
+            Only .jpg, .jpeg, .png files are allowed
+          </span>
         </div>
 
       </form>
@@ -554,17 +567,17 @@
             </select>
             <label>Plant</label>
           </div> -->
-             <div class="form-field">
-              <select [(ngModel)]="filterPlant">
-                <option value="">Select Plant</option>
+          <div class="form-field">
+            <select [(ngModel)]="filterPlant">
+              <option value="">Select Plant</option>
 
-                <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">
-                  {{p.PLANT_TEXT}}
-                </option>
+              <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">
+                {{p.PLANT_TEXT}}
+              </option>
 
-              </select>
-              <label>Plant</label>
-            </div>
+            </select>
+            <label>Plant</label>
+          </div>
 
           <!-- Division -->
           <!-- <div class="form-field">
@@ -575,18 +588,18 @@
             </select>
             <label>Division</label>
           </div> -->
-             <div class="form-field">
-              <select [(ngModel)]="filterDivision">
+          <div class="form-field">
+            <select [(ngModel)]="filterDivision">
 
-                <option value="">Select Division</option>
+              <option value="">Select Division</option>
 
-                <option *ngFor="let d of divisionList" [value]="d.DIVISION">
-                  {{ d.DIV_TEXT }}
-                </option>
+              <option *ngFor="let d of divisionList" [value]="d.DIVISION">
+                {{ d.DIV_TEXT }}
+              </option>
 
-              </select>
-              <label>Division</label>
-            </div>
+            </select>
+            <label>Division</label>
+          </div>
 
           <!-- Customer -->
           <div class="form-field">

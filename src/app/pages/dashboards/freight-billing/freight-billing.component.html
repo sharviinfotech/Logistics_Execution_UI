@@ -327,27 +327,39 @@
         </div>
 
         <div class="form-field">
-          <input type="file" accept=".jpg,.jpeg,.png,.pdf,.xls,.xlsx"
-            (change)="onFileChange($event, 'FreightBillupload')" />
+          <input type="file" accept=".jpg,.jpeg,.png" (change)="onFileChange($event, 'FreightBillupload')" />
           <label>Freight Bill upload</label>
+
+          <span class="error-message" *ngIf="freightBillError">
+            Only .jpg, .jpeg, .png files are allowed
+          </span>
+
         </div>
 
         <div class="form-field">
-          <input type="file" accept=".jpg,.jpeg,.png,.pdf,.xls,.xlsx"
-            (change)="onFileChange($event, 'UnloadingChargesApproval')" />
+          <input type="file" accept=".jpg,.jpeg,.png" (change)="onFileChange($event, 'UnloadingChargesApproval')" />
           <label>Unloading Charges Approval</label>
+
+          <span class="error-message" *ngIf="unloadingError">
+            Only .jpg, .jpeg, .png files are allowed
+          </span>
         </div>
 
         <div class="form-field">
-          <input type="file" accept=".jpg,.jpeg,.png,.pdf,.xls,.xlsx"
-            (change)="onFileChange($event, 'DetentionChargesUploading')" />
+          <input type="file" accept=".jpg,.jpeg,.png" (change)="onFileChange($event, 'DetentionChargesUploading')" />
           <label>Detention Charges Uploading</label>
+          <span class="error-message" *ngIf="detentionError">
+            Only .jpg, .jpeg, .png files are allowed
+          </span>
         </div>
 
         <div class="form-field">
-          <input type="file" accept=".jpg,.jpeg,.png,.pdf,.xls,.xlsx"
-            (change)="onFileChange($event, 'WorkOrderUploading')" />
+          <input type="file" accept=".jpg,.jpeg,.png" (change)="onFileChange($event, 'WorkOrderUploading')" />
           <label>Work Order Uploading</label>
+          <span class="error-message" *ngIf="workOrderError">
+            Only .jpg, .jpeg, .png files are allowed
+          </span>
+
         </div>
 
       </form>
@@ -434,17 +446,17 @@
             </select>
             <label>Plant</label>
           </div> -->
-            <div class="form-field">
-              <select [(ngModel)]="filterPlant">
-                <option value="">Select Plant</option>
+          <div class="form-field">
+            <select [(ngModel)]="filterPlant">
+              <option value="">Select Plant</option>
 
-                <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">
-                  {{p.PLANT_TEXT}}
-                </option>
+              <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">
+                {{p.PLANT_TEXT}}
+              </option>
 
-              </select>
-              <label>Plant</label>
-            </div>
+            </select>
+            <label>Plant</label>
+          </div>
 
           <!-- Division -->
           <!-- <div class="form-field">
@@ -456,18 +468,18 @@
             <label>Division</label>
           </div> -->
 
-            <div class="form-field">
-              <select [(ngModel)]="filterDivision">
+          <div class="form-field">
+            <select [(ngModel)]="filterDivision">
 
-                <option value="">Select Division</option>
+              <option value="">Select Division</option>
 
-                <option *ngFor="let d of divisionList" [value]="d.DIVISION">
-                  {{ d.DIV_TEXT }}
-                </option>
+              <option *ngFor="let d of divisionList" [value]="d.DIVISION">
+                {{ d.DIV_TEXT }}
+              </option>
 
-              </select>
-              <label>Division</label>
-            </div>
+            </select>
+            <label>Division</label>
+          </div>
 
           <!-- Customer -->
           <div class="form-field">
