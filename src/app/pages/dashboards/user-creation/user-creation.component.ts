@@ -688,12 +688,12 @@ const plantCode = mapping?.PLANT;
         DIVISION: d.DIVISION
       }));
 
-      // also select all plants
-      this.selectedPlants = this.PlantCodeList.map(p => p.PLANT);
+      // // also select all plants
+      // this.selectedPlants = this.PlantCodeList.map(p => p.PLANT);
 
-      this.newUser.PLANTS = this.selectedPlants.map(p => ({
-        WERKS: p
-      }));
+      // this.newUser.PLANTS = this.selectedPlants.map(p => ({
+      //   WERKS: p
+      // }));
 
     } else {
 
