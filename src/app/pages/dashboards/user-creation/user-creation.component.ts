@@ -172,14 +172,14 @@ export class UserCreationComponent implements OnInit {
         ]
       ],
       CONTACT: ['', [Validators.required, Validators.pattern('[0-9]{10}')]],
-   PASSWORD: [
+      PASSWORD: [
         '',
         [
-      Validators.required,
-      Validators.minLength(8),
-       Validators.maxLength(10),
-      Validators.pattern(/^(?=.*[A-Z])(?=.*\d)[^&*%]*$/)
-    ]
+          Validators.required,
+          Validators.minLength(8),
+          Validators.maxLength(10),
+          Validators.pattern(/^(?=.*[A-Z])(?=.*\d)[^&*%]*$/)
+        ]
       ],
       CONFPSWD: [
         '',
@@ -326,7 +326,11 @@ export class UserCreationComponent implements OnInit {
 
 
   onPlantToggle(plant: string, event: any) {
+
+  console.log("Clicked Plant:", plant);
+  console.log("Checkbox State:", event.target.checked);
     if (event.target.checked) {
+      console.log("Plant Selected");
       if (!this.selectedPlants.includes(plant)) this.selectedPlants.push(plant);
 
 
@@ -334,6 +338,8 @@ export class UserCreationComponent implements OnInit {
         this.newUser.PLANTS.push({ WERKS: plant });
       }
     } else {
+          console.log("Plant Unselected");
+
       this.selectedPlants = this.selectedPlants.filter(p => p !== plant);
 
 
@@ -368,14 +374,14 @@ export class UserCreationComponent implements OnInit {
 
   onDivisionToggle(division: string, event: any, plant?: string) {
 
-    // Find correct plant for this division
-    const mapping = this.DivisionList.find(
-      d => d.DIVISION === division
-    );
+  const mapping = this.DivisionList.find(
+  d => d.DIVISION === division
+);
 
-    const plantCode = mapping?.PLANT;
+const plantCode = mapping?.PLANT;
 
     if (event.target.checked) {
+         console.log("Division Selected");
 
       // ===== ADD DIVISION (MULTI) =====
       if (!this.selectedDivisions.includes(division)) {
@@ -389,16 +395,20 @@ export class UserCreationComponent implements OnInit {
         }
 
         // ===== AUTO ADD PLANT (MULTI) =====
-        if (!this.selectedPlants.includes(plantCode)) {
-          this.selectedPlants.push(plantCode);
-        }
+        // if (!this.selectedPlants.includes(plantCode)) {
+        //   this.selectedPlants.push(plantCode);
+        // }
 
         if (!this.newUser.PLANTS.some(p => p.WERKS === plantCode)) {
           this.newUser.PLANTS.push({ WERKS: plantCode });
+               console.log("Updated selectedPlants:", this.selectedPlants);
+      console.log("Updated newUser.PLANTS:", this.newUser.PLANTS);
         }
+        
       }
 
     } else {
+       console.log("Division Unselected");
 
       // ===== REMOVE DIVISION =====
       this.selectedDivisions = this.selectedDivisions.filter(d => d !== division);
@@ -543,58 +553,156 @@ export class UserCreationComponent implements OnInit {
   }
 
 
+  // fetchPlantCodeList(): void {
+  //   this.spinner.show();
+  //   this.service.fetchVendorCode().subscribe(
+  //     (res: any) => {
+  //       if (res && res[0]?.PLANT) {
+  //         this.PlantCodeList = res[0].PLANT;
+  //         const uniqueDivisions = Array.from(new Set(this.PlantCodeList.map(p => p.DIVISION)));
+  //         this.DivisionList = uniqueDivisions.map(div => ({
+  //           DIVISION: div,
+  //           PLANT: this.PlantCodeList.find(p => p.DIVISION === div)?.PLANT || ''
+  //         }));
+  //       } else Swal.fire('No Plant Found', '', 'warning');
+  //       this.spinner.hide();
+  //     },
+  //     error => {
+  //       this.spinner.hide();
+  //       Swal.fire('Error fetching plants', '', 'error');
+  //     }
+  //   );
+  // }
+
+  // onPlantChange() {
+  //   const plant = this.userForm.value.PLANT;
+  //   if (!plant) return;
+
+  //   if (!this.newUser.PLANTS.some(p => p.WERKS === plant)) this.newUser.PLANTS.push({ WERKS: plant });
+
+  //   this.DivisionList = this.PlantCodeList
+  //     .filter(p => p.PLANT === plant)
+  //     .map(p => ({ DIVISION: p.DIVISION, PLANT: p.PLANT }));
+
+  //   this.userForm.patchValue({ DIVISION: '' });
+  // }
+
+  // onDivisionChange() {
+  //   const plant = this.userForm.value.PLANT;
+  //   const division = this.userForm.value.DIVISION;
+
+  //   if (plant && division) {
+  //     const exists = this.newUser.DIVISIONS.some(
+  //       d => d.WERKS === plant && d.DIVISION === division
+  //     );
+
+  //     if (!exists) {
+  //       this.newUser.DIVISIONS.push({
+  //         WERKS: plant,
+  //         DIVISION: division
+  //       });
+  //     }
+  //   }
+
+  //   console.log('🟣 Selected Divisions:', this.newUser.DIVISIONS);
+  // }
+
   fetchPlantCodeList(): void {
-    this.spinner.show();
-    this.service.fetchVendorCode().subscribe(
-      (res: any) => {
-        if (res && res[0]?.PLANT) {
-          this.PlantCodeList = res[0].PLANT;
-          const uniqueDivisions = Array.from(new Set(this.PlantCodeList.map(p => p.DIVISION)));
-          this.DivisionList = uniqueDivisions.map(div => ({
-            DIVISION: div,
-            PLANT: this.PlantCodeList.find(p => p.DIVISION === div)?.PLANT || ''
-          }));
-        } else Swal.fire('No Plant Found', '', 'warning');
-        this.spinner.hide();
-      },
-      error => {
-        this.spinner.hide();
-        Swal.fire('Error fetching plants', '', 'error');
+
+  this.spinner.show();
+
+  this.service.fetchVendorCode().subscribe(
+    (res: any) => {
+
+      if (res && res[0]?.PLANT) {
+
+        this.PlantCodeList = res[0].PLANT;
+
+        this.DivisionList = this.PlantCodeList.map(p => ({
+          DIVISION: p.DIVISION,
+          PLANT: p.PLANT
+        }));
+
+        console.log("PlantCodeList:", this.PlantCodeList);
+        console.log("DivisionList:", this.DivisionList);
+
+      } else {
+        Swal.fire('No Plant Found', '', 'warning');
       }
-    );
-  }
 
-  onPlantChange() {
-    const plant = this.userForm.value.PLANT;
-    if (!plant) return;
+      this.spinner.hide();
+    },
 
-    if (!this.newUser.PLANTS.some(p => p.WERKS === plant)) this.newUser.PLANTS.push({ WERKS: plant });
-
-    this.DivisionList = this.PlantCodeList
-      .filter(p => p.PLANT === plant)
-      .map(p => ({ DIVISION: p.DIVISION, PLANT: p.PLANT }));
-
-    this.userForm.patchValue({ DIVISION: '' });
-  }
-
-  onDivisionChange() {
-    const plant = this.userForm.value.PLANT;
-    const division = this.userForm.value.DIVISION;
-
-    if (plant && division) {
-      const exists = this.newUser.DIVISIONS.some(
-        d => d.WERKS === plant && d.DIVISION === division
-      );
-
-      if (!exists) {
-        this.newUser.DIVISIONS.push({
-          WERKS: plant,
-          DIVISION: division
-        });
-      }
+    error => {
+      this.spinner.hide();
+      Swal.fire('Error fetching plants', '', 'error');
     }
+  );
+}
 
-    console.log('🟣 Selected Divisions:', this.newUser.DIVISIONS);
+  toggleAllPlants(event: any) {
+
+    if (event.target.checked) {
+
+      this.selectedPlants = this.PlantCodeList.map(p => p.PLANT);
+
+      this.newUser.PLANTS = this.selectedPlants.map(p => ({
+        WERKS: p
+      }));
+
+      this.updateDivisionsForSelectedPlants();
+
+      // divisions also select
+      this.selectedDivisions = this.DivisionList.map(d => d.DIVISION);
+
+      this.newUser.DIVISIONS = this.DivisionList.map(d => ({
+        WERKS: d.PLANT,
+        DIVISION: d.DIVISION
+      }));
+
+    } else {
+
+      this.selectedPlants = [];
+      this.selectedDivisions = [];
+      this.newUser.PLANTS = [];
+      this.newUser.DIVISIONS = [];
+    }
+  }
+
+  isAllPlantsSelected() {
+    return this.selectedPlants.length === this.PlantCodeList.length;
+  }
+
+  isAllDivisionsSelected() {
+    return this.selectedDivisions.length === this.DivisionList.length;
+  }
+  toggleAllDivisions(event: any) {
+
+    if (event.target.checked) {
+
+      // select all divisions
+      this.selectedDivisions = this.DivisionList.map(d => d.DIVISION);
+
+      this.newUser.DIVISIONS = this.DivisionList.map(d => ({
+        WERKS: d.PLANT,
+        DIVISION: d.DIVISION
+      }));
+
+      // also select all plants
+      this.selectedPlants = this.PlantCodeList.map(p => p.PLANT);
+
+      this.newUser.PLANTS = this.selectedPlants.map(p => ({
+        WERKS: p
+      }));
+
+    } else {
+
+      this.selectedDivisions = [];
+      this.newUser.DIVISIONS = [];
+
+      this.selectedPlants = [];
+      this.newUser.PLANTS = [];
+    }
   }
 
 
@@ -616,7 +724,7 @@ export class UserCreationComponent implements OnInit {
     this.service.UserCreationDisplayTable().subscribe(
       (res: any[]) => {
         this.spinner.hide();
-        console.log('🟢 API Response:', res);
+        console.log(' API Response:', res);
 
         if (!Array.isArray(res)) {
           this.users = [];
@@ -891,15 +999,15 @@ export class UserCreationComponent implements OnInit {
   // }
 
   blockSpecialChars(event: KeyboardEvent) {
-  const forbidden = ['&', '*', '%'];
-  if (forbidden.includes(event.key)) {
-    event.preventDefault();
+    const forbidden = ['&', '*', '%'];
+    if (forbidden.includes(event.key)) {
+      event.preventDefault();
+    }
   }
-}
-hasForbiddenChars(): boolean {
-  const value = this.userForm.get('PASSWORD')?.value || '';
-  return /[&*%]/.test(value);
-}
+  hasForbiddenChars(): boolean {
+    const value = this.userForm.get('PASSWORD')?.value || '';
+    return /[&*%]/.test(value);
+  }
 
   deleteUser(index: number) {
     Swal.fire({

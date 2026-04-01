@@ -146,7 +146,7 @@
         </div>
 
         <!-- Modal -->
-        <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+        <div class="modal-overlay" *ngIf="showModal" >
             <div class="modal-container" (click)="$event.stopPropagation()">
 
                 <!-- Modal Header -->
@@ -366,6 +366,11 @@
 
                                 <!-- Dropdown -->
                                 <div class="multi-select-dropdown" *ngIf="showPlantDropdown">
+                                       <label class="dropdown-option">
+                                        <input type="checkbox" [checked]="isAllPlantsSelected()"
+                                            (change)="toggleAllPlants($event)" />
+                                        Select All Plants
+                                    </label>
                                     <div *ngFor="let plant of PlantCodeList">
                                         <label class="dropdown-option">
                                             <input type="checkbox" [checked]="isPlantSelected(plant.PLANT)"
@@ -389,6 +394,11 @@
 
                                 <!-- Dropdown -->
                                 <div class="multi-select-dropdown" *ngIf="showDivisionDropdown">
+                                       <label class="dropdown-option">
+                                        <input type="checkbox" [checked]="isAllDivisionsSelected()"
+                                            (change)="toggleAllDivisions($event)" />
+                                        Select All Divisions
+                                    </label>
                                     <div *ngFor="let div of DivisionList">
                                         <label class="dropdown-option">
                                             <input type="checkbox" [checked]="isDivisionSelected(div.DIVISION)"
