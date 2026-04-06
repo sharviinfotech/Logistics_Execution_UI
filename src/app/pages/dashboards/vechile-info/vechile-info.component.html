@@ -355,10 +355,14 @@
                 <td><input type="text" formControlName="ZTRUC_TYPE" /></td>
                 <td><input type="text" formControlName="ZTRUC_WT" class="width-le" /></td>
                 <td><input type="number" formControlName="ZTRUC_VOL" class="width-le" /></td>
-                <td>
+                <!-- <td>
                   <input type="text" formControlName="ZVEH_NUM" class="width-le" maxlength="10"
                     pattern="[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}" placeholder="" (input)="onVehicleNumberInput($event, i)"
                     title="Format: State Code/Registration (e.g., AP/TS09AB1234)" />
+                </td> -->
+                <td>
+                  <input type="text" formControlName="ZVEH_NUM" class="width-le" maxlength="10"
+                    placeholder="Enter Vehicle Number" />
                 </td>
                 <td><input type="number" formControlName="ZNOOFVEH" min="1" class="width-le" /></td>
                 <td><input type="text" formControlName="ZDNAME" /></td>
@@ -679,12 +683,20 @@
               </td>
 
               <!-- Vehicle No -->
-              <td>
+              <!-- <td>
                 <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
                   [(ngModel)]="item.ZVEH_NUM" placeholder="" maxlength="10" pattern="[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}"
                   (input)="onVehicleNumberEditInput(item)"
                   title="Format: State Code/Registration (e.g., AP/TS09AB1234)" />
                 <span *ngIf="!item.isEdit">{{ item.ZVEH_NUM }}</span>
+              </td> -->
+              <td>
+                <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
+                  [(ngModel)]="item.ZVEH_NUM" placeholder="Enter Vehicle Number" maxlength="10" />
+
+                <span *ngIf="!item.isEdit">
+                  {{ item.ZVEH_NUM }}
+                </span>
               </td>
 
               <!-- No Vehicles -->

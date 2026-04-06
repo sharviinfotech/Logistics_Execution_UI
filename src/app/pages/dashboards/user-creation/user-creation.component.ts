@@ -107,6 +107,7 @@ export class UserCreationComponent implements OnInit {
   selectedDivisions: string[] = [];
   showPassword = false;
   showConfirmPassword = false;
+  changePassword = false;
 
 
 
@@ -132,7 +133,7 @@ export class UserCreationComponent implements OnInit {
   }
 
   availableActivities: string[] = [
-    'Outward-Dashboard',
+    // 'Outward-Dashboard',
     'Outward-Dispatch',
     'Outward-OrderInfo',
     'Outward-ShipmentDetails',
@@ -141,9 +142,12 @@ export class UserCreationComponent implements OnInit {
     'Outward-VehicleInfo',
     'Outward-TransitInfo',
     'Outward-FreightBilling',
+    // 'Outward-ServiceLevel',
     'Outward-TransitDamageInfo',
     'Outward-InsuranceClaimTracking',
-    'Outward-UserCreation'
+    'Outward-UserCreation',
+    // 'Outward-Reports',
+    // 'Outward-TransitReport'
   ];
 
 
@@ -327,8 +331,8 @@ export class UserCreationComponent implements OnInit {
 
   onPlantToggle(plant: string, event: any) {
 
-  console.log("Clicked Plant:", plant);
-  console.log("Checkbox State:", event.target.checked);
+    console.log("Clicked Plant:", plant);
+    console.log("Checkbox State:", event.target.checked);
     if (event.target.checked) {
       console.log("Plant Selected");
       if (!this.selectedPlants.includes(plant)) this.selectedPlants.push(plant);
@@ -338,7 +342,7 @@ export class UserCreationComponent implements OnInit {
         this.newUser.PLANTS.push({ WERKS: plant });
       }
     } else {
-          console.log("Plant Unselected");
+      console.log("Plant Unselected");
 
       this.selectedPlants = this.selectedPlants.filter(p => p !== plant);
 
@@ -374,14 +378,14 @@ export class UserCreationComponent implements OnInit {
 
   onDivisionToggle(division: string, event: any, plant?: string) {
 
-  const mapping = this.DivisionList.find(
-  d => d.DIVISION === division
-);
+    const mapping = this.DivisionList.find(
+      d => d.DIVISION === division
+    );
 
-const plantCode = mapping?.PLANT;
+    const plantCode = mapping?.PLANT;
 
     if (event.target.checked) {
-         console.log("Division Selected");
+      console.log("Division Selected");
 
       // ===== ADD DIVISION (MULTI) =====
       if (!this.selectedDivisions.includes(division)) {
@@ -401,14 +405,14 @@ const plantCode = mapping?.PLANT;
 
         if (!this.newUser.PLANTS.some(p => p.WERKS === plantCode)) {
           this.newUser.PLANTS.push({ WERKS: plantCode });
-               console.log("Updated selectedPlants:", this.selectedPlants);
-      console.log("Updated newUser.PLANTS:", this.newUser.PLANTS);
+          console.log("Updated selectedPlants:", this.selectedPlants);
+          console.log("Updated newUser.PLANTS:", this.newUser.PLANTS);
         }
-        
+
       }
 
     } else {
-       console.log("Division Unselected");
+      console.log("Division Unselected");
 
       // ===== REMOVE DIVISION =====
       this.selectedDivisions = this.selectedDivisions.filter(d => d !== division);
@@ -529,7 +533,10 @@ const plantCode = mapping?.PLANT;
   openModal() {
     this.resetForm(); // reset everything
     this.showModal = true;
+    this.changePassword = true;
 
+    this.userForm.get('PASSWORD')?.enable();
+    this.userForm.get('CONFPSWD')?.enable();
     // Fetch plant list if needed
     this.fetchPlantCodeList();
 
@@ -609,36 +616,36 @@ const plantCode = mapping?.PLANT;
 
   fetchPlantCodeList(): void {
 
-  this.spinner.show();
+    this.spinner.show();
 
-  this.service.fetchVendorCode().subscribe(
-    (res: any) => {
+    this.service.fetchVendorCode().subscribe(
+      (res: any) => {
 
-      if (res && res[0]?.PLANT) {
+        if (res && res[0]?.PLANT) {
 
-        this.PlantCodeList = res[0].PLANT;
+          this.PlantCodeList = res[0].PLANT;
 
-        this.DivisionList = this.PlantCodeList.map(p => ({
-          DIVISION: p.DIVISION,
-          PLANT: p.PLANT
-        }));
+          this.DivisionList = this.PlantCodeList.map(p => ({
+            DIVISION: p.DIVISION,
+            PLANT: p.PLANT
+          }));
 
-        console.log("PlantCodeList:", this.PlantCodeList);
-        console.log("DivisionList:", this.DivisionList);
+          console.log("PlantCodeList:", this.PlantCodeList);
+          console.log("DivisionList:", this.DivisionList);
 
-      } else {
-        Swal.fire('No Plant Found', '', 'warning');
+        } else {
+          Swal.fire('No Plant Found', '', 'warning');
+        }
+
+        this.spinner.hide();
+      },
+
+      error => {
+        this.spinner.hide();
+        Swal.fire('Error fetching plants', '', 'error');
       }
-
-      this.spinner.hide();
-    },
-
-    error => {
-      this.spinner.hide();
-      Swal.fire('Error fetching plants', '', 'error');
-    }
-  );
-}
+    );
+  }
 
   toggleAllPlants(event: any) {
 
@@ -840,6 +847,7 @@ const plantCode = mapping?.PLANT;
 
   editUser(user: User, index: number) {
     this.editingIndex = index;
+      this.newUser.PASSWORD = user.PASSWORD;
     this.userForm.patchValue({
       USER: user.USER,
       FIRST_NAME: user.FIRST_NAME,
@@ -865,6 +873,11 @@ const plantCode = mapping?.PLANT;
     } else {
       this.userForm.get('EMP_CODE')?.enable();
     }
+
+    this.changePassword = false;
+
+    this.userForm.get('PASSWORD')?.disable();
+    this.userForm.get('CONFPSWD')?.disable();
 
     this.activitiesFormArray.clear();
     user.ACTIVITIES.forEach(a => this.activitiesFormArray.push(this.fb.control(a.ACT)));
@@ -908,13 +921,16 @@ const plantCode = mapping?.PLANT;
         LAST_NAME: formValue.LAST_NAME,
         EMAIL: formValue.EMAIL,
         CONTACT: formValue.CONTACT,
-        PASSWORD: formValue.PASSWORD,
-        CONFPSWD: formValue.CONFPSWD,
+        // PASSWORD: formValue.PASSWORD,
+        // CONFPSWD: formValue.CONFPSWD,
+        PASSWORD: this.changePassword ? formValue.PASSWORD : this.newUser.PASSWORD,
+        CONFPSWD: this.changePassword ? formValue.CONFPSWD : this.newUser.PASSWORD,
         STATUS: formValue.STATUS,
         EMP_CODE: formValue.EMP_CODE,
         INOUT_TYPE: formValue.INOUT_TYPE,
         TYUSER: formValue.ROLES,
         CATEGORY: formValue.CATEGORY,
+        ZCHPWRD: this.changePassword ? 'X' : '',
 
         // Send plants
         PLANTS: this.newUser.PLANTS,
@@ -1050,4 +1066,25 @@ const plantCode = mapping?.PLANT;
 
     });
   }
+
+onChangePasswordToggle(event: any) {
+  this.changePassword = event.target.checked;
+
+  if (this.changePassword) {
+    // Enable fields so user can edit
+    this.userForm.get('PASSWORD')?.enable();
+    this.userForm.get('CONFPSWD')?.enable();
+    
+    // this.userForm.patchValue({ PASSWORD: '', CONFPSWD: '' });
+  } else {
+    // Disable fields so user cannot edit
+    this.userForm.get('PASSWORD')?.disable();
+    this.userForm.get('CONFPSWD')?.disable();
+    // Refill old password from this.newUser to keep payload intact
+    this.userForm.patchValue({
+      PASSWORD: this.newUser.PASSWORD,
+      CONFPSWD: this.newUser.PASSWORD
+    });
+  }
+}
 }

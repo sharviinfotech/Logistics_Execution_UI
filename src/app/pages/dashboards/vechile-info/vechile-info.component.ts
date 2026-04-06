@@ -749,25 +749,25 @@ export class VechileInfoComponent implements OnInit {
   }
 
   // Enforce vehicle number format (XX/YYYYY... where XX=state code, YYYYY=registration)
-  onVehicleNumberInput(event: any, index: number): void {
-    const input = event.target as HTMLInputElement;
-    let val = (input.value || '').toUpperCase();
-    // Allow only letters, digits, and forward slash
-    val = val.replace(/[^A-Z0-9\/]/g, '');
-    input.value = val;
-    const row = this.vehicles.at(index) as FormGroup;
-    if (row) {
-      row.get('ZVEH_NUM')?.setValue(val);
-    }
-  }
+  // onVehicleNumberInput(event: any, index: number): void {
+  //   const input = event.target as HTMLInputElement;
+  //   let val = (input.value || '').toUpperCase();
+  //   // Allow only letters, digits, and forward slash
+  //   val = val.replace(/[^A-Z0-9\/]/g, '');
+  //   input.value = val;
+  //   const row = this.vehicles.at(index) as FormGroup;
+  //   if (row) {
+  //     row.get('ZVEH_NUM')?.setValue(val);
+  //   }
+  // }
 
   // Enforce vehicle number format for ngModel-ed edit rows
-  onVehicleNumberEditInput(item: any): void {
-    if (!item) return;
-    let val = String(item.ZVEH_NUM || '').toUpperCase();
-    val = val.replace(/[^A-Z0-9\/]/g, '');
-    item.ZVEH_NUM = val;
-  }
+  // onVehicleNumberEditInput(item: any): void {
+  //   if (!item) return;
+  //   let val = String(item.ZVEH_NUM || '').toUpperCase();
+  //   val = val.replace(/[^A-Z0-9\/]/g, '');
+  //   item.ZVEH_NUM = val;
+  // }
 
   getForm(type: 'purchase' | 'invoice'): void {
     this.fetchVehicleDetails();
@@ -974,11 +974,11 @@ export class VechileInfoComponent implements OnInit {
     }
 
     // Validate vehicle numbers for selected rows: must be in format XX/YYY... (e.g., AP/TS457889)
-    const invalidVehicleRow = filtered.find((r: any) => !(/^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/.test(String(r.ZVEH_NUM || '').trim())));
-    if (invalidVehicleRow) {
-      Swal.fire('Warning', 'Vehicle Number must be in format like AP/TS09AB1234 (state code/registration).', 'warning');
-      return;
-    }
+    // const invalidVehicleRow = filtered.find((r: any) => !(/^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/.test(String(r.ZVEH_NUM || '').trim())));
+    // if (invalidVehicleRow) {
+    //   Swal.fire('Warning', 'Vehicle Number must be in format like AP/TS09AB1234 (state code/registration).', 'warning');
+    //   return;
+    // }
 
 
     if (filtered.length === 0) {
@@ -1186,10 +1186,10 @@ export class VechileInfoComponent implements OnInit {
       }
 
       // Validate vehicle number format if present
-      if (row.ZVEH_NUM && !(/^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/.test(String(row.ZVEH_NUM).trim()))) {
-        Swal.fire('Warning', 'Vehicle Number must be in format like AP/TS09AB1234 (state code/registration).', 'warning');
-        return;
-      }
+      // if (row.ZVEH_NUM && !(/^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/.test(String(row.ZVEH_NUM).trim()))) {
+      //   Swal.fire('Warning', 'Vehicle Number must be in format like AP/TS09AB1234 (state code/registration).', 'warning');
+      //   return;
+      // }
 
       this.spinner.show();
 

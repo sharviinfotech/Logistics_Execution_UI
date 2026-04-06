@@ -17,6 +17,7 @@ import { TransitDamageInfoComponent } from './transit-damage-info/transit-damage
 import { InsuranceClaimTrackingComponent } from './insurance-claim-tracking/insurance-claim-tracking.component';
 import { DispatchComponent } from './dispatch/dispatch.component';
 import { UserCreationComponent } from './user-creation/user-creation.component';
+import { ServiceLevelComponent } from './service-level/service-level.component';
 // import { CooisComponent } from './coois/coois.component';
 // import { Co11Component } from './co11/co11.component';
 
@@ -78,7 +79,8 @@ import { UserCreationComponent } from './user-creation/user-creation.component';
 
 
 
-    UserCreationComponent
+    UserCreationComponent,
+    
   ]
 })
 export class DashboardsModule { }

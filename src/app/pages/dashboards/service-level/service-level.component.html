@@ -1,0 +1,346 @@
+<div class="card-LE">
+  <div class="card-header-LE header-flex">
+
+    <!-- Left Title -->
+    <div class="header-title">
+      Service Level(Shipment Feedback)
+    </div>
+
+    <!-- Right Actions -->
+    <div class="header-actions">
+
+
+
+      <!-- Refresh -->
+      <button class="header-icon refresh-btn" (click)="refreshScreen()" title="Refresh">
+        <i class="fas fa-sync-alt"></i>
+      </button>
+
+    </div>
+  </div>
+
+  <div class="card-body-LE">
+
+
+    <br />
+
+
+
+    <!-- Order Type with Processing Badge -->
+    <div class="form-radio optional ">
+
+      <label>
+        <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
+        <span>Outward</span>
+      </label>
+      <div *ngIf="orderType === 'Outward'" class="sap-row">
+        <div class="sap-toggle-group">
+
+          <!-- WITH SAP -->
+          <div class="sap-toggle-item">
+            <label class="toggle-label">
+              <input type="radio" name="sapType" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
+              <span class="toggle-track">
+                <span class="toggle-circle"></span>
+              </span>
+              <span class="toggle-text">With SAP</span>
+            </label>
+          </div>
+
+          <!-- WITHOUT SAP -->
+          <div class="sap-toggle-item">
+            <label class="toggle-label">
+              <input type="radio" name="sapType" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
+              <span class="toggle-track">
+                <span class="toggle-circle"></span>
+              </span>
+              <span class="toggle-text">Without SAP</span>
+            </label>
+          </div>
+
+        </div>
+
+        <!-- PENDING & COMPLETED COUNTS -->
+        <!-- <div *ngIf="orderType === 'Outward' && sapType" class="status-counts-container">
+          <div class="pending-box">
+            <i class="fas fa-clock"></i>
+            <span class="count-text">Pending: {{ pendingCount }}</span>
+          </div>
+          <div class="completed-box">
+            <i class="fas fa-check-circle"></i>
+            <span class="count-text">Completed: {{ completedCount }}</span>
+          </div>
+        </div> -->
+        <!-- Truck Type Selection -->
+
+        <!-- Truck Type Selection -->
+
+        <div *ngIf="sapType" class="sap-row truck-row">
+
+          <div class="sap-toggle-group">
+
+            <!-- Full Truck Load -->
+            <div class="sap-toggle-item">
+              <label class="toggle-label">
+                <input type="radio" name="truckType" [(ngModel)]="truckType" value="FTL"
+                  (change)="onTruckTypeChange()" />
+
+                <span class="toggle-track">
+                  <span class="toggle-circle"></span>
+                </span>
+
+                <span class="toggle-text">Full Truck Load</span>
+              </label>
+            </div>
+
+            <!-- Cargo -->
+            <div class="sap-toggle-item">
+              <label class="toggle-label">
+                <input type="radio" name="truckType" [(ngModel)]="truckType" value="Cargo"
+                  (change)="onTruckTypeChange()">
+
+                <span class="toggle-track">
+                  <span class="toggle-circle"></span>
+                </span>
+
+                <span class="toggle-text">Cargo</span>
+              </label>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <br />
+
+    <!-- SAP Type Selection -->
+
+
+    <!-- Common Section for Both SAP and Non-SAP -->
+    <div class="input-row" *ngIf="sapType">
+      <!-- Inward: PO Number Input -->
+      <div *ngIf="orderType === 'Inward'" class="input-flex">
+        <div class="form-field flex-1">
+          <input type="text" name="ponumber" [(ngModel)]="ponumber" placeholder=" "
+            (input)="onInputChange('purchase')" />
+          <label>PO Number</label>
+        </div>
+        <button type="button" class="btn-get" (click)="getForm('purchase')"
+          [disabled]="!ponumber || ponumber.trim()===''">
+          GET
+        </button>
+      </div>
+      <!-- Outward: Table + Invoice/DC Reference + Search -->
+      <div *ngIf="orderType === 'Outward'">
+        <!-- Reference Number Table (Common for both SAP and Non-SAP) -->
+        <form [formGroup]="OrderInfo">
+          <div class="table-responsive" id="refTable">
+            <table class="table table-bordered text-center">
+              <thead>
+                <tr>
+                  <th>Select</th>
+                  <th>Sl.No</th>
+                  <th>Reference Number</th>
+                  <th>Work Order Number</th>
+                  <th>LR Number</th>
+                  <th>Transporter</th>
+                  <!-- <th>Action</th> -->
+                </tr>
+              </thead>
+
+              <tbody formArrayName="items">
+                <tr *ngFor="let item of items.controls; let i = index" [formGroupName]="i">
+                  <td>
+                    <input type="checkbox" (change)="onCheckboxChange($event, i)" [checked]="isItemSelected(i)" />
+                  </td>
+
+                  <td>{{ i + 1 }}</td>
+
+                  <td>
+                    <input type="text" formControlName="referenceNumber" class="width-le" placeholder="Enter Ref. No."
+                      maxlength="10" (input)="onlyNumbers($event, i)" (blur)="onFieldBlur(i, 'REF_NO')"
+                      (keydown.enter)="onFieldBlur(i, 'REF_NO')" (keydown.tab)="onFieldBlur(i, 'REF_NO')"
+                      [readonly]="i !== 0" />
+                  </td>
+
+                  <td>
+                    <input type="text" formControlName="workOrderNumber" class="width-le"
+                      placeholder="Enter Work Order No." (blur)="onFieldBlur(i, 'WORK_ORDER_NO')"
+                      (keydown.enter)="onFieldBlur(i, 'WORK_ORDER_NO')" (keydown.tab)="onFieldBlur(i, 'WORK_ORDER_NO')"
+                      [readonly]="i !== 0" />
+                  </td>
+
+                  <td>
+                    <input type="text" formControlName="lrNumber" class="width-le" placeholder="Enter LR No."
+                      (blur)="onFieldBlur(i, 'LR_NO')" (keydown.enter)="onFieldBlur(i, 'LR_NO')"
+                      (keydown.tab)="onFieldBlur(i, 'LR_NO')" [readonly]="i !== 0" />
+                  </td>
+
+                  <td>
+                    <input type="text" formControlName="transporter" placeholder="Enter Transporter"
+                      (blur)="onFieldBlur(i, 'TRANSPORTER')" (keydown.enter)="onFieldBlur(i, 'TRANSPORTER')"
+                      (keydown.tab)="onFieldBlur(i, 'TRANSPORTER')" [readonly]="i !== 0" />
+                  </td>
+
+                  <!-- <td>
+                      <button type="button" class="btn-remove-LR" (click)="removeRow(i)" *ngIf="items.length > 1">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </td> -->
+
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </form>
+
+        <!-- SAP: Invoice Number + GET Button + Search Bar -->
+        <div class="input-row input-flex" *ngIf="sapType">
+          <div class="form-field flex-1">
+            <input type="text" name="invoicenumber" [(ngModel)]="invoicenumber" placeholder=" "
+              (input)="onInputChange('invoice')" />
+            <label>Invoice Number</label>
+          </div>
+
+          <button type="button" class="btn-get" (click)="getForm('invoice')"
+            [disabled]="!invoicenumber || invoicenumber.trim()===''">
+            GET
+          </button>
+
+        </div>
+
+        <!-- Shipment Feedback Section -->
+
+        <!-- Shipment Feedback Section -->
+        <div class="feedback-card" *ngIf="showFeedback">
+
+          <div class="feedback-title">
+            Shipment Feedback
+          </div>
+
+          <!-- On time placement (FTL only) -->
+          <div class="feedback-row" *ngIf="truckType === 'FTL'">
+            <div class="question">On time placement</div>
+            <div class="options">
+              <label class="check">
+                <input type="radio" name="onTimePlacement" value="Yes" [(ngModel)]="feedback.onTimePlacement"> Yes
+              </label>
+
+              <label class="check">
+                <input type="radio" name="onTimePlacement" value="No" [(ngModel)]="feedback.onTimePlacement"> No
+              </label>
+            </div>
+          </div>
+
+          <!-- Transhipment -->
+          <div class="feedback-row" *ngIf="truckType === 'FTL'">
+            <div class="question">Transhipment if any</div>
+            <div class="options">
+              <label class="check">
+                <input type="radio" name="transhipment" value="Yes" [(ngModel)]="feedback.transhipment"> Yes
+              </label>
+              <label class="check">
+                <input type="radio" name="transhipment" value="No" [(ngModel)]="feedback.transhipment"> No
+              </label>
+            </div>
+          </div>
+
+          <!-- On time delivery -->
+          <div class="feedback-row">
+            <div class="question">On time delivery</div>
+            <div class="options">
+              <label class="check">
+                <input type="radio" name="delivery" value="Yes" [(ngModel)]="feedback.delivery"> Yes
+              </label>
+              <label class="check">
+                <input type="radio" name="delivery" value="No" [(ngModel)]="feedback.delivery"> No
+              </label>
+            </div>
+          </div>
+
+          <!-- Damage -->
+          <div class="feedback-row">
+            <div class="question">Damage if any</div>
+            <div class="options">
+              <label class="check">
+                <input type="radio" name="damage" value="Yes" [(ngModel)]="feedback.damage"> Yes
+              </label>
+              <label class="check">
+                <input type="radio" name="damage" value="No" [(ngModel)]="feedback.damage"> No
+              </label>
+            </div>
+          </div>
+
+          <!-- Accident -->
+          <div class="feedback-row">
+            <div class="question">Accident if any</div>
+            <div class="options">
+              <label class="check">
+                <input type="radio" name="accident" value="Yes" [(ngModel)]="feedback.accident"> Yes
+              </label>
+              <label class="check">
+                <input type="radio" name="accident" value="No" [(ngModel)]="feedback.accident"> No
+              </label>
+            </div>
+          </div>
+
+          <!-- POD -->
+          <div class="feedback-row">
+            <div class="question">On time POD submission</div>
+            <div class="options">
+              <label class="check">
+                <input type="radio" name="pod" value="Yes" [(ngModel)]="feedback.pod"> Yes
+              </label>
+              <label class="check">
+                <input type="radio" name="pod" value="No" [(ngModel)]="feedback.pod"> No
+              </label>
+            </div>
+          </div>
+
+          <!-- Freight -->
+          <div class="feedback-row">
+            <div class="question">On time freight bill submission</div>
+            <div class="options">
+              <label class="check">
+                <input type="radio" name="freight" value="Yes" [(ngModel)]="feedback.freight"> Yes
+              </label>
+              <label class="check">
+                <input type="radio" name="freight" value="No" [(ngModel)]="feedback.freight"> No
+              </label>
+            </div>
+          </div>
+
+          <!-- Overall -->
+          <div class="feedback-row overall">
+            <div class="question">Overall Feedback from User</div>
+            <div class="options">
+              <label class="check poor">
+                <input type="radio" name="overall" value="Poor" [(ngModel)]="feedback.overall"> Poor
+              </label>
+              <label class="check avg">
+                <input type="radio" name="overall" value="Average" [(ngModel)]="feedback.overall"> Average
+              </label>
+              <label class="check good">
+                <input type="radio" name="overall" value="Good" [(ngModel)]="feedback.overall"> Good
+              </label>
+              <label class="check excellent">
+                <input type="radio" name="overall" value="Excellent" [(ngModel)]="feedback.overall"> Excellent
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+</div>

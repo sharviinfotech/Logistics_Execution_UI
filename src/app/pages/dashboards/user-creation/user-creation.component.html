@@ -146,7 +146,7 @@
         </div>
 
         <!-- Modal -->
-        <div class="modal-overlay" *ngIf="showModal" >
+        <div class="modal-overlay" *ngIf="showModal">
             <div class="modal-container" (click)="$event.stopPropagation()">
 
                 <!-- Modal Header -->
@@ -366,7 +366,7 @@
 
                                 <!-- Dropdown -->
                                 <div class="multi-select-dropdown" *ngIf="showPlantDropdown">
-                                       <label class="dropdown-option">
+                                    <label class="dropdown-option">
                                         <input type="checkbox" [checked]="isAllPlantsSelected()"
                                             (change)="toggleAllPlants($event)" />
                                         Select All Plants
@@ -394,7 +394,7 @@
 
                                 <!-- Dropdown -->
                                 <div class="multi-select-dropdown" *ngIf="showDivisionDropdown">
-                                       <label class="dropdown-option">
+                                    <label class="dropdown-option">
                                         <input type="checkbox" [checked]="isAllDivisionsSelected()"
                                             (change)="toggleAllDivisions($event)" />
                                         Select All Divisions
@@ -518,6 +518,15 @@
                                         Active
                                     </button>
                                 </div>
+                            </div>
+
+                            <div class="form-group" *ngIf="editingIndex !== null">
+
+                                <label class="form-label">
+                                    <input type="checkbox" (change)="onChangePasswordToggle($event)">
+                                    Change Password
+                                </label>
+
                             </div>
 
 

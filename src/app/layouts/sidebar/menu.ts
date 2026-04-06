@@ -76,6 +76,13 @@ export const MENU: MenuItem[] = [
         parentId: 2,
         icon: 'bx-credit-card',
     },
+    // {
+    //     id: 2,
+    //     label: 'Service Level',
+    //     link: '/service-level',
+    //     parentId: 2,
+    //     icon: 'bx-cog',
+    // },
     {
         id: 2,
         label: 'Transit Damage Info',

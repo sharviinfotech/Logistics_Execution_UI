@@ -68,6 +68,7 @@ export class Login2Component implements OnInit {
   submittedForgot = false;
   isForgotPassword = false;
   showForgotPassword = false;
+  zsession: number;
 
   fieldTextType = false;
   year = new Date().getFullYear();
@@ -82,6 +83,7 @@ export class Login2Component implements OnInit {
     this.forgotPasswordForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]]
     });
+    this.zsession = Date.now() + Math.floor(Math.random() * 1000);
     this.startSlideshow();
     // Change image every 5 seconds
   }
@@ -159,7 +161,7 @@ export class Login2Component implements OnInit {
       // if (this.response.MSGTXT) {
       this.isForgotPassword = false
       if (response.status === true) {
-            this.spinner.hide();
+        this.spinner.hide();
         Swal.fire({
           icon: 'success',
           title: 'Success',
@@ -171,7 +173,7 @@ export class Login2Component implements OnInit {
 
       }
       else {
-          this.spinner.hide();
+        this.spinner.hide();
         Swal.fire('Login Failed', `${response.message} `, 'error');
         // Swal.fire("",dummy, "success")
         this.submitted = false;
@@ -180,7 +182,7 @@ export class Login2Component implements OnInit {
     }, error => {
       console.log("error", error)
       this.toaster.error(error)
-  this.spinner.hide();
+      this.spinner.hide();
     });
   }
 
@@ -309,7 +311,8 @@ export class Login2Component implements OnInit {
     const loginPayload = {
       LOGIN: {
         USER: userName,
-        PASSWORD: password
+        PASSWORD: password,
+        ZSESSION: this.zsession
       }
     };
 
@@ -321,67 +324,78 @@ export class Login2Component implements OnInit {
         this.spinner.hide();
 
         // Ensure UI update completes before showing Swal
-        setTimeout(() => {
-          // ✅ CORRECT: Check if USER exists and STATUS is Active
-          if (response.USER && response.STATUS === 'Active') {
+        // setTimeout(() => {
+        // ✅ CORRECT: Check if USER exists and STATUS is Active
+        if (response.STATUS === 'ACTIVE' || response.STATUS === 'Active') {
 
-            localStorage.setItem('currentUser', JSON.stringify(response));
-            // const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-            // this.router.navigate([returnUrl], { skipLocationChange: true });
-            this.service.setLoginResponse(response);
-            const activities = response.ACTIVITIES;
+          localStorage.setItem('currentUser', JSON.stringify(response));
+          // const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+          // this.router.navigate([returnUrl], { skipLocationChange: true });
+          this.service.setLoginResponse(response);
+          const activities = response.ACTIVITIES;
 
-            if (activities && activities.length > 0) {
+          if (activities && activities.length > 0) {
 
-              let route = null;
+            let route = null;
 
-              // Sidebar order follow avvali
-              for (const key of Object.keys(activityRouteMap)) {
+            // Sidebar order follow avvali
+            for (const key of Object.keys(activityRouteMap)) {
 
-                const found = activities.find((a: any) => a.ACTIVITY === key);
+              const found = activities.find((a: any) => a.ACTIVITY === key);
 
-                if (found) {
-                  route = activityRouteMap[key];
-                  break;
-                }
+              if (found) {
+                route = activityRouteMap[key];
+                break;
               }
+            }
 
-              if (route) {
-                this.router.navigate([route]);
-              } else {
-                this.router.navigate(['/dispatch']);
-              }
-
+            if (route) {
+              this.router.navigate([route]);
             } else {
               this.router.navigate(['/dispatch']);
             }
 
-            // ✅ CORRECT: Use WARNMSG, FIRST_NAME, LAST_NAME
+          } else {
+            this.router.navigate(['/dispatch']);
+          }
+          if (response.ZEXPIRY == 'TRUE') {
             Swal.fire({
               title: response.WARNMSG || 'Login Successful',
               text: `Welcome ${response.FIRST_NAME} ${response.LAST_NAME}`,
-              icon: 'success',
-              timer: 5000,
-              timerProgressBar: true,
+              icon: 'warning',
+              // timer: 5000,
+              // timerProgressBar: true,
             });
-
-            setTimeout(() => {
-              const menuButton = document.getElementById('vertical-menu-btn');
-              if (menuButton) {
-                menuButton.click();
-              }
-            }, 1000);
-
           }
-          else if (response.USER && response.STATUS === 'Inactive') {
-            Swal.fire('Login Failed', 'Your account is inactive', 'error');
+          else{
+             Swal.fire({
+            title: response.WARNMSG || 'Login Successful',
+            text: `Welcome ${response.FIRST_NAME} ${response.LAST_NAME}`,
+            icon: 'success',
+            // timer: 5000,
+            // timerProgressBar: true,
+          });
           }
-          else {
-            Swal.fire('', 'Invalid login credentials!', 'error');
-          }
+       
+        
 
-          this.submitted = false;
-        }, 0);
+          setTimeout(() => {
+            const menuButton = document.getElementById('vertical-menu-btn');
+            if (menuButton) {
+              menuButton.click();
+            }
+          }, 1000);
+
+        }
+        else if (response.STATUS === 'INACTIVE' || response.STATUS === 'Inactive') {
+          Swal.fire('Error', response.WARNMSG, 'error');
+        }
+        else {
+          Swal.fire('Error', response.MESSAGE, 'error');
+        }
+
+        this.submitted = false;
+        // }, 0);
       },
       (error) => {
         this.spinner.hide();
