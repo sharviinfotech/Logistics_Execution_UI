@@ -82,7 +82,7 @@
             <!-- Full Truck Load -->
             <div class="sap-toggle-item">
               <label class="toggle-label">
-                <input type="radio" name="truckType" [(ngModel)]="truckType" value="FTL"
+                <input type="radio" name="truckType" [(ngModel)]="truckType" value="FULL TRUCK LOAD"
                   (change)="onTruckTypeChange()" />
 
                 <span class="toggle-track">
@@ -96,7 +96,7 @@
             <!-- Cargo -->
             <div class="sap-toggle-item">
               <label class="toggle-label">
-                <input type="radio" name="truckType" [(ngModel)]="truckType" value="Cargo"
+                <input type="radio" name="truckType" [(ngModel)]="truckType" value="CARGO"
                   (change)="onTruckTypeChange()">
 
                 <span class="toggle-track">
@@ -119,7 +119,7 @@
 
 
     <!-- Common Section for Both SAP and Non-SAP -->
-    <div class="input-row" *ngIf="sapType">
+    <div class="input-row" *ngIf="sapType && truckType">
       <!-- Inward: PO Number Input -->
       <div *ngIf="orderType === 'Inward'" class="input-flex">
         <div class="form-field flex-1">
@@ -160,9 +160,8 @@
 
                   <td>
                     <input type="text" formControlName="referenceNumber" class="width-le" placeholder="Enter Ref. No."
-                      maxlength="10" (input)="onlyNumbers($event, i)" (blur)="onFieldBlur(i, 'REF_NO')"
-                      (keydown.enter)="onFieldBlur(i, 'REF_NO')" (keydown.tab)="onFieldBlur(i, 'REF_NO')"
-                      [readonly]="i !== 0" />
+                      maxlength="10" (blur)="onFieldBlur(i, 'REF_NO')" (keydown.enter)="onFieldBlur(i, 'REF_NO')"
+                      (keydown.tab)="onFieldBlur(i, 'REF_NO')" [readonly]="i !== 0" />
                   </td>
 
                   <td>
@@ -198,10 +197,25 @@
 
         <!-- SAP: Invoice Number + GET Button + Search Bar -->
         <div class="input-row input-flex" *ngIf="sapType">
-          <div class="form-field flex-1">
+          <!-- <div class="form-field flex-1">
             <input type="text" name="invoicenumber" [(ngModel)]="invoicenumber" placeholder=" "
               (input)="onInputChange('invoice')" />
             <label>Invoice Number</label>
+          </div> -->
+          <div class="form-field flex-1">
+
+            <select name="invoicenumber" [(ngModel)]="invoicenumber" class="invoice-select">
+
+              <option value="">Select Invoice Number</option>
+
+              <option *ngFor="let inv of invoiceList" [value]="inv">
+                {{ inv }}
+              </option>
+
+            </select>
+
+            <label>Invoice Number</label>
+
           </div>
 
           <button type="button" class="btn-get" (click)="getForm('invoice')"
@@ -212,37 +226,35 @@
         </div>
 
         <!-- Shipment Feedback Section -->
-
-        <!-- Shipment Feedback Section -->
-        <div class="feedback-card" *ngIf="showFeedback">
+        <form [formGroup]="feedbackForm" class="feedback-card" *ngIf="showFeedback">
 
           <div class="feedback-title">
             Shipment Feedback
           </div>
 
           <!-- On time placement (FTL only) -->
-          <div class="feedback-row" *ngIf="truckType === 'FTL'">
+          <div class="feedback-row" *ngIf="truckType === 'FULL TRUCK LOAD'">
             <div class="question">On time placement</div>
             <div class="options">
               <label class="check">
-                <input type="radio" name="onTimePlacement" value="Yes" [(ngModel)]="feedback.onTimePlacement"> Yes
+                <input type="radio" value="YES" formControlName="onTimePlacement"> YES
               </label>
 
               <label class="check">
-                <input type="radio" name="onTimePlacement" value="No" [(ngModel)]="feedback.onTimePlacement"> No
+                <input type="radio" value="NO" formControlName="onTimePlacement"> NO
               </label>
             </div>
           </div>
 
           <!-- Transhipment -->
-          <div class="feedback-row" *ngIf="truckType === 'FTL'">
+          <div class="feedback-row" *ngIf="truckType === 'FULL TRUCK LOAD'">
             <div class="question">Transhipment if any</div>
             <div class="options">
               <label class="check">
-                <input type="radio" name="transhipment" value="Yes" [(ngModel)]="feedback.transhipment"> Yes
+                <input type="radio" value="YES" formControlName="transhipment"> YES
               </label>
               <label class="check">
-                <input type="radio" name="transhipment" value="No" [(ngModel)]="feedback.transhipment"> No
+                <input type="radio" value="NO" formControlName="transhipment"> NO
               </label>
             </div>
           </div>
@@ -252,10 +264,10 @@
             <div class="question">On time delivery</div>
             <div class="options">
               <label class="check">
-                <input type="radio" name="delivery" value="Yes" [(ngModel)]="feedback.delivery"> Yes
+                <input type="radio" value="YES" formControlName="delivery"> YES
               </label>
               <label class="check">
-                <input type="radio" name="delivery" value="No" [(ngModel)]="feedback.delivery"> No
+                <input type="radio" value="NO" formControlName="delivery"> NO
               </label>
             </div>
           </div>
@@ -265,10 +277,10 @@
             <div class="question">Damage if any</div>
             <div class="options">
               <label class="check">
-                <input type="radio" name="damage" value="Yes" [(ngModel)]="feedback.damage"> Yes
+                <input type="radio" value="YES" formControlName="damage"> YES
               </label>
               <label class="check">
-                <input type="radio" name="damage" value="No" [(ngModel)]="feedback.damage"> No
+                <input type="radio" value="NO" formControlName="damage"> NO
               </label>
             </div>
           </div>
@@ -278,10 +290,40 @@
             <div class="question">Accident if any</div>
             <div class="options">
               <label class="check">
-                <input type="radio" name="accident" value="Yes" [(ngModel)]="feedback.accident"> Yes
+                <input type="radio" value="YES" formControlName="accident"> YES
               </label>
               <label class="check">
-                <input type="radio" name="accident" value="No" [(ngModel)]="feedback.accident"> No
+                <input type="radio" value="NO" formControlName="accident"> NO
+              </label>
+            </div>
+          </div>
+
+          <!-- Prohibited materials -->
+          <div class="feedback-row" *ngIf="truckType === 'FULL TRUCK LOAD'">
+            <div class="question">
+              Prohibited materials loaded along with battery
+            </div>
+            <div class="options">
+              <label class="check">
+                <input type="radio" value="YES" formControlName="probiated"> YES
+              </label>
+              <label class="check">
+                <input type="radio" value="NO" formControlName="probiated"> NO
+              </label>
+            </div>
+          </div>
+
+          <!-- Other materials -->
+          <div class="feedback-row" *ngIf="truckType === 'FULL TRUCK LOAD'">
+            <div class="question">
+              Other materials loaded during transit
+            </div>
+            <div class="options">
+              <label class="check">
+                <input type="radio" value="YES" formControlName="othermaterials"> YES
+              </label>
+              <label class="check">
+                <input type="radio" value="NO" formControlName="othermaterials"> NO
               </label>
             </div>
           </div>
@@ -291,10 +333,10 @@
             <div class="question">On time POD submission</div>
             <div class="options">
               <label class="check">
-                <input type="radio" name="pod" value="Yes" [(ngModel)]="feedback.pod"> Yes
+                <input type="radio" value="YES" formControlName="pod"> YES
               </label>
               <label class="check">
-                <input type="radio" name="pod" value="No" [(ngModel)]="feedback.pod"> No
+                <input type="radio" value="NO" formControlName="pod"> NO
               </label>
             </div>
           </div>
@@ -304,10 +346,10 @@
             <div class="question">On time freight bill submission</div>
             <div class="options">
               <label class="check">
-                <input type="radio" name="freight" value="Yes" [(ngModel)]="feedback.freight"> Yes
+                <input type="radio" value="YES" formControlName="freight"> YES
               </label>
               <label class="check">
-                <input type="radio" name="freight" value="No" [(ngModel)]="feedback.freight"> No
+                <input type="radio" value="NO" formControlName="freight"> NO
               </label>
             </div>
           </div>
@@ -317,28 +359,38 @@
             <div class="question">Overall Feedback from User</div>
             <div class="options">
               <label class="check poor">
-                <input type="radio" name="overall" value="Poor" [(ngModel)]="feedback.overall"> Poor
+                <input type="radio" value="POOR" formControlName="overall"> POOR
               </label>
               <label class="check avg">
-                <input type="radio" name="overall" value="Average" [(ngModel)]="feedback.overall"> Average
+                <input type="radio" value="AVG" formControlName="overall"> AVG
               </label>
               <label class="check good">
-                <input type="radio" name="overall" value="Good" [(ngModel)]="feedback.overall"> Good
+                <input type="radio" value="GOOD" formControlName="overall"> GOOD
               </label>
               <label class="check excellent">
-                <input type="radio" name="overall" value="Excellent" [(ngModel)]="feedback.overall"> Excellent
+                <input type="radio" value="EXCELLENT" formControlName="overall"> EXCELLENT
               </label>
             </div>
           </div>
 
-        </div>
+          <div class="text-right mt-3">
+            <button class="btnSave" (click)="submitFeedback()">Submit</button>
+          </div>
+
+        </form>
+
+
 
 
       </div>
 
 
 
+
+
     </div>
+
+
 
 
 

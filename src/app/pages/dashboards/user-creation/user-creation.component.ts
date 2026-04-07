@@ -142,7 +142,7 @@ export class UserCreationComponent implements OnInit {
     'Outward-VehicleInfo',
     'Outward-TransitInfo',
     'Outward-FreightBilling',
-    // 'Outward-ServiceLevel',
+    'Outward-ServiceLevel',
     'Outward-TransitDamageInfo',
     'Outward-InsuranceClaimTracking',
     'Outward-UserCreation',

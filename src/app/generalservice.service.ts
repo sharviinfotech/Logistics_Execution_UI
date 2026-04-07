@@ -426,6 +426,12 @@ export class GeneralserviceService {
  forgotPassword(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/send-credentials', obj);
   }
+  FeedbackCreationwithsap(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/ServiceLevel/Outword/withsap/FeedbackCreation', obj);
+  }
+    FeedbackCreationwithoutsap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/ServiceLevel/Outword/WithoutSap/FeedbackCreation', obj);
+  }
 
 
 
