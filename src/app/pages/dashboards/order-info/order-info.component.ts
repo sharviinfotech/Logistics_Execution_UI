@@ -113,6 +113,8 @@ export class OrderInfoComponent implements OnInit {
       DestinationLocation: [''],
       DestinationState: [''],
       DestinationZone: [''],
+      RequiredDateTime: [''],
+      ReportedDateTime: [''],
       PhysicalDispatchDateTime: [''],
       items: this.fb.array([this.createItemRow()])
     });
@@ -245,7 +247,7 @@ console.log("Logged in user:", this.loggedInUser);
       'ODN', 'BasicShipment', 'InvoiceWithGst', 'FiscalQuarter', 'Month',
       'BillingTransactionType', 'Plant', 'TransactionType', 'Division', 'SubDivision',
       'RefNumber', 'Customer', 'CustomerGroup', 'CNee', 'DestinationLocation',
-      'DestinationState', 'DestinationZone', 'PhysicalDispatchDateTime'
+      'DestinationState', 'DestinationZone', 'PhysicalDispatchDateTime','RequiredDateTime','ReportedDateTime'
     ];
     alwaysRequired.forEach(key => {
       this.OrderInfo.get(key)?.setValidators([Validators.required]);
@@ -576,6 +578,8 @@ console.log("Logged in user:", this.loggedInUser);
       FiscalYear: data.FISCAL_YEAR || '',
       FiscalQuarter: data.FISCAL_QUARTER || '',
       Month: data.MONTH || '',
+      RequiredDateTime: data.ZVEHREQDT || '',
+      ReportedDateTime: data.ZVEHREPDT || '',
       PhysicalDispatchDateTime: formattedPhysDispatch,
       Plant: data.PLANT_NAME || '',
       TransactionType: data.TRAN_TYPE || '',
@@ -668,6 +672,8 @@ console.log("Logged in user:", this.loggedInUser);
         : formValue.ReferenceDate,
       BASIC_SHIP_VALUE: formValue.BasicShipment,
       INV_VALUE_GST: formValue.InvoiceWithGst,
+      ZVEHREQDT: formValue.RequiredDateTime,
+      ZVEHREPDT: formValue.ReportedDateTime,
       PHYS_DISPATCH: formValue.PhysicalDispatchDateTime,
       FISCAL_YEAR: formValue.FiscalYear,
       FISCAL_QUARTER: formValue.FiscalQuarter,

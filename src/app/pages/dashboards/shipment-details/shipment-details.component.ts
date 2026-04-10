@@ -82,7 +82,7 @@ export class ShipmentDetailsComponent implements OnInit {
   invoiceF4List: string[] = [];
   fullReferenceData: any[] = [];
   loggedInUser: string = '';
-   plantList: any;
+  plantList: any;
   divisionList: any;
 
 
@@ -99,21 +99,21 @@ export class ShipmentDetailsComponent implements OnInit {
     this.ProductInfo = this.fb.group({
       ZINCO: ['', Validators.required],
       ZINS_SCPOE: ['', Validators.required],
-      ZKM: [null, [Validators.required, Validators.min(0)]],
+      ZKM: ['', [Validators.required]],
       VBELN: [''],
       items: this.fb.array([this.createItemRow()]),
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
- const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
-this.loggedInUser = userData.USER || '';
-console.log("Logged in user:", this.loggedInUser);
- this.plantList = userData.PLANTS || [];
+    const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    this.loggedInUser = userData.USER || '';
+    console.log("Logged in user:", this.loggedInUser);
+    this.plantList = userData.PLANTS || [];
 
-  // ✅ Divisions from login response
-  this.divisionList = userData.DIV || [];
+    // ✅ Divisions from login response
+    this.divisionList = userData.DIV || [];
 
-  console.log("Plants:", this.plantList);
-  console.log("Divisions:", this.divisionList);
+    console.log("Plants:", this.plantList);
+    console.log("Divisions:", this.divisionList);
     this.fetchIncoterms();
     this.fetchTransporter();
     this.fetchPlantCodeList();
@@ -151,10 +151,10 @@ console.log("Logged in user:", this.loggedInUser);
       ZODN_NO: [''],
       MTART: [''],
       ZINCO: [''],
-      ZINS_SCPOE: [''],
+      ZINS_SCPOE: ['', Validators.required],
       ZPIN_PLT: [''],
       ZPIN_STP: [''],
-      ZKM: [''],
+      ZKM: ['', Validators.required],
 
       ZWORK_ORDER: [''],
       ZLRNO: [''],
@@ -222,8 +222,8 @@ console.log("Logged in user:", this.loggedInUser);
       this.fetchPendingAndCompletedCounts();
     }
     this.selectedType = '';
-  this.searchReference = '';
-  this.searchOptionsList = [];
+    this.searchReference = '';
+    this.searchOptionsList = [];
 
     if (this.sapType === 'SAP') {
       this.showForm = false;
@@ -377,11 +377,11 @@ console.log("Logged in user:", this.loggedInUser);
   populateReferenceRows(data: any[]): void {
     this.referenceItems.clear();
     this.invoiceF4List = [];   // 🔑 Reset F4 list
-     this.selectedItems = [];
-     this.fullReferenceData = [];
+    this.selectedItems = [];
+    this.fullReferenceData = [];
 
     if (data && data.length > 0) {
-       this.fullReferenceData = data;
+      this.fullReferenceData = data;
       data.forEach(d => {
 
         // ✅ EXTRACT INVOICE NUMBERS FOR F4
@@ -431,7 +431,7 @@ console.log("Logged in user:", this.loggedInUser);
   onchangeMAPID(index: number) {
     const rowForm = this.items.at(index) as FormGroup;
     const selectedMapId = rowForm.get('ZMAPID')?.value;
-    console.log("onchangeMAPID this.selectedItems",this.selectedItems,"selectedMapId",selectedMapId)
+    console.log("onchangeMAPID this.selectedItems", this.selectedItems, "selectedMapId", selectedMapId)
     const selectedObj = this.selectedItems.find(
       item => item.MAPID == selectedMapId
     );
@@ -474,7 +474,7 @@ console.log("Logged in user:", this.loggedInUser);
           item.transporter === rowValue.transporter &&
           item.soNumber === rowValue.soNumber &&
           item.odnNumber === rowValue.odnNumber &&
-          item.lineNumber === rowValue.lineNumber 
+          item.lineNumber === rowValue.lineNumber
       );
       if (!exists) {
         this.selectedItems.push(rowValue);
@@ -500,35 +500,35 @@ console.log("Logged in user:", this.loggedInUser);
 
     console.log('✅ Selected Items:', this.selectedItems);
   }
-   updateInvoiceListForSelectedItems(): void {
-  this.invoiceF4List = [];
- 
-  if (this.selectedItems.length === 0) {
-    // No items selected, clear invoice list
-    console.log('⚠️ No items selected, invoice list cleared');
-    return;
-  }
- 
-  // Get unique MAPIDs from selected items
-  const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
- 
-  console.log('🔍 Selected MAPIDs:', selectedMapIds);
- 
-  // Filter reference data for selected MAPIDs and extract invoices
-  this.fullReferenceData.forEach(refItem => {
-    if (selectedMapIds.includes(refItem.MAPID)) {
-      if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
-        refItem.INV_NO.forEach((inv: any) => {
-          if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
-            this.invoiceF4List.push(inv.VBELN);
-          }
-        });
-      }
+  updateInvoiceListForSelectedItems(): void {
+    this.invoiceF4List = [];
+
+    if (this.selectedItems.length === 0) {
+      // No items selected, clear invoice list
+      console.log('⚠️ No items selected, invoice list cleared');
+      return;
     }
-  });
- 
-  console.log('📋 Filtered Invoice List:', this.invoiceF4List);
-}
+
+    // Get unique MAPIDs from selected items
+    const selectedMapIds = [...new Set(this.selectedItems.map(item => item.MAPID))];
+
+    console.log('🔍 Selected MAPIDs:', selectedMapIds);
+
+    // Filter reference data for selected MAPIDs and extract invoices
+    this.fullReferenceData.forEach(refItem => {
+      if (selectedMapIds.includes(refItem.MAPID)) {
+        if (refItem.INV_NO && Array.isArray(refItem.INV_NO)) {
+          refItem.INV_NO.forEach((inv: any) => {
+            if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
+              this.invoiceF4List.push(inv.VBELN);
+            }
+          });
+        }
+      }
+    });
+
+    console.log('📋 Filtered Invoice List:', this.invoiceF4List);
+  }
 
   isItemSelected(index: number): boolean {
     const rowValue = (this.referenceItems.at(index) as FormGroup).value;
@@ -542,7 +542,7 @@ console.log("Logged in user:", this.loggedInUser);
         item.transporter === rowValue.transporter &&
         item.soNumber === rowValue.soNumber &&
         item.odnNumber === rowValue.odnNumber &&
-         item.lineNumber === rowValue.lineNumber 
+        item.lineNumber === rowValue.lineNumber
     );
   }
 
@@ -568,7 +568,7 @@ console.log("Logged in user:", this.loggedInUser);
     let payload1: any = {
 
       "global": "SHIPMENT DETAILS",
-       ZUSER: this.loggedInUser,
+      ZUSER: this.loggedInUser,
       "data": {
         "ref_no": "",
         "inv_no": "",
@@ -661,8 +661,8 @@ console.log("Logged in user:", this.loggedInUser);
     this.isAllSelected = this.allSelected();
     console.log('All Selected:', this.items.value);
   }
-  onClickRow(){
-    console.log("this.items.value",this.items.value)
+  onClickRow() {
+    console.log("this.items.value", this.items.value)
   }
 
   getSelectedRows() {
@@ -694,7 +694,7 @@ console.log("Logged in user:", this.loggedInUser);
 
     this.service.shipmentdetailsfetch(payload).subscribe({
       next: (res: any) => {
-        // YOUR SAP RESPONSE IS ALWAYS ARRAY
+       
         const result = Array.isArray(res) ? res : [];
 
         if (result.length === 0) {
@@ -715,6 +715,8 @@ console.log("Logged in user:", this.loggedInUser);
           ZKM: firstItem.ZKM ?? null,
           VBELN: firstItem.VBELN || ''
         });
+        this.ProductInfo.markAllAsTouched();
+        // this.ProductInfo.updateValueAndValidity();
 
         // Fill FormArray rows
         result.forEach((item: any) => {
@@ -810,7 +812,7 @@ console.log("Logged in user:", this.loggedInUser);
     const commonFields = {
       ZINCO: this.ProductInfo.get('ZINCO')?.value || '',
       ZINS_SCPOE: this.ProductInfo.get('ZINS_SCPOE')?.value || '',
-      ZKM: this.ProductInfo.get('ZKM')?.value ?? 0,
+      ZKM: this.ProductInfo.get('ZKM')?.value  || '',
       VBELN: this.ProductInfo.get('VBELN')?.value || ''
     };
 
@@ -841,12 +843,12 @@ console.log("Logged in user:", this.loggedInUser);
         ZAH: row.ZAH,
         ZSHIP_WT: row.ZSHIP_WT,
         ZUSER: this.loggedInUser,
-        ZUSER_CH:'',
+        ZUSER_CH: '',
       };
     });
 
     console.log('📤 finalPayload (to send):', finalPayload);
-    
+
 
     // ✅ SEND PAYLOAD DIRECTLY AS ARRAY (not wrapped in object)
     if (this.sapType === "SAP") {
@@ -990,8 +992,8 @@ console.log("Logged in user:", this.loggedInUser);
           ZDIVISION: row.ZDIVISION,
           ZCREATED_DT: row.ZCREATED_DT,
           ZVEH_TYPE: row.ZVEH_TYPE,
-          ZUSER:row.ZUSER,
-            ZUSER_CH: this.loggedInUser
+          ZUSER: row.ZUSER,
+          ZUSER_CH: this.loggedInUser
         }
       ]
     };
@@ -1016,7 +1018,7 @@ console.log("Logged in user:", this.loggedInUser);
     const payload = {
       CHANGE: [{
         ZREFNO: row.ZREFNO,
-        ZLINE_NO: row.ZLINE_NO,   
+        ZLINE_NO: row.ZLINE_NO,
         VBELN: row.VBELN,
         POSNR: row.POSNR,
         ZMAPID: row.ZMAPID,
@@ -1039,8 +1041,8 @@ console.log("Logged in user:", this.loggedInUser);
         ZDIVISION: row.ZDIVISION || '',
         ZCREATED_DT: row.ZCREATED_DT || '',
         ZVEH_TYPE: row.ZVEH_TYPE || '',
-          ZUSER: row.ZUSER,
-            ZUSER_CH: this.loggedInUser
+        ZUSER: row.ZUSER,
+        ZUSER_CH: this.loggedInUser
       }
       ]
     };
@@ -1207,7 +1209,7 @@ console.log("Logged in user:", this.loggedInUser);
           this.ProductInfo.patchValue({
             ZINCO: firstItem.ZINCO || '',
             ZINS_SCPOE: firstItem.ZINS_SCPOE || '',
-            ZKM: firstItem.ZKM || 0,
+            ZKM: firstItem.ZKM || '',
             VBELN: firstItem.VBELN || ''
           });
           res.forEach((item: any) => {

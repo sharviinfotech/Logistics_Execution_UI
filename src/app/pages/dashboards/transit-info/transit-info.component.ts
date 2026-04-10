@@ -78,11 +78,12 @@ export class TransitInfoComponent implements OnInit {
   filterSapType: string = '';
   invoiceF4List: string[] = [];
   fullReferenceData: any[] = [];
-   loggedInUser: string = '';
-     plantList: any;
+  loggedInUser: string = '';
+  plantList: any;
   divisionList: any;
   podScanError = false;
-
+  podFileBase64: any = '';
+  podFilePath: any = '';
 
 
   constructor(
@@ -94,16 +95,16 @@ export class TransitInfoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-           const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
-this.loggedInUser = userData.USER || '';
-console.log("Logged in user:", this.loggedInUser);
- this.plantList = userData.PLANTS || [];
+    const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    this.loggedInUser = userData.USER || '';
+    console.log("Logged in user:", this.loggedInUser);
+    this.plantList = userData.PLANTS || [];
 
-  // ✅ Divisions from login response
-  this.divisionList = userData.DIV || [];
+    // ✅ Divisions from login response
+    this.divisionList = userData.DIV || [];
 
-  console.log("Plants:", this.plantList);
-  console.log("Divisions:", this.divisionList);
+    console.log("Plants:", this.plantList);
+    console.log("Divisions:", this.divisionList);
 
     this.initializeForm();
     this.fetchTransporter();
@@ -176,7 +177,7 @@ console.log("Logged in user:", this.loggedInUser);
   }
 
   updateSIT(): void {
-      const physicalArrived = this.transitInfo.get('physicalarrivedatdestinationdateandtime')?.value;
+    const physicalArrived = this.transitInfo.get('physicalarrivedatdestinationdateandtime')?.value;
     const field2 = this.transitInfo.get('unloadingdateandtime')?.value;
     const field3 = this.transitInfo.get('podscanreceiveddateandtime')?.value;
 
@@ -297,7 +298,7 @@ console.log("Logged in user:", this.loggedInUser);
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
       LINE_NO: values.lineNumber || '',
-       ZUSER: this.loggedInUser
+      ZUSER: this.loggedInUser
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -522,7 +523,7 @@ console.log("Logged in user:", this.loggedInUser);
 
     let payload1: any = {
       global: 'TRANSIT INFO',
-       ZUSER: this.loggedInUser,
+      ZUSER: this.loggedInUser,
       data: {
         ref_no: '',
         inv_no: '',
@@ -665,6 +666,8 @@ console.log("Logged in user:", this.loggedInUser);
       SIT_SALE: f.sit || '',
       ZUSER: this.loggedInUser,
       ZUSER_CH: '',
+      ZPOD_FNAME: this.podFileBase64,
+      ZPATH: this.podFilePath
     };
 
 
@@ -777,14 +780,14 @@ console.log("Logged in user:", this.loggedInUser);
         return;
       }
 
-     
+
       const invalidItems = itemRows.filter(item => !item.ZREFNO || !item.ZLINE_NO);
       if (invalidItems.length > 0) {
         Swal.fire('Error', 'Missing mandatory keys in items (ZREFNO/ZLINE_NO)', 'error');
         return;
       }
 
-     
+
       const headerPayload = {
         ZREFNO: headerRow.ZREFNO,
         ZINV_NO: headerRow.ZINV_NO || '',
@@ -800,11 +803,11 @@ console.log("Logged in user:", this.loggedInUser);
         ZPLANT: headerRow.ZPLANT || '',
         ZDIVISION: headerRow.ZDIVISION || '',
         ZVEH_TYPE: headerRow.ZVEH_TYPE || '',
-        ZUSER:headerRow.ZUSER || '',
+        ZUSER: headerRow.ZUSER || '',
         ZUSER_CH: this.loggedInUser,
       };
 
-     
+
       const itemPayload = itemRows.map(item => ({
         ZREFNO: String(item.ZREFNO),
         ZLINE_NO: String(item.ZLINE_NO),
@@ -815,7 +818,7 @@ console.log("Logged in user:", this.loggedInUser);
         ZLRNO: item.ZLRNO || '',
         ZWORK_ORDER: item.ZWORK_ORDER || '',
         ZTRANSPORTER: item.ZTRANSPORTER || '',
-          ZUSER:item.ZUSER || '',
+        ZUSER: item.ZUSER || '',
         ZUSER_CH: this.loggedInUser,
 
       }));
@@ -1057,7 +1060,7 @@ console.log("Logged in user:", this.loggedInUser);
 
     const payload = {
       GLOBAL: 'TRANSIT INFO',
-        ZUSER: this.loggedInUser,
+      ZUSER: this.loggedInUser,
       DATE_FROM: this.filterFromDate,
       DATE_TO: this.filterToDate,
       PLANT: this.filterPlant || '',
@@ -1521,29 +1524,44 @@ console.log("Logged in user:", this.loggedInUser);
     item.ZVEH_NUM = val;
   }
 
- 
 
-onFileSelected(event: Event): void {
-  this.podScanError = false;
-  const input = event.target as HTMLInputElement;
-  
-  if (!input.files || input.files.length === 0) {
-    this.transitInfo.get('PODSCAN')?.setValue(null);
-    return;
+
+  onFileSelected(event: any): void {
+
+    const file = event.target.files[0];
+
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+
+    if (!allowedTypes.includes(file.type)) {
+      this.podScanError = true;
+      this.podFileBase64 = '';
+      this.podFilePath = '';
+      return;
+    }
+
+    this.podScanError = false;
+
+    const reader = new FileReader();
+
+    reader.onload = (e: any) => {
+
+      const base64String = e.target.result;
+
+      // remove data:image/jpeg;base64,
+      this.podFileBase64 = base64String.split(',')[1];
+
+      const fixedPath = "C:/Users/ADMIN/OneDrive/Desktop/";
+
+      this.podFilePath = fixedPath + file.name;
+
+      console.log("POD Base64:", this.podFileBase64);
+      console.log("POD Path:", this.podFilePath);
+    };
+
+    reader.readAsDataURL(file);
   }
-
-  const file = input.files[0];
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-
-  if (!allowedTypes.includes(file.type)) {
-    this.podScanError = true;
-    this.transitInfo.get('PODSCAN')?.setValue(null);
-    return;
-  }
-
-  // ✅ Valid file: update form control
-  this.transitInfo.get('PODSCAN')?.setValue(file);
-}
 
 
 

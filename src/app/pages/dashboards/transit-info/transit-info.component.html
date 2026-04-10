@@ -292,7 +292,7 @@
         </div>
 
         <div class="form-field">
-          <input type="file" formControlName="PODSCAN" id="imagesuploading" accept=".jpg,.jpeg,.png" (change)="onFileSelected($event)"  />
+          <input type="file" formControlName="PODSCAN" id="imagesuploading" accept=".jpg,.jpeg,.png"  (change)="onFileSelected($event)"  />
           <label>POD Scan</label>
           <span class="error-message" *ngIf="podScanError">
             Only .jpg, .jpeg, .png files are allowed

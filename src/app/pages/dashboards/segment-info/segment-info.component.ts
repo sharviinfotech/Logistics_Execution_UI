@@ -274,11 +274,13 @@ export class SegmentInfoComponent implements OnInit {
           this.searchOptionsList = [];
           Swal.fire('Success', 'Invoice Details fetched successfully!', 'success');
         } else {
+        
           Swal.fire('No data found', '', 'info');
         }
       },
       error: () => {
         this.spinner.hide();
+
         Swal.fire('Error fetching SAP data', '', 'error');
       }
     });
@@ -315,6 +317,10 @@ export class SegmentInfoComponent implements OnInit {
       BRANCH: !data.BRANCH,
       APPTYP: !data.APPTYP
     };
+  //     if (!data.TAT_TYPE) {
+  //   this.segmentInfo.get('TAT_Type')?.markAsTouched();
+  // }
+  this.segmentInfo.get('TAT_Type')?.markAsTouched();
   }
 
   // Reference Table: Field Blur Handler

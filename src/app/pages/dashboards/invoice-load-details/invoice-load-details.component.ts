@@ -627,6 +627,12 @@ export class InvoiceLoadDetailsComponent implements OnInit {
           });
 
           this.showForm = true;
+             if (!this.InvoiceForm.get('ACTUAL_LOAD')?.value) {
+          this.InvoiceForm.get('ACTUAL_LOAD')?.markAsTouched();
+        }
+        if (!this.InvoiceForm.get('ACTUAL_VOLUME')?.value) {
+          this.InvoiceForm.get('ACTUAL_VOLUME')?.markAsTouched();
+        }
           this.searchOptionsList = [];
 
           console.log('✅ Total Invoice Rows Created:', this.invoices.length);
