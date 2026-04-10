@@ -479,11 +479,11 @@
             <label>Month</label>
           </div>
 
-            <div class="form-field">
+          <div class="form-field">
             <input type="datetime-local" formControlName="RequiredDateTime" placeholder=" " />
             <label>Required Date & Time</label>
           </div>
-            <div class="form-field">
+          <div class="form-field">
             <input type="datetime-local" formControlName="ReportedDateTime" placeholder=" " />
             <label>Reported Date & Time</label>
           </div>
@@ -509,7 +509,7 @@
           </div> -->
           <div class="form-field">
             <ng-container *ngIf="!isSap(); else sapPlant">
-              <select formControlName="Plant" >
+              <select formControlName="Plant">
                 <option value="">Select Plant</option>
 
                 <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">
@@ -694,6 +694,8 @@
                   <th>Invoice Date</th>
                   <th>Basic Value</th>
                   <th>Invoice Value (GST)</th>
+                  <th>Required Date & Time</th>
+                  <th>Reported Date & Time</th>
                   <th>Physical Dispatch</th>
                   <th>Fiscal Year</th>
                   <th>System Date</th>
@@ -751,6 +753,18 @@
                     <input *ngIf="item.isEdit" type="number" class="form-control form-control-sm"
                       [(ngModel)]="item.ZINV_VALUE_GST">
                     <span *ngIf="!item.isEdit">{{ item.ZINV_VALUE_GST }}</span>
+                  </td>
+
+                  <td>
+                    <input *ngIf="item.isEdit" type="datetime-local" class="form-control form-control-sm"
+                      [(ngModel)]="item.ZVEHREQDT">
+                    <span *ngIf="!item.isEdit">{{ item.ZVEHREQDT }}</span>
+                  </td>
+
+                  <td>
+                    <input *ngIf="item.isEdit" type="datetime-local" class="form-control form-control-sm"
+                      [(ngModel)]="item.ZVEHREPDT">
+                    <span *ngIf="!item.isEdit">{{ item.ZVEHREPDT }}</span>
                   </td>
 
                   <td>

@@ -237,17 +237,17 @@
             <div class="question">On time placement</div>
             <div class="options">
               <label class="check">
-                <input type="radio" value="YES" formControlName="onTimePlacement"> YES
+                <input type="radio" value="YES" formControlName="onTimePlacement" > YES
               </label>
 
               <label class="check">
-                <input type="radio" value="NO" formControlName="onTimePlacement"> NO
+                <input type="radio" value="NO" formControlName="onTimePlacement" > NO
               </label>
             </div>
           </div>
 
           <!-- Transhipment -->
-          <div class="feedback-row" *ngIf="truckType === 'FULL TRUCK LOAD'">
+          <div class="feedback-row reverse" *ngIf="truckType === 'FULL TRUCK LOAD'">
             <div class="question">Transhipment if any</div>
             <div class="options">
               <label class="check">
@@ -264,7 +264,7 @@
             <div class="question">On time delivery</div>
             <div class="options">
               <label class="check">
-                <input type="radio" value="YES" formControlName="delivery"> YES
+                <input type="radio" value="YES" formControlName="delivery" > YES
               </label>
               <label class="check">
                 <input type="radio" value="NO" formControlName="delivery"> NO
@@ -273,7 +273,7 @@
           </div>
 
           <!-- Damage -->
-          <div class="feedback-row">
+          <div class="feedback-row reverse">
             <div class="question">Damage if any</div>
             <div class="options">
               <label class="check">
@@ -286,7 +286,7 @@
           </div>
 
           <!-- Accident -->
-          <div class="feedback-row">
+          <div class="feedback-row reverse">
             <div class="question">Accident if any</div>
             <div class="options">
               <label class="check">
@@ -299,7 +299,7 @@
           </div>
 
           <!-- Prohibited materials -->
-          <div class="feedback-row" *ngIf="truckType === 'FULL TRUCK LOAD'">
+          <div class="feedback-row reverse" *ngIf="truckType === 'FULL TRUCK LOAD'">
             <div class="question">
               Prohibited materials loaded along with battery
             </div>
@@ -314,7 +314,7 @@
           </div>
 
           <!-- Other materials -->
-          <div class="feedback-row" *ngIf="truckType === 'FULL TRUCK LOAD'">
+          <div class="feedback-row reverse" *ngIf="truckType === 'FULL TRUCK LOAD'">
             <div class="question">
               Other materials loaded during transit
             </div>
@@ -333,10 +333,10 @@
             <div class="question">On time POD submission</div>
             <div class="options">
               <label class="check">
-                <input type="radio" value="YES" formControlName="pod"> YES
+                <input type="radio" value="YES" formControlName="pod" > YES
               </label>
               <label class="check">
-                <input type="radio" value="NO" formControlName="pod"> NO
+                <input type="radio" value="NO" formControlName="pod" > NO
               </label>
             </div>
           </div>
@@ -346,10 +346,10 @@
             <div class="question">On time freight bill submission</div>
             <div class="options">
               <label class="check">
-                <input type="radio" value="YES" formControlName="freight"> YES
+                <input type="radio" value="YES" formControlName="freight" > YES
               </label>
               <label class="check">
-                <input type="radio" value="NO" formControlName="freight"> NO
+                <input type="radio" value="NO" formControlName="freight" > NO
               </label>
             </div>
           </div>

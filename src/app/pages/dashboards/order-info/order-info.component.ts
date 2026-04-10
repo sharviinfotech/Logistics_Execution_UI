@@ -842,6 +842,8 @@ console.log("Logged in user:", this.loggedInUser);
         PLANT_NAME: row.ZPLANT || "",
         TRAN_TYPE: row.ZTRX_TYPE || "",
         TRAN_TEXT_BILL: row.ZBILL_TRX_TEXT || "",
+        ZVEHREQDT: row.ZVEHREQDT || "",
+        ZVEHREPDT: row.ZVEHREPDT || "",
         DIVISION: row.ZDIVISION || "",
         SUB_DIVISION: row.ZSUB_DIVISION || "",
         SO_REF_NO: row.ZSO_NO || "",

@@ -432,6 +432,12 @@ export class GeneralserviceService {
     FeedbackCreationwithoutsap(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/ServiceLevel/Outword/WithoutSap/FeedbackCreation', obj);
   }
+  FeedBackInvoiceDetailsfetchwithsap(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/ServiceLevel/Outward/WithSap/InvoiceDetailsfetch', obj);
+  }
+  FeedBackInvoiceDetailsfetchwithoutsap(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/ServiceLevel/Outward/WithoutSap/InvoiceDetailsfetch', obj);
+  }
 
 
 

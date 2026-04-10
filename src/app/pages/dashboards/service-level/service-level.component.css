@@ -10,14 +10,12 @@
 }
 
 .feedback-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: #4a5568;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
+  font-size: 15px;
+  font-weight: 500;
+  color: #2E86C1;
   padding: 16px 24px;
-  border-bottom: 1px solid #eee;
-  background: #f9fafb;
+  border-bottom: 1px solid #2E86C1;
+  background: #ffffffe0;
 }
 
 /* ===== FEEDBACK ROW ===== */
@@ -164,6 +162,30 @@
   color: #ef4444;
 }
 
+/* YES → RED */
+.reverse .check:has(input[value="YES"]:checked) {
+  background: #fff1f2;
+  color: #dc2626;
+  border-color: #ef4444;
+}
+ 
+/* NO → GREEN */
+.reverse .check:has(input[value="NO"]:checked) {
+  background: #ecfdf5;
+  color: #10b981;
+  border-color: #10b981;
+}
+ 
+/* YES → RED icon */
+.reverse .check:has(input[value="YES"]:checked)::before {
+  color: #ef4444;
+}
+ 
+/* NO → GREEN icon */
+.reverse .check:has(input[value="NO"]:checked)::before {
+  color: #10b981;
+}
+
 /* ===== OVERALL FEEDBACK PILLS ===== */
 .check.poor {
   color: #6b7280;
@@ -208,7 +230,7 @@
   border-color: #3b82f6;
   color: #2563eb;
 }
-.invoice-select {
+/* .invoice-select {
   width: 100%;
   height: 44px;
   border: 1px solid #ddd;
@@ -216,5 +238,5 @@
   padding: 0 10px;
   font-size: 14px;
   background: white;
-}
+} */
 
