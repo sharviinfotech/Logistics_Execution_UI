@@ -267,6 +267,11 @@
           </select>
 
           <label>Invoice Number</label>
+          <span class="error-message" *ngIf="transitInfo.get('invoicenumber')?.touched &&
+         transitInfo.get('invoicenumber')?.invalid">
+            Invoice Number is required
+          </span>
+
         </div>
 
         <div class="form-field">
@@ -292,13 +297,15 @@
         </div>
 
         <div class="form-field">
-          <input type="file" formControlName="PODSCAN" id="imagesuploading" accept=".jpg,.jpeg,.png"  (change)="onFileSelected($event)"  />
+          <input type="file" #fileInput formControlName="PODSCAN" id="imagesuploading" accept=".jpg,.jpeg,.png"
+            (change)="onFileSelected($event, fileInput)" />
+
           <label>POD Scan</label>
+
           <span class="error-message" *ngIf="podScanError">
             Only .jpg, .jpeg, .png files are allowed
           </span>
         </div>
-
 
 
       </form>

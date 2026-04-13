@@ -305,6 +305,10 @@
             </select>
 
             <label>DC Reference Number</label>
+            <span class="error-message" *ngIf="VehicleForm.get('VBELN')?.touched &&
+               VehicleForm.get('VBELN')?.hasError('required')">
+              DC Reference Number is required
+            </span>
           </div>
         </div>
       </form>

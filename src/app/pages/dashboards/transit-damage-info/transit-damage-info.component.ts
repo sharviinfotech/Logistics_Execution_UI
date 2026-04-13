@@ -458,6 +458,7 @@ cofError = false;
           d.INV_NO.forEach((inv: any) => {
             if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
               this.invoiceF4List.push(inv.VBELN);
+              this.HeaderForm.patchValue({ VBELN: ''}); 
             }
           });
         }

@@ -115,7 +115,7 @@ export class TransitInfoComponent implements OnInit {
     this.transitInfo = this.fb.group({
       ponumber: [''],
       // Updated: Removed Validators.required from invoicenumber since the main input field is gone
-      invoicenumber: [''],
+      invoicenumber: ['', Validators.required],
       physicalarrivedatdestinationdateandtime: [''],
       unloadingdateandtime: [''],
       podscanreceiveddateandtime: [''],
@@ -244,7 +244,7 @@ export class TransitInfoComponent implements OnInit {
       this.transitInfo.get('ponumber')?.setValidators([Validators.required]);
       this.transitInfo.get('invoicenumber')?.clearValidators();
     } else if (this.orderType === 'Outward') {
-      this.transitInfo.get('invoicenumber')?.clearValidators();
+      this.transitInfo.get('invoicenumber')?.setValidators([Validators.required]);
       this.transitInfo.get('ponumber')?.clearValidators();
     } else {
       this.transitInfo.get('ponumber')?.clearValidators();
@@ -359,6 +359,7 @@ export class TransitInfoComponent implements OnInit {
           d.INV_NO.forEach((inv: any) => {
             if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
               this.invoiceF4List.push(inv.VBELN);
+              this.transitInfo.patchValue({ invoicenumber: '' });
             }
           });
         }
@@ -1526,43 +1527,49 @@ export class TransitInfoComponent implements OnInit {
 
 
 
-  onFileSelected(event: any): void {
+ onFileSelected(event: any, fileInput: HTMLInputElement): void {
 
-    const file = event.target.files[0];
+  const file = event.target.files[0];
 
-    if (!file) return;
+  if (!file) return;
 
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
-    if (!allowedTypes.includes(file.type)) {
-      this.podScanError = true;
-      this.podFileBase64 = '';
-      this.podFilePath = '';
-      return;
-    }
+ 
+  if (!allowedTypes.includes(file.type)) {
 
-    this.podScanError = false;
+    this.podScanError = true;
 
-    const reader = new FileReader();
+    // reset values
+    this.podFileBase64 = '';
+    this.podFilePath = '';
 
-    reader.onload = (e: any) => {
+    // 🔥 IMPORTANT: reset input → shows "No file chosen"
+    fileInput.value = '';
 
-      const base64String = e.target.result;
-
-      // remove data:image/jpeg;base64,
-      this.podFileBase64 = base64String.split(',')[1];
-
-      const fixedPath = "C:/Users/ADMIN/OneDrive/Desktop/";
-
-      this.podFilePath = fixedPath + file.name;
-
-      console.log("POD Base64:", this.podFileBase64);
-      console.log("POD Path:", this.podFilePath);
-    };
-
-    reader.readAsDataURL(file);
+    return;
   }
 
+  //  Valid file
+  this.podScanError = false;
+
+  const reader = new FileReader();
+
+  reader.onload = (e: any) => {
+
+    const base64String = e.target.result;
+
+    this.podFileBase64 = base64String.split(',')[1];
+
+    const fixedPath = "C:/Users/ADMIN/OneDrive/Desktop/";
+    this.podFilePath = fixedPath + file.name;
+
+    console.log("POD Base64:", this.podFileBase64);
+    console.log("POD Path:", this.podFilePath);
+  };
+
+  reader.readAsDataURL(file);
+}
 
 
 }

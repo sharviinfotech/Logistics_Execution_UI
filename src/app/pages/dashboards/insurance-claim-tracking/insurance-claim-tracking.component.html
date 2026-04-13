@@ -311,10 +311,12 @@
             </option>
           </select>
           <label>DC Reference Number</label>
+
+          <span class="error-message" *ngIf="HeaderForm.get('VBELN')?.touched &&
+               HeaderForm.get('VBELN')?.hasError('required')">
+            DC Reference Number is required
+          </span>
         </div>
-
-
-
 
 
         <div class="form-field">

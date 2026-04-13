@@ -238,6 +238,10 @@
           </select>
 
           <label>Invoice Number</label>
+          <span class="error-message" *ngIf="FreightBilling.get('invoicenumber')?.touched &&
+               FreightBilling.get('invoicenumber')?.hasError('required')">
+            Invoice Number is required
+          </span>
         </div>
 
         <div class="form-field">

@@ -102,7 +102,7 @@ export class VechileInfoComponent implements OnInit {
     console.log("Plants:", this.plantList);
     console.log("Divisions:", this.divisionList);
     this.VehicleForm = this.fb.group({
-      VBELN: [''],
+      VBELN: ['', Validators.required],
       vehicles: this.fb.array([]),
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
@@ -494,6 +494,7 @@ export class VechileInfoComponent implements OnInit {
           d.INV_NO.forEach((inv: any) => {
             if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
               this.invoiceF4List.push(inv.VBELN);
+              this.VehicleForm.patchValue({ VBELN: '' }); // Auto-fill VBELN with first invoice number
             }
           });
         }

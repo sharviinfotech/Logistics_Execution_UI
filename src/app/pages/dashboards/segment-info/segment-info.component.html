@@ -270,6 +270,10 @@
           </select>
 
           <label>Invoice Number</label>
+            <span class="error-message" *ngIf="segmentInfo.get('INV_VBELN')?.touched &&
+               segmentInfo.get('INV_VBELN')?.hasError('required')">
+            Invoice Number is required
+          </span>
         </div>
 
 
@@ -396,7 +400,8 @@
         <div class="form-field" [class.filled]="segmentInfo.get('TAT_Type')?.value">
           <select formControlName="TAT_Type" (change)="onTatTypeChange()">
             <option value="">Select TAT Type</option>
-            <option value="Direct Truck TAT">Direct Truck TAT</option>
+            <option value="Direct Truck TAT(Vizag)">Direct Truck TAT(Vizag)</option>
+              <option value="Direct Truck TAT(Hyd)">Direct Truck TAT(Hyd)</option>
             <option value="Revised TAT">Revised TAT</option>
             <option value="Safe Express TAT">Safe Express TAT</option>
             <option value="Delivery TAT">Delivery TAT</option>

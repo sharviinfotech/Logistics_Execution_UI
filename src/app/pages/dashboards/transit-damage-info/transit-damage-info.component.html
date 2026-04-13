@@ -309,6 +309,11 @@
           </select>
 
           <label>DC Reference Number</label>
+
+          <span class="error-message" *ngIf="HeaderForm.get('VBELN')?.touched &&
+               HeaderForm.get('VBELN')?.hasError('required')">
+            DC Reference Number is required
+          </span>
         </div>
 
 
@@ -384,7 +389,8 @@
         </div>
 
         <div class="form-field ">
-          <input type="file" formControlName="IMAGES" id="imagesuploading" accept=".jpg,.jpeg,.png" (change)="onFileChange($event, 'IMAGES')"/>
+          <input type="file" formControlName="IMAGES" id="imagesuploading" accept=".jpg,.jpeg,.png"
+            (change)="onFileChange($event, 'IMAGES')" />
           <label>Images</label>
           <span class="error-message" *ngIf="imagesError">
             Only .jpg, .jpeg, .png files are allowed
@@ -393,7 +399,7 @@
 
         <div class="form-field ">
           <input type="file" formControlName="FSRREPORT" id="imagesuploading" accept=".jpg,.jpeg,.png"
-             (change)="onFileChange($event, 'FSRREPORT')"/>
+            (change)="onFileChange($event, 'FSRREPORT')" />
           <label>FSR Report</label>
           <span class="error-message" *ngIf="fsrReportError">
             Only .jpg, .jpeg, .png files are allowed

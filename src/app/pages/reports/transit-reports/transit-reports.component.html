@@ -19,7 +19,7 @@
             <div class="pe-card-body">
 
                 <div class="form-scroll">
-                    <form>
+                <form [formGroup]="filterForm">
                         <div class="row g-3">
 
                             <div class="col-md-3">
@@ -112,9 +112,7 @@
                                 <button type="button" class="btn btn-md btn-raised btnclear">
                                     Clear Filters <i class='bx bx-reset ml-1'></i>
                                 </button>
-                                <button type="button" class="btn btn-md btn-raised btnExecuteReports">
-                                    Execute Report <i class='bx bx-search ml-1'></i>
-                                </button>
+                             <button type="button" (click)="onSearch()" class="btn btnExecuteReports"></button>
                             </div>
 
                         </div>

@@ -268,8 +268,9 @@
                     <option *ngFor="let opt of searchOptions" [value]="opt.key">{{ opt.label }}</option>
                   </select>
 
-                  <input type="text" class="search-input" style="width: 300px; flex: none; min-width: 0;" placeholder="Enter Reference / Invoice / ODN / SO Number"
-                    [(ngModel)]="searchReference" name="searchReference" (keyup.enter)="onSearchReference()" />
+                  <input type="text" class="search-input" style="width: 300px; flex: none; min-width: 0;"
+                    placeholder="Enter Reference / Invoice / ODN / SO Number" [(ngModel)]="searchReference"
+                    name="searchReference" (keyup.enter)="onSearchReference()" />
 
                   <button type="button" class="search-btn-global" (click)="onSearchReference()">
                     <i class="fas fa-search"></i>
@@ -335,6 +336,10 @@
               </select>
 
               <label>DC Reference Number</label>
+              <span class="error-message" *ngIf="ProductInfo.get('VBELN')?.touched &&
+           ProductInfo.get('VBELN')?.invalid">
+                DC Reference Number is required
+              </span>
             </div>
 
           </div>
@@ -513,17 +518,17 @@
             </select>
             <label>Plant</label>
           </div> -->
-             <div class="form-field">
-              <select [(ngModel)]="filterPlant">
-                <option value="">Select Plant</option>
+          <div class="form-field">
+            <select [(ngModel)]="filterPlant">
+              <option value="">Select Plant</option>
 
-                <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">
-                  {{p.PLANT_TEXT}}
-                </option>
+              <option *ngFor="let p of plantList" [value]="p.PLANT_DESC">
+                {{p.PLANT_TEXT}}
+              </option>
 
-              </select>
-              <label>Plant</label>
-            </div>
+            </select>
+            <label>Plant</label>
+          </div>
 
           <!-- Division -->
           <!-- <div class="form-field">
@@ -534,18 +539,18 @@
             </select>
             <label>Division</label>
           </div> -->
-            <div class="form-field">
-              <select [(ngModel)]="filterDivision">
+          <div class="form-field">
+            <select [(ngModel)]="filterDivision">
 
-                <option value="">Select Division</option>
+              <option value="">Select Division</option>
 
-                <option *ngFor="let d of divisionList" [value]="d.DIVISION">
-                  {{ d.DIV_TEXT }}
-                </option>
+              <option *ngFor="let d of divisionList" [value]="d.DIVISION">
+                {{ d.DIV_TEXT }}
+              </option>
 
-              </select>
-              <label>Division</label>
-            </div>
+            </select>
+            <label>Division</label>
+          </div>
 
           <!-- Customer -->
           <div class="form-field">

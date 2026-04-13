@@ -4,6 +4,7 @@ import {
   FormBuilder,
   FormGroup,
   FormArray,
+   Validators,
   ReactiveFormsModule,
   FormsModule
 } from '@angular/forms';
@@ -131,7 +132,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   // Form Builders
   buildHeaderForm(): void {
     this.HeaderForm = this.fb.group({
-      VBELN: [''],
+      VBELN: ['', Validators.required],
       ZMAPID: [''],
       LINE_NO: [''],
       INV_NO: [''],
@@ -454,6 +455,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
           d.INV_NO.forEach((inv: any) => {
             if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
               this.invoiceF4List.push(inv.VBELN);
+              this.HeaderForm.patchValue({ VBELN: '' }); 
             }
           });
         }

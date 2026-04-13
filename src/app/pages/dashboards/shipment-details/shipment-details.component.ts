@@ -100,7 +100,7 @@ export class ShipmentDetailsComponent implements OnInit {
       ZINCO: ['', Validators.required],
       ZINS_SCPOE: ['', Validators.required],
       ZKM: ['', [Validators.required]],
-      VBELN: [''],
+      VBELN: ['', [Validators.required]],
       items: this.fb.array([this.createItemRow()]),
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
@@ -389,6 +389,7 @@ export class ShipmentDetailsComponent implements OnInit {
           d.INV_NO.forEach((inv: any) => {
             if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
               this.invoiceF4List.push(inv.VBELN);
+              this.ProductInfo.patchValue({ VBELN: '' }); 
             }
           });
         }

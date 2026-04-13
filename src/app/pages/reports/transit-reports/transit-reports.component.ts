@@ -11,22 +11,34 @@ export class TransitReportsComponent implements OnInit {
 
   filterForm!: FormGroup;
 
-  // Dummy table data
-  tables$ = of([
-    {
-      WERKS: '1000',
-      KDAUF_AUFK: '500001',
-      KDPOS_AUFK: '10',
-      MATNR: 'MAT001',
-      MATXT: 'Sample Material',
-      AUFNR: '300001',
-      AUART: 'PP01',
-      STEXT: 'Released',
-      GWEMG: 10,
-      GAMNG: 100
-    }
-  ]);
+allData = [
+  {
+    WERKS: '1000',
+    KDAUF_AUFK: '500001',
+    KDPOS_AUFK: '10',
+    MATNR: 'MAT001',
+    MATXT: 'Sample Material',
+    AUFNR: '300001',
+    AUART: 'PP01',
+    STEXT: 'Released',
+    GWEMG: 10,
+    GAMNG: 100
+  },
+  {
+    WERKS: '2000',
+    KDAUF_AUFK: '500002',
+    KDPOS_AUFK: '20',
+    MATNR: 'MAT002',
+    MATXT: 'Material 2',
+    AUFNR: '300002',
+    AUART: 'PP02',
+    STEXT: 'Pending',
+    GWEMG: 20,
+    GAMNG: 200
+  }
+];
 
+filteredData: any[] = [];
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {

@@ -87,7 +87,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.InvoiceForm = this.fb.group({
-      INV_VBELN: [''],
+      INV_VBELN: ['', Validators.required],
       invoices: this.fb.array([]),
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
@@ -406,6 +406,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
           d.INV_NO.forEach((inv: any) => {
             if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
               this.invoiceF4List.push(inv.VBELN);
+              this.InvoiceForm.patchValue({ INV_VBELN: '' }); 
             }
           });
         }

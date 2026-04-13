@@ -10,6 +10,7 @@ import * as XLSX from 'xlsx';
 import * as jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+
 @Component({
   selector: 'app-segment-info',
   standalone: true,
@@ -98,7 +99,7 @@ export class SegmentInfoComponent implements OnInit {
 
   ngOnInit(): void {
     this.segmentInfo = this.fb.group({
-      INV_VBELN: [''],
+      INV_VBELN: ['',Validators.required],
       SALE_PERSON: ['', Validators.required],
       SEGMENT: ['', Validators.required],
       APPTYP: ['', Validators.required],
@@ -420,6 +421,7 @@ export class SegmentInfoComponent implements OnInit {
           d.INV_NO.forEach((inv: any) => {
             if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
               this.invoiceF4List.push(inv.VBELN);
+              this.segmentInfo.patchValue({ INV_VBELN: '' });
             }
           });
         }
@@ -533,6 +535,7 @@ export class SegmentInfoComponent implements OnInit {
           refItem.INV_NO.forEach((inv: any) => {
             if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
               this.invoiceF4List.push(inv.VBELN);
+              this.segmentInfo.patchValue({ INV_VBELN: '' });
             }
           });
         }

@@ -159,7 +159,7 @@ console.log("Logged in user:", this.loggedInUser);
     this.FreightBilling = this.fb.group({
       ponumber: [''],
       REFNO: [''],
-      invoicenumber: [''],
+      invoicenumber: ['',Validators.required],
       FreightBillNumber: [''],
       FreightBillDate: [''],
       FreightBillPhysicalSubmissionDate: [''],
@@ -344,6 +344,7 @@ console.log("Logged in user:", this.loggedInUser);
           d.INV_NO.forEach((inv: any) => {
             if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
               this.invoiceF4List.push(inv.VBELN);
+               this.FreightBilling.patchValue({ invoicenumber: '' });
             }
           });
         }
