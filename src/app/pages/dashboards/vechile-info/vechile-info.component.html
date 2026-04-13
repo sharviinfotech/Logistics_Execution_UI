@@ -68,7 +68,7 @@
       </button>
     </div> -->
 
-    <br />
+   
 
     <div *ngIf="mainMode === 'creation'">
       <!-- Order Type -->
@@ -123,7 +123,7 @@
         </div>
       </div>
 
-      <br />
+     
 
       <!-- SAP Type -->
 
@@ -287,7 +287,7 @@
         </div>
       </div>
 
-      <form [formGroup]="VehicleForm">
+      <form [formGroup]="VehicleForm" id="id2">
         <div class="form-grid">
           <!-- <div class="form-field" [hidden]="sapType !== 'Non-SAP'">
             <input type="text" formControlName="VBELN" (keydown.enter)="fetchDCReferenceNo()"
@@ -328,7 +328,7 @@
                 <th>Type of transporter</th>
                 <th>LR No</th>
                 <th>Type of Vehicle</th>
-                <th>Passing Weight<br>
+                <th>Passing Weight
                   (Tons)</th>
                 <th>Volume of Truck</th>
                 <th>Vehicle Number</th>
@@ -445,8 +445,7 @@
 
       <!-- Filter Form -->
       <div class="card-body-LE" *ngIf="filterSapType">
-        <div class="form-grid">
-
+        <div class="form-grid" id="id1">
           <!-- From Date -->
           <div class="form-field">
             <input type="date" [(ngModel)]="filterFromDate" />
@@ -574,7 +573,7 @@
 
     </div>
     <!-- Search Results Table -->
-    <div class="card mt-3" *ngIf="searchOptionsList?.length > 0 && mainMode === 'creation'">
+    <div class="card mt-1" *ngIf="searchOptionsList?.length > 0 && mainMode === 'creation'">
       <div class="card-body-LE table-responsive">
         <table class="table table-bordered table-striped text-center">
           <thead>

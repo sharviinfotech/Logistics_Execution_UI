@@ -153,7 +153,8 @@ thead,
 tbody,
 tr,
 td {
-  white-space: nowrap !important
+  white-space: nowrap !important;
+      padding: 5px !important;
 }
 
 
@@ -239,7 +240,7 @@ td {
 
 .table>thead {
   vertical-align: bottom;
-  height: 45px;
+  
 }
 
 // .table thead th {
@@ -259,12 +260,12 @@ td {
 .table tbody td input[type="datetime-local"],
 .table tbody td select {
 
-  padding: 10px 12px;
+  padding: 6px;
   background: #F5F5F5;
   /* Light gray background */
   border: 1px solid #E0E0E0;
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 13px;
   color: #333;
   outline: none;
   transition: all 0.3s ease;
@@ -281,8 +282,9 @@ td {
   background-repeat: no-repeat;
   background-position: right 12px center;
   background-size: 12px;
-  padding-right: 35px;
+  // padding-right: 35px;
   cursor: pointer;
+  width: 150px;
 }
 
 /* ✨ Focus State */
@@ -1241,7 +1243,7 @@ input[type="radio"] {
   display: flex;
   align-items: center;
   gap: 20px;
-  padding: 8px 0;
+  padding: 8px 0px;
   flex-wrap: wrap;
 }
 
@@ -1872,7 +1874,7 @@ input[type="radio"]:checked ~ .toggle-text {
   align-items: center;
   gap: 10px;
   width: fit-content;
-  margin-top: 15px;
+  // margin-top: 15px;
   /* shrink to content size */
 
 }
@@ -1886,7 +1888,7 @@ input[type="radio"]:checked ~ .toggle-text {
 
 
 .width-le {
-  width: 120px;
+  // width: 120px;
 }
 
 .width-md {
@@ -3111,7 +3113,7 @@ input[type="radio"]:checked ~ .toggle-text {
   /* Your existing styling */
   font-size: 20px !important;
   font-weight: bold !important;
-  padding: 15px 20px;
+  padding: 6px;
   // border-bottom: 2px solid #8f1e42;
   border-bottom:2px solid #2E86C1;
   // color: #8f1e42;
