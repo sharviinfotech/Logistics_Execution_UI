@@ -170,6 +170,7 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
 
 'Outward-TransitReport': '/transit-report',
 'Outward-PendingPodReport': '/pending-pod',
+'Outward-FreightBills': '/Freight-Bills',
 
 };
 

@@ -105,29 +105,36 @@ export const MENU: MenuItem[] = [
         icon: 'bx-user-plus',
     },
 
-    // {
-    //     id: 12,
-    //     label: "Reports",
-    //     icon: "bx-cloud-download",
-    //     subItems: [
-    //         {
-    //             id: 13,
-    //             label: "Transit & E-way bill Report",
-    //             link: "/transit-report",
-    //             icon: "bx-layer",
-    //             parentId: 12,
-    //         },
-    //         {
-    //             id: 14,
-    //             label: "Pending PODs",
-    //             link: "/pending-pod",
-    //             icon: "bx-time",
-    //             parentId: 12,
-    //         },
+    {
+        id: 12,
+        label: "Reports",
+        icon: "bx-cloud-download",
+        subItems: [
+            {
+                id: 13,
+                label: "Transit & E-way bill Report",
+                link: "/transit-report",
+                icon: "bx-layer",
+                parentId: 12,
+            },
+            {
+                id: 14,
+                label: "Pending PODs",
+                link: "/pending-pod",
+                icon: "bx-time",
+                parentId: 12,
+            },
+             {
+                id: 14,
+                label: "Freight Bills",
+                link: "/Freight-Bills",
+                icon: "bx-time",
+                parentId: 12,
+            },
 
 
-    //     ],
-    // }
+        ],
+    }
     //   {
     //     id: 2,
     //     label: 'Production Order Confirmation',

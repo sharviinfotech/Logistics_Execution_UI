@@ -6,20 +6,16 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { CommonModule } from '@angular/common';
 import { SpinnerService } from 'src/app/spinner.service';
 import { GeneralserviceService } from 'src/app/generalservice.service';
- 
+
 @Component({
-  selector: 'app-transit-reports',
-  standalone: true,
+  selector: 'app-freightbills',
+   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule, NgSelectModule],
- 
-  templateUrl: './transit-reports.component.html',
-  styleUrls: ['./transit-reports.component.css']
+  templateUrl: './freightbills.component.html',
+  styleUrl: './freightbills.component.css'
 })
-
-
-export class TransitReportsComponent implements OnInit {
-
-  filterForm!: FormGroup;
+export class FreightbillsComponent {
+filterForm!: FormGroup;
 
 
 

@@ -39,6 +39,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { ReportsComponent } from './reports/reports.component';
 import { TransitReportsComponent } from './reports/transit-reports/transit-reports.component';
 import { PendingPodComponent } from './reports/pending-pod/pending-pod.component';
+import { FreightbillsComponent } from './reports/freightbills/freightbills.component';
 
 
 @NgModule(
@@ -46,9 +47,11 @@ import { PendingPodComponent } from './reports/pending-pod/pending-pod.component
                 declarations: [
  
   
-    ReportsComponent,
-          TransitReportsComponent,
+//     ReportsComponent,
+//           TransitReportsComponent,
           PendingPodComponent
+  
+//     FreightbillsComponent
   ],
                 imports: [CommonModule,
                         FormsModule,
