@@ -30,6 +30,7 @@ import { DispatchComponent } from './dispatch/dispatch.component';
 import { UserCreationComponent } from './user-creation/user-creation.component';
 import { TransitReportsComponent } from '../reports/transit-reports/transit-reports.component';
 import { ServiceLevelComponent } from './service-level/service-level.component';
+import { PendingPodComponent } from '../reports/pending-pod/pending-pod.component';
 
 // import { CooisComponent } from './coois/coois.component';
 // import { Co11Component } from './co11/co11.component';
@@ -150,6 +151,10 @@ const routes: Routes = [
       {
     path: "transit-report",
     component: TransitReportsComponent,
+  },
+        {
+    path: "pending-pod",
+    component: PendingPodComponent,
   },
     // {
     //     path: 'co11',

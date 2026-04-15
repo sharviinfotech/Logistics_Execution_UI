@@ -38,6 +38,7 @@ import { MapsModule } from './maps/maps.module';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ReportsComponent } from './reports/reports.component';
 import { TransitReportsComponent } from './reports/transit-reports/transit-reports.component';
+import { PendingPodComponent } from './reports/pending-pod/pending-pod.component';
 
 
 @NgModule(
@@ -46,7 +47,8 @@ import { TransitReportsComponent } from './reports/transit-reports/transit-repor
  
   
     ReportsComponent,
-          TransitReportsComponent
+          TransitReportsComponent,
+          PendingPodComponent
   ],
                 imports: [CommonModule,
                         FormsModule,
