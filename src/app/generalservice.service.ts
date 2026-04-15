@@ -438,6 +438,10 @@ export class GeneralserviceService {
   FeedBackInvoiceDetailsfetchwithoutsap(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/ServiceLevel/Outward/WithoutSap/InvoiceDetailsfetch', obj);
   }
+  //reports
+   FetchTransitReport(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/Reports/FetchTransitReport', obj);
+  }
 
 
 

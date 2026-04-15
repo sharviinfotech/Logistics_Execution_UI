@@ -41,6 +41,7 @@
     justify-content: space-between;
     border-bottom: 2px solid  #2E86C1;
     color:  #2E86C1;
+    margin-bottom: 5px;
 }
 
 .pe-card-header i,
@@ -253,15 +254,15 @@ input[type="radio"] {
 
 .btnclear {
     padding: 6px 12px;
-    border: 1px solid #2E86C1;
-    background: white;
+    border: 1px solid #ccc;
+    background: #2E86C1;
     cursor: pointer;
     border-radius: 4px;
-    color: #2E86C1;
+    color: white;
 }
-
+ 
 .btnclear:hover {
-    background-color: #ccc !important;
+    background-color: white !important;
     color: #2E86C1 !important;
     border: 1px solid #2E86C1 !important;
 }
@@ -276,4 +277,9 @@ input[type="radio"] {
     max-height: calc(100vh - 350px); /* dynamic height based on screen */
     overflow-y: auto;
     padding-right: 5px;
+}
+.form-grid {
+   
+    grid-template-columns: repeat(4, 1fr);
+   
 }
