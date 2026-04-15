@@ -49,7 +49,7 @@ import { FreightbillsComponent } from './reports/freightbills/freightbills.compo
   
 //     ReportsComponent,
 //           TransitReportsComponent,
-          PendingPodComponent
+        //   PendingPodComponent
   
 //     FreightbillsComponent
   ],

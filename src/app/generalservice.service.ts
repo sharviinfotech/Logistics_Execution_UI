@@ -66,7 +66,7 @@ export class GeneralserviceService {
   invoiceApprovedOrRejected(obj) {
     return this.http.post(environment.baseUrl + 'api/invoice/invoiceApprovedOrRejected', obj);
   }
- 
+
   getAllCustomerList() {
     return this.http.get(environment.baseUrl + 'api/invoice/getAllCustomerList');
   }
@@ -180,7 +180,7 @@ export class GeneralserviceService {
   SegmentInfoOutwardFetch(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/fetchInvoiceList', obj);
   }
- SegmentInfoOutwardwithoutSapFetch(obj) {
+  SegmentInfoOutwardwithoutSapFetch(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/segmentInfo/Outward/WithoutSap/fetchInvoiceList', obj);
   }
   SegmentInfoOutwardSave(obj) {
@@ -423,13 +423,13 @@ export class GeneralserviceService {
   UserCreationDelete(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/UserCreationDelete', obj);
   }
- forgotPassword(obj) {
+  forgotPassword(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/send-credentials', obj);
   }
   FeedbackCreationwithsap(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/ServiceLevel/Outword/withsap/FeedbackCreation', obj);
   }
-    FeedbackCreationwithoutsap(obj) {
+  FeedbackCreationwithoutsap(obj) {
     return this.http.put(environment.baseUrl + 'api/external/LE/ServiceLevel/Outword/WithoutSap/FeedbackCreation', obj);
   }
   FeedBackInvoiceDetailsfetchwithsap(obj) {
@@ -439,8 +439,11 @@ export class GeneralserviceService {
     return this.http.put(environment.baseUrl + 'api/external/LE/ServiceLevel/Outward/WithoutSap/InvoiceDetailsfetch', obj);
   }
   //reports
-   FetchTransitReport(obj) {
+  FetchTransitReport(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/Reports/FetchTransitReport', obj);
+  }
+  FetchPendingPodReport(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/Reports/FetchPendingPods', obj);
   }
 
 

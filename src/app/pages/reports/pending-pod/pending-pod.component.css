@@ -280,4 +280,43 @@ input[type="radio"] {
     margin-top: 0.25rem;
 }
 
+.header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* LEFT SIDE */
+.header-flex .left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* RIGHT SIDE */
+.header-flex .right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* SEARCH BOX STYLE */
+/* .search-input {
+  width: 220px;
+  height: 34px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: all 0.3s ease;
+} */
+
+/* FOCUS EFFECT */
+.search-input:focus {
+  border-color: #2E86C1;
+  box-shadow: 0 0 5px rgba(46, 134, 193, 0.4);
+}
+
+
+
  
