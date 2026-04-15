@@ -7,9 +7,9 @@
         </div>
     </div>
     <div class="card-body-LE">
- 
- 
- 
+
+
+
         <!-- FILTER CARD -->
         <div class="pe-card">
             <div class="pe-card-header">
@@ -18,222 +18,311 @@
                     Transit Filter
                 </span>
             </div>
- 
+
             <div class="pe-card-body">
- 
- 
+
+
                 <form [formGroup]="filterForm">
- 
+
                     <div class="form-grid">
- 
+
                         <div class="form-field">
-                            <input type="text" formControlName="INOUT" class="form-control form-control-sm"
-                                placeholder=" ">
+                            <select formControlName="INOUT" class="form-control form-control-sm">
+                                <option value="" disabled selected>Select Type</option>
+                                <option value="INWARD">INWARD</option>
+                                <option value="OUTWARD">OUTWARD</option>
+                            </select>
                             <label>Inward/Outward</label>
+                            <span class="text-danger"
+                                *ngIf="filterForm.get('INOUT')?.touched && filterForm.get('INOUT')?.errors?.['required']">
+                                Inward/Outward is required
+                            </span>
                         </div>
- 
+
                         <div class="form-field">
- 
-                            <input type="text" formControlName="SAPTYPE" class="form-control form-control-sm"
-                                placeholder=" ">
+
+                            <select formControlName="SAPTYPE" class="form-control form-control-sm">
+                                <option value="" disabled selected>Select Type</option>
+                                <option value="SAP">SAP</option>
+                                <option value="NONSAP">NONSAP</option>
+                            </select>
                             <label>Sap/Nonsap</label>
                         </div>
- 
+
                         <div class="form-field">
- 
+
                             <input type="date" formControlName="FROM_DATE" class="form-control form-control-sm"
                                 placeholder=" ">
                             <label>From Date</label>
+                            <span class="text-danger"
+                                *ngIf="filterForm.get('FROM_DATE')?.touched && filterForm.get('FROM_DATE')?.hasError('required')">
+                                From Date is required
+                            </span>
                         </div>
- 
+
                         <div class="form-field">
- 
+
                             <input type="date" formControlName="TO_DATE" class="form-control form-control-sm"
                                 placeholder=" ">
                             <label>To Date</label>
+                            <span class="text-danger"
+                                *ngIf="filterForm.get('TO_DATE')?.touched && filterForm.get('TO_DATE')?.hasError('required')">
+                                To Date is required
+                            </span>
                         </div>
- 
+
                         <div class="form-field">
- 
-                            <input type="text" formControlName="TRANS_GROUP" class="form-control form-control-sm"
-                                placeholder=" ">
+
+                            <select formControlName="TRANS_GROUP" class="form-control form-control-sm">
+                                <option value="">Select Transporter Group</option>
+                                <option value="FULL TRUCK LOAD">FULL TRUCK LOAD</option>
+                                <option value="CARGO">CARGO</option>
+                                <option value="RATECONTRACT">RATE CONTRACT</option>
+                                <option value="LOCALTRANSPORTATION">LOCAL TRANSPORTATION</option>
+                                <option value="CUSTOMERTRANSPORTER">CUSTOMER TRANSPORTER</option>
+                                <option value="COMPANYVEHICLE">COMPANY VEHICLE</option>
+                                <option value="COURIER">COURIER</option>
+                                <option value="BYHAND">BY HAND</option>
+                            </select>
                             <label>Transporter Group</label>
                         </div>
- 
-                        <div class="form-field">
- 
+
+                        <!-- <div class="form-field">
+
                             <input type="text" formControlName="TRANSPORTER" class="form-control form-control-sm"
                                 placeholder=" ">
                             <label>Transporter</label>
-                        </div>
- 
+                        </div> -->
+
                         <div class="form-field">
- 
+
+                            <select formControlName="TRANSPORTER" class="form-control form-control-sm">
+                                <option value="">Select Transporter</option>
+
+                                <option *ngFor="let transporter of transporterList" [value]="transporter.TRANSPORTER">
+                                    {{ transporter.TRANSPORTER }}
+                                </option>
+
+                            </select>
+
+                            <label>Transporter</label>
+
+                        </div>
+
+                        <!-- <div class="form-field">
+
                             <input type="text" formControlName="WERKS" class="form-control form-control-sm"
                                 placeholder=" ">
                             <label>Plant</label>
-                        </div>
- 
+                        </div> -->
                         <div class="form-field">
- 
-                            <input type="text" formControlName="MATNR" class="form-control form-control-sm"
-                                placeholder=" ">
+
+                            <select formControlName="WERKS" class="form-control form-control-sm">
+                                <option value="">Select Plant</option>
+                                <option *ngFor="let p of plantList" [value]="p.PLANT_TEXT">
+                                    {{ p.PLANT_TEXT }}
+                                </option>
+                            </select>
+
+                            <label>Plant</label>
+
+                        </div>
+
+                        <div class="form-field">
+
+                            <select formControlName="MATNR" class="form-control form-control-sm">
+                                <option value="">Select Product</option>
+                                <option value="Batteries">Batteries</option>
+                                <option value="Electronics">Electronics</option>
+                                <option value="Fuze">Fuze</option>
+                                <option value="Cement Poles and Piles">Cement Poles and Piles</option>
+                                <option value="Raw Materials">Raw Materials</option>
+                                <option value="Job Work Material">Job Work Material</option>
+                                <option value="Machinery">Machinery</option>
+                                <option value="Others">Others</option>
+                            </select>
                             <label>Product</label>
                         </div>
- 
-                        <div class=form-field>
- 
+
+                        <!-- <div class=form-field>
+
                             <input type="text" formControlName="DIVISION" class="form-control form-control-sm"
                                 placeholder=" ">
                             <label>Division</label>
+                        </div> -->
+                        <div class="form-field">
+
+                            <select formControlName="DIVISION" class="form-control form-control-sm">
+
+                                <option value="">Select Division</option>
+
+                                <option *ngFor="let d of divisionList" [value]="d.DIVISION">
+                                    {{ d.DIV_TEXT }}
+                                </option>
+
+                            </select>
+
+                            <label>Division</label>
+
                         </div>
- 
+
                         <div class=form-field>
- 
+
                             <input type="text" formControlName="CUSTOMER" class="form-control form-control-sm"
                                 placeholder=" ">
                             <label>Customer</label>
                         </div>
- 
+
                         <div class="form-field">
- 
+
                             <input type="text" formControlName="BRANCH" class="form-control form-control-sm"
                                 placeholder=" ">
                             <label>Branch</label>
                         </div>
- 
+
                         <div class="form-field">
- 
+
                             <input type="text" formControlName="BRANCH_ZONE" class="form-control form-control-sm"
                                 placeholder=" ">
                             <label>Branch Zone</label>
                         </div>
- 
+
                         <div class=form-field>
- 
+
                             <input type="text" formControlName="DEST_LOCATION" class="form-control form-control-sm"
                                 placeholder=" ">
                             <label>Destination Location</label>
                         </div>
- 
+
                         <div class="form-field">
- 
+
                             <input type="text" formControlName="DEST_STATE" class="form-control form-control-sm"
                                 placeholder=" ">
                             <label>Destination State</label>
                         </div>
- 
+
                         <div class="form-field">
- 
+
                             <input type="text" formControlName="DEST_ZONE" class="form-control form-control-sm"
                                 placeholder=" ">
                             <label>Destination Zone</label>
                         </div>
- 
+
                         <div class=form-field>
- 
+
                             <input type="text" formControlName="INCOTERMS" class="form-control form-control-sm"
                                 placeholder=" ">
                             <label>Incoterms</label>
                         </div>
- 
+
                         <!-- BUTTONS -->
- 
- 
+
+
                     </div>
                     <div class="col-12 mt-3 d-flex justify-content-end gap-2">
                         <button type="button" (click)="resetForm()" class="btn btnclear">
                             Clear Filters
                         </button>
- 
+
                         <button type="button" (click)="onSearch()" class="btn btnExecuteReports">
                             Execute Report
                         </button>
                     </div>
- 
+
                 </form>
- 
- 
-                <!-- TABLE CARD -->
-                <div class="pe-card mt-4">
- 
-                    <div class="pe-card-header">
-                        <span>
-                            <i class='bx bx-list-check'></i>
-                           Transit Reports Detailed
-                        </span>
-                    </div>
- 
-                    <div class="pe-card-body">
- 
-                        <!-- MESSAGE -->
-                        <div *ngIf="filteredData.length === 0" class="text-center py-5">
-                            <p class="text-muted">
-                                Fill filters and click execute to see results.
-                            </p>
-                        </div>
- 
-                        <!-- TABLE -->
-                        <div *ngIf="filteredData.length > 0" class="table-responsive">
-                            <table class="table table-bordered table-hover">
- 
-                                <thead class="bg-light">
-                                    <tr>
-                                        <th>Reference No</th>
-                                        <th>In/Out</th>
-                                        <th>SAP Type</th>
-                                        <th>Plant</th>
-                                        <th>Division</th>
-                                        <th>Customer</th>
-                                        <th>Product</th>
-                                        <th>Material Desc</th>
-                                        <th>Invoice No</th>
-                                        <th>Invoice Date</th>
-                                        <th>Transporter Group</th>
-                                        <th>Transporter</th>
-                                        <th>LR No</th>
-                                        <th>Driver</th>
-                                        <th>Mobile</th>
-                                        <th>Dispatch Date</th>
-                                        <th>ETA</th>
-                                        <th>Eway No</th>
-                                        <th>Eway Valid Till</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
 
-                                <tbody>
-                                    <tr *ngFor="let row of filteredData">
-                                        <td>{{ row.REFERENCE_NUMBER }}</td>
-                                        <td>{{ row.INWARD_OUTWARD }}</td>
-                                        <td>{{ row.SAP_NONSAP || '-' }}</td>
-                                        <td>{{ row.PLANT }}</td>
-                                        <td>{{ row.DIVISION }}</td>
-                                        <td>{{ row.CUSTOMER }}</td>
-                                        <td>{{ row.PRODUCT || '-' }}</td>
-                                        <td>{{ row.MATERIAL_DESCRIPTION || '-' }}</td>
-                                        <td>{{ row.INVOICE_NUMBER }}</td>
-                                        <td>{{ row.INVOICE_DATE }}</td>
-                                        <td>{{ row.TRANSPORTER_GROUP }}</td>
-                                        <td>{{ row.TRANSPORTER }}</td>
-                                        <td>{{ row.LR_NO }}</td>
-                                        <td>{{ row.DRIVER_NAME || '-' }}</td>
-                                        <td>{{ row.DRIVER_MOBILE || '-' }}</td>
-                                        <td>{{ row.PHYSICAL_DISPATCH_DATE }}</td>
-                                        <td>{{ row.ETA || '-' }}</td>
-                                        <td>{{ row.EWAY_NO || '-' }}</td>
-                                        <td>{{ row.EWAY_VALIDITY_TILL || '-' }}</td>
-                                        <td>{{ row.STATUS }}</td>
-                                    </tr>
-                                </tbody>
 
- 
-                            </table>
-                        </div>
- 
-                    </div>
+
+
+            </div>
+            <!-- TABLE CARD -->
+
+        </div>
+        <div class="pe-card mt-4">
+
+            <div class="pe-card-header header-flex">
+                <div class="left">
+                    <span>
+                        <i class='bx bx-list-check'></i>
+                        Transit Reports Detailed
+                    </span>
                 </div>
- 
+
+                <div class="right">
+                    <label>Search:</label>
+                    <input type="text" class="search-input" (input)="onFilter($event)" />
+                </div>
+            </div>
+
+
+            <div class="pe-card-body">
+
+                <!-- MESSAGE -->
+                <div *ngIf="filteredData.length === 0" class="text-center py-5">
+                    <p class="text-muted">
+                        Fill filters and click execute to see results.
+                    </p>
+                </div>
+
+                <!-- TABLE -->
+                <div *ngIf="filteredData.length > 0" class="table-responsive">
+                    <table class="table table-bordered table-hover">
+
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Reference No</th>
+                                <th>In/Out</th>
+                                <th>SAP Type</th>
+                                <th>Plant</th>
+                                <th>Division</th>
+                                <th>Customer</th>
+                                <th>Product</th>
+                                <th>Material Desc</th>
+                                <th>Invoice No</th>
+                                <th>Invoice Date</th>
+                                <th>Transporter Group</th>
+                                <th>Transporter</th>
+                                <th>LR No</th>
+                                <th>Driver</th>
+                                <th>Mobile</th>
+                                <th>Dispatch Date</th>
+                                <th>ETA</th>
+                                <th>Eway No</th>
+                                <th>Eway Valid Till</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr *ngFor="let row of filteredData">
+                                <td>{{ row.REFERENCE_NUMBER }}</td>
+                                <td>{{ row.INWARD_OUTWARD }}</td>
+                                <td>{{ row.SAP_NONSAP || '-' }}</td>
+                                <td>{{ row.PLANT }}</td>
+                                <td>{{ row.DIVISION }}</td>
+                                <td>{{ row.CUSTOMER }}</td>
+                                <td>{{ row.PRODUCT || '-' }}</td>
+                                <td>{{ row.MATERIAL_DESCRIPTION || '-' }}</td>
+                                <td>{{ row.INVOICE_NUMBER }}</td>
+                                <td>{{ row.INVOICE_DATE }}</td>
+                                <td>{{ row.TRANSPORTER_GROUP }}</td>
+                                <td>{{ row.TRANSPORTER }}</td>
+                                <td>{{ row.LR_NO }}</td>
+                                <td>{{ row.DRIVER_NAME || '-' }}</td>
+                                <td>{{ row.DRIVER_MOBILE || '-' }}</td>
+                                <td>{{ row.PHYSICAL_DISPATCH_DATE }}</td>
+                                <td>{{ row.ETA || '-' }}</td>
+                                <td>{{ row.EWAY_NO || '-' }}</td>
+                                <td>{{ row.EWAY_VALIDITY_TILL || '-' }}</td>
+                                <td>{{ row.STATUS }}</td>
+                            </tr>
+                        </tbody>
+
+
+                    </table>
+                </div>
+
             </div>
         </div>
- 
+    </div>
+</div>

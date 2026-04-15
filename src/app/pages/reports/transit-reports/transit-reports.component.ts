@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { Validators } from '@angular/forms';
 import { NgxSpinnerService } from 'ngx-spinner';
 import Swal from 'sweetalert2';
 import { GeneralserviceService } from 'src/app/generalservice.service';
+import { validateEvents } from 'angular-calendar/modules/common/util/util';
 
 @Component({
   selector: 'app-transit-reports',
@@ -16,15 +18,20 @@ export class TransitReportsComponent implements OnInit {
 
 
   filteredData: any[] = [];
+   originalData: any[] = [];
+    plantList: any;
+     divisionList: any;
+     loggedInUser: string = '';
+     transporterList: any[] = [];
 
   constructor(private fb: FormBuilder, private service: GeneralserviceService,  private spinner: NgxSpinnerService,) {}
 
   ngOnInit(): void {
   this.filterForm = this.fb.group({
-  INOUT: [''],
+  INOUT: ['',Validators.required],
   SAPTYPE: [''],
-  FROM_DATE: [''],
-  TO_DATE: [''],
+  FROM_DATE: ['',Validators.required],
+  TO_DATE: ['',Validators.required],
   TRANS_GROUP: [''],
   TRANSPORTER: [''],
   WERKS: [''],
@@ -38,9 +45,32 @@ export class TransitReportsComponent implements OnInit {
   DEST_ZONE: [''],
   INCOTERMS: ['']
 });
+ const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    this.loggedInUser = userData.USER || '';
+    console.log("Logged in user:", this.loggedInUser);
+ this.plantList = userData.PLANTS || [];
+   this.divisionList = userData.DIV || [];
+ 
+  console.log("Plants:", this.plantList);
+  console.log("Divisions:", this.divisionList);
+  this.transporterList = userData.VEND_CODE || [];
+console.log("Transporters:", this.transporterList);
   }
 
 onSearch() {
+  this.filterForm.markAllAsTouched(); 
+
+  if (this.filterForm.invalid) {
+
+    Swal.fire({
+      icon: 'warning',
+      title: 'Validation',
+      text: 'Please fill required fields'
+    });
+
+    return; 
+  }
+
 
   const form = this.filterForm.value;
 
@@ -72,6 +102,7 @@ onSearch() {
       console.log('API Response:', res);
 
       this.filteredData = res || [];
+      this.originalData = [...this.filteredData];
 
       this.spinner.hide(); // stop spinner
 
@@ -108,6 +139,15 @@ onSearch() {
   });
 }
 
+  onFilter(event: any) {
+  const value = event.target.value.toLowerCase();
+ 
+  this.filteredData = this.originalData.filter(item =>
+    Object.values(item).some(val =>
+      String(val).toLowerCase().includes(value)
+    )
+  );
+}
   // ✅ CLEAR BUTTON
   resetForm() {
     this.filterForm.reset();
