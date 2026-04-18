@@ -26,224 +26,300 @@
 
                     <div class="form-grid">
 
-                        <div class="form-field">
-                            <select formControlName="INOUT" class="form-control form-control-sm">
-                                <option value="" disabled selected>Select Type</option>
-                                <option value="INWARD">INWARD</option>
-                                <option value="OUTWARD">OUTWARD</option>
-                            </select>
-                            <label>Inward/Outward</label>
+                        <!-- Inward/Outward -->
+                        <div class="form-field" [class.filled]="filterForm.get('INOUT')?.value?.length">
+                            <ng-select [items]="inoutOptions" bindLabel="label" bindValue="value"
+                                formControlName="INOUT" [multiple]="true" [closeOnSelect]="false" [searchable]="false"
+                                placeholder=" " class="w-full">
+                                <ng-template ng-multi-label-tmp let-items="items">
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].label }}</div>
+                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
+                                </ng-template>
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                    <div class="checkbox-option">
+                                        <input type="checkbox" [checked]="item$.selected" />
+                                        <span>{{ item.label }}</span>
+                                    </div>
+                                </ng-template>
+                            </ng-select>
+                            <label class="global-ng-select">Inward/Outward</label>
                             <span class="text-danger"
-                                *ngIf="filterForm.get('INOUT')?.touched && filterForm.get('INOUT')?.errors?.['required']">
+                                *ngIf="filterForm.get('INOUT')?.touched && filterForm.get('INOUT')?.invalid">
                                 Inward/Outward is required
                             </span>
                         </div>
 
-                        <div class="form-field">
+                        <!-- SAP Type (keep as input) -->
 
-                            <select formControlName="SAPTYPE" class="form-control form-control-sm">
-                                <option value="" disabled selected>Select Type</option>
-                                <option value="SAP">SAP</option>
-                                <option value="NONSAP">NONSAP</option>
-                            </select>
-                            <label>Sap/Nonsap</label>
+
+                        <div class="form-field" [class.filled]="filterForm.get('SAPTYPE')?.value?.length">
+                            <ng-select [items]="sapTypeOptions" bindLabel="label" bindValue="value"
+                                formControlName="SAPTYPE" [multiple]="true" [closeOnSelect]="false" [searchable]="false"
+                                placeholder=" " class="w-full">
+                                <ng-template ng-multi-label-tmp let-items="items">
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].label }}</div>
+                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
+                                </ng-template>
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                    <div class="checkbox-option">
+                                        <input type="checkbox" [checked]="item$.selected" />
+                                        <span>{{ item.label }}</span>
+                                    </div>
+                                </ng-template>
+                            </ng-select>
+                            <label class="global-ng-select">Sap/Nonsap</label>
                         </div>
 
+                        <!-- From Date (keep as input) -->
                         <div class="form-field">
-
                             <input type="date" formControlName="FROM_DATE" class="form-control form-control-sm"
                                 placeholder=" ">
                             <label>From Date</label>
                             <span class="text-danger"
-                                *ngIf="filterForm.get('FROM_DATE')?.touched && filterForm.get('FROM_DATE')?.hasError('required')">
+                                *ngIf="filterForm.get('FROM_DATE')?.touched && filterForm.get('FROM_DATE')?.invalid">
                                 From Date is required
                             </span>
                         </div>
 
+                        <!-- To Date (keep as input) -->
                         <div class="form-field">
-
                             <input type="date" formControlName="TO_DATE" class="form-control form-control-sm"
                                 placeholder=" ">
                             <label>To Date</label>
                             <span class="text-danger"
-                                *ngIf="filterForm.get('TO_DATE')?.touched && filterForm.get('TO_DATE')?.hasError('required')">
+                                *ngIf="filterForm.get('TO_DATE')?.touched && filterForm.get('TO_DATE')?.invalid">
                                 To Date is required
                             </span>
                         </div>
 
-                        <div class="form-field">
-
-                            <select formControlName="TRANS_GROUP" class="form-control form-control-sm">
-                                <option value="">Select Transporter Group</option>
-                                <option value="FULL TRUCK LOAD">FULL TRUCK LOAD</option>
-                                <option value="CARGO">CARGO</option>
-                                <option value="RATECONTRACT">RATE CONTRACT</option>
-                                <option value="LOCALTRANSPORTATION">LOCAL TRANSPORTATION</option>
-                                <option value="CUSTOMERTRANSPORTER">CUSTOMER TRANSPORTER</option>
-                                <option value="COMPANYVEHICLE">COMPANY VEHICLE</option>
-                                <option value="COURIER">COURIER</option>
-                                <option value="BYHAND">BY HAND</option>
-                            </select>
-                            <label>Transporter Group</label>
+                        <!-- Transporter Group -->
+                        <div class="form-field" [class.filled]="filterForm.get('TRANS_GROUP')?.value?.length">
+                            <ng-select [items]="transGroupOptions" bindLabel="label" bindValue="value"
+                                formControlName="TRANS_GROUP" [multiple]="true" [closeOnSelect]="false"
+                                [searchable]="false" placeholder=" " class="w-full">
+                                <ng-template ng-multi-label-tmp let-items="items">
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].label }}</div>
+                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
+                                </ng-template>
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                    <div class="checkbox-option">
+                                        <input type="checkbox" [checked]="item$.selected" />
+                                        <span>{{ item.label }}</span>
+                                    </div>
+                                </ng-template>
+                            </ng-select>
+                            <label class="global-ng-select">Transporter Group</label>
                         </div>
 
-                        <!-- <div class="form-field">
-
-                            <input type="text" formControlName="TRANSPORTER" class="form-control form-control-sm"
-                                placeholder=" ">
-                            <label>Transporter</label>
-                        </div> -->
-
-                        <div class="form-field">
-                            <select formControlName="TRANSPORTER" class="form-control form-control-sm">
-                                <option value="">Select Transporter</option>
-
-                                <option *ngFor="let t of transporterList" [value]="t.VENDOR_CODE">
-                                    {{ t.TRANSPORTER }}
-                                </option>
-
-                            </select>
-                            <label>Transporter</label>
+                        <!-- Transporter -->
+                        <div class="form-field" [class.filled]="filterForm.get('TRANSPORTER')?.value?.length">
+                            <ng-select [items]="transporterList" bindLabel="TRANSPORTER" bindValue="TRANSPORTER"
+                                formControlName="TRANSPORTER" [multiple]="true" [closeOnSelect]="false"
+                                [searchable]="true" [virtualScroll]="true" placeholder=" " class="w-full">
+                                <ng-template ng-multi-label-tmp let-items="items">
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].TRANSPORTER }}</div>
+                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
+                                </ng-template>
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                    <div class="checkbox-option">
+                                        <input type="checkbox" [checked]="item$.selected" />
+                                        <span>{{ item.TRANSPORTER }}</span>
+                                    </div>
+                                </ng-template>
+                            </ng-select>
+                            <label class="global-ng-select">Transporter</label>
                         </div>
 
-                        <!-- <div class="form-field">
-
-                            <input type="text" formControlName="WERKS" class="form-control form-control-sm"
-                                placeholder=" ">
-                            <label>Plant</label>
-                        </div> -->
-                        <div class="form-field">
-
-                            <select formControlName="WERKS" class="form-control form-control-sm">
-                                <option value="">Select Plant</option>
-                                <option *ngFor="let p of plantList" [value]="p.PLANT_TEXT">
-                                    {{ p.PLANT_TEXT }}
-                                </option>
-                            </select>
-
-                            <label>Plant</label>
-
+                        <!-- Plant -->
+                        <div class="form-field" [class.filled]="filterForm.get('WERKS')?.value?.length">
+                            <ng-select [items]="plantList" bindLabel="PLANT_TEXT" bindValue="PLANT_TEXT"
+                                formControlName="WERKS" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
+                                [virtualScroll]="true" placeholder=" " class="w-full">
+                                <ng-template ng-multi-label-tmp let-items="items">
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].PLANT_TEXT }}</div>
+                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
+                                </ng-template>
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                    <div class="checkbox-option">
+                                        <input type="checkbox" [checked]="item$.selected" />
+                                        <span>{{ item.PLANT_TEXT }}</span>
+                                    </div>
+                                </ng-template>
+                            </ng-select>
+                            <label class="global-ng-select">Plant</label>
                         </div>
 
-                        <div class="form-field">
-
-                            <select formControlName="MATNR" class="form-control form-control-sm">
-                                <option value="">Select Product</option>
-                                <option value="Batteries">Batteries</option>
-                                <option value="Electronics">Electronics</option>
-                                <option value="Fuze">Fuze</option>
-                                <option value="Cement Poles and Piles">Cement Poles and Piles</option>
-                                <option value="Raw Materials">Raw Materials</option>
-                                <option value="Job Work Material">Job Work Material</option>
-                                <option value="Machinery">Machinery</option>
-                                <option value="Others">Others</option>
-                            </select>
-                            <label>Product</label>
+                        <!-- Product -->
+                        <div class="form-field" [class.filled]="filterForm.get('MATNR')?.value?.length">
+                            <ng-select [items]="productOptions" bindLabel="label" bindValue="value"
+                                formControlName="MATNR" [multiple]="true" [closeOnSelect]="false" [searchable]="false"
+                                placeholder=" " class="w-full">
+                                <ng-template ng-multi-label-tmp let-items="items">
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].label }}</div>
+                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
+                                </ng-template>
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                    <div class="checkbox-option">
+                                        <input type="checkbox" [checked]="item$.selected" />
+                                        <span>{{ item.label }}</span>
+                                    </div>
+                                </ng-template>
+                            </ng-select>
+                            <label class="global-ng-select">Product</label>
                         </div>
 
-                        <!-- <div class=form-field>
-
-                            <input type="text" formControlName="DIVISION" class="form-control form-control-sm"
-                                placeholder=" ">
-                            <label>Division</label>
-                        </div> -->
-                        <div class="form-field">
-
-                            <select formControlName="DIVISION" class="form-control form-control-sm">
-
-                                <option value="">Select Division</option>
-
-                                <option *ngFor="let d of divisionList" [value]="d.DIVISION">
-                                    {{ d.DIV_TEXT }}
-                                </option>
-
-                            </select>
-
-                            <label>Division</label>
-
+                        <!-- Division -->
+                        <div class="form-field" [class.filled]="filterForm.get('DIVISION')?.value?.length">
+                            <ng-select [items]="divisionList" bindLabel="DIV_TEXT" bindValue="DIVISION"
+                                formControlName="DIVISION" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
+                                [virtualScroll]="true" placeholder=" " class="w-full">
+                                <ng-template ng-multi-label-tmp let-items="items">
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].DIV_TEXT }}</div>
+                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
+                                </ng-template>
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                    <div class="checkbox-option">
+                                        <input type="checkbox" [checked]="item$.selected" />
+                                        <span> {{ item.DIV_TEXT }}</span>
+                                    </div>
+                                </ng-template>
+                            </ng-select>
+                            <label class="global-ng-select">Division</label>
                         </div>
 
-                        <!-- <div class=form-field>
-
-                            <input type="text" formControlName="CUSTOMER" class="form-control form-control-sm"
-                                placeholder=" ">
-                            <label>Customer</label>
-                        </div> -->
-                        <div class="form-field" [class.filled]="filterForm .get('CUSTOMER')?.value">
-                            <ng-container>
-                                <ng-select [items]="customerList" bindLabel="CUSTOMER_NAME" bindValue="CUSTOMER"
-                                    formControlName="CUSTOMER" [searchable]="true" [virtualScroll]="true"
-                                    placeholder=" " class="w-full">
-
-                                    <ng-template ng-option-tmp let-item="item">
-                                        {{ item.CUSTOMER }} - {{ item.CUSTOMER_NAME }}
-                                    </ng-template>
-
-                                </ng-select>
-                            </ng-container>
-
+                        <!-- Customer Name (already done) -->
+                        <div class="form-field" [class.filled]="filterForm.get('CUSTOMER')?.value?.length">
+                            <ng-select [items]="customerList" bindLabel="CUSTOMER_NAME" bindValue="CUSTOMER"
+                                formControlName="CUSTOMER" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
+                                [virtualScroll]="true" placeholder=" " class="w-full">
+                                <ng-template ng-multi-label-tmp let-items="items">
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].CUSTOMER_NAME }}</div>
+                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
+                                </ng-template>
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                    <div class="checkbox-option">
+                                        <input type="checkbox" [checked]="item$.selected" />
+                                        <span>{{ item.CUSTOMER }} - {{ item.CUSTOMER_NAME }}</span>
+                                    </div>
+                                </ng-template>
+                            </ng-select>
                             <label class="global-ng-select">Customer Name</label>
                         </div>
 
-                        <!-- <div class="form-field">
-
-                            <input type="text" formControlName="BRANCH" class="form-control form-control-sm"
-                                placeholder=" ">
-                            <label>Branch</label>
-                        </div> -->
-
-                        <div class="form-field">
-
-                            <select formControlName="BRANCH" class="form-control form-control-sm">
-                                <option value="">Select Branch</option>
-
-                                <option *ngFor="let b of branchList" [value]="b.BRANCH_DESC">
-                                    {{ b.BRANCH_DESC }}
-                                </option>
-
-                            </select>
-
-                            <label>Branch</label>
-
+                        <!-- Branch -->
+                        <div class="form-field" [class.filled]="filterForm.get('BRANCH')?.value?.length">
+                            <ng-select [items]="branchList" bindLabel="BRANCH_DESC" bindValue="BRANCH_DESC"
+                                formControlName="BRANCH" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
+                                [virtualScroll]="true" placeholder=" " class="w-full">
+                                <ng-template ng-multi-label-tmp let-items="items">
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].BRANCH_DESC }}</div>
+                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
+                                </ng-template>
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                    <div class="checkbox-option">
+                                        <input type="checkbox" [checked]="item$.selected" />
+                                        <span>{{ item.BRANCH_DESC }}</span>
+                                    </div>
+                                </ng-template>
+                            </ng-select>
+                            <label class="global-ng-select">Branch</label>
                         </div>
 
-                        <div class="form-field">
-
-                            <input type="text" formControlName="BRANCH_ZONE" class="form-control form-control-sm"
-                                placeholder=" ">
-                            <label>Branch Zone</label>
+                        <!-- Branch Zone -->
+                        <div class="form-field" [class.filled]="filterForm.get('BRANCH_ZONE')?.value?.length">
+                            <ng-select [items]="branchList" bindLabel="BRANCH_ZONE" bindValue="BRANCH_ZONE"
+                                formControlName="BRANCH_ZONE" [multiple]="true" [closeOnSelect]="false"
+                                [searchable]="true" [virtualScroll]="true" placeholder=" " class="w-full">
+                                <ng-template ng-multi-label-tmp let-items="items">
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].BRANCH_ZONE }}</div>
+                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
+                                </ng-template>
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                    <div class="checkbox-option">
+                                        <input type="checkbox" [checked]="item$.selected" />
+                                        <span>{{ item.BRANCH_ZONE }}</span>
+                                    </div>
+                                </ng-template>
+                            </ng-select>
+                            <label class="global-ng-select">Branch Zone</label>
                         </div>
 
-                        <div class=form-field>
-
-                            <input type="text" formControlName="DEST_LOCATION" class="form-control form-control-sm"
-                                placeholder=" ">
-                            <label>Destination Location</label>
+                        <!-- Destination Location -->
+                        <div class="form-field" [class.filled]="filterForm.get('DEST_LOCATION')?.value?.length">
+                            <ng-select [items]="destLocationList" bindLabel="DLOC" bindValue="DLOC"
+                                formControlName="DEST_LOCATION" [multiple]="true" [closeOnSelect]="false"
+                                [searchable]="true" [virtualScroll]="true" placeholder=" " class="w-full">
+                                <ng-template ng-multi-label-tmp let-items="items">
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].DLOC }}</div>
+                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
+                                </ng-template>
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                    <div class="checkbox-option">
+                                        <input type="checkbox" [checked]="item$.selected" />
+                                        <span>{{ item.DLOC }}</span>
+                                    </div>
+                                </ng-template>
+                            </ng-select>
+                            <label class="global-ng-select">Destination Location</label>
                         </div>
 
-                        <div class="form-field">
-
-                            <input type="text" formControlName="DEST_STATE" class="form-control form-control-sm"
-                                placeholder=" ">
-                            <label>Destination State</label>
+                        <!-- Destination State -->
+                        <div class="form-field" [class.filled]="filterForm.get('DEST_STATE')?.value?.length">
+                            <ng-select [items]="destStateZoneList" bindLabel="DEST_STATE" bindValue="DEST_STATE"
+                                formControlName="DEST_STATE" [multiple]="true" [closeOnSelect]="false"
+                                [searchable]="true" [virtualScroll]="true" placeholder=" " class="w-full">
+                                <ng-template ng-multi-label-tmp let-items="items">
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].DEST_STATE }}</div>
+                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
+                                </ng-template>
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                    <div class="checkbox-option">
+                                        <input type="checkbox" [checked]="item$.selected" />
+                                        <span>{{ item.DEST_STATE }}</span>
+                                    </div>
+                                </ng-template>
+                            </ng-select>
+                            <label class="global-ng-select">Destination State</label>
                         </div>
 
-                        <div class="form-field">
-
-                            <input type="text" formControlName="DEST_ZONE" class="form-control form-control-sm"
-                                placeholder=" ">
-                            <label>Destination Zone</label>
+                        <!-- Destination Zone -->
+                        <div class="form-field" [class.filled]="filterForm.get('DEST_ZONE')?.value?.length">
+                            <ng-select [items]="destStateZoneList" bindLabel="DEST_ZONE" bindValue="DEST_ZONE"
+                                formControlName="DEST_ZONE" [multiple]="true" [closeOnSelect]="false"
+                                [searchable]="true" [virtualScroll]="true" placeholder=" " class="w-full">
+                                <ng-template ng-multi-label-tmp let-items="items">
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].DEST_ZONE }}</div>
+                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
+                                </ng-template>
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                    <div class="checkbox-option">
+                                        <input type="checkbox" [checked]="item$.selected" />
+                                        <span>{{ item.DEST_ZONE }}</span>
+                                    </div>
+                                </ng-template>
+                            </ng-select>
+                            <label class="global-ng-select">Destination Zone</label>
                         </div>
 
-                        <div class=form-field>
-
-                            <input type="text" formControlName="INCOTERMS" class="form-control form-control-sm"
-                                placeholder=" ">
-                            <label>Incoterms</label>
+                        <!-- Incoterms -->
+                        <div class="form-field" [class.filled]="filterForm.get('INCOTERMS')?.value?.length">
+                            <ng-select [items]="IncotermsList" bindLabel="BEZEI" bindValue="INCO1"
+                                formControlName="INCOTERMS" [multiple]="true" [closeOnSelect]="false"
+                                [searchable]="true" [virtualScroll]="true" placeholder=" " class="w-full">
+                                <ng-template ng-multi-label-tmp let-items="items">
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].INCO1 }} - {{
+                                        items[0].BEZEI }}</div>
+                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
+                                </ng-template>
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                    <div class="checkbox-option">
+                                        <input type="checkbox" [checked]="item$.selected" />
+                                        <span>{{ item.INCO1 }} - {{ item.BEZEI }}</span>
+                                    </div>
+                                </ng-template>
+                            </ng-select>
+                            <label class="global-ng-select">Incoterms</label>
                         </div>
-
-                        <!-- BUTTONS -->
-
 
                     </div>
                     <div class="col-12 mt-3 d-flex justify-content-end gap-2">
@@ -278,6 +354,12 @@
                 <div class="right">
                     <label>Search:</label>
                     <input type="text" class="search-input" (input)="onFilter($event)" />
+                    <button class="btnExecuteReports" (click)="exportToExcel()">
+                        Export Excel
+                    </button>
+                   <button class="btnExecuteReports" (click)="downloadPDF()">
+                        Export PDF
+                    </button>
                 </div>
             </div>
 
