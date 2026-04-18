@@ -10,21 +10,7 @@
    
 }
 
- 
-.main {
-    flex: 1;
-    padding: 20px;
-}
- 
-/* =====================
-   PAGE HEADER
-===================== */
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
+
  
 /* =====================
    PE CARD STANDARD
@@ -316,6 +302,29 @@ input[type="radio"] {
   border-color: #2E86C1;
   box-shadow: 0 0 5px rgba(46, 134, 193, 0.4);
 }
+
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-option input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.checkbox-option span {
+  font-size: 14px;
+}
+
+/* Match exact height of date/text inputs */
+.form-field ::ng-deep .ng-select .ng-select-container {
+  height: 35px;
+}
+
+
 
 
 
