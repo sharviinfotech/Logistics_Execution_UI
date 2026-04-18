@@ -234,7 +234,7 @@
                             <label>Customer</label>
                         </div> -->
                         <div class="form-field" [class.filled]="filterForm.get('CUSTOMER')?.value?.length">
-                            <ng-select [items]="customerList" bindLabel="CUSTOMER" bindValue="CUSTOMER"
+                            <ng-select [items]="customerList" bindLabel="CUSTOMER_NAME" bindValue="CUSTOMER"
                                 formControlName="CUSTOMER" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
                                 [virtualScroll]="true" placeholder=" " class="w-full">
                                 <ng-template ng-multi-label-tmp let-items="items">
@@ -275,10 +275,6 @@
                             </ng-select>
                             <label class="global-ng-select">Branch</label>
                         </div>
-
-
-
-
                         <div class="form-field" [class.filled]="filterForm.get('DEST_LOCATION')?.value?.length">
                             <ng-select [items]="destLocationList" bindLabel="DLOC" bindValue="DLOC"
                                 formControlName="DEST_LOCATION" [multiple]="true" [closeOnSelect]="false"
