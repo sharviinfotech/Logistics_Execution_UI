@@ -124,11 +124,18 @@ export const MENU: MenuItem[] = [
                 icon: "bx-time",
                 parentId: 12,
             },
-             {
-                id: 14,
+            {
+                id: 15,
                 label: "Freight Bills",
                 link: "/Freight-Bills",
-                icon: "bx-time",
+                icon: "bx-receipt",
+                parentId: 12,
+            },
+            {
+                id: 16,
+                label: "Loading Factor & Cost",
+                link: "/Loading-Factor-Cost",
+                icon: "bx-bar-chart",
                 parentId: 12,
             },
 

@@ -149,7 +149,8 @@ export class UserCreationComponent implements OnInit {
     'Outward-Reports',
     'Outward-TransitReport',
     'Outward-PendingPodReport',
-    'Outward-FreightBills'
+    'Outward-FreightBills',
+    'Outward-LoadingFactorCost'
   ];
 
 
@@ -849,7 +850,7 @@ export class UserCreationComponent implements OnInit {
 
   editUser(user: User, index: number) {
     this.editingIndex = index;
-      this.newUser.PASSWORD = user.PASSWORD;
+    this.newUser.PASSWORD = user.PASSWORD;
     this.userForm.patchValue({
       USER: user.USER,
       FIRST_NAME: user.FIRST_NAME,
@@ -1069,24 +1070,24 @@ export class UserCreationComponent implements OnInit {
     });
   }
 
-onChangePasswordToggle(event: any) {
-  this.changePassword = event.target.checked;
+  onChangePasswordToggle(event: any) {
+    this.changePassword = event.target.checked;
 
-  if (this.changePassword) {
-    // Enable fields so user can edit
-    this.userForm.get('PASSWORD')?.enable();
-    this.userForm.get('CONFPSWD')?.enable();
-    
-    // this.userForm.patchValue({ PASSWORD: '', CONFPSWD: '' });
-  } else {
-    // Disable fields so user cannot edit
-    this.userForm.get('PASSWORD')?.disable();
-    this.userForm.get('CONFPSWD')?.disable();
-    // Refill old password from this.newUser to keep payload intact
-    this.userForm.patchValue({
-      PASSWORD: this.newUser.PASSWORD,
-      CONFPSWD: this.newUser.PASSWORD
-    });
+    if (this.changePassword) {
+      // Enable fields so user can edit
+      this.userForm.get('PASSWORD')?.enable();
+      this.userForm.get('CONFPSWD')?.enable();
+
+      // this.userForm.patchValue({ PASSWORD: '', CONFPSWD: '' });
+    } else {
+      // Disable fields so user cannot edit
+      this.userForm.get('PASSWORD')?.disable();
+      this.userForm.get('CONFPSWD')?.disable();
+      // Refill old password from this.newUser to keep payload intact
+      this.userForm.patchValue({
+        PASSWORD: this.newUser.PASSWORD,
+        CONFPSWD: this.newUser.PASSWORD
+      });
+    }
   }
-}
 }

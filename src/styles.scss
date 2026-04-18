@@ -3247,3 +3247,125 @@ input[type="radio"]:checked ~ .toggle-text {
   font-size: 12px;
   margin-top: 5px;
 }
+
+//reports screen css
+
+.pe-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+ 
+.pe-card-header {
+    background: #f2f2f2;
+    padding: 10px 14px;
+    font-weight: 600;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid  #2E86C1;
+    color:  #2E86C1;
+    margin-bottom: 5px;
+}
+ 
+.pe-card-header i,
+button i {
+    margin-right: 8px;
+    vertical-align: middle;
+    font-size: 1.2rem;
+}
+.pe-card-header i {
+    color: #800000;
+}
+ 
+.pe-card-body {
+    padding: 15px;
+}
+.order-header-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+ 
+.order-header-grid .col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    /* small gap between label & input */
+}
+ 
+/* WORK CENTER ROW */
+.work-center-row {
+    display: flex;
+    gap: 10px;
+}
+ 
+/* SHIFT ROW */
+.shift {
+    display: flex;
+    flex-direction: column;
+}
+ 
+.shift-options {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 2px;
+    /* small space after shift label */
+}
+ 
+/* CONFIRMED / BALANCE QTY ROW */
+.qty-row {
+    display: flex;
+    gap: 10px;
+}
+ 
+.qty-row>div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    /* small space between label & input */
+}
+ 
+/* LABELS & INPUTS */
+label {
+    font-size: 13px;
+    font-weight: 500;
+    margin: 0;
+    /* remove default margin */
+    display: inline-block;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    align-items: center;
+    gap: 20px;
+}
+ 
+.summary-grid h3 {
+    margin: 4px 0 0;
+}
+ 
+.shift-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    /* Increased gap between the groups */
+    font-weight: bold;
+    margin-top: 15px;
+}
+ 
+.shift-row label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    /* This keeps the text A, B right beside the circle */
+    cursor: pointer;
+}
+
+
