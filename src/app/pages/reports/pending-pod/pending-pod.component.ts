@@ -6,6 +6,9 @@ import { SpinnerService } from 'src/app/spinner.service';
 import { GeneralserviceService } from 'src/app/generalservice.service';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { CommonModule } from '@angular/common';
+import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 @Component({
   selector: 'app-pending-pod',
   standalone: true,
@@ -16,35 +19,6 @@ import { CommonModule } from '@angular/common';
 export class PendingPodComponent implements OnInit {
 
   Pendingform!: FormGroup;
-
-  // Static Data
-  // allData = [
-  //   {
-  //     WERKS: '1000',
-  //     KDAUF_AUFK: '500001',
-  //     KDPOS_AUFK: '10',
-  //     MATNR: 'MAT001',
-  //     MATXT: 'Sample Material',
-  //     AUFNR: '300001',
-  //     AUART: 'PP01',
-  //     STEXT: 'Released',
-  //     GWEMG: 10,
-  //     GAMNG: 100
-  //   },
-  //   {
-  //     WERKS: '2000',
-  //     KDAUF_AUFK: '500002',
-  //     KDPOS_AUFK: '20',
-  //     MATNR: 'MAT002',
-  //     MATXT: 'Material 2',
-  //     AUFNR: '300002',
-  //     AUART: 'PP02',
-  //     STEXT: 'Pending',
-  //     GWEMG: 20,
-  //     GAMNG: 200
-  //   }
-  // ];
-
   filteredData: any[] = [];
   originalData: any[] = [];
   transporterList: any[] = [];
@@ -53,6 +27,42 @@ export class PendingPodComponent implements OnInit {
   divisionList: any[] = [];
   customerList: any[] = [];
   branchList: any[] = [];
+  destLocationList: any[] = [];
+  destStateZoneList: any[] = [];
+  IncotermsList: any[] = [];
+
+  // Add these static option arrays
+inoutOptions = [
+  { value: 'INWARD', label: 'Inward' },
+  { value: 'OUTWARD', label: 'Outward' }
+];
+
+sapTypeOptions = [
+  { value: 'SAP', label: 'SAP' },
+  { value: 'NONSAP', label: 'Non-SAP' }
+];
+
+transGroupOptions = [
+  { value: 'FULL TRUCK LOAD', label: 'FULL TRUCK LOAD' },
+  { value: 'CARGO', label: 'CARGO' },
+  { value: 'RATECONTRACT', label: 'RATE CONTRACT' },
+  { value: 'LOCALTRANSPORTATION', label: 'LOCAL TRANSPORTATION' },
+  { value: 'CUSTOMERTRANSPORTER', label: 'CUSTOMER TRANSPORTER' },
+  { value: 'COMPANYVEHICLE', label: 'COMPANY VEHICLE' },
+  { value: 'COURIER', label: 'COURIER' },
+  { value: 'BYHAND', label: 'BY HAND' }
+];
+
+productOptions = [
+  { value: 'Batteries', label: 'Batteries' },
+  { value: 'Electronics', label: 'Electronics' },
+  { value: 'Fuze', label: 'Fuze' },
+  { value: 'Cement Poles and Piles', label: 'Cement Poles and Piles' },
+  { value: 'Raw Materials', label: 'Raw Materials' },
+  { value: 'Job Work Material', label: 'Job Work Material' },
+  { value: 'Machinery', label: 'Machinery' },
+  { value: 'Others', label: 'Others' }
+];
 
 
 
@@ -65,27 +75,28 @@ export class PendingPodComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.Pendingform = this.fb.group({
-      INOUT: ['', Validators.required],
-      SAPTYPE: [''],
-      FROM_DATE: ['', Validators.required],
-      TO_DATE: ['', Validators.required],
-      TRANS_GROUP: [''],
-      TRANSPORTER: [''],
-      WERKS: [''],
-      MATNR: [''],
-      DIVISION: [''],
-      CUSTOMER: [''],
-      BRANCH: [''],
-      BRANCH_ZONE: [''],
-      DEST_LOCATION: [''],
-      DEST_STATE: [''],
-      DEST_ZONE: [''],
-      INCOTERMS: ['']
-    });
+this.Pendingform = this.fb.group({
+  INOUT:          [[], Validators.required], 
+  SAPTYPE: [[]],
+  FROM_DATE:      ['', Validators.required],
+  TO_DATE:        ['', Validators.required],
+  TRANS_GROUP:    [[]],
+  TRANSPORTER:    [[]],
+  WERKS:          [[]],
+  MATNR:          [[]],
+  DIVISION:       [[]],
+  CUSTOMER:       [[]],
+  BRANCH:         [[]],
+  BRANCH_ZONE:    [[]],
+  DEST_LOCATION:  [[]],
+  DEST_STATE:     [[]],
+  DEST_ZONE:      [[]],
+  INCOTERMS:      [[]] 
+});
     this.getTransporters();
     this.fetchpdb();
     this.getBranches();
+    this.fetchIncoterms();
 
     const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
     this.loggedInUser = userData.USER || '';
@@ -96,6 +107,23 @@ export class PendingPodComponent implements OnInit {
     console.log("Plants:", this.plantList);
     console.log("Divisions:", this.divisionList);
   }
+
+  createArray(value: any, key: string) {
+    if (!value || (Array.isArray(value) && value.length === 0)) {
+      return [];
+    }
+ 
+    if (Array.isArray(value)) {
+      return value.map(v => ({ [key]: v }));
+    }
+ 
+    return [{ [key]: value }];
+  }
+
+formatDate(date: string) {
+  if (!date) return '';
+  return date.split('-').join('');
+}
 
   // ✅ EXECUTE BUTTON
   onSearch() {
@@ -117,23 +145,41 @@ export class PendingPodComponent implements OnInit {
 
     const form = this.Pendingform.value;
 
-    const payload = {
-      inward_outward: form.INOUT || '',
-      from_date: form.FROM_DATE || '',
-      to_date: form.TO_DATE || '',
-      sap_nonsap: form.SAPTYPE || '',
-      transporter_group: form.TRANS_GROUP || '',
-      transporter: form.TRANSPORTER || '',
-      plant: form.WERKS || '',
-      product: form.MATNR || '',
-      division: form.DIVISION || '',
-      customer: form.CUSTOMER || '',
-      branch: form.BRANCH || '',
-      branch_zone: form.BRANCH_ZONE || '',
-      destination_location: form.DEST_LOCATION || '',
-      destination_state: form.DEST_STATE || '',
-      destination_zone: form.DEST_ZONE || '',
-      incoterms: form.INCOTERMS || ''
+    // const payload = {
+    //   inward_outward: form.INOUT || '',
+    //   from_date: form.FROM_DATE || '',
+    //   to_date: form.TO_DATE || '',
+    //   sap_nonsap: form.SAPTYPE || '',
+    //   transporter_group: form.TRANS_GROUP || '',
+    //   transporter: form.TRANSPORTER || '',
+    //   plant: form.WERKS || '',
+    //   product: form.MATNR || '',
+    //   division: form.DIVISION || '',
+    //   customer: form.CUSTOMER || '',
+    //   branch: form.BRANCH || '',
+    //   branch_zone: form.BRANCH_ZONE || '',
+    //   destination_location: form.DEST_LOCATION || '',
+    //   destination_state: form.DEST_STATE || '',
+    //   destination_zone: form.DEST_ZONE || '',
+    //   incoterms: form.INCOTERMS || ''
+    // };
+const payload = {
+      inward_outward: this.createArray(form.INOUT, 'inout'),
+   from_date: this.formatDate(form.FROM_DATE),
+      to_date: this.formatDate(form.TO_DATE),
+      sap_nonsap: this.createArray(form.SAPTYPE, 'type'),
+      transporter_group: this.createArray(form.TRANS_GROUP, 'transporter_group'),
+      transporter: this.createArray(form.TRANSPORTER, 'transporter'),
+      plant: this.createArray(form.WERKS, 'plant'),
+      product: this.createArray(form.MATNR, 'product'),
+      division: this.createArray(form.DIVISION, 'division'),
+      customer: this.createArray(form.CUSTOMER, 'customer'),
+      branch: this.createArray(form.BRANCH, 'branch'),
+      branch_zone: this.createArray(form.BRANCH_ZONE, 'branch_zone'),
+      destination_location: this.createArray(form.DEST_LOCATION, 'destination_location'),
+      destination_state: this.createArray(form.DEST_STATE, 'destination_state'),
+      destination_zone: this.createArray(form.DEST_ZONE, 'destination_zone'),
+      incoterms: this.createArray(form.INCOTERMS, 'incoterms')
     };
 
     console.log('Payload:', payload);
@@ -231,29 +277,41 @@ export class PendingPodComponent implements OnInit {
     });
   }
 
-  fetchpdb(): void {
-    this.spinner.show();
-    this.service.getpdb().subscribe(
-      (res: any) => {
+fetchpdb(): void {
+  this.spinner.show();
+  this.service.getpdb().subscribe(
+    (res: any) => {
+      console.log("PDB Data:", res);
 
-        console.log("PDB Data:", res);
+      this.customerList = res?.[0]?.CUSTOMER || [];
 
-        this.customerList = res?.[0]?.CUSTOMER || [];
+      this.spinner.hide();
+    },
+    error => {
+      console.error("❌ PDB Fetch Error:", error);
+      this.spinner.hide();
+    }
+  );
+}
 
+onCustomerChange(): void {
+  const selectedValues = this.Pendingform.get('CUSTOMER')?.value;
+  console.log("Selected customers:", selectedValues);
+}
 
-        this.spinner.hide();
-      },
-      error => {
-        console.error("❌ PDB Fetch Error:", error);
-        this.spinner.hide();
-      }
-    );
-  }
+// toggleSelectAll(event: any): void {
+//   if (event.target.checked) {
+//     const allCustomers = this.customerList.map((item: any) => item.CUSTOMER);
+//     this.Pendingform.get('CUSTOMER')?.setValue(allCustomers);
+//   } else {
+//     this.Pendingform.get('CUSTOMER')?.setValue([]);
+//   }
+// }
 
-  onCustomerChange(): void {
-    const value = this.Pendingform.get('CUSTOMER')?.value;
-    console.log("Customer selected:", value);
-  }
+// isAllSelected(): boolean {
+//   const selected = this.Pendingform.get('CUSTOMER')?.value || [];
+//   return selected.length === this.customerList.length;
+// }
 
   getBranches(): void {
     this.spinner.show();
@@ -265,6 +323,11 @@ export class PendingPodComponent implements OnInit {
           const data = res[0];
 
           this.branchList = data.BRANCH || [];
+          this.destLocationList =
+            // data?.DEST_LOCATION ||
+            data.DEST_LOC ||
+            [];
+            this.destStateZoneList = data.DEST_STZ || [];
 
         }
       },
@@ -275,6 +338,121 @@ export class PendingPodComponent implements OnInit {
       }
     });
   }
+
+  fetchIncoterms() {
+    this.spinner.show();
+    const payload = { INCO1: "", BEZEI: "" };
+    this.service.Incoterms(payload).subscribe({
+      next: (res: any) => {
+        this.IncotermsList = Array.isArray(res) ? res : (res?.data || []);
+        this.spinner.hide();
+      },
+      error: (err) => {
+        console.error("Error fetching Incoterms:", err);
+        this.spinner.hide();
+      }
+    });
+  }
+
+downloadExcel() {
+  if (!this.filteredData || this.filteredData.length === 0) {
+    Swal.fire('Warning', 'No data available to download.', 'warning');
+    return;
+  }
+
+  const exportData = this.filteredData.map((row: any) => ({
+    'Reference No': row.REFERENCE_NUMBER || '',
+    'Type': row.INWARD_OUTWARD || '',
+    'SAP Type': row.SAP_NONSAP || '',
+    'Plant': row.PLANT || '',
+    'Division': row.DIVISION || '',
+    'Customer': row.CUSTOMER || '',
+    'Product': row.PRODUCT || '',
+    'Description': row.PRODUCT_DESCRIPTION || '',
+    'Invoice No': row.INVOICE_NUMBER || '',
+    'Invoice Date': row.INVOICE_DATE || '',
+    'Transporter': row.TRANSPORTER || '',
+    'Transporter Group': row.TRANSPORTER_GROUP || '',
+    'LR No': row.LR_NO || '',
+    'Delivery Date': row.DELIVERY_DATE || '',
+    'POD Age': row.POD_PENDING_AGE || '',
+    'Age Group': row.POD_PENDING_AGE_GROUP || ''
+  }));
+
+  const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+  const wb: XLSX.WorkBook = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Pending PODs');
+
+  XLSX.writeFile(wb, 'Pending_PODs_Report.xlsx');
+
+  Swal.fire('Success', 'Excel downloaded successfully.', 'success');
+}
+downloadPDF() {
+  if (!this.filteredData || this.filteredData.length === 0) {
+    Swal.fire('Warning', 'No data available to download.', 'warning');
+    return;
+  }
+
+  const doc = new jsPDF('l', 'mm', 'a3'); // landscape
+
+  const tableColumn = [
+    'Reference No',
+    'Type',
+    'SAP Type',
+    'Plant',
+    'Division',
+    'Customer',
+    'Product',
+    'Description',
+    'Invoice No',
+    'Invoice Date',
+    'Transporter',
+    'Transporter Group',
+    'LR No',
+    'Delivery Date',
+    'POD Age',
+    'Age Group'
+  ];
+
+  const tableRows = this.filteredData.map((row: any) => [
+    row.REFERENCE_NUMBER || '',
+    row.INWARD_OUTWARD || '',
+    row.SAP_NONSAP || '',
+    row.PLANT || '',
+    row.DIVISION || '',
+    row.CUSTOMER || '',
+    row.PRODUCT || '',
+    row.PRODUCT_DESCRIPTION || '',
+    row.INVOICE_NUMBER || '',
+    row.INVOICE_DATE || '',
+    row.TRANSPORTER || '',
+    row.TRANSPORTER_GROUP || '',
+    row.LR_NO || '',
+    row.DELIVERY_DATE || '',
+    row.POD_PENDING_AGE || '',
+    row.POD_PENDING_AGE_GROUP || ''
+  ]);
+
+  doc.text('Pending PODs Report', 14, 10);
+
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    startY: 20,
+    styles: {
+      fontSize: 8
+    },
+    headStyles: {
+      fillColor: [41, 128, 185]
+    }
+  });
+
+  doc.save('Pending_PODs_Report.pdf');
+
+  Swal.fire('Success', 'PDF downloaded successfully.', 'success');
+}
+  
 
 
 }
