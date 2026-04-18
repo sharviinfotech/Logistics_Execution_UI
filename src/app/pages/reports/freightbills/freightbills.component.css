@@ -284,18 +284,18 @@ input[type="radio"] {
    
 }
 /* LEFT SIDE */
-.header-flex .left {
+/* .header-flex .left {
   display: flex;
   align-items: center;
   gap: 8px;
-}
+} */
  
 /* RIGHT SIDE */
-.header-flex .right {
+/* .header-flex .right {
   display: flex;
   align-items: center;
   gap: 8px;
-}
+} */
  
 /* SEARCH BOX STYLE */
 /* .search-input {
@@ -313,4 +313,40 @@ input[type="radio"] {
   border-color: #2E86C1;
   box-shadow: 0 0 5px rgba(46, 134, 193, 0.4);
 }
+
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+.checkbox-option input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
  
+.checkbox-option span {
+  font-size: 14px;
+}
+ 
+/* Match exact height of date/text inputs */
+.form-field ::ng-deep .ng-select .ng-select-container {
+ 
+  height: 35px;
+ 
+}
+
+.header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-flex .right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
