@@ -35,6 +35,7 @@ import { FreightbillsComponent } from '../reports/freightbills/freightbills.comp
 import { LoadingFactorCostComponent } from '../reports/loading-factor-cost/loading-factor-cost.component';
 import { BusinessShareMatrixComponent } from '../reports/business-share-matrix/business-share-matrix.component';
 import { DispatchOrdersComponent } from './dispatch-orders/dispatch-orders.component';
+import { DamageListComponent } from '../reports/damage-list/damage-list.component';
 
 
 // import { CooisComponent } from './coois/coois.component';
@@ -173,10 +174,16 @@ const routes: Routes = [
         path: "Loading-Factor-Cost",
         component: LoadingFactorCostComponent,
     },
-     {
-        path: "businessshare-matrix",
-        component: BusinessShareMatrixComponent,
-    },
+        {
+            path: "businessshare-matrix",
+            component: BusinessShareMatrixComponent,
+        },
+        {
+            path: "damage-list",
+            component: DamageListComponent,
+        }
+
+
 
     // {
     //     path: 'co11',
