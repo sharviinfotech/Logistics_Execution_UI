@@ -33,6 +33,9 @@ import { ServiceLevelComponent } from './service-level/service-level.component';
 import { PendingPodComponent } from '../reports/pending-pod/pending-pod.component';
 import { FreightbillsComponent } from '../reports/freightbills/freightbills.component';
 import { LoadingFactorCostComponent } from '../reports/loading-factor-cost/loading-factor-cost.component';
+import { BusinessShareMatrixComponent } from '../reports/business-share-matrix/business-share-matrix.component';
+import { DispatchOrdersComponent } from './dispatch-orders/dispatch-orders.component';
+
 
 // import { CooisComponent } from './coois/coois.component';
 // import { Co11Component } from './co11/co11.component';
@@ -102,6 +105,10 @@ const routes: Routes = [
         component: SectorWiseComponent
     },
     {
+        path: 'Dispatchorders',
+        component:DispatchOrdersComponent
+    },
+    {
         path: 'dispatch',
         component: DispatchComponent
     },
@@ -165,6 +172,10 @@ const routes: Routes = [
     {
         path: "Loading-Factor-Cost",
         component: LoadingFactorCostComponent,
+    },
+     {
+        path: "businessshare-matrix",
+        component: BusinessShareMatrixComponent,
     },
 
     // {

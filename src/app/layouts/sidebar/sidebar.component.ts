@@ -154,6 +154,7 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
   // }
   ACTIVITY_ROUTE_MAP: { [key: string]: string } = {
   'Outward-Dashboard': '/dashboard',
+  'Outward-DispatchOrders': '/Dispatchorders',
   'Outward-Dispatch': '/dispatch',
   'Outward-OrderInfo': '/order-info',
   'Outward-ShipmentDetails': '/shipment-details',
@@ -172,6 +173,8 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
 'Outward-PendingPodReport': '/pending-pod',
 'Outward-FreightBills': '/Freight-Bills',
 'Outward-LoadingFactorCost': '/Loading-Factor-Cost',
+'Outward-BusinessShareMatrix': '/businessshare-matrix',
+'Outward-DamageList': '/damage-list'
 
 };
 

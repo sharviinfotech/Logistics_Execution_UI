@@ -18,6 +18,7 @@ import { InsuranceClaimTrackingComponent } from './insurance-claim-tracking/insu
 import { DispatchComponent } from './dispatch/dispatch.component';
 import { UserCreationComponent } from './user-creation/user-creation.component';
 import { ServiceLevelComponent } from './service-level/service-level.component';
+import { DispatchOrdersComponent } from './dispatch-orders/dispatch-orders.component';
 // import { CooisComponent } from './coois/coois.component';
 // import { Co11Component } from './co11/co11.component';
 
@@ -80,6 +81,7 @@ import { ServiceLevelComponent } from './service-level/service-level.component';
 
 
     UserCreationComponent,
+    DispatchOrdersComponent,
     
   ]
 })

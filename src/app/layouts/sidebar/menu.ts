@@ -13,6 +13,13 @@ export const MENU: MenuItem[] = [
     //     parentId: 2,
     //     icon: 'bxs-dashboard',
     // },
+    //  {
+    //     id: 2,
+    //     label: 'Dispatch Orders',
+    //     link: '/Dispatchorders',
+    //     parentId: 2,
+    //     icon: 'bx-list-ul',
+    // },
     {
         id: 2,
         label: 'Dispatch',
@@ -136,6 +143,20 @@ export const MENU: MenuItem[] = [
                 label: "Loading Factor & Cost",
                 link: "/Loading-Factor-Cost",
                 icon: "bx-bar-chart",
+                parentId: 12,
+            },
+            {
+                id: 16,
+                label: "Business Share Matrix",
+                link: "/businessshare-matrix",
+                icon: "bx-grid-alt",
+                parentId: 12,
+            },
+            {
+                id: 16,
+                label: "Damage List",
+                link: "/damage-list",
+                icon: "bx-detail",
                 parentId: 12,
             },
 

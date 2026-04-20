@@ -43,7 +43,7 @@
 
 
 
-   
+
 
 
     <div *ngIf="mainMode === 'creation'">
@@ -58,7 +58,7 @@
           <input type="radio" name="orderType" [(ngModel)]="orderType" value="Outward" (change)="onOrderTypeChange()" />
           <span>Outward</span>
         </label>
-          <!-- <div *ngIf="orderType" class="form-radio optional sap-radio">
+        <!-- <div *ngIf="orderType" class="form-radio optional sap-radio">
           <label>
             <input type="radio" [(ngModel)]="sapType" value="SAP" (change)="onSapTypeChange()" />
             <span>With SAP</span>
@@ -68,7 +68,7 @@
             <span>Without SAP</span>
           </label>
         </div> -->
-                <div *ngIf="orderType" class="sap-row">
+        <div *ngIf="orderType" class="sap-row">
           <div class="sap-toggle-group">
 
             <!-- WITH SAP -->
@@ -85,8 +85,7 @@
             <!-- WITHOUT SAP -->
             <div class="sap-toggle-item">
               <label class="toggle-label">
-                <input type="radio" name="sapType" [(ngModel)]="sapType" value="Non-SAP"
-                  (change)="onSapTypeChange()" />
+                <input type="radio" name="sapType" [(ngModel)]="sapType" value="Non-SAP" (change)="onSapTypeChange()" />
                 <span class="toggle-track">
                   <span class="toggle-circle"></span>
                 </span>
@@ -99,7 +98,7 @@
         </div>
       </div>
 
-     
+
 
       <!-- 🔹 SAP Type (With / Without SAP) & Search Bar -->
       <div *ngIf="orderType" class="sap-search-container">
@@ -108,7 +107,7 @@
         <!-- 🔍 Search Bar -->
         <div class="search-bar-wrapper" *ngIf="sapType">
           <div class="search-container">
-            <div class="search-box" >
+            <div class="search-box">
 
               <!-- 🔽 Select Search Type -->
               <select class="search-type-select" [(ngModel)]="selectedType" (change)="onSearchTypeChange()">
@@ -119,8 +118,9 @@
               </select>
 
               <!-- 🔍 Single Search Input -->
-              <input type="text" class="search-input"  style="width: 300px; flex: none; min-width: 0;" [placeholder]="searchPlaceholder" [(ngModel)]="searchValue"
-                [disabled]="!selectedType" (keyup.enter)="onSearchReference()" />
+              <input type="text" class="search-input" style="width: 300px; flex: none; min-width: 0;"
+                [placeholder]="searchPlaceholder" [(ngModel)]="searchValue" [disabled]="!selectedType"
+                (keyup.enter)="onSearchReference()" />
 
               <!-- 🔎 Button -->
               <button type="button" class="search-btn-global" (click)="onSearchReference()">
@@ -133,7 +133,7 @@
 
       </div>
 
-     
+
 
       <!-- 📊 Dispatch Form Table -->
       <div class="table-responsive">
@@ -156,6 +156,7 @@
                 <th>LR Number</th>
                 <th>Loading Points</th>
                 <th>UnLoading Points</th>
+                <th>Remarks</th>
                 <th *ngIf="showActionColumn">Action</th>
               </tr>
             </thead>
@@ -218,9 +219,9 @@
                   <div class="d-flex align-items-center">
                     <select formControlName="Plant" (change)="onchangePlantCode(i)">
                       <option value="">Select Plant</option>
-                    <option *ngFor="let p of plantList" [value]="p.PLANT_TEXT">
-                  {{p.PLANT_TEXT}}
-                    </option>
+                      <option *ngFor="let p of plantList" [value]="p.PLANT_TEXT">
+                        {{p.PLANT_TEXT}}
+                      </option>
                     </select>
                   </div>
                 </td>
@@ -230,9 +231,9 @@
                   <div class="d-flex align-items-center">
                     <select formControlName="Division" (change)="onchangeDivisionCode(i)">
                       <option value="">Select Division</option>
-                        <option *ngFor="let d of divisionList" [value]="d.DIVISION">
-                  {{ d.DIV_TEXT }}
-                </option>
+                      <option *ngFor="let d of divisionList" [value]="d.DIVISION">
+                        {{ d.DIV_TEXT }}
+                      </option>
                     </select>
                   </div>
                 </td>
@@ -240,6 +241,9 @@
                 <td><input type="text" formControlName="LRNumber" class="width-le"></td>
                 <td><input type="text" formControlName="LoadingPoints" class="width-lg"></td>
                 <td><input type="text" formControlName="UnLoadingPoints" class="width-lg"></td>
+                <td *ngIf="shouldShowRemarks(row)">
+                  <input type="text" formControlName="Remarks" class="width-le">
+                </td>
 
                 <td class="action-btns" *ngIf="showActionColumn">
                   <button type="button" class="btn-add" (click)="addRow()">+</button>
@@ -330,32 +334,32 @@
           </div>
 
           <!-- Plant -->
-<div class="form-field">
-              <select [(ngModel)]="filterPlant">
-                <option value="">Select Plant</option>
- 
-                <option *ngFor="let p of plantList" [value]="p.PLANT_TEXT">
-                  {{p.PLANT_TEXT}}
-                </option>
- 
-              </select>
-              <label>Plant</label>
-            </div>
+          <div class="form-field">
+            <select [(ngModel)]="filterPlant">
+              <option value="">Select Plant</option>
+
+              <option *ngFor="let p of plantList" [value]="p.PLANT_TEXT">
+                {{p.PLANT_TEXT}}
+              </option>
+
+            </select>
+            <label>Plant</label>
+          </div>
 
 
           <!-- Division (Auto-filled from Plant OR select to fill Plant) -->
-<div class="form-field">
-              <select [(ngModel)]="filterDivision">
- 
-                <option value="">Select Division</option>
- 
-                <option *ngFor="let d of divisionList" [value]="d.DIVISION">
-                  {{ d.DIV_TEXT }}
-                </option>
- 
-              </select>
-              <label>Division</label>
-            </div>
+          <div class="form-field">
+            <select [(ngModel)]="filterDivision">
+
+              <option value="">Select Division</option>
+
+              <option *ngFor="let d of divisionList" [value]="d.DIVISION">
+                {{ d.DIV_TEXT }}
+              </option>
+
+            </select>
+            <label>Division</label>
+          </div>
 
           <!-- Transporter -->
           <div class="form-field">

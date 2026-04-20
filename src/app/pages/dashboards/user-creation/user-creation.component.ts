@@ -134,6 +134,7 @@ export class UserCreationComponent implements OnInit {
 
   availableActivities: string[] = [
     // 'Outward-Dashboard',
+    //  'Outward-DispatchOrders',
     'Outward-Dispatch',
     'Outward-OrderInfo',
     'Outward-ShipmentDetails',
@@ -150,7 +151,10 @@ export class UserCreationComponent implements OnInit {
     'Outward-TransitReport',
     'Outward-PendingPodReport',
     'Outward-FreightBills',
-    'Outward-LoadingFactorCost'
+    'Outward-LoadingFactorCost',
+    'Outward-BusinessShareMatrix',
+    'Outward-DamageList'
+ 
   ];
 
 

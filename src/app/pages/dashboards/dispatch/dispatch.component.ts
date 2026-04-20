@@ -260,7 +260,8 @@ export class DispatchComponent implements OnInit {
       LRNumber: ['', Validators.required],
       LoadingPoints: ['', Validators.required],
       UnLoadingPoints: ['', Validators.required],
-       ZLRSPEC: ['']
+       ZLRSPEC: [''],
+         Remarks: [''],
     });
 
     row.get('VehicleType')?.valueChanges.subscribe(() => {
@@ -518,6 +519,7 @@ export class DispatchComponent implements OnInit {
         LRNumber:       [item.LR_NO          || '', Validators.required],
         LoadingPoints:  [item.LOAD_PT        || '', Validators.required],
         UnLoadingPoints:[item.UNLOAD_PT      || '', Validators.required],
+        Remarks: [item.REMARKS || ''], 
           ZLRSPEC:       [item.ZLRSPEC        || '']
       });
 
@@ -881,6 +883,11 @@ export class DispatchComponent implements OnInit {
       }
     });
   }
+
+  shouldShowRemarks(row: any): boolean {
+  const type = row.get('VehicleType')?.value;
+  return type !== 'FULL TRUCK LOAD' && type !== 'CARGO';
+}
 
   clearFilters() {
     this.filterFromDate = '';

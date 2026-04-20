@@ -446,12 +446,19 @@ export class GeneralserviceService {
     return this.http.post(environment.baseUrl + 'api/external/LE/Reports/FetchPendingPods', obj);
   }
 
- FetchLoadingFactorandCost(obj) {
+  FetchLoadingFactorandCost(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/Reports/FetchLoadingFactorandCost', obj);
   }
 
   FetchFreightBills(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/Reports/FetchFreightBills', obj);
+  }
+  FetchBusinessShareMatrix(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/Reports/FetchBusinessShareMatrix', obj);
+  }
+
+  FetchDamageList(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/Reports/FetchDamageList', obj);
   }
 
 

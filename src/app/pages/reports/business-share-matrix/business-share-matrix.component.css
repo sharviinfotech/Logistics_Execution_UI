@@ -1,0 +1,352 @@
+/* =====================
+   LAYOUT
+===================== */
+.layout {
+    display: flex;
+}
+
+.main {
+    flex: 1;
+    padding: 20px;
+}
+
+/* =====================
+   PAGE HEADER
+===================== */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* =====================
+   PE CARD STANDARD
+===================== */
+.pe-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.pe-card-header {
+    background: #f2f2f2;
+    padding: 10px 14px;
+    font-weight: 600;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid  #2E86C1;
+    color:  #2E86C1;
+    margin-bottom: 5px;
+}
+
+.pe-card-header i,
+button i {
+    margin-right: 8px;
+    /* Space between icon and text */
+    vertical-align: middle;
+    font-size: 1.2rem;
+}
+
+/* Match the Red Theme from your "Production Orders" image */
+.pe-card-header i {
+    color: #800000;
+}
+
+.pe-card-body {
+    padding: 15px;
+}
+
+/* =====================
+   ORDER HEADER GRID
+===================== */
+.order-header-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    /* spacing between columns */
+}
+
+.order-header-grid .col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    /* small gap between label & input */
+}
+
+/* WORK CENTER ROW */
+.work-center-row {
+    display: flex;
+    gap: 10px;
+}
+
+/* SHIFT ROW */
+.shift {
+    display: flex;
+    flex-direction: column;
+}
+
+.shift-options {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 2px;
+    /* small space after shift label */
+}
+
+/* CONFIRMED / BALANCE QTY ROW */
+.qty-row {
+    display: flex;
+    gap: 10px;
+}
+
+.qty-row>div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    /* small space between label & input */
+}
+
+/* LABELS & INPUTS */
+label {
+    font-size: 13px;
+    font-weight: 500;
+    margin: 0;
+    /* remove default margin */
+    display: inline-block;
+}
+
+input {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 13px;
+    margin: 0;
+    /* remove extra spacing */
+}
+
+/* SUCCESS INPUT */
+.success {
+    border-color: green;
+    color: green;
+    font-weight: bold;
+}
+
+/* =====================
+   TABLE
+===================== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border-bottom: 1px solid #eee;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background: #fafafa;
+    font-weight: 600;
+}
+
+.highlight {
+    background: #fff2f2;
+}
+
+.success-text {
+    color: green;
+    font-weight: bold;
+}
+
+/* =====================
+   BUTTONS
+===================== */
+button {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    background: #fff;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+button.primary {
+    background: #800000;
+    color: #fff;
+    border: none;
+}
+
+button.danger {
+    background: #ffe5e5;
+    color: #a00000;
+    border: 1px solid #a00000;
+}
+
+/* =====================
+   SUMMARY CARD GRID
+===================== */
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    align-items: center;
+    gap: 20px;
+}
+
+.summary-grid h3 {
+    margin: 4px 0 0;
+}
+
+.shift-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    /* Increased gap between the groups */
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.shift-row label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    /* This keeps the text A, B right beside the circle */
+    cursor: pointer;
+}
+
+input[type="radio"] {
+    accent-color: #800000;
+    transform: scale(1.5);
+    /* This makes the radio button bigger */
+    margin: 0 5px;
+    /* Adds a tiny bit of breathing room */
+}
+
+.button-group {
+    display: flex;
+    justify-content: flex-end;
+    /* Keeps buttons on the right side */
+    gap: 15px;
+    /* Adds the specific space between the buttons */
+}
+
+.btnExecuteReports {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    background: #2E86C1;
+    cursor: pointer;
+    border-radius: 4px;
+    color: white;
+}
+
+.btnExecuteReports:hover {
+    background-color: white !important;
+    color: #2E86C1 !important;
+    border: 1px solid #2E86C1 !important;
+}
+
+.btnclear {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    background: #2E86C1;
+    cursor: pointer;
+    border-radius: 4px;
+    color: white;
+}
+ 
+.btnclear:hover {
+    background-color: white !important;
+    color: #2E86C1 !important;
+    border: 1px solid #2E86C1 !important;
+}
+
+.invalid-feedback {
+    display: block !important;
+    color: #800 !important;
+    font-size: 80%;
+    margin-top: 0.25rem;
+}
+.form-scroll {
+    max-height: calc(100vh - 350px); /* dynamic height based on screen */
+    overflow-y: auto;
+    padding-right: 5px;
+}
+.form-grid {
+   
+    grid-template-columns: repeat(4, 1fr);
+   
+}
+/* LEFT SIDE */
+/* .header-flex .left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+} */
+ 
+/* RIGHT SIDE */
+/* .header-flex .right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+} */
+ 
+/* SEARCH BOX STYLE */
+/* .search-input {
+  width: 220px;
+  height: 34px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: all 0.3s ease;
+} */
+ 
+/* FOCUS EFFECT */
+.search-input:focus {
+  border-color: #2E86C1;
+  box-shadow: 0 0 5px rgba(46, 134, 193, 0.4);
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+.checkbox-option input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+ 
+.checkbox-option span {
+  font-size: 14px;
+}
+ 
+/* Match exact height of date/text inputs */
+.form-field ::ng-deep .ng-select .ng-select-container {
+ 
+  height: 35px;
+ 
+}
+
+.header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-flex .right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}

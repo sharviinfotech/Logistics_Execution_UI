@@ -40,6 +40,7 @@ import { ReportsComponent } from './reports/reports.component';
 import { TransitReportsComponent } from './reports/transit-reports/transit-reports.component';
 import { PendingPodComponent } from './reports/pending-pod/pending-pod.component';
 import { FreightbillsComponent } from './reports/freightbills/freightbills.component';
+import { BusinessShareMatrixComponent } from './reports/business-share-matrix/business-share-matrix.component';
 
 
 @NgModule(
@@ -52,6 +53,7 @@ import { FreightbillsComponent } from './reports/freightbills/freightbills.compo
         //   PendingPodComponent
   
 //     FreightbillsComponent
+  
   ],
                 imports: [CommonModule,
                         FormsModule,
