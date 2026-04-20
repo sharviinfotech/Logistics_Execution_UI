@@ -3,7 +3,7 @@
     <div class="card-header-LE header-flex">
         <div class="header-title">
             <!-- Transit Reports -->
-            Loading Factor & Cost Report
+            Damage List Report
         </div>
     </div>
     <div class="card-body-LE">
@@ -12,7 +12,7 @@
             <div class="pe-card-header">
                 <span>
                     <i class='bx bx-filter-alt'></i>
-                    Loading Factor & Cost Filter
+                    Damage List Filter
                 </span>
             </div>
 
@@ -46,9 +46,6 @@
                             </span>
                         </div>
 
-                        <!-- SAP Type (keep as input) -->
-
-
                         <div class="form-field" [class.filled]="Pendingform.get('SAPTYPE')?.value?.length">
                             <ng-select [items]="sapTypeOptions" bindLabel="label" bindValue="value"
                                 formControlName="SAPTYPE" [multiple]="true" [closeOnSelect]="false" [searchable]="false"
@@ -66,6 +63,7 @@
                             </ng-select>
                             <label class="global-ng-select">Sap/Nonsap</label>
                         </div>
+
 
                         <!-- From Date (keep as input) -->
                         <div class="form-field">
@@ -146,6 +144,35 @@
                             <label class="global-ng-select">Plant</label>
                         </div>
 
+                        <div class="form-field" [class.filled]="Pendingform.get('DAMAGE_RMK')?.value?.length">
+                            <ng-select [items]="damageRemarkOptions" bindLabel="label" bindValue="value"
+                                formControlName="DAMAGE_RMK" [multiple]="true" [closeOnSelect]="false"
+                                [searchable]="true" placeholder=" " class="w-full">
+                                <ng-template ng-multi-label-tmp let-items="items">
+                                    <div class="ng-value" *ngIf="items.length === 1">
+                                        {{ items[0].label }}
+                                    </div>
+                                    <div class="ng-value" *ngIf="items.length > 1">
+                                        {{ items.length }} Selected
+                                    </div>
+                                </ng-template>
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                    <div class="checkbox-option">
+                                        <input type="checkbox" [checked]="item$.selected" />
+                                        <span>{{ item.label }}</span>
+                                    </div>
+                                </ng-template>
+                            </ng-select>
+                            <label class="global-ng-select">Damage Remarks</label>
+                        </div>
+
+                        <!-- From Date (keep as input) -->
+                        <div class="form-field">
+                            <input type="date" formControlName="INCIDENT_DATE" class="form-control form-control-sm"
+                                placeholder=" ">
+                            <label>Incident Date</label>
+                        </div>
+
                         <!-- Product -->
                         <div class="form-field" [class.filled]="Pendingform.get('MATNR')?.value?.length">
                             <ng-select [items]="productOptions" bindLabel="label" bindValue="value"
@@ -184,68 +211,23 @@
                             <label class="global-ng-select">Division</label>
                         </div>
 
-                        <div class="form-field">
-                            <input type="text" formControlName="CUSTOMER_GROUP" placeholder=" " />
-                            <label>Customer Group</label>
-                        </div>
-
-
-
-                        <!-- Branch -->
-                        <div class="form-field" [class.filled]="Pendingform.get('BRANCH')?.value?.length">
-                            <ng-select [items]="branchList" bindLabel="BRANCH_DESC" bindValue="BRANCH_DESC"
-                                formControlName="BRANCH" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
-                                [virtualScroll]="true" placeholder=" " class="w-full">
+                        <!-- Customer Name (already done) -->
+                        <div class="form-field" [class.filled]="Pendingform.get('CUSTOMER')?.value?.length">
+                            <ng-select [items]="customerList" bindLabel="CUSTOMER_NAME" bindValue="CUSTOMER"
+                                formControlName="CUSTOMER" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
+                                [virtualScroll]="true" placeholder=" " class="w-full" (change)="onCustomerChange()">
                                 <ng-template ng-multi-label-tmp let-items="items">
-                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].BRANCH_DESC }}</div>
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].CUSTOMER_NAME }}</div>
                                     <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
                                 </ng-template>
                                 <ng-template ng-option-tmp let-item="item" let-item$="item$">
                                     <div class="checkbox-option">
                                         <input type="checkbox" [checked]="item$.selected" />
-                                        <span>{{ item.BRANCH_DESC }}</span>
+                                        <span>{{ item.CUSTOMER }} - {{ item.CUSTOMER_NAME }}</span>
                                     </div>
                                 </ng-template>
                             </ng-select>
-                            <label class="global-ng-select">Branch</label>
-                        </div>
-
-                        <!-- Branch Zone -->
-                        <div class="form-field" [class.filled]="Pendingform.get('BRANCH_ZONE')?.value?.length">
-                            <ng-select [items]="branchList" bindLabel="BRANCH_ZONE" bindValue="BRANCH_ZONE"
-                                formControlName="BRANCH_ZONE" [multiple]="true" [closeOnSelect]="false"
-                                [searchable]="true" [virtualScroll]="true" placeholder=" " class="w-full">
-                                <ng-template ng-multi-label-tmp let-items="items">
-                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].BRANCH_ZONE }}</div>
-                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
-                                </ng-template>
-                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
-                                    <div class="checkbox-option">
-                                        <input type="checkbox" [checked]="item$.selected" />
-                                        <span>{{ item.BRANCH_ZONE }}</span>
-                                    </div>
-                                </ng-template>
-                            </ng-select>
-                            <label class="global-ng-select">Branch Zone</label>
-                        </div>
-
-                        <!-- Destination State -->
-                        <div class="form-field" [class.filled]="Pendingform.get('DEST_STATE')?.value?.length">
-                            <ng-select [items]="destStateZoneList" bindLabel="DEST_STATE" bindValue="DEST_STATE"
-                                formControlName="DEST_STATE" [multiple]="true" [closeOnSelect]="false"
-                                [searchable]="true" [virtualScroll]="true" placeholder=" " class="w-full">
-                                <ng-template ng-multi-label-tmp let-items="items">
-                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].DEST_STATE }}</div>
-                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
-                                </ng-template>
-                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
-                                    <div class="checkbox-option">
-                                        <input type="checkbox" [checked]="item$.selected" />
-                                        <span>{{ item.DEST_STATE }}</span>
-                                    </div>
-                                </ng-template>
-                            </ng-select>
-                            <label class="global-ng-select">Destination State</label>
+                            <label class="global-ng-select">Customer Name</label>
                         </div>
 
                         <!-- Destination Location -->
@@ -265,67 +247,6 @@
                                 </ng-template>
                             </ng-select>
                             <label class="global-ng-select">Destination Location</label>
-                        </div>
-
-
-
-                        <!-- Destination Zone -->
-                        <!-- <div class="form-field" [class.filled]="Pendingform.get('DEST_ZONE')?.value?.length">
-                            <ng-select [items]="destStateZoneList" bindLabel="DEST_ZONE" bindValue="DEST_ZONE"
-                                formControlName="DEST_ZONE" [multiple]="true" [closeOnSelect]="false"
-                                [searchable]="true" [virtualScroll]="true" placeholder=" " class="w-full">
-                                <ng-template ng-multi-label-tmp let-items="items">
-                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].DEST_ZONE }}</div>
-                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
-                                </ng-template>
-                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
-                                    <div class="checkbox-option">
-                                        <input type="checkbox" [checked]="item$.selected" />
-                                        <span>{{ item.DEST_ZONE }}</span>
-                                    </div>
-                                </ng-template>
-                            </ng-select>
-                            <label class="global-ng-select">Destination Zone</label>
-                        </div> -->
-
-                        <!-- Segment -->
-                        <div class="form-field" [class.filled]="Pendingform.get('SEGMENT')?.value?.length">
-                            <ng-select [items]="segmentList" bindLabel="SEGMENT_DESC" bindValue="SEGMENT_DESC"
-                                formControlName="SEGMENT" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
-                                [virtualScroll]="true" placeholder=" " class="w-full">
-                                <ng-template ng-multi-label-tmp let-items="items">
-                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].SEGMENT_DESC }}</div>
-                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
-                                </ng-template>
-                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
-                                    <div class="checkbox-option">
-                                        <input type="checkbox" [checked]="item$.selected" />
-                                        <span>{{ item.SEGMENT }} - {{ item.SEGMENT_DESC }}</span>
-                                    </div>
-                                </ng-template>
-                            </ng-select>
-                            <label class="global-ng-select">Segment</label>
-                        </div>
-
-
-
-                        <!-- Customer Name (already done) -->
-                        <div class="form-field" [class.filled]="Pendingform.get('CUSTOMER')?.value?.length">
-                            <ng-select [items]="customerList" bindLabel="CUSTOMER_NAME" bindValue="CUSTOMER"
-                                formControlName="CUSTOMER" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
-                                [virtualScroll]="true" placeholder=" " class="w-full" (change)="onCustomerChange()">
-                                <ng-template ng-multi-label-tmp let-items="items">
-                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].CUSTOMER_NAME }}</div>
-                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
-                                </ng-template>
-                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
-                                    <div class="checkbox-option">
-                                        <input type="checkbox" [checked]="item$.selected" />
-                                        <span>{{ item.CUSTOMER }} - {{ item.CUSTOMER_NAME }}</span>
-                                    </div>
-                                </ng-template>
-                            </ng-select>
-                            <label class="global-ng-select">Customer Name</label>
                         </div>
 
                         <!-- Incoterms -->
@@ -373,7 +294,7 @@
                 <div class="left">
                     <span>
                         <i class='bx bx-list-check'></i>
-                        Loading Factor & Cost Data
+                        Damage List Data
                     </span>
                 </div>
 
@@ -405,98 +326,46 @@
                     <thead class="bg-light">
                         <tr>
                             <th>Reference No</th>
+                            <th>Inward / Outward</th>
                             <th>SAP Type</th>
-                            <th>Financial Year</th>
-                            <th>Month</th>
+                            <th>Incident Date</th>
                             <th>Plant</th>
                             <th>Division</th>
-                            <th>Sub Division</th>
                             <th>Customer</th>
-                            <th>Customer Group</th>
-                            <th>Destination Location</th>
-                            <th>Destination State</th>
-                            <th>Destination Zone</th>
+                            <th>Invoice Number</th>
+                            <th>Invoice Date</th>
                             <th>Product</th>
-                            <th>Type of Material</th>
-                            <th>Material Description</th>
-                            <th>Battery Condition</th>
-                            <th>Inco Terms</th>
-                            <th>Transporter Name</th>
-                            <th>Type of Vehicle</th>
-                            <th>GSTIN No</th>
-                            <th>ODN Number</th>
-                            <th>Date</th>
-                            <th>Basic Invoice Amount</th>
-                            <th>Physical Dispatch Date</th>
+                            <th>Product Description</th>
                             <th>Transporter Group</th>
-                            <th>No of Vehicle</th>
-                            <th>Vehicle Passing Weight</th>
-                            <th>Actual Load</th>
-                            <th>Loading Factor Weight</th>
-                            <th>Vehicle Volume</th>
-                            <th>% of Volume Occupied</th>
-                            <th>Shipment Volume</th>
-                            <th>Total Freight</th>
-                            <th>AH Loaded in Truck</th>
-                            <th>Freight AH</th>
-                            <th>Distance KM</th>
-                            <th>Cost KM</th>
-                            <th>Cost Ton KM</th>
-                            <th>Freight Cost Over Sales</th>
-                            <th>Cost Ton Passing Weight</th>
-                            <th>Cost Ton Actual Load</th>
-                            <th>Total Cost Passing Weight</th>
-                            <th>Total Cost Actual Load</th>
-                            <th>Percentage</th>
+                            <th>Transporter</th>
+                            <th>LR No</th>
+                            <th>Nature of Damage</th>
+                            <th>FSR Reported Date</th>
+                            <th>Settlement</th>
+                            <th>Incident Closing Date</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         <tr *ngFor="let row of filteredData">
                             <td>{{ row.REFERENCE_NUMBER }}</td>
+                            <td>{{ row.INWARD_OUTWARD }}</td>
                             <td>{{ row.SAP_NONSAP }}</td>
-                            <td>{{ row.FINANCIAL_YEAR }}</td>
-                            <td>{{ row.MONTH }}</td>
+                            <td>{{ row.INCIDENT_DATE }}</td>
                             <td>{{ row.PLANT }}</td>
                             <td>{{ row.DIVISION }}</td>
-                            <td>{{ row.SUB_DIVISION }}</td>
                             <td>{{ row.CUSTOMER }}</td>
-                            <td>{{ row.CUSTOMER_GROUP }}</td>
-                            <td>{{ row.DESTINATION_LOCATION }}</td>
-                            <td>{{ row.DESTINATION_STATE }}</td>
-                            <td>{{ row.DESTINATION_ZONE }}</td>
+                            <td>{{ row.INVOICE_NUMBER }}</td>
+                            <td>{{ row.INVOICE_DATE }}</td>
                             <td>{{ row.PRODUCT }}</td>
-                            <td>{{ row.TYPE_OF_MATERIAL }}</td>
-                            <td>{{ row.MATERIAL_DESCRIPTION }}</td>
-                            <td>{{ row.BATTERY_CONDITION }}</td>
-                            <td>{{ row.INCO_TERMS }}</td>
-                            <td>{{ row.TRANSPORTER_NAME }}</td>
-                            <td>{{ row.TYPE_OF_VEHICLE }}</td>
-                            <td>{{ row.GSTIN_NO }}</td>
-                            <td>{{ row.ODN_NUMBER }}</td>
-                            <td>{{ row.DATE }}</td>
-                            <td>{{ row.BASIC_INVOICE_AMOUNT }}</td>
-                            <td>{{ row.PHYSICAL_DISPATCH_DATE }}</td>
+                            <td>{{ row.PRODUCT_DESCRIPTION }}</td>
                             <td>{{ row.TRANSPORTER_GROUP }}</td>
-                            <td>{{ row.NO_OF_VEHICLE }}</td>
-                            <td>{{ row.VEHICLE_PASSING_WEIGHT }}</td>
-                            <td>{{ row.ACTUAL_LOAD }}</td>
-                            <td>{{ row.LOADING_FACTOR_WEIGHT }}</td>
-                            <td>{{ row.VEHICLE_VOLUME }}</td>
-                            <td>{{ row['%_OF_VOLUME_OCCUPIED'] }}</td>
-                            <td>{{ row.SHIPMENT_VOLUME }}</td>
-                            <td>{{ row.TOTAL_FREIGHT }}</td>
-                            <td>{{ row.AH_LOADED_IN_THE_TRUCK }}</td>
-                            <td>{{ row.FREIGHT_AH }}</td>
-                            <td>{{ row.DISTANCE_KILLOMETER }}</td>
-                            <td>{{ row.COST_KM }}</td>
-                            <td>{{ row.COST_TON_KM }}</td>
-                            <td>{{ row.FREIGHT_COST_OVER_SALES }}</td>
-                            <td>{{ row.COST_TON_AS_PER_PASSING_WEIGHT }}</td>
-                            <td>{{ row.COST_TON_AS_PER_ACTUAL_LOAD }}</td>
-                            <td>{{ row.TOTAL_COST_PASSING_WEIGHT }}</td>
-                            <td>{{ row.TOTAL_COST_AS_PER_ACTUAL_LOAD }}</td>
-                            <td>{{ row.PERCENTAGE }}</td>
+                            <td>{{ row.TRANSPORTER }}</td>
+                            <td>{{ row.LR_NO }}</td>
+                            <td>{{ row.NATURE_OF_DAMAGE }}</td>
+                            <td>{{ row.FSR_REPORTED_DATE }}</td>
+                            <td>{{ row.SETTLEMENT }}</td>
+                            <td>{{ row.INCIDENT_CLOSING_DATE }}</td>
                         </tr>
                     </tbody>
                 </table>

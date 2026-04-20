@@ -116,6 +116,8 @@ export class OrderInfoComponent implements OnInit {
       RequiredDateTime: [''],
       ReportedDateTime: [''],
       PhysicalDispatchDateTime: [''],
+      CUST_CODE: [''],
+
       items: this.fb.array([this.createItemRow()])
     });
 
@@ -589,6 +591,7 @@ console.log("Logged in user:", this.loggedInUser);
       RefNumber: data.SO_REF_NO || '',
       Customer: data.CUST_NAME || '',
       CustomerGroup: data.CUST_GROUP || '',
+      CUST_CODE: data.CUST_CODE || '',
       CNee: data.CNEE_NAME || '',
       DestinationLocation: data.DEST_LOC || '',
       DestinationState: data.DEST_STATE || '',
@@ -685,7 +688,7 @@ console.log("Logged in user:", this.loggedInUser);
       SUB_DIVISION: formValue.SubDivision,
       SO_REF_NO: formValue.RefNumber,
       CUST_NAME: formValue.Customer,
-
+      CUST_CODE: formValue.CUST_CODE,
       CUST_GROUP: formValue.CustomerGroup,
       CNEE_NAME: formValue.CNee,
       DEST_LOC: formValue.DestinationLocation,
@@ -848,6 +851,7 @@ console.log("Logged in user:", this.loggedInUser);
         SUB_DIVISION: row.ZSUB_DIVISION || "",
         SO_REF_NO: row.ZSO_NO || "",
         CUST_NAME: row.ZCUST_NAME || "",
+        CUST_CODE: row.ZCUST_CODE || "",
         LINE_NO: row.ZLINE_NO || "",
         CUST_GROUP: row.ZCUST_GRP || "",
         CNEE_NAME: row.ZCONSIGN_NAME || "",
