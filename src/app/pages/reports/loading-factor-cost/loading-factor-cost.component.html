@@ -184,9 +184,27 @@
                             <label class="global-ng-select">Division</label>
                         </div>
 
-                        <div class="form-field">
+                        <!-- <div class="form-field">
                             <input type="text" formControlName="CUSTOMER_GROUP" placeholder=" " />
                             <label>Customer Group</label>
+                        </div> -->
+
+                        <div class="form-field" [class.filled]="Pendingform.get('CUSTOMER_GROUP')?.value?.length">
+                            <ng-select [items]="customergroupList" bindLabel="ZCUST_GRP" bindValue="ZCUST_GRP"
+                                formControlName="CUSTOMER_GROUP" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
+                                [virtualScroll]="true" placeholder=" " class="w-full">
+                                <ng-template ng-multi-label-tmp let-items="items">
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].ZCUST_GRP }}</div>
+                                    <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
+                                </ng-template>
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$">
+                                    <div class="checkbox-option">
+                                        <input type="checkbox" [checked]="item$.selected" />
+                                        <span>{{ item.ZCUST_GRP }}</span>
+                                    </div>
+                                </ng-template>
+                            </ng-select>
+                            <label class="global-ng-select">Customer Group</label>
                         </div>
 
 
@@ -212,17 +230,17 @@
 
                         <!-- Branch Zone -->
                         <div class="form-field" [class.filled]="Pendingform.get('BRANCH_ZONE')?.value?.length">
-                            <ng-select [items]="branchList" bindLabel="BRANCH_ZONE" bindValue="BRANCH_ZONE"
+                            <ng-select [items]="branchList" bindLabel="BZONE" bindValue="BRANCH_ZONE"
                                 formControlName="BRANCH_ZONE" [multiple]="true" [closeOnSelect]="false"
                                 [searchable]="true" [virtualScroll]="true" placeholder=" " class="w-full">
                                 <ng-template ng-multi-label-tmp let-items="items">
-                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].BRANCH_ZONE }}</div>
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].BZONE }}</div>
                                     <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
                                 </ng-template>
                                 <ng-template ng-option-tmp let-item="item" let-item$="item$">
                                     <div class="checkbox-option">
                                         <input type="checkbox" [checked]="item$.selected" />
-                                        <span>{{ item.BRANCH_ZONE }}</span>
+                                        <span>{{ item.BZONE }}</span>
                                     </div>
                                 </ng-template>
                             </ng-select>
@@ -311,11 +329,11 @@
 
                         <!-- Customer Name (already done) -->
                         <div class="form-field" [class.filled]="Pendingform.get('CUSTOMER')?.value?.length">
-                            <ng-select [items]="customerList" bindLabel="CUSTOMER_NAME" bindValue="CUSTOMER"
+                            <ng-select [items]="customerList" bindLabel="searchText" bindValue="CUSTOMER"
                                 formControlName="CUSTOMER" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
                                 [virtualScroll]="true" placeholder=" " class="w-full" (change)="onCustomerChange()">
                                 <ng-template ng-multi-label-tmp let-items="items">
-                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].CUSTOMER_NAME }}</div>
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].searchText }}</div>
                                     <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
                                 </ng-template>
                                 <ng-template ng-option-tmp let-item="item" let-item$="item$">

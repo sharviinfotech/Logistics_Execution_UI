@@ -189,11 +189,11 @@
 
                         <!-- Customer Name (already done) -->
                         <div class="form-field" [class.filled]="filterForm.get('CUSTOMER')?.value?.length">
-                            <ng-select [items]="customerList" bindLabel="CUSTOMER" bindValue="CUSTOMER"
+                            <ng-select [items]="customerList" bindLabel="searchText" bindValue="CUSTOMER"
                                 formControlName="CUSTOMER" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
                                 [virtualScroll]="true" placeholder=" " class="w-full">
                                 <ng-template ng-multi-label-tmp let-items="items">
-                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].CUSTOMER_NAME }}</div>
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].searchText }}</div>
                                     <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
                                 </ng-template>
                                 <ng-template ng-option-tmp let-item="item" let-item$="item$">
@@ -227,17 +227,18 @@
 
                         <!-- Branch Zone -->
                         <div class="form-field" [class.filled]="filterForm.get('BRANCH_ZONE')?.value?.length">
-                            <ng-select [items]="branchList" bindLabel="BRANCH_ZONE" bindValue="BRANCH_ZONE"
+                            <ng-select [items]="branchList" bindLabel="BZONE" bindValue="BRANCH_ZONE"
                                 formControlName="BRANCH_ZONE" [multiple]="true" [closeOnSelect]="false"
                                 [searchable]="true" [virtualScroll]="true" placeholder=" " class="w-full">
                                 <ng-template ng-multi-label-tmp let-items="items">
-                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].BRANCH_ZONE }}</div>
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].BZONE }}</div>
                                     <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
                                 </ng-template>
                                 <ng-template ng-option-tmp let-item="item" let-item$="item$">
                                     <div class="checkbox-option">
                                         <input type="checkbox" [checked]="item$.selected" />
-                                        <span>{{ item.BRANCH_ZONE }}</span>
+                                        <span>{{ item.BZONE }}</span>
+                                        <!-- <span>{{ item.BZONE }} - {{ item.BRANCH_ZONE }}</span> -->
                                     </div>
                                 </ng-template>
                             </ng-select>
@@ -284,17 +285,18 @@
 
                         <!-- Destination Zone -->
                         <div class="form-field" [class.filled]="filterForm.get('DEST_ZONE')?.value?.length">
-                            <ng-select [items]="destStateZoneList" bindLabel="DEST_ZONE" bindValue="DEST_ZONE"
+                            <ng-select [items]="destStateZoneList" bindLabel="DZONE" bindValue="DEST_ZONE"
                                 formControlName="DEST_ZONE" [multiple]="true" [closeOnSelect]="false"
                                 [searchable]="true" [virtualScroll]="true" placeholder=" " class="w-full">
                                 <ng-template ng-multi-label-tmp let-items="items">
-                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].DEST_ZONE }}</div>
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].DZONE }}</div>
                                     <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
                                 </ng-template>
                                 <ng-template ng-option-tmp let-item="item" let-item$="item$">
                                     <div class="checkbox-option">
                                         <input type="checkbox" [checked]="item$.selected" />
-                                        <span>{{ item.DEST_ZONE }}</span>
+                                        <!-- <span>{{ item.DEST_ZONE }}</span> -->
+                                        <span>{{ item.DZONE }}</span>
                                     </div>
                                 </ng-template>
                             </ng-select>

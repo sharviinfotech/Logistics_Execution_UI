@@ -16,6 +16,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 
 const activityRouteMap: { [key: string]: string } = {
+  'Outward-DispatchOrders': '/Dispatchorders',
   'Outward-Dispatch': '/dispatch',
   'Outward-OrderInfo': '/order-info',
   'Outward-ShipmentDetails': '/shipment-details',
@@ -27,6 +28,8 @@ const activityRouteMap: { [key: string]: string } = {
   'Outward-TransitDamageInfo': '/transit-damage-info',
   'Outward-InsuranceClaimTracking': '/insurance-claim-tracking',
   'Outward-UserCreation': '/user-creation',
+  'Outward-Reports': '/reports',
+  
 };
 
 @Component({

@@ -90,12 +90,12 @@ export class DispatchComponent implements OnInit {
     this.loggedInUser = userData.USER || '';
     console.log("Logged in user:", this.loggedInUser);
     this.plantList = userData.PLANTS || [];
- 
-  // ✅ Divisions from login response
-  this.divisionList = userData.DIV || [];
- 
-  console.log("Plants:", this.plantList);
-  console.log("Divisions:", this.divisionList);
+
+    // ✅ Divisions from login response
+    this.divisionList = userData.DIV || [];
+
+    console.log("Plants:", this.plantList);
+    console.log("Divisions:", this.divisionList);
 
     this.rows.at(0).get('VehicleType')?.valueChanges.subscribe(val => {
       this.handleVehicleTypeChange(val);
@@ -172,11 +172,11 @@ export class DispatchComponent implements OnInit {
 
     // Get totals for all fields
     const totals = {
-      NoOfTrucks:      this.getTotal(this.originalTotalTrucks,         'NoOfTrucks'),
-      NoOfInvoices:    this.getTotal(this.originalTotalInvoices,       'NoOfInvoices'),
-      NoOfLRs:         this.getTotal(this.originalTotalLRs,            'NoOfLRs'),
-      LoadingPoints:   this.getTotal(this.originalTotalLoadingPoints,  'LoadingPoints'),
-      UnLoadingPoints: this.getTotal(this.originalTotalUnLoadingPoints,'UnLoadingPoints'),
+      NoOfTrucks: this.getTotal(this.originalTotalTrucks, 'NoOfTrucks'),
+      NoOfInvoices: this.getTotal(this.originalTotalInvoices, 'NoOfInvoices'),
+      NoOfLRs: this.getTotal(this.originalTotalLRs, 'NoOfLRs'),
+      LoadingPoints: this.getTotal(this.originalTotalLoadingPoints, 'LoadingPoints'),
+      UnLoadingPoints: this.getTotal(this.originalTotalUnLoadingPoints, 'UnLoadingPoints'),
     };
 
     // Distribute each field across all rows
@@ -260,8 +260,8 @@ export class DispatchComponent implements OnInit {
       LRNumber: ['', Validators.required],
       LoadingPoints: ['', Validators.required],
       UnLoadingPoints: ['', Validators.required],
-       ZLRSPEC: [''],
-         Remarks: [''],
+      ZLRSPEC: [''],
+      Remarks: [''],
     });
 
     row.get('VehicleType')?.valueChanges.subscribe(() => {
@@ -301,38 +301,95 @@ export class DispatchComponent implements OnInit {
   }
 
   handleVehicleTypeChange(val: string) {
-    this.showActionColumn = (val === 'Full Truck Load');
+    this.showActionColumn = (val === 'FULL TRUCK LOAD');
 
-    if (val !== 'Full Truck Load') {
+    if (val !== 'FULL TRUCK LOAD') {
       this.resetRowsForNonFTL(val);
     }
+
+
 
     this.applyFirstRowValuesToAll();
     this.cd.detectChanges();
   }
+  OnRowChangeVehicleType(val: string, index: number) {
+    console.log("Vehicle Type changed to:", val, "at index:", index);
+    if (val === 'RATE CONTRACT') {
+      const obj = this.VendorCodeList.find((item: any) => item.VENDOR_CODE === 111111);
+      console.log("Found vendor for RATE CONTRACT:", obj);
+      this.rows.at(index).patchValue({
+        VendorCode: obj.VENDOR_CODE,
+        Transporter: obj.TRANSPORTER
+      });
+    }
+    else if (val === 'LOCAL TRANSPORTATION') {
+      const obj = this.VendorCodeList.find((item: any) => item.VENDOR_CODE === 222222);
+      console.log("Found vendor for LOCAL TRANSPORTATION:", obj);
+      this.rows.at(index).patchValue({
+        VendorCode: obj.VENDOR_CODE,
+        Transporter: obj.TRANSPORTER
+      });
+    }
+    else if (val === 'CUSTOMER TRANSPORTER') {
+      const obj = this.VendorCodeList.find((item: any) => item.VENDOR_CODE === 333333);
+      console.log("Found vendor for CUSTOMER TRANSPORTER:", obj);
+      this.rows.at(index).patchValue({
+        VendorCode: obj.VENDOR_CODE,
+        Transporter: obj.TRANSPORTER
+      });
+    }
+    else if (val === 'COMPANY VEHICLE') {
+      const obj = this.VendorCodeList.find((item: any) => item.VENDOR_CODE === 444444);
+      console.log("Found vendor for COMPANY VEHICLE:", obj);
+      this.rows.at(index).patchValue({
+        VendorCode: obj.VENDOR_CODE,
+        Transporter: obj.TRANSPORTER
+      });
+    }
+    else if (val === 'COURIER') {
+      const obj = this.VendorCodeList.find((item: any) => item.VENDOR_CODE === 555555);
+      console.log("Found vendor for COURIER:", obj);
+      this.rows.at(index).patchValue({
+        VendorCode: obj.VENDOR_CODE,
+        Transporter: obj.TRANSPORTER
+      });
+    }
+    else if (val === 'BY HAND') {
+      const obj = this.VendorCodeList.find((item: any) => item.VENDOR_CODE === 666666);
+      console.log("Found vendor for BY HAND:", obj);
+      this.rows.at(index).patchValue({
+        VendorCode: obj.VENDOR_CODE,
+        Transporter: obj.TRANSPORTER
+      });
+    }
 
- checkActionColumnVisibility() {
-  const firstType = this.rows.at(0).get('VehicleType')?.value;
 
-  if (firstType === 'Full Truck Load') {
-    this.showActionColumn = true;
-    this.cd.detectChanges();
-    return;
+    console.log("this.rows.controls:", this.rows.controls);
   }
 
-  // ✅ Only this line needed
-  this.showActionColumn = this.rows.length > 1 || this.maxRowsAllowed > 1;
-  
-  this.cd.detectChanges();
-}
+
+  checkActionColumnVisibility() {
+    const firstType = this.rows.at(0).get('VehicleType')?.value;
+
+    if (firstType === 'FULL TRUCK LOAD') {
+      this.showActionColumn = true;
+      this.cd.detectChanges();
+      return;
+    }
+
+    // ✅ Only this line needed
+    this.showActionColumn = this.rows.length > 1 || this.maxRowsAllowed > 1;
+
+    this.cd.detectChanges();
+  }
 
   applyFirstRowValuesToAll() {
     const firstRow = this.rows.at(0) as FormGroup;
 
     const fixedValues = {
       VehicleType: firstRow.get('VehicleType')?.value,
-      workorder:   firstRow.get('workorder')?.value,
-      VendorCode:  firstRow.get('VendorCode')?.value,
+      workorder: firstRow.get('workorder')?.value,
+      VendorCode: firstRow.get('VendorCode')?.value,
       Transporter: firstRow.get('Transporter')?.value,
     };
 
@@ -408,7 +465,7 @@ export class DispatchComponent implements OnInit {
     if (this.rows.length > 1) {
       this.rows.removeAt(index);
       this.redistributeAll();       // ✅ single call handles everything
-      this.checkActionColumnVisibility(); 
+      this.checkActionColumnVisibility();
       this.cd.detectChanges();
     }
   }
@@ -496,31 +553,31 @@ export class DispatchComponent implements OnInit {
     rowsArray.clear();
 
     // Calculate original totals from all records
-    this.originalTotalTrucks      = records.reduce((sum, item) => sum + (+item.NO_TRUCKS   || 0), 0);
-    this.originalTotalInvoices    = records.reduce((sum, item) => sum + (+item.NO_INVOICES || 0), 0);
-    this.originalTotalLRs         = records.reduce((sum, item) => sum + (+item.NO_LRS      || 0), 0);
-    this.originalTotalLoadingPoints   = records.reduce((sum, item) => sum + (+item.LOAD_PT  || 0), 0);
-    this.originalTotalUnLoadingPoints = records.reduce((sum, item) => sum + (+item.UNLOAD_PT|| 0), 0);
+    this.originalTotalTrucks = records.reduce((sum, item) => sum + (+item.NO_TRUCKS || 0), 0);
+    this.originalTotalInvoices = records.reduce((sum, item) => sum + (+item.NO_INVOICES || 0), 0);
+    this.originalTotalLRs = records.reduce((sum, item) => sum + (+item.NO_LRS || 0), 0);
+    this.originalTotalLoadingPoints = records.reduce((sum, item) => sum + (+item.LOAD_PT || 0), 0);
+    this.originalTotalUnLoadingPoints = records.reduce((sum, item) => sum + (+item.UNLOAD_PT || 0), 0);
 
     records.forEach((item, index) => {
       const row = this.fb.group({
-        LINE_NO:        [item.LINE_NO        || ''],
-        ZMAPID:         [item.ZMAPID         || ''],
-        CREATED_DT:     [item.CREATED_DT     || ''],
-        workorder:      [item.WORK_ORDER     || ''],
-        VehicleType:    [item.VEH_TYPE       || '', Validators.required],
-        NoOfTrucks:     [item.NO_TRUCKS      || '', Validators.required],
-        NoOfInvoices:   [item.NO_INVOICES    || '', Validators.required],
-        VendorCode:     [item.VENDOR_CD      || ''],
-        Transporter:    [item.TRANSPORTER    || '', Validators.required],
-        Plant:          [item.WERKS          || ''],
-        Division:       [item.DIVISION       || '', Validators.required],
-        NoOfLRs:        [item.NO_LRS         || '', Validators.required],
-        LRNumber:       [item.LR_NO          || '', Validators.required],
-        LoadingPoints:  [item.LOAD_PT        || '', Validators.required],
-        UnLoadingPoints:[item.UNLOAD_PT      || '', Validators.required],
-        Remarks: [item.REMARKS || ''], 
-          ZLRSPEC:       [item.ZLRSPEC        || '']
+        LINE_NO: [item.LINE_NO || ''],
+        ZMAPID: [item.ZMAPID || ''],
+        CREATED_DT: [item.CREATED_DT || ''],
+        workorder: [item.WORK_ORDER || ''],
+        VehicleType: [item.VEH_TYPE || '', Validators.required],
+        NoOfTrucks: [item.NO_TRUCKS || '', Validators.required],
+        NoOfInvoices: [item.NO_INVOICES || '', Validators.required],
+        VendorCode: [item.VENDOR_CD || ''],
+        Transporter: [item.TRANSPORTER || '', Validators.required],
+        Plant: [item.WERKS || ''],
+        Division: [item.DIVISION || '', Validators.required],
+        NoOfLRs: [item.NO_LRS || '', Validators.required],
+        LRNumber: [item.LR_NO || '', Validators.required],
+        LoadingPoints: [item.LOAD_PT || '', Validators.required],
+        UnLoadingPoints: [item.UNLOAD_PT || '', Validators.required],
+        Remarks: [item.ZDIS_RM || ''],
+        ZLRSPEC: [item.ZLRSPEC || '']
       });
 
       row.get('LINE_NO')?.disable();
@@ -549,25 +606,26 @@ export class DispatchComponent implements OnInit {
     const rawRows = rowsArray.getRawValue();
 
     const payload = rawRows.map((row: any) => ({
-      ZMAPID:     row.ZMAPID     || '',
-      REFNO:      Number(this.searchReference),
-      LINE_NO:    Number(row.LINE_NO),
+      ZMAPID: row.ZMAPID || '',
+      REFNO: Number(this.searchReference),
+      LINE_NO: Number(row.LINE_NO),
       CREATED_DT: row.CREATED_DT || '',
-      VEH_TYPE:   row.VehicleType,
-      NO_TRUCKS:  Number(row.NoOfTrucks),
-      NO_INVOICES:Number(row.NoOfInvoices),
-      WORK_ORDER: row.workorder    || '',
-      VENDOR_CD:  Number(row.VendorCode) || 0,
-      TRANSPORTER:row.Transporter  || '',
-      WERKS:      row.Plant        || '',
-      DIVISION:   row.Division     || '',
-      NO_LRS:     Number(row.NoOfLRs) || 0,
-      LR_NO:      row.LRNumber     || '',
-      ZLRSPEC:    row.ZLRSPEC   || '',
-      LOAD_PT:    row.LoadingPoints || '',
-      UNLOAD_PT:  row.UnLoadingPoints || '',
-      ZUSER:      row.ZUSER,
-      ZUSER_CH:   this.loggedInUser
+      VEH_TYPE: row.VehicleType,
+      NO_TRUCKS: Number(row.NoOfTrucks),
+      NO_INVOICES: Number(row.NoOfInvoices),
+      WORK_ORDER: row.workorder || '',
+      VENDOR_CD: Number(row.VendorCode) || 0,
+      TRANSPORTER: row.Transporter || '',
+      WERKS: row.Plant || '',
+      DIVISION: row.Division || '',
+      NO_LRS: Number(row.NoOfLRs) || 0,
+      LR_NO: row.LRNumber || '',
+      ZLRSPEC: row.ZLRSPEC || '',
+      LOAD_PT: row.LoadingPoints || '',
+      UNLOAD_PT: row.UnLoadingPoints || '',
+      ZDIS_RM: row.Remarks || '',
+      ZUSER: row.ZUSER,
+      ZUSER_CH: this.loggedInUser
     }));
 
     console.log("📤 Update payload:", payload);
@@ -731,21 +789,22 @@ export class DispatchComponent implements OnInit {
 
     const payload = {
       DISPATCH: this.rows.controls.map((row: any) => ({
-        NO_TRUCKS:   row.get('NoOfTrucks')?.value,
+        NO_TRUCKS: row.get('NoOfTrucks')?.value,
         NO_INVOICES: row.get('NoOfInvoices')?.value,
-        veh_type:    row.get('VehicleType')?.value,
-        work_order:  row.get('workorder')?.value,
-        VENDOR_CD:   row.get('VendorCode')?.value,
+        veh_type: row.get('VehicleType')?.value,
+        work_order: row.get('workorder')?.value,
+        VENDOR_CD: row.get('VendorCode')?.value,
         transporter: row.get('Transporter')?.value,
-        WERKS:       row.get('Plant')?.value,
-        DIVISION:    row.get('Division')?.value,
-        NO_LRS:      row.get('NoOfLRs')?.value,
-        lr_no:       row.get('LRNumber')?.value,
-        load_pt:     row.get('LoadingPoints')?.value,
-        unload_Pt:   row.get('UnLoadingPoints')?.value,
-          ZLRSPEC: row.get('ZLRSPEC')?.value,
-        ZUSER:       this.loggedInUser,
-        ZUSER_CH:    ''
+        WERKS: row.get('Plant')?.value,
+        DIVISION: row.get('Division')?.value,
+        NO_LRS: row.get('NoOfLRs')?.value,
+        lr_no: row.get('LRNumber')?.value,
+        load_pt: row.get('LoadingPoints')?.value,
+        unload_Pt: row.get('UnLoadingPoints')?.value,
+        ZLRSPEC: row.get('ZLRSPEC')?.value,
+        ZDIS_RM: row.get('Remarks')?.value,
+        ZUSER: this.loggedInUser,
+        ZUSER_CH: ''
       }))
     };
 
@@ -841,11 +900,11 @@ export class DispatchComponent implements OnInit {
 
     const payload: any = {
       ZUSER: this.loggedInUser,
-      DATE_FROM:    this.filterFromDate,
-      DATE_TO:      this.filterToDate,
-      PLANT:        this.filterPlant       || '',
-      DIVISION:     this.filterDivision    || '',
-      TRANSPORTER:  this.filterTransporter || '',
+      DATE_FROM: this.filterFromDate,
+      DATE_TO: this.filterToDate,
+      PLANT: this.filterPlant || '',
+      DIVISION: this.filterDivision || '',
+      TRANSPORTER: this.filterTransporter || '',
       VEHICLE_TYPE: this.filterVehicleType || ''
     };
 
@@ -884,10 +943,12 @@ export class DispatchComponent implements OnInit {
     });
   }
 
-  shouldShowRemarks(row: any): boolean {
-  const type = row.get('VehicleType')?.value;
-  return type !== 'FULL TRUCK LOAD' && type !== 'CARGO';
-}
+  shouldShowRemarks(): boolean {
+    const type = this.rows.at(0)?.get('VehicleType')?.value;
+    return type !== 'FULL TRUCK LOAD' && type !== 'CARGO';
+  }
+
+
 
   clearFilters() {
     this.filterFromDate = '';
@@ -908,21 +969,21 @@ export class DispatchComponent implements OnInit {
     }
 
     const exportData = this.filteredData.map((record) => ({
-      "Reference No":    record.ZREFNO        || '',
-      "Date":            record.ZCREATED_DT   || '',
-      "Vehicle Type":    record.ZVEH_TYPE     || '',
-      "Work Order":      record.ZWORK_ORDER   || '',
-      "Vendor Code":     record.ZVENDOR_CD    || '',
-      "Transporter":     record.ZTRANSPORTER  || '',
-      "Plant":           record.ZWERKS        || '',
-      "Division":        record.ZDIVISION     || '',
-      "No. of Trucks":   record.ZNO_TRUCKS    || '',
-      "No. of LRs":      record.ZNO_LRS       || '',
-      "LR Number":       record.ZLR_NO        || '',
-      "Loading Points":  record.ZLOAD_PT      || '',
-      "Unloading Points":record.ZUNLOAD_PT    || '',
-      "No. of Invoices": record.ZNO_INVOICES  || '',
-      "Created date":    record.ZCREATED_DT   || ''
+      "Reference No": record.ZREFNO || '',
+      "Date": record.ZCREATED_DT || '',
+      "Vehicle Type": record.ZVEH_TYPE || '',
+      "Work Order": record.ZWORK_ORDER || '',
+      "Vendor Code": record.ZVENDOR_CD || '',
+      "Transporter": record.ZTRANSPORTER || '',
+      "Plant": record.ZWERKS || '',
+      "Division": record.ZDIVISION || '',
+      "No. of Trucks": record.ZNO_TRUCKS || '',
+      "No. of LRs": record.ZNO_LRS || '',
+      "LR Number": record.ZLR_NO || '',
+      "Loading Points": record.ZLOAD_PT || '',
+      "Unloading Points": record.ZUNLOAD_PT || '',
+      "No. of Invoices": record.ZNO_INVOICES || '',
+      "Created date": record.ZCREATED_DT || ''
     }));
 
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
@@ -961,21 +1022,21 @@ export class DispatchComponent implements OnInit {
     ]];
 
     const data = this.filteredData.map(record => ([
-      record.ZREFNO       || '',
-      record.ZCREATED_DT  || '',
-      record.ZVEH_TYPE    || '',
-      record.ZWORK_ORDER  || '',
-      record.ZVENDOR_CD   || '',
+      record.ZREFNO || '',
+      record.ZCREATED_DT || '',
+      record.ZVEH_TYPE || '',
+      record.ZWORK_ORDER || '',
+      record.ZVENDOR_CD || '',
       record.ZTRANSPORTER || '',
-      record.ZWERKS       || '',
-      record.ZDIVISION    || '',
-      record.ZNO_TRUCKS   || '',
-      record.ZNO_LRS      || '',
-      record.ZLR_NO       || '',
-      record.ZLOAD_PT     || '',
-      record.ZUNLOAD_PT   || '',
+      record.ZWERKS || '',
+      record.ZDIVISION || '',
+      record.ZNO_TRUCKS || '',
+      record.ZNO_LRS || '',
+      record.ZLR_NO || '',
+      record.ZLOAD_PT || '',
+      record.ZUNLOAD_PT || '',
       record.ZNO_INVOICES || '',
-      record.ZCREATED_DT  || ''
+      record.ZCREATED_DT || ''
     ]));
 
     autoTable(doc, {

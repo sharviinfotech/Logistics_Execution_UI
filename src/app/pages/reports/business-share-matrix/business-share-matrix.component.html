@@ -189,11 +189,11 @@
                             <label>Customer</label>
                         </div> -->
                         <div class="form-field" [class.filled]="filterForm.get('CUSTOMER')?.value?.length">
-                            <ng-select [items]="customerList" bindLabel="CUSTOMER" bindValue="CUSTOMER"
+                            <ng-select [items]="customerList" bindLabel="searchText" bindValue="CUSTOMER"
                                 formControlName="CUSTOMER" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
                                 [virtualScroll]="true" placeholder=" " class="w-full">
                                 <ng-template ng-multi-label-tmp let-items="items">
-                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].CUSTOMER_NAME }}</div>
+                                    <div class="ng-value" *ngIf="items.length === 1">{{ items[0].searchText }}</div>
                                     <div class="ng-value" *ngIf="items.length > 1">{{ items.length }} Selected</div>
                                 </ng-template>
                                 <ng-template ng-option-tmp let-item="item" let-item$="item$">

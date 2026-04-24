@@ -461,6 +461,18 @@ export class GeneralserviceService {
     return this.http.post(environment.baseUrl + 'api/external/LE/Reports/FetchDamageList', obj);
   }
 
+  FetchInsuranceReports(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/Reports/FetchInsuranceReportsDetails', obj);
+  }
+
+  FetchDispatchOrderFlowData(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/DispatchOrderFlow/FetchData', obj);
+  }
+
+  FetchDispatchOrderPendingCounts() {
+    return this.http.get(environment.baseUrl + 'api/external/LE/DispatchOrderFlow/PendingCounts');
+  }
+
 
 
 

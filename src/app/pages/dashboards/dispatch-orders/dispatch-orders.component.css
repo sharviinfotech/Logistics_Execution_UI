@@ -39,8 +39,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 2px solid  #2E86C1;
-    color:  #2E86C1;
+    border-bottom: 2px solid #2E86C1;
+    color: #2E86C1;
     margin-bottom: 5px;
 }
 
@@ -260,7 +260,7 @@ input[type="radio"] {
     border-radius: 4px;
     color: white;
 }
- 
+
 .btnclear:hover {
     background-color: white !important;
     color: #2E86C1 !important;
@@ -273,30 +273,34 @@ input[type="radio"] {
     font-size: 80%;
     margin-top: 0.25rem;
 }
+
 .form-scroll {
-    max-height: calc(100vh - 350px); /* dynamic height based on screen */
+    max-height: calc(100vh - 350px);
+    /* dynamic height based on screen */
     overflow-y: auto;
     padding-right: 5px;
 }
+
 .form-grid {
-   
+
     grid-template-columns: repeat(4, 1fr);
-   
+
 }
+
 /* LEFT SIDE */
 .header-flex .left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
- 
+
 /* RIGHT SIDE */
 .header-flex .right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
- 
+
 /* SEARCH BOX STYLE */
 /* .search-input {
   width: 220px;
@@ -307,10 +311,17 @@ input[type="radio"] {
   outline: none;
   transition: all 0.3s ease;
 } */
- 
+
 /* FOCUS EFFECT */
 .search-input:focus {
-  border-color: #2E86C1;
-  box-shadow: 0 0 5px rgba(46, 134, 193, 0.4);
+    border-color: #2E86C1;
+    box-shadow: 0 0 5px rgba(46, 134, 193, 0.4);
 }
- 
+/* Status Counts Container */
+.status-counts-container {
+  display: flex;
+  gap: 50px;
+  height: 45px;
+  width: 80%;
+
+}

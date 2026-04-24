@@ -156,7 +156,7 @@
                 <th>LR Number</th>
                 <th>Loading Points</th>
                 <th>UnLoading Points</th>
-                <th>Remarks</th>
+                <th *ngIf="shouldShowRemarks()">Remarks</th>
                 <th *ngIf="showActionColumn">Action</th>
               </tr>
             </thead>
@@ -169,7 +169,7 @@
                   <input type="date" formControlName="CREATED_DT" />
                 </td>
                 <td>
-                  <select formControlName="VehicleType">
+                  <select formControlName="VehicleType" (change)="OnRowChangeVehicleType($event.target.value,i)">
                     <option value="" disabled>Select Vehicle Type</option>
                     <option value="CARGO">CARGO</option>
                     <option value="RATE CONTRACT">RATE CONTRACT</option>
@@ -217,7 +217,7 @@
 
                 <td>
                   <div class="d-flex align-items-center">
-                    <select formControlName="Plant" (change)="onchangePlantCode(i)">
+                    <select formControlName="Plant" >
                       <option value="">Select Plant</option>
                       <option *ngFor="let p of plantList" [value]="p.PLANT_TEXT">
                         {{p.PLANT_TEXT}}
@@ -229,7 +229,7 @@
 
                 <td>
                   <div class="d-flex align-items-center">
-                    <select formControlName="Division" (change)="onchangeDivisionCode(i)">
+                    <select formControlName="Division">
                       <option value="">Select Division</option>
                       <option *ngFor="let d of divisionList" [value]="d.DIVISION">
                         {{ d.DIV_TEXT }}
@@ -241,7 +241,7 @@
                 <td><input type="text" formControlName="LRNumber" class="width-le"></td>
                 <td><input type="text" formControlName="LoadingPoints" class="width-lg"></td>
                 <td><input type="text" formControlName="UnLoadingPoints" class="width-lg"></td>
-                <td *ngIf="shouldShowRemarks(row)">
+                <td *ngIf="shouldShowRemarks()">
                   <input type="text" formControlName="Remarks" class="width-le">
                 </td>
 

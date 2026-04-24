@@ -9,15 +9,15 @@ import { CommonModule } from '@angular/common';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+
 @Component({
-  selector: 'app-pending-pod',
+  selector: 'app-insurance',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule, NgSelectModule],
-  templateUrl: './pending-pod.component.html',
-  styleUrl: './pending-pod.component.css'
+  templateUrl: './insurance.component.html',
+  styleUrl: './insurance.component.css'
 })
-export class PendingPodComponent implements OnInit {
-
+export class InsuranceComponent implements OnInit {
   Pendingform!: FormGroup;
   filteredData: any[] = [];
   originalData: any[] = [];
@@ -30,6 +30,7 @@ export class PendingPodComponent implements OnInit {
   destLocationList: any[] = [];
   destStateZoneList: any[] = [];
   IncotermsList: any[] = [];
+  segmentList: any[] = [];
 
   // Add these static option arrays
   inoutOptions = [
@@ -64,6 +65,25 @@ export class PendingPodComponent implements OnInit {
     { value: 'Others', label: 'Others' }
   ];
 
+  damageRemarkOptions = [
+    { value: 'Packing material damage', label: 'Packing material damage' },
+    { value: 'Pallet damage', label: 'Pallet damage' },
+    { value: 'Cells damage', label: 'Cells damage' },
+    { value: 'Cell Bank damage', label: 'Cell Bank damage' },
+    { value: 'Can damage', label: 'Can damage' },
+    { value: 'Accident', label: 'Accident' },
+    {
+      value: 'Prohibited material loading and seized by Police',
+      label: 'Prohibited material loading and seized by Police'
+    },
+    { value: 'Damage during unloading', label: 'Damage during unloading' },
+    { value: 'Material in wet condition', label: 'Material in wet condition' },
+    {
+      value: 'Damage due to other materials loaded',
+      label: 'Damage due to other materials loaded'
+    }
+  ];
+
 
 
   constructor(private fb: FormBuilder,
@@ -83,15 +103,14 @@ export class PendingPodComponent implements OnInit {
       TRANS_GROUP: [[]],
       TRANSPORTER: [[]],
       WERKS: [[]],
+      DAMAGE_RMK: [[]],
+      INCIDENT_DATE: [''],
       MATNR: [[]],
       DIVISION: [[]],
       CUSTOMER: [[]],
-      BRANCH: [[]],
-      BRANCH_ZONE: [[]],
       DEST_LOCATION: [[]],
-      DEST_STATE: [[]],
-      DEST_ZONE: [[]],
-      INCOTERMS: [[]]
+      INCOTERMS: [[]],
+
     });
     this.getTransporters();
     this.fetchpdb();
@@ -168,17 +187,15 @@ export class PendingPodComponent implements OnInit {
       from_date: this.formatDate(form.FROM_DATE),
       to_date: this.formatDate(form.TO_DATE),
       sap_nonsap: this.createArray(form.SAPTYPE, 'type'),
-      transporter_group: this.createArray(form.TRANS_GROUP, 'transporter_group'),
-      transporter: this.createArray(form.TRANSPORTER, 'transporter'),
+      transporter_group: this.createArray(form.TRANS_GROUP, 'TRANSPORTER_GROUP'),
+      transporter: this.createArray(form.TRANSPORTER, 'TRANSPORTER'),
       plant: this.createArray(form.WERKS, 'plant'),
+      damage_remarks: this.createArray(form.DAMAGE_RMK, 'damage_remarks'),
+      incident_date: this.createArray(form.INCIDENT_DATE, 'incident_date'),
       product: this.createArray(form.MATNR, 'product'),
-      division: this.createArray(form.DIVISION, 'division'),
-      customer: this.createArray(form.CUSTOMER, 'customer'),
-      branch: this.createArray(form.BRANCH, 'branch'),
-      branch_zone: this.createArray(form.BRANCH_ZONE, 'branch_zone'),
+      division: this.createArray(form.DIVISION, 'DIVISION'),
       destination_location: this.createArray(form.DEST_LOCATION, 'destination_location'),
-      destination_state: this.createArray(form.DEST_STATE, 'destination_state'),
-      destination_zone: this.createArray(form.DEST_ZONE, 'destination_zone'),
+      customer: this.createArray(form.CUSTOMER, 'CUSTOMER'),
       incoterms: this.createArray(form.INCOTERMS, 'incoterms')
     };
 
@@ -186,7 +203,7 @@ export class PendingPodComponent implements OnInit {
 
     this.spinner.show(); // optional spinner start
 
-    this.service.FetchPendingPodReport(payload).subscribe({
+    this.service.FetchInsuranceReports(payload).subscribe({
       next: (res: any) => {
         console.log('API Response:', res);
 
@@ -321,12 +338,13 @@ export class PendingPodComponent implements OnInit {
     this.spinner.show();
     this.service.getssc().subscribe({
       next: (res: any) => {
-        console.log('Branch API response:', res);
+        console.log('Branch & Segment API response:', res);
         this.spinner.hide();
         if (res && res.length > 0) {
           const data = res[0];
 
           this.branchList = data.BRANCH || [];
+          this.segmentList = data.SEGMENTS || [];
           this.destLocationList =
             // data?.DEST_LOCATION ||
             data.DEST_LOC ||
@@ -358,6 +376,7 @@ export class PendingPodComponent implements OnInit {
     });
   }
 
+
   downloadExcel() {
     if (!this.filteredData || this.filteredData.length === 0) {
       Swal.fire('Warning', 'No data available to download.', 'warning');
@@ -365,30 +384,40 @@ export class PendingPodComponent implements OnInit {
     }
 
     const exportData = this.filteredData.map((row: any) => ({
-      'Reference No': row.REFERENCE_NUMBER || '',
-      'Type': row.INWARD_OUTWARD || '',
+      'Reference No': `${row.REFERENCE_NUMBER || ''}`,
+      'Inward / Outward': row.INWARD_OUTWARD || '',
       'SAP Type': row.SAP_NONSAP || '',
+      'Incident Date': row.INCIDENT_DATE || '',
+      'Nature of Damage': row.NATURE_OF_DAMAGE || '',
       'Plant': row.PLANT || '',
       'Division': row.DIVISION || '',
       'Customer': row.CUSTOMER || '',
       'Product': row.PRODUCT || '',
-      'Description': row.PRODUCT_DESCRIPTION || '',
-      'Invoice No': row.INVOICE_NUMBER || '',
+      'Product Description': row.PRODUCT_DESCRIPTION || '',
+      'Invoice Number': row.INVOICE_NUMBER || '',
       'Invoice Date': row.INVOICE_DATE || '',
-      'Transporter': row.TRANSPORTER || '',
       'Transporter Group': row.TRANSPORTER_GROUP || '',
+      'Transporter': row.TRANSPORTER || '',
       'LR No': row.LR_NO || '',
-      'Delivery Date': row.DELIVERY_DATE || '',
-      'POD Age': row.POD_PENDING_AGE || '',
-      'Age Group': row.POD_PENDING_AGE_GROUP || ''
+      'FSR Reported Date': row.FSR_REPORTED_DATE || '',
+      'Claim Info Sent': row.CLAIM_INFO_SENT || '',
+      'Claim Reference': row.CLAIM_REFERENCE || '',
+      'Loss Declared': row.LOSS_DECLARED || '',
+      'Salvage Value': row.SALVAGE_VALUE || '',
+      'Claim Document Status': row.CLAIM_DOCUMENT_STATUS || '',
+      'Courier Details': row.COURIER_DETAILS || '',
+      'Settlement': row.SETTLEMENT || '',
+      'Payment Status': row.PAYMENT_STATUS || '',
+      'UTR Info': row.UTR_INFO || '',
+      'Claim Settlement Date': row.CLAIM_SETTLEMENT_DATE || '',
+      'Claim Status': row.CLAIM_STATUS || ''
     }));
 
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
 
-    XLSX.utils.book_append_sheet(wb, ws, 'Pending PODs');
-
-    XLSX.writeFile(wb, 'Pending_PODs_Report.xlsx');
+    XLSX.utils.book_append_sheet(wb, ws, 'Insurance Report');
+    XLSX.writeFile(wb, 'Insurance_Report.xlsx');
 
     Swal.fire('Success', 'Excel downloaded successfully.', 'success');
   }
@@ -398,31 +427,44 @@ export class PendingPodComponent implements OnInit {
       return;
     }
 
-    const doc = new jsPDF('l', 'mm', 'a3'); // landscape
+    const doc = new jsPDF('l', 'mm', 'a2');
 
     const tableColumn = [
       'Reference No',
-      'Type',
+      'Inward / Outward',
       'SAP Type',
+      'Incident Date',
+      'Nature of Damage',
       'Plant',
       'Division',
       'Customer',
       'Product',
-      'Description',
-      'Invoice No',
+      'Product Description',
+      'Invoice Number',
       'Invoice Date',
-      'Transporter',
       'Transporter Group',
+      'Transporter',
       'LR No',
-      'Delivery Date',
-      'POD Age',
-      'Age Group'
+      'FSR Reported Date',
+      'Claim Info Sent',
+      'Claim Reference',
+      'Loss Declared',
+      'Salvage Value',
+      'Claim Document Status',
+      'Courier Details',
+      'Settlement',
+      'Payment Status',
+      'UTR Info',
+      'Claim Settlement Date',
+      'Claim Status'
     ];
 
     const tableRows = this.filteredData.map((row: any) => [
       row.REFERENCE_NUMBER || '',
       row.INWARD_OUTWARD || '',
       row.SAP_NONSAP || '',
+      row.INCIDENT_DATE || '',
+      row.NATURE_OF_DAMAGE || '',
       row.PLANT || '',
       row.DIVISION || '',
       row.CUSTOMER || '',
@@ -430,37 +472,42 @@ export class PendingPodComponent implements OnInit {
       row.PRODUCT_DESCRIPTION || '',
       row.INVOICE_NUMBER || '',
       row.INVOICE_DATE || '',
-      row.TRANSPORTER || '',
       row.TRANSPORTER_GROUP || '',
+      row.TRANSPORTER || '',
       row.LR_NO || '',
-      row.DELIVERY_DATE || '',
-      row.POD_PENDING_AGE || '',
-      row.POD_PENDING_AGE_GROUP || ''
+      row.FSR_REPORTED_DATE || '',
+      row.CLAIM_INFO_SENT || '',
+      row.CLAIM_REFERENCE || '',
+      row.LOSS_DECLARED || '',
+      row.SALVAGE_VALUE || '',
+      row.CLAIM_DOCUMENT_STATUS || '',
+      row.COURIER_DETAILS || '',
+      row.SETTLEMENT || '',
+      row.PAYMENT_STATUS || '',
+      row.UTR_INFO || '',
+      row.CLAIM_SETTLEMENT_DATE || '',
+      row.CLAIM_STATUS || ''
     ]);
 
-    doc.text('Pending PODs Report', 14, 10);
+    doc.text('Insurance Report', 14, 10);
 
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
       startY: 20,
       styles: {
-        fontSize: 8
+        fontSize: 6,
+        cellPadding: 1
       },
       headStyles: {
-        fillColor: [41, 128, 185]
-      }
+        fillColor: [41, 128, 185],
+        fontSize: 6
+      },
+      margin: { left: 5, right: 5 }
     });
 
-    doc.save('Pending_PODs_Report.pdf');
+    doc.save('Insurance_Report.pdf');
 
     Swal.fire('Success', 'PDF downloaded successfully.', 'success');
   }
-
-
-
-
-
 }
-
-

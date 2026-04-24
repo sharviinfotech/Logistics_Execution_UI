@@ -69,7 +69,7 @@
     </div> -->
 
 
-   
+
 
     <div *ngIf="mainMode === 'creation'">
 
@@ -125,7 +125,7 @@
         </div>
       </div>
 
-     
+
 
 
 
@@ -355,11 +355,17 @@
                   </select>
                 </td>
 
-                <td><input type="text" formControlName="ZTRUC_WT" class="width-le" /></td>
+                <td><input type="text" formControlName="ZTRUC_WT" class="width-le" (input)="onPassingWeightChange(i)" />
+                </td>
                 <td><input type="number" formControlName="ZACT_LOAD" class="width-le" /></td>
                 <td><input type="text" formControlName="ZLF_WT" class="width-le" /></td>
-                <td><input type="text" formControlName="ZACT_VOL" (change)="onTruckTypeChange(i)" /></td>
-                <td><input type="text" formControlName="ZLF_VOL" /></td>
+                <td>
+                  <input type="text" formControlName="ZACT_VOL" (change)="onTruckTypeChange(i)"/>
+                </td>
+
+                <td>
+                  <input type="text" formControlName="ZLF_VOL"/>
+                </td>
                 <td><input type="text" formControlName="ZWEEK_SF" /></td>
                 <td><input type="text" formControlName="ZEWAYBILL_NO" /></td>
                 <td><input type="date" formControlName="ZEWAYBILL_DT" /></td>

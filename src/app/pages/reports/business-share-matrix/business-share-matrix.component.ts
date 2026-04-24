@@ -12,14 +12,14 @@ import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-business-share-matrix',
-   standalone: true,
+  standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule, NgSelectModule],
   templateUrl: './business-share-matrix.component.html',
   styleUrl: './business-share-matrix.component.css'
 })
 export class BusinessShareMatrixComponent {
 
-filterForm!: FormGroup;
+  filterForm!: FormGroup;
 
 
 
@@ -34,8 +34,8 @@ filterForm!: FormGroup;
   IncotermsList: any[] = [];
   destStateZoneList: any[] = [];
   destLocationList: any[] = [];
-   segmentList: any[] = [];
-   inoutOptions = [
+  segmentList: any[] = [];
+  inoutOptions = [
     { value: 'INWARD', label: 'Inward' },
     { value: 'OUTWARD', label: 'Outward' }
   ];
@@ -44,11 +44,11 @@ filterForm!: FormGroup;
     { value: 'SAP', label: 'SAP' },
     { value: 'NONSAP', label: 'Non-SAP' }
   ];
-  
+
   provisionAccountOptions = [
-  { label: 'PROVISION', value: 'PROVISION' },
-  { label: 'ACCOUNT', value: 'ACCOUNT' }
-];
+    { label: 'PROVISION', value: 'PROVISION' },
+    { label: 'ACCOUNT', value: 'ACCOUNT' }
+  ];
 
   transGroupOptions = [
     { value: 'FULL TRUCK LOAD', label: 'FULL TRUCK LOAD' },
@@ -94,7 +94,7 @@ filterForm!: FormGroup;
       DEST_STATE: [[]],
       DEST_ZONE: [[]],
       INCOTERMS: [[]],
-       SEGMENT: [[]]
+      SEGMENT: [[]]
     });
     const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
     this.loggedInUser = userData.USER || '';
@@ -143,7 +143,7 @@ filterForm!: FormGroup;
           const data = res[0];
 
           this.branchList = data.BRANCH || [];
-           this.segmentList = data.SEGMENTS || [];
+          this.segmentList = data.SEGMENTS || [];
           this.destLocationList =
             // data?.DEST_LOCATION ||
             data.DEST_LOC ||
@@ -188,41 +188,41 @@ filterForm!: FormGroup;
 
     const form = this.filterForm.value;
 
- const payload = {
-  inward_outward: this.createArray(form.INOUT, 'inout'),
+    const payload = {
+      inward_outward: this.createArray(form.INOUT, 'inout'),
 
-  from_date: this.formatDate(form.FROM_DATE),
-  to_date: this.formatDate(form.TO_DATE),
+      from_date: this.formatDate(form.FROM_DATE),
+      to_date: this.formatDate(form.TO_DATE),
 
-  // ✅ convert to lowercase (IMPORTANT)
-  sap_nonsap: (form.SAPTYPE || []).map((v: string) => ({
-    type: v.toLowerCase()
-  })),
+      // ✅ convert to lowercase (IMPORTANT)
+      sap_nonsap: (form.SAPTYPE || []).map((v: string) => ({
+        type: v.toLowerCase()
+      })),
 
 
 
-  transporter_group: this.createArray(form.TRANS_GROUP, 'TRANSPORTER_GROUP'),
-  transporter: this.createArray(form.TRANSPORTER, 'TRANSPORTER'),
+      transporter_group: this.createArray(form.TRANS_GROUP, 'TRANSPORTER_GROUP'),
+      transporter: this.createArray(form.TRANSPORTER, 'TRANSPORTER'),
 
-  plant: this.createArray(form.WERKS, 'plant'),
-  product: this.createArray(form.MATNR, 'product'),
+      plant: this.createArray(form.WERKS, 'plant'),
+      product: this.createArray(form.MATNR, 'product'),
 
-  division: this.createArray(form.DIVISION, 'DIVISION'),
+      division: this.createArray(form.DIVISION, 'DIVISION'),
 
-  // ✅ ADD THIS (you missed it)
-  customer_group: this.createArray(form.CUSTOMER_GROUP, 'CUSTOMER_GROUP'),
+      // ✅ ADD THIS (you missed it)
+      customer_group: this.createArray(form.CUSTOMER_GROUP, 'CUSTOMER_GROUP'),
 
-  customer: this.createArray(form.CUSTOMER, 'CUSTOMER'),
+      customer: this.createArray(form.CUSTOMER, 'CUSTOMER'),
 
-  branch: this.createArray(form.BRANCH, 'branch'),
+      branch: this.createArray(form.BRANCH, 'branch'),
 
-  destination_location: this.createArray(form.DEST_LOCATION, 'destination_location'),
+      destination_location: this.createArray(form.DEST_LOCATION, 'destination_location'),
 
-  // ✅ ADD THIS (you missed it)
-  segment: this.createArray(form.SEGMENT, 'segment'),
+      // ✅ ADD THIS (you missed it)
+      segment: this.createArray(form.SEGMENT, 'segment'),
 
-  incoterms: this.createArray(form.INCOTERMS, 'incoterms')
-};
+      incoterms: this.createArray(form.INCOTERMS, 'incoterms')
+    };
     console.log('Payload:', payload);
 
     this.spinner.show(); // optional spinner start
@@ -314,6 +314,10 @@ filterForm!: FormGroup;
         console.log("📦 PDB Data:", res);
 
         this.customerList = res?.[0]?.CUSTOMER || [];
+        this.customerList = this.customerList.map((item: any) => ({
+          ...item,
+          searchText: `${item.CUSTOMER} - ${item.CUSTOMER_NAME}`
+        }));
 
 
         this.spinner.hide();
@@ -340,109 +344,109 @@ filterForm!: FormGroup;
     });
   }
 
-    exportToExcel(): void {
-  if (!this.filteredData || this.filteredData.length === 0) {
-    Swal.fire('No Data', 'Nothing to export', 'warning');
-    return;
-  }
-
-const exportData = this.filteredData.map(row => ({
-    'Reference No': row.REFERENCE_NUMBER,
-    'In/Out': row.INWARD_OUTWARD,
-    'SAP Type': row.SAP_NONSAP,
-    'Plant': row.PLANT,
-    'Transporter Group': row.TRANSPORTER_GROUP,
-    'Transporter': row.TRANSPORTER,
-    'No. of Vehicles': row.NO_OF_VEHICLES_PLACED,
-    'Freight Amount': row.FREIGHT_AMOUNT,
-    'Basic Charge': row.BASIC_CHARGE,
-    'Detention Loading': row.DETENTION_LOADING,
-    'Detention Unloading': row.DETENTION_UNLOADING,
-    'Loading Charge': row.LOADING_CHARGE,
-    'Unloading Charge': row.UNLOADING_CHARGE,
-    'Routing Charges': row.ROUTING_CHARGES,
-    'Transshipment Charges': row.TRANSHIPMENT_CHARGES,
-    'Other Charges': row.OTHER_CHARGES,
-    'Deduction Charges': row.DEDUCTION_CHARGES
-  }));
-
-  const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
-  const workbook: XLSX.WorkBook = {
-    Sheets: { 'Business Share Matrix': worksheet },
-    SheetNames: ['Business Share Matrix']
-  };
-
-  XLSX.writeFile(workbook, 'Business_Share_Matrix.xlsx');
-}
-
-downloadPDF() {
-  if (!this.filteredData || this.filteredData.length === 0) {
-    Swal.fire('Warning', 'No data available to download.', 'warning');
-    return;
-  }
-
-  const doc = new jsPDF('l', 'mm', 'a2');
-
-  doc.text('Freight Bills Report', 14, 10);
-
- const tableColumn = [
-    'Reference No',
-    'In/Out',
-    'SAP Type',
-    'Plant',
-    'Transporter Group',
-    'Transporter',
-    'No. of Vehicles',
-    'Freight Amount',
-    'Basic Charge',
-    'Detention Loading',
-    'Detention Unloading',
-    'Loading Charge',
-    'Unloading Charge',
-    'Routing Charges',
-    'Transshipment Charges',
-    'Other Charges',
-    'Deduction Charges'
-  ];
-
-  const tableRows = this.filteredData.map((row: any) => [
-    row.REFERENCE_NUMBER || '',
-    row.INWARD_OUTWARD || '',
-    row.SAP_NONSAP || '',
-    row.PLANT || '',
-    row.TRANSPORTER_GROUP || '',
-    row.TRANSPORTER || '',
-    row.NO_OF_VEHICLES_PLACED || '',
-    row.FREIGHT_AMOUNT || 0,
-    row.BASIC_CHARGE || 0,
-    row.DETENTION_LOADING || 0,
-    row.DETENTION_UNLOADING || 0,
-    row.LOADING_CHARGE || 0,
-    row.UNLOADING_CHARGE || 0,
-    row.ROUTING_CHARGES || 0,
-    row.TRANSHIPMENT_CHARGES || 0,
-    row.OTHER_CHARGES || 0,
-    row.DEDUCTION_CHARGES || 0
-  ]);
-
-
-  autoTable(doc, {
-    head: [tableColumn],
-    body: tableRows,
-    startY: 15,
-    styles: {
-      fontSize: 7,
-      cellWidth: 'wrap'
-    },
-    headStyles: {
-      fillColor: [41, 128, 185],
-      fontSize: 7
+  exportToExcel(): void {
+    if (!this.filteredData || this.filteredData.length === 0) {
+      Swal.fire('No Data', 'Nothing to export', 'warning');
+      return;
     }
-  });
 
-  doc.save(`Business_Share_Matrix_Report_${Date.now()}.pdf`);
+    const exportData = this.filteredData.map(row => ({
+      'Reference No': row.REFERENCE_NUMBER,
+      'In/Out': row.INWARD_OUTWARD,
+      'SAP Type': row.SAP_NONSAP,
+      'Plant': row.PLANT,
+      'Transporter Group': row.TRANSPORTER_GROUP,
+      'Transporter': row.TRANSPORTER,
+      'No. of Vehicles': row.NO_OF_VEHICLES_PLACED,
+      'Freight Amount': row.FREIGHT_AMOUNT,
+      'Basic Charge': row.BASIC_CHARGE,
+      'Detention Loading': row.DETENTION_LOADING,
+      'Detention Unloading': row.DETENTION_UNLOADING,
+      'Loading Charge': row.LOADING_CHARGE,
+      'Unloading Charge': row.UNLOADING_CHARGE,
+      'Routing Charges': row.ROUTING_CHARGES,
+      'Transshipment Charges': row.TRANSHIPMENT_CHARGES,
+      'Other Charges': row.OTHER_CHARGES,
+      'Deduction Charges': row.DEDUCTION_CHARGES
+    }));
 
-  Swal.fire('Success', 'PDF downloaded successfully.', 'success');
-}
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook: XLSX.WorkBook = {
+      Sheets: { 'Business Share Matrix': worksheet },
+      SheetNames: ['Business Share Matrix']
+    };
+
+    XLSX.writeFile(workbook, 'Business_Share_Matrix.xlsx');
+  }
+
+  downloadPDF() {
+    if (!this.filteredData || this.filteredData.length === 0) {
+      Swal.fire('Warning', 'No data available to download.', 'warning');
+      return;
+    }
+
+    const doc = new jsPDF('l', 'mm', 'a2');
+
+    doc.text('Freight Bills Report', 14, 10);
+
+    const tableColumn = [
+      'Reference No',
+      'In/Out',
+      'SAP Type',
+      'Plant',
+      'Transporter Group',
+      'Transporter',
+      'No. of Vehicles',
+      'Freight Amount',
+      'Basic Charge',
+      'Detention Loading',
+      'Detention Unloading',
+      'Loading Charge',
+      'Unloading Charge',
+      'Routing Charges',
+      'Transshipment Charges',
+      'Other Charges',
+      'Deduction Charges'
+    ];
+
+    const tableRows = this.filteredData.map((row: any) => [
+      row.REFERENCE_NUMBER || '',
+      row.INWARD_OUTWARD || '',
+      row.SAP_NONSAP || '',
+      row.PLANT || '',
+      row.TRANSPORTER_GROUP || '',
+      row.TRANSPORTER || '',
+      row.NO_OF_VEHICLES_PLACED || '',
+      row.FREIGHT_AMOUNT || 0,
+      row.BASIC_CHARGE || 0,
+      row.DETENTION_LOADING || 0,
+      row.DETENTION_UNLOADING || 0,
+      row.LOADING_CHARGE || 0,
+      row.UNLOADING_CHARGE || 0,
+      row.ROUTING_CHARGES || 0,
+      row.TRANSHIPMENT_CHARGES || 0,
+      row.OTHER_CHARGES || 0,
+      row.DEDUCTION_CHARGES || 0
+    ]);
+
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 15,
+      styles: {
+        fontSize: 7,
+        cellWidth: 'wrap'
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        fontSize: 7
+      }
+    });
+
+    doc.save(`Business_Share_Matrix_Report_${Date.now()}.pdf`);
+
+    Swal.fire('Success', 'PDF downloaded successfully.', 'success');
+  }
 }
 

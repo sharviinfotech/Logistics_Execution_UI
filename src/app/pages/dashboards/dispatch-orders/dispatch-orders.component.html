@@ -1,34 +1,31 @@
 <div class="card-LE">
+
     <!-- HEADER -->
     <div class="card-header-LE header-flex">
         <div class="header-title">
-            <!-- Transit Reports -->
-          Dispatch Orders
+            Dispatch Orders
         </div>
     </div>
+
     <div class="card-body-LE">
-
-
 
         <!-- FILTER CARD -->
         <div class="pe-card">
+
             <div class="pe-card-header">
                 <span>
                     <i class='bx bx-filter-alt'></i>
-                 Dispatch order Filter
+                    Dispatch order Filter
                 </span>
             </div>
 
             <div class="pe-card-body">
-
-
                 <form [formGroup]="filterForm">
 
                     <div class="form-grid">
 
-
+                        <!-- FROM DATE -->
                         <div class="form-field">
-
                             <input type="date" formControlName="FROM_DATE" class="form-control form-control-sm"
                                 placeholder=" ">
                             <label>From Date</label>
@@ -38,8 +35,8 @@
                             </span>
                         </div>
 
+                        <!-- TO DATE -->
                         <div class="form-field">
-
                             <input type="date" formControlName="TO_DATE" class="form-control form-control-sm"
                                 placeholder=" ">
                             <label>To Date</label>
@@ -49,30 +46,26 @@
                             </span>
                         </div>
 
-                    
+                        <!-- PENDING & COMPLETED COUNTS -->
+                        <div class="status-counts-container">
+                            <div class="pending-box">
+                                <i class="fas fa-clock"></i>
+                                <span class="count-text">
+                                    Pending: {{ pendingCount }}
+                                </span>
+                            </div>
 
-                     
-
-                     
-
-                       
-
-                     
-
-                     
-
-                      
-
-                      
-                    
-
-
-
-
-                        <!-- BUTTONS -->
-
+                            <div class="completed-box">
+                                <i class="fas fa-check-circle"></i>
+                                <span class="count-text">
+                                    Completed: {{ completedCount }}
+                                </span>
+                            </div>
+                        </div>
 
                     </div>
+
+                    <!-- BUTTONS -->
                     <div class="col-12 mt-3 d-flex justify-content-end gap-2">
                         <button type="button" (click)="resetForm()" class="btn btnclear">
                             Clear Filters
@@ -84,21 +77,17 @@
                     </div>
 
                 </form>
-
-
-
-
             </div>
-            <!-- TABLE CARD -->
-
         </div>
+
+        <!-- TABLE CARD -->
         <div class="pe-card mt-4">
 
             <div class="pe-card-header header-flex">
                 <div class="left">
                     <span>
                         <i class='bx bx-list-check'></i>
-                      Dispatch Orders List
+                        Dispatch Orders List
                     </span>
                 </div>
 
@@ -108,75 +97,58 @@
                 </div>
             </div>
 
-
             <div class="pe-card-body">
 
                 <!-- MESSAGE -->
-                 <div *ngIf="filteredData.length === 0" class="text-center py-5">
+                <div *ngIf="filteredData.length === 0" class="text-center py-5">
                     <p class="text-muted">
                         Fill filters and click execute to see results.
                     </p>
-                </div> 
+                </div>
 
                 <!-- TABLE -->
-                 <div *ngIf="filteredData.length > 0" class="table-responsive">
+                <div *ngIf="filteredData.length > 0" class="table-responsive">
                     <table class="table table-bordered table-hover">
 
                         <thead class="bg-light">
                             <tr>
-                                <th>Reference No</th>
-                                <th>In/Out</th>
-                                <th>SAP Type</th>
-                                <th>Plant</th>
-                                <th>Division</th>
-                                <th>Customer</th>
-                                <th>Product</th>
-                                <th>Material Desc</th>
                                 <th>Invoice No</th>
                                 <th>Invoice Date</th>
-                                <th>Transporter Group</th>
-                                <th>Transporter</th>
-                                <th>LR No</th>
-                                <th>Driver</th>
-                                <th>Mobile</th>
-                                <th>Dispatch Date</th>
-                                <th>ETA</th>
-                                <th>Eway No</th>
-                                <th>Eway Valid Till</th>
-                                <th>Status</th>
+                                <th>Billing Transaction Type</th>
+                                <th>Material</th>
+                                <th>Description</th>
+                                <th>Plant</th>
+                                <th>Plant Name</th>
+                                <th>Division</th>
+                                <th>Division Text</th>
+                                <th>Basic Shipment Value</th>
+                                <th>Invoice Value With GST</th>
+                                <th>Incoterms</th>
                             </tr>
                         </thead>
 
                         <tbody>
                             <tr *ngFor="let row of filteredData">
-                                <td>{{ row.REFERENCE_NUMBER }}</td>
-                                <td>{{ row.INWARD_OUTWARD }}</td>
-                                <td>{{ row.SAP_NONSAP || '-' }}</td>
-                                <td>{{ row.PLANT }}</td>
-                                <td>{{ row.DIVISION }}</td>
-                                <td>{{ row.CUSTOMER }}</td>
-                                <td>{{ row.PRODUCT || '-' }}</td>
-                                <td>{{ row.MATERIAL_DESCRIPTION || '-' }}</td>
-                                <td>{{ row.INVOICE_NUMBER }}</td>
-                                <td>{{ row.INVOICE_DATE }}</td>
-                                <td>{{ row.TRANSPORTER_GROUP }}</td>
-                                <td>{{ row.TRANSPORTER }}</td>
-                                <td>{{ row.LR_NO }}</td>
-                                <td>{{ row.DRIVER_NAME || '-' }}</td>
-                                <td>{{ row.DRIVER_MOBILE || '-' }}</td>
-                                <td>{{ row.PHYSICAL_DISPATCH_DATE }}</td>
-                                <td>{{ row.ETA || '-' }}</td>
-                                <td>{{ row.EWAY_NO || '-' }}</td>
-                                <td>{{ row.EWAY_VALIDITY_TILL || '-' }}</td>
-                                <td>{{ row.STATUS }}</td>
+                                <td>{{ row.INVOICE_NUMBER || '-' }}</td>
+                                <td>{{ row.INVOICE_DATE || '-' }}</td>
+                                <td>{{ row.BILLING_TRANSACTION_TYPE || '-' }}</td>
+                                <td>{{ row.MATERIAL || '-' }}</td>
+                                <td>{{ row.DESCRIPTION || '-' }}</td>
+                                <td>{{ row.PLANT || '-' }}</td>
+                                <td>{{ row.PLANT_NAME || '-' }}</td>
+                                <td>{{ row.DIVISION || '-' }}</td>
+                                <td>{{ row.DIVISION_TEXT || '-' }}</td>
+                                <td>{{ row.BASIC_SHIPMENT_VALUE || '-' }}</td>
+                                <td>{{ row.INVOICE_VALUE_WITH_GST || '-' }}</td>
+                                <td>{{ row.INCOTERMS || '-' }}</td>
                             </tr>
                         </tbody>
 
-
                     </table>
-                </div> 
+                </div>
 
             </div>
         </div>
+
     </div>
 </div>

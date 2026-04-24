@@ -702,7 +702,7 @@ console.log("Logged in user:", this.loggedInUser);
 
     if (this.sapType === "SAP") {
       this.spinner.show();
-      this.service.OrderInfoOutwardSave({ SAVE: record }).subscribe(
+      this.service.OrderInfoOutwardSave({ CHANGE: "", SAVE: record }).subscribe(
         (res: any) => {
           console.log("✅ SAP Save Response:", res);
 
@@ -747,7 +747,7 @@ console.log("Logged in user:", this.loggedInUser);
       );
     } else {
       this.spinner.show();
-      this.service.OrderInfoNonSap({ CREATE: record }).subscribe(
+      this.service.OrderInfoNonSap({ CHANGE: "",CREATE: record }).subscribe(
         (res: any) => {
           console.log("✅ Non-SAP Save Response:", res);
           this.spinner.hide();
@@ -870,9 +870,11 @@ console.log("Logged in user:", this.loggedInUser);
       let apiCall =
         this.sapType === "SAP"
           ? this.service.OrderInfoOutwardSave({
+             CHANGE: "X",
             SAVE: [updatePayload]
           })
           : this.service.OrderInfoNonSap({
+             CHANGE: "X",
             CREATE: [updatePayload]
           });
 
@@ -1152,14 +1154,23 @@ console.log("Logged in user:", this.loggedInUser);
     const value = type === 'purchase' ? this.ponumber : this.invoicenumber;
     if (!value || value.trim() === '') {
       this.showForm = false;
-      this.resetExtraFields();
+      // this.resetExtraFields();
     }
   }
 
-  resetExtraFields(): void {
-    this.OrderInfo.reset();
+  // resetExtraFields(): void {
+  //   this.OrderInfo.reset();
 
-  }
+  // }
+
+  resetExtraFields(): void {
+    // Reset all controls EXCEPT the items FormArray
+    Object.keys(this.OrderInfo.controls).forEach(key => {
+        if (key !== 'items') {
+            this.OrderInfo.get(key)?.reset('');
+        }
+    });
+}
 
   fetchpdb(): void {
   this.spinner.show();

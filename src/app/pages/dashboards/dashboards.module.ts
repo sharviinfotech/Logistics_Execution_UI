@@ -81,7 +81,7 @@ import { DispatchOrdersComponent } from './dispatch-orders/dispatch-orders.compo
 
 
     UserCreationComponent,
-    DispatchOrdersComponent,
+   
     
   ]
 })

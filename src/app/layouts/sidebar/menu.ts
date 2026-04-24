@@ -13,13 +13,13 @@ export const MENU: MenuItem[] = [
     //     parentId: 2,
     //     icon: 'bxs-dashboard',
     // },
-    //  {
-    //     id: 2,
-    //     label: 'Dispatch Orders',
-    //     link: '/Dispatchorders',
-    //     parentId: 2,
-    //     icon: 'bx-list-ul',
-    // },
+    {
+        id: 2,
+        label: 'Dispatch Orders',
+        link: '/Dispatchorders',
+        parentId: 2,
+        icon: 'bx-list-ul',
+    },
     {
         id: 2,
         label: 'Dispatch',
@@ -159,6 +159,20 @@ export const MENU: MenuItem[] = [
                 icon: "bx-detail",
                 parentId: 12,
             },
+            {
+                id: 16,
+                label: "Insurance",
+                link: "/insurance",
+                icon: "bx-shield",
+                parentId: 12,
+            },
+            // {
+            //     id: 16,
+            //     label: "Service Level",
+            //     link: "/service-level-report",
+            //     icon: "bx-cog",
+            //     parentId: 12,
+            // },
 
 
         ],

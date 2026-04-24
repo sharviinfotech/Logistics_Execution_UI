@@ -704,10 +704,10 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     }
 
     this.InvoiceForm.markAllAsTouched();
-    if (this.InvoiceForm.invalid) {
-      Swal.fire('Error', 'Please fill all required fields', 'error');
-      return;
-    }
+    // if (this.InvoiceForm.invalid) {
+    //   Swal.fire('Error', 'Please fill all required fields', 'error');
+    //   return;
+    // }
 
     if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
       Swal.fire({
@@ -728,7 +728,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     }));
 
     this.spinner.show();
-    this.service.InvoiceloaddetailsSave(payloadWithUser).subscribe({
+    this.service.InvoiceloaddetailsSave({CHANGE: "",INV_SAP: payloadWithUser }).subscribe({
       next: (res: any) => {
         this.spinner.hide();
         if (res?.NUMBER === '200') {
@@ -824,7 +824,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     };
 
     this.spinner.show();
-    this.service.InvoiceloaddetailsNonSap(payload).subscribe({
+    this.service.InvoiceloaddetailsNonSap({CHANGE: "",payload}).subscribe({
       next: (res: any) => {
         this.spinner.hide();
         if (res?.NUMBER === '200') {
@@ -912,7 +912,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       ZUSER_CH: this.getCurrentUser()
     }];
 
-    return this.service.InvoiceloaddetailsSave(payload);
+    return this.service.InvoiceloaddetailsSave({CHANGE: "X",INV_SAP: payload});
   }
   updateInvoiceNonSap(row: any) {
     if (!row.ZMAPID || !row.VBELN || !row.ZREFNO || !row.ZLINE_NO) {
@@ -946,7 +946,7 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       }]
     };
 
-    return this.service.InvoiceloaddetailsNonSap(payload);
+    return this.service.InvoiceloaddetailsNonSap({CHANGE: "X", payload });
   }
   updateInvoiceRow(row: any): void {
     console.log("Updating Row:", row);
@@ -1140,39 +1140,76 @@ export class InvoiceLoadDetailsComponent implements OnInit {
     });
   }
 
-  onVehicleTypeChange(i: number): void {
-    const row = this.invoices.at(i);
-    const selectedTruck = row.get('ZTRUC_TYPE')?.value;
+onVehicleTypeChange(i: number): void {
+  const row = this.invoices.at(i);
+  const selectedTruck = row.get('ZTRUC_TYPE')?.value;
 
-    if (!selectedTruck) {
-      // Clear ZTRUC_WT if no truck type selected
-      row.patchValue({
-        ZTRUC_WT: ''
-      });
-      return;
-    }
-
-    // Find the matching vehicle type from the loaded list
-    const matchedVehicle = this.vehicleTypes.find(
-      v => v.ZTRUC_TYPE === selectedTruck
-    );
-
-    if (matchedVehicle) {
-      // Patch the passing weight directly from local data
-      row.patchValue({
-        ZTRUC_WT: matchedVehicle.ZTRUC_WT || ''
-      }, { emitEvent: false });
-
-      console.log(`✅ Patched ZTRUC_WT: ${matchedVehicle.ZTRUC_WT} for ${selectedTruck}`);
-    } else {
-      // If not found in local list, clear the weight
-      row.patchValue({
-        ZTRUC_WT: ''
-      });
-      console.warn(`⚠️ No matching weight found for: ${selectedTruck}`);
-    }
+  if (selectedTruck === 'PART LOAD') {
+    row.get('ZACT_VOL')?.disable();
+    row.get('ZLF_VOL')?.disable();
+  } else {
+    row.get('ZACT_VOL')?.enable();
+    row.get('ZLF_VOL')?.enable();
   }
 
+  if (!selectedTruck) {
+    row.patchValue({
+      ZTRUC_WT: '',
+      ZACT_LOAD: ''
+    });
+    return;
+  }
+
+  const matchedVehicle = this.vehicleTypes.find(
+    v => v.ZTRUC_TYPE === selectedTruck
+  );
+
+  if (matchedVehicle) {
+    const weight = matchedVehicle.ZTRUC_WT || '';
+
+    row.patchValue({
+      ZTRUC_WT: weight
+    }, { emitEvent: false });
+
+    // ✅ call second method here
+    this.setActualLoadForPartLoad(i, selectedTruck, weight);
+
+    console.log(`✅ Patched ZTRUC_WT: ${weight} for ${selectedTruck}`);
+  } else {
+    row.patchValue({
+      ZTRUC_WT: '',
+      ZACT_LOAD: ''
+    });
+  }
+}
+
+setActualLoadForPartLoad(i: number, truckType: string, weight: any): void {
+  if (truckType === 'PART LOAD') {
+    this.invoices.at(i).patchValue({
+      ZACT_LOAD: weight
+    });
+  }
+}
+onPassingWeightChange(i: number): void {
+  const row = this.invoices.at(i);
+
+  const truckType = row.get('ZTRUC_TYPE')?.value;
+  const passingWeight = row.get('ZTRUC_WT')?.value;
+
+  if (truckType === 'PART LOAD') {
+    row.patchValue({
+      ZACT_LOAD: passingWeight
+    });
+  }
+}
+
+shouldShowVolumeFields(i: number): boolean {
+  const truckType = this.invoices.at(i)?.get('ZTRUC_TYPE')?.value;
+
+  console.log("Truck Type:", truckType);
+
+  return truckType === 'PART LOAD';
+}
 
 
   isSap(): boolean {

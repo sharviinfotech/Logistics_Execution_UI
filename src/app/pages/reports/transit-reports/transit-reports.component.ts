@@ -14,7 +14,6 @@ import autoTable from 'jspdf-autotable';
   selector: 'app-transit-reports',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule, NgSelectModule],
-
   templateUrl: './transit-reports.component.html',
   styleUrls: ['./transit-reports.component.css']
 })
@@ -298,6 +297,10 @@ export class TransitReportsComponent implements OnInit {
         console.log("📦 PDB Data:", res);
 
         this.customerList = res?.[0]?.CUSTOMER || [];
+        this.customerList = this.customerList.map((item: any) => ({
+          ...item,
+          searchText: `${item.CUSTOMER} - ${item.CUSTOMER_NAME}`
+        }));
 
 
         this.spinner.hide();
@@ -330,116 +333,116 @@ export class TransitReportsComponent implements OnInit {
   }
 
   exportToExcel(): void {
-  if (!this.filteredData || this.filteredData.length === 0) {
-    Swal.fire('No Data', 'Nothing to export', 'warning');
-    return;
-  }
-
-  const exportData = this.filteredData.map(row => ({
-    'Reference No': row.REFERENCE_NUMBER,
-    'In/Out': row.INWARD_OUTWARD,
-    'SAP Type': row.SAP_NONSAP,
-    'Plant': row.PLANT,
-    'Division': row.DIVISION,
-    'Customer': row.CUSTOMER,
-    'Product': row.PRODUCT,
-    'Material Desc': row.MATERIAL_DESCRIPTION,
-    'Invoice No': row.INVOICE_NUMBER,
-    'Invoice Date': row.INVOICE_DATE,
-    'Transporter Group': row.TRANSPORTER_GROUP,
-    'Transporter': row.TRANSPORTER,
-    'LR No': row.LR_NO,
-    'Driver': row.DRIVER_NAME,
-    'Mobile': row.DRIVER_MOBILE,
-    'Dispatch Date': row.PHYSICAL_DISPATCH_DATE,
-    'ETA': row.ETA,
-    'Eway No': row.EWAY_NO,
-    'Eway Valid Till': row.EWAY_VALIDITY_TILL,
-    'Status': row.STATUS
-  }));
-
-  const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
-  const workbook: XLSX.WorkBook = {
-    Sheets: { 'Transit Reports': worksheet },
-    SheetNames: ['Transit Reports']
-  };
-
-  XLSX.writeFile(workbook, 'Transit_Reports.xlsx');
-}
-
-downloadPDF() {
-  if (!this.filteredData || this.filteredData.length === 0) {
-    Swal.fire('Warning', 'No data available to download.', 'warning');
-    return;
-  }
-
-  const doc = new jsPDF('l', 'mm', 'a2');
-
-  doc.text('Transit Report', 14, 10);
-
-  const tableColumn = [
-    'Reference No',
-    'In/Out',
-    'SAP Type',
-    'Plant',
-    'Division',
-    'Customer',
-    'Product',
-    'Material Desc',
-    'Invoice No',
-    'Invoice Date',
-    'Transporter Group',
-    'Transporter',
-    'LR No',
-    'Driver',
-    'Mobile',
-    'Dispatch Date',
-    'ETA',
-    'Eway No',
-    'Eway Valid Till',
-    'Status'
-  ];
-
-  const tableRows = this.filteredData.map((row: any) => [
-    row.REFERENCE_NUMBER || '',
-    row.INWARD_OUTWARD || '',
-    row.SAP_NONSAP || '',
-    row.PLANT || '',
-    row.DIVISION || '',
-    row.CUSTOMER || '',
-    row.PRODUCT || '',
-    row.MATERIAL_DESCRIPTION || '',
-    row.INVOICE_NUMBER || '',
-    this.formatDate(row.INVOICE_DATE),
-    row.TRANSPORTER_GROUP || '',
-    row.TRANSPORTER || '',
-    row.LR_NO || '',
-    row.DRIVER_NAME || '',
-    row.DRIVER_MOBILE || '',
-    this.formatDate(row.PHYSICAL_DISPATCH_DATE),
-    row.ETA || '',
-    row.EWAY_NO || '',
-    row.EWAY_VALIDITY_TILL || '',
-    row.STATUS || ''
-  ]);
-
-  autoTable(doc, {
-    head: [tableColumn],
-    body: tableRows,
-    startY: 15,
-    styles: {
-      fontSize: 7,
-      cellWidth: 'wrap'
-    },
-    headStyles: {
-      fillColor: [41, 128, 185],
-      fontSize: 7
+    if (!this.filteredData || this.filteredData.length === 0) {
+      Swal.fire('No Data', 'Nothing to export', 'warning');
+      return;
     }
-  });
 
-  doc.save(`Transit_Report_${Date.now()}.pdf`);
+    const exportData = this.filteredData.map(row => ({
+      'Reference No': row.REFERENCE_NUMBER,
+      'In/Out': row.INWARD_OUTWARD,
+      'SAP Type': row.SAP_NONSAP,
+      'Plant': row.PLANT,
+      'Division': row.DIVISION,
+      'Customer': row.CUSTOMER,
+      'Product': row.PRODUCT,
+      'Material Desc': row.MATERIAL_DESCRIPTION,
+      'Invoice No': row.INVOICE_NUMBER,
+      'Invoice Date': row.INVOICE_DATE,
+      'Transporter Group': row.TRANSPORTER_GROUP,
+      'Transporter': row.TRANSPORTER,
+      'LR No': row.LR_NO,
+      'Driver': row.DRIVER_NAME,
+      'Mobile': row.DRIVER_MOBILE,
+      'Dispatch Date': row.PHYSICAL_DISPATCH_DATE,
+      'ETA': row.ETA,
+      'Eway No': row.EWAY_NO,
+      'Eway Valid Till': row.EWAY_VALIDITY_TILL,
+      'Status': row.STATUS
+    }));
 
-  Swal.fire('Success', 'PDF downloaded successfully.', 'success');
-}
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook: XLSX.WorkBook = {
+      Sheets: { 'Transit Reports': worksheet },
+      SheetNames: ['Transit Reports']
+    };
+
+    XLSX.writeFile(workbook, 'Transit_Reports.xlsx');
+  }
+
+  downloadPDF() {
+    if (!this.filteredData || this.filteredData.length === 0) {
+      Swal.fire('Warning', 'No data available to download.', 'warning');
+      return;
+    }
+
+    const doc = new jsPDF('l', 'mm', 'a2');
+
+    doc.text('Transit Report', 14, 10);
+
+    const tableColumn = [
+      'Reference No',
+      'In/Out',
+      'SAP Type',
+      'Plant',
+      'Division',
+      'Customer',
+      'Product',
+      'Material Desc',
+      'Invoice No',
+      'Invoice Date',
+      'Transporter Group',
+      'Transporter',
+      'LR No',
+      'Driver',
+      'Mobile',
+      'Dispatch Date',
+      'ETA',
+      'Eway No',
+      'Eway Valid Till',
+      'Status'
+    ];
+
+    const tableRows = this.filteredData.map((row: any) => [
+      row.REFERENCE_NUMBER || '',
+      row.INWARD_OUTWARD || '',
+      row.SAP_NONSAP || '',
+      row.PLANT || '',
+      row.DIVISION || '',
+      row.CUSTOMER || '',
+      row.PRODUCT || '',
+      row.MATERIAL_DESCRIPTION || '',
+      row.INVOICE_NUMBER || '',
+      this.formatDate(row.INVOICE_DATE),
+      row.TRANSPORTER_GROUP || '',
+      row.TRANSPORTER || '',
+      row.LR_NO || '',
+      row.DRIVER_NAME || '',
+      row.DRIVER_MOBILE || '',
+      this.formatDate(row.PHYSICAL_DISPATCH_DATE),
+      row.ETA || '',
+      row.EWAY_NO || '',
+      row.EWAY_VALIDITY_TILL || '',
+      row.STATUS || ''
+    ]);
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 15,
+      styles: {
+        fontSize: 7,
+        cellWidth: 'wrap'
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        fontSize: 7
+      }
+    });
+
+    doc.save(`Transit_Report_${Date.now()}.pdf`);
+
+    Swal.fire('Success', 'PDF downloaded successfully.', 'success');
+  }
 
 }

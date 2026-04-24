@@ -33,7 +33,7 @@ export class FreightbillsComponent {
   IncotermsList: any[] = [];
   destStateZoneList: any[] = [];
   destLocationList: any[] = [];
-   inoutOptions = [
+  inoutOptions = [
     { value: 'INWARD', label: 'Inward' },
     { value: 'OUTWARD', label: 'Outward' }
   ];
@@ -42,11 +42,11 @@ export class FreightbillsComponent {
     { value: 'SAP', label: 'SAP' },
     { value: 'NONSAP', label: 'Non-SAP' }
   ];
-  
+
   provisionAccountOptions = [
-  { label: 'PROVISION', value: 'PROVISION' },
-  { label: 'ACCOUNT', value: 'ACCOUNT' }
-];
+    { label: 'PROVISION', value: 'PROVISION' },
+    { label: 'ACCOUNT', value: 'ACCOUNT' }
+  ];
 
   transGroupOptions = [
     { value: 'FULL TRUCK LOAD', label: 'FULL TRUCK LOAD' },
@@ -302,6 +302,10 @@ export class FreightbillsComponent {
         console.log("📦 PDB Data:", res);
 
         this.customerList = res?.[0]?.CUSTOMER || [];
+        this.customerList = this.customerList.map((item: any) => ({
+          ...item,
+          searchText: `${item.CUSTOMER} - ${item.CUSTOMER_NAME}`
+        }));
 
 
         this.spinner.hide();
@@ -328,110 +332,110 @@ export class FreightbillsComponent {
     });
   }
 
-    exportToExcel(): void {
-  if (!this.filteredData || this.filteredData.length === 0) {
-    Swal.fire('No Data', 'Nothing to export', 'warning');
-    return;
-  }
-
-const exportData = this.filteredData.map(row => ({
-  'Reference No': row.REFERENCE_NUMBER,
-  'In/Out': row.INWARD_OUTWARD,
-  'SAP Type': row.SAP_NONSAP,
-  'Plant': row.PLANT,
-  'Division': row.DIVISION,
-  'Customer': row.CUSTOMER,
-  'Product': row.PRODUCT,
-  'Product Description': row.PRODUCT_DESCRIPTION,
-  'Invoice No': row.INVOICE_NUMBER,
-  'Invoice Date': row.INVOICE_DATE,
-  'Transporter Group': row.TRANSPORTER_GROUP,
-  'Transporter': row.TRANSPORTER,
-  'LR No': row.LR_NO,
-  'Delivery Date': row.DELIVERY_DATE,
-  'POD Submitted Date': row.POD_SUBMITTED_DATE || '-',
-  'Provision Account Status': row.PROVISION_ACCOUNT_STATUS,
-  'Freight Bill Status': row.FREIGHT_BILL_STATUS,
-  'Pending Days': row.PENDING_DAYS
-}));
-
-  const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
-  const workbook: XLSX.WorkBook = {
-    Sheets: { 'Freight Bills': worksheet },
-    SheetNames: ['Freight Bills']
-  };
-
-  XLSX.writeFile(workbook, 'Freight_Bills.xlsx');
-}
-
-downloadPDF() {
-  if (!this.filteredData || this.filteredData.length === 0) {
-    Swal.fire('Warning', 'No data available to download.', 'warning');
-    return;
-  }
-
-  const doc = new jsPDF('l', 'mm', 'a2');
-
-  doc.text('Freight Bills Report', 14, 10);
-
- const tableColumn = [
-  'Reference No',
-  'In/Out',
-  'SAP Type',
-  'Plant',
-  'Division',
-  'Customer',
-  'Product',
-  'Product Description',
-  'Invoice No',
-  'Invoice Date',
-  'Transporter Group',
-  'Transporter',
-  'LR No',
-  'Delivery Date',
-  'POD Submitted Date',
-  'Provision Account Status',
-  'Freight Bill Status',
-  'Pending Days'
-];
-
-const tableRows = this.filteredData.map((row: any) => [
-  row.REFERENCE_NUMBER || '',
-  row.INWARD_OUTWARD || '',
-  row.SAP_NONSAP || '',
-  row.PLANT || '',
-  row.DIVISION || '',
-  row.CUSTOMER || '',
-  row.PRODUCT || '',
-  row.PRODUCT_DESCRIPTION || '',
-  row.INVOICE_NUMBER || '',
-  this.formatDate(row.INVOICE_DATE),
-  row.TRANSPORTER_GROUP || '',
-  row.TRANSPORTER || '',
-  row.LR_NO || '',
-  this.formatDate(row.DELIVERY_DATE),
-  row.POD_SUBMITTED_DATE || '-',
-  row.PROVISION_ACCOUNT_STATUS || '',
-  row.FREIGHT_BILL_STATUS || '',
-  row.PENDING_DAYS || ''
-]);
-
-  autoTable(doc, {
-    head: [tableColumn],
-    body: tableRows,
-    startY: 15,
-    styles: {
-      fontSize: 7,
-      cellWidth: 'wrap'
-    },
-    headStyles: {
-      fillColor: [41, 128, 185],
-      fontSize: 7
+  exportToExcel(): void {
+    if (!this.filteredData || this.filteredData.length === 0) {
+      Swal.fire('No Data', 'Nothing to export', 'warning');
+      return;
     }
-  });
 
-  doc.save(`Freight_Bills_Report_${Date.now()}.pdf`);
+    const exportData = this.filteredData.map(row => ({
+      'Reference No': row.REFERENCE_NUMBER,
+      'In/Out': row.INWARD_OUTWARD,
+      'SAP Type': row.SAP_NONSAP,
+      'Plant': row.PLANT,
+      'Division': row.DIVISION,
+      'Customer': row.CUSTOMER,
+      'Product': row.PRODUCT,
+      'Product Description': row.PRODUCT_DESCRIPTION,
+      'Invoice No': row.INVOICE_NUMBER,
+      'Invoice Date': row.INVOICE_DATE,
+      'Transporter Group': row.TRANSPORTER_GROUP,
+      'Transporter': row.TRANSPORTER,
+      'LR No': row.LR_NO,
+      'Delivery Date': row.DELIVERY_DATE,
+      'POD Submitted Date': row.POD_SUBMITTED_DATE || '-',
+      'Provision Account Status': row.PROVISION_ACCOUNT_STATUS,
+      'Freight Bill Status': row.FREIGHT_BILL_STATUS,
+      'Pending Days': row.PENDING_DAYS
+    }));
 
-  Swal.fire('Success', 'PDF downloaded successfully.', 'success');
-}
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook: XLSX.WorkBook = {
+      Sheets: { 'Freight Bills': worksheet },
+      SheetNames: ['Freight Bills']
+    };
+
+    XLSX.writeFile(workbook, 'Freight_Bills.xlsx');
+  }
+
+  downloadPDF() {
+    if (!this.filteredData || this.filteredData.length === 0) {
+      Swal.fire('Warning', 'No data available to download.', 'warning');
+      return;
+    }
+
+    const doc = new jsPDF('l', 'mm', 'a2');
+
+    doc.text('Freight Bills Report', 14, 10);
+
+    const tableColumn = [
+      'Reference No',
+      'In/Out',
+      'SAP Type',
+      'Plant',
+      'Division',
+      'Customer',
+      'Product',
+      'Product Description',
+      'Invoice No',
+      'Invoice Date',
+      'Transporter Group',
+      'Transporter',
+      'LR No',
+      'Delivery Date',
+      'POD Submitted Date',
+      'Provision Account Status',
+      'Freight Bill Status',
+      'Pending Days'
+    ];
+
+    const tableRows = this.filteredData.map((row: any) => [
+      row.REFERENCE_NUMBER || '',
+      row.INWARD_OUTWARD || '',
+      row.SAP_NONSAP || '',
+      row.PLANT || '',
+      row.DIVISION || '',
+      row.CUSTOMER || '',
+      row.PRODUCT || '',
+      row.PRODUCT_DESCRIPTION || '',
+      row.INVOICE_NUMBER || '',
+      this.formatDate(row.INVOICE_DATE),
+      row.TRANSPORTER_GROUP || '',
+      row.TRANSPORTER || '',
+      row.LR_NO || '',
+      this.formatDate(row.DELIVERY_DATE),
+      row.POD_SUBMITTED_DATE || '-',
+      row.PROVISION_ACCOUNT_STATUS || '',
+      row.FREIGHT_BILL_STATUS || '',
+      row.PENDING_DAYS || ''
+    ]);
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 15,
+      styles: {
+        fontSize: 7,
+        cellWidth: 'wrap'
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        fontSize: 7
+      }
+    });
+
+    doc.save(`Freight_Bills_Report_${Date.now()}.pdf`);
+
+    Swal.fire('Success', 'PDF downloaded successfully.', 'success');
+  }
 }

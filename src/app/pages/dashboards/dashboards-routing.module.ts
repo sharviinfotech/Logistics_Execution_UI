@@ -36,6 +36,8 @@ import { LoadingFactorCostComponent } from '../reports/loading-factor-cost/loadi
 import { BusinessShareMatrixComponent } from '../reports/business-share-matrix/business-share-matrix.component';
 import { DispatchOrdersComponent } from './dispatch-orders/dispatch-orders.component';
 import { DamageListComponent } from '../reports/damage-list/damage-list.component';
+import { InsuranceComponent } from '../reports/insurance/insurance.component';
+import { ServiceLevelReportComponent } from '../reports/service-level-report/service-level-report.component';
 
 
 // import { CooisComponent } from './coois/coois.component';
@@ -107,7 +109,7 @@ const routes: Routes = [
     },
     {
         path: 'Dispatchorders',
-        component:DispatchOrdersComponent
+        component: DispatchOrdersComponent
     },
     {
         path: 'dispatch',
@@ -174,14 +176,23 @@ const routes: Routes = [
         path: "Loading-Factor-Cost",
         component: LoadingFactorCostComponent,
     },
-        {
-            path: "businessshare-matrix",
-            component: BusinessShareMatrixComponent,
-        },
-        {
-            path: "damage-list",
-            component: DamageListComponent,
-        }
+    {
+        path: "businessshare-matrix",
+        component: BusinessShareMatrixComponent,
+    },
+    {
+        path: "damage-list",
+        component: DamageListComponent,
+    },
+    {
+        path: "insurance",
+        component: InsuranceComponent,
+    },
+    {
+        path: "service-level-report",
+        component: ServiceLevelReportComponent,
+    },
+
 
 
 

@@ -31,6 +31,7 @@ export class LoadingFactorCostComponent implements OnInit {
   destStateZoneList: any[] = [];
   IncotermsList: any[] = [];
   segmentList: any[] = [];
+  customergroupList: any[] = [];
 
   // Add these static option arrays
 inoutOptions = [
@@ -333,6 +334,7 @@ onCustomerChange(): void {
             data.DEST_LOC ||
             [];
             this.destStateZoneList = data.DEST_STZ || [];
+            this.customergroupList = data.CUSTGRP || [];
 
         }
       },
