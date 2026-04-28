@@ -35,6 +35,7 @@ export class ServiceLevelReportComponent implements OnInit {
   destStateZoneList: any[] = [];
   isDropdownOpen = false;
   selectedZones: string[] = [];
+  selectedReportType: string = '';
   customergroupList: any[] = [];
   segmentList: any[] = [];
 
@@ -98,8 +99,8 @@ export class ServiceLevelReportComponent implements OnInit {
       DEST_STATE: [[]],
       DEST_ZONE: [[]],
       INCOTERMS: [''],
-       REPORT_TYPE: ['']
-      
+      REPORT_TYPE: ['', Validators.required]
+
 
     });
     const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
@@ -196,9 +197,8 @@ export class ServiceLevelReportComponent implements OnInit {
 
       return;
     }
-
-
     const form = this.filterForm.value;
+    this.selectedReportType = form.REPORT_TYPE;
 
     const payload = {
       inward_outward: this.createArray(form.INOUT, 'inout'),
@@ -210,19 +210,21 @@ export class ServiceLevelReportComponent implements OnInit {
       plant: this.createArray(form.WERKS, 'plant'),
       product: this.createArray(form.MATNR, 'product'),
       division: this.createArray(form.DIVISION, 'division'),
+      customer_group: this.createArray(form.CUSTOMER_GROUP, 'customer_group'),
+      segment: this.createArray(form.SEGMENT, 'segment'),
       customer: this.createArray(form.CUSTOMER, 'customer'),
-      branch: this.createArray(form.BRANCH, 'branch'),
-      branch_zone: this.createArray(form.BRANCH_ZONE, 'branch_zone'),
       destination_location: this.createArray(form.DEST_LOCATION, 'destination_location'),
       destination_state: this.createArray(form.DEST_STATE, 'destination_state'),
       destination_zone: this.createArray(form.DEST_ZONE, 'destination_zone'),
-      incoterms: this.createArray(form.INCOTERMS, 'incoterms')
+      incoterms: this.createArray(form.INCOTERMS, 'incoterms'),
+      vehicle: this.createArray(form.TRANS_GROUP, 'vehicle'),
+      mode: form.REPORT_TYPE
     };
     console.log('Payload:', payload);
 
     this.spinner.show(); // optional spinner start
 
-    this.service.FetchTransitReport(payload).subscribe({
+    this.service.FetchServiceLevelReports(payload).subscribe({
       next: (res: any) => {
         this.spinner.hide();
 
@@ -340,36 +342,69 @@ export class ServiceLevelReportComponent implements OnInit {
       return;
     }
 
-    const exportData = this.filteredData.map(row => ({
-      'Reference No': row.REFERENCE_NUMBER,
-      'In/Out': row.INWARD_OUTWARD,
-      'SAP Type': row.SAP_NONSAP,
-      'Plant': row.PLANT,
-      'Division': row.DIVISION,
-      'Customer': row.CUSTOMER,
-      'Product': row.PRODUCT,
-      'Material Desc': row.MATERIAL_DESCRIPTION,
-      'Invoice No': row.INVOICE_NUMBER,
-      'Invoice Date': row.INVOICE_DATE,
-      'Transporter Group': row.TRANSPORTER_GROUP,
-      'Transporter': row.TRANSPORTER,
-      'LR No': row.LR_NO,
-      'Driver': row.DRIVER_NAME,
-      'Mobile': row.DRIVER_MOBILE,
-      'Dispatch Date': row.PHYSICAL_DISPATCH_DATE,
-      'ETA': row.ETA,
-      'Eway No': row.EWAY_NO,
-      'Eway Valid Till': row.EWAY_VALIDITY_TILL,
-      'Status': row.STATUS
-    }));
+    let exportData: any[] = [];
+    let fileName = '';
+
+    // DETAILED
+    if (this.selectedReportType === 'Detailed') {
+      fileName = 'Service_Level_Detailed_Report';
+
+      exportData = this.filteredData.map(row => ({
+        'Reference No': row.REFERENCE_NUMBER,
+        'SAP Type': row.SAP_NONSAP,
+        'Financial Year': row.FINANCIAL_YEAR,
+        'Month': row.MONTH,
+        'Plant': row.PLANT,
+        'Transporter Group': row.TRANSPORTER_GROUP,
+        'Transporter': row.TRANSPORTER,
+        'LR Number': row.LR_NUMBER,
+        'LR Date': row.LR_DATE,
+        'Division': row.DIVISION,
+        'Sub Division': row.SUB_DIVISION,
+        'Customer Group': row.CUSTOMER_GROUP,
+        'Customer': row.CUSTOMER,
+        'No Of Vehicles': row.NO_OF_VEHICLES_PLACED,
+        'Vehicle Type': row.VEHICLE_TYPE,
+        'On Time Placement': row.ON_TIME_PLACEMENT,
+        'Transhipment': row.TRANSHIPMENT_IF_ANY,
+        'On Time Delivery': row.ON_TIME_DELIVERY,
+        'Damage': row.DAMAGE_IF_ANY,
+        'Accident': row.ACCIDENT_IF_ANY,
+        'Total Score': row.TOTAL_SCORE,
+        'Feedback Date': row.FEEDBACK_SUBMITTED_DATE,
+        'Feedback': row.FEEDBACK_FROM_USER
+      }));
+    }
+
+    // SUMMARY
+    else if (this.selectedReportType === 'Summary') {
+      fileName = 'Service_Level_Summary_Audit_Report';
+
+      exportData = this.filteredData.map(row => ({
+        'Transporter Group': row.TRANSPORTER_GROUP,
+        'Transporter': row.TRANSPORTER,
+        'No Of Feedbacks': row.NO_OF_FEEDBACKS,
+        'No Of Vehicles': row.NO_OF_VEHICLE_PLACED,
+        'On Time Placement %': row.ON_TIME_PLACEMENT_PER,
+        'Transhipment %': row.TRANSHIPMENT_IF_ANY_PER,
+        'On Time Delivery %': row.ON_TIME_DELIVERY_PER,
+        'Damage %': row.DAMAGE_IF_ANY_PER,
+        'Accident %': row.ACCIDENT_IF_ANY_PER,
+        'Problem Material Load %': row.PROB_MAT_LOAD_DURING_TRANS_PER,
+        'Other Material Load %': row.OTH_MAT_LOAD_DURING_TRANS_PER,
+        'POD Submission %': row.ON_TIME_POD_SUBMISSION_PER,
+        'Freight Bill Submission %': row.ON_TIME_FREIGHT_BILL_SUB_PER,
+        'Overall Feedback %': row.OVERALL_FEEDBACK_FROM_USER_PER
+      }));
+    }
 
     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
     const workbook: XLSX.WorkBook = {
-      Sheets: { 'Transit Reports': worksheet },
-      SheetNames: ['Transit Reports']
+      Sheets: { Report: worksheet },
+      SheetNames: ['Report']
     };
 
-    XLSX.writeFile(workbook, 'Transit_Reports.xlsx');
+    XLSX.writeFile(workbook, `${fileName}.xlsx`);
   }
 
   downloadPDF() {
@@ -380,69 +415,122 @@ export class ServiceLevelReportComponent implements OnInit {
 
     const doc = new jsPDF('l', 'mm', 'a2');
 
-    doc.text('Transit Report', 14, 10);
+    let tableColumn: string[] = [];
+    let tableRows: any[] = [];
+    let fileName = '';
 
-    const tableColumn = [
-      'Reference No',
-      'In/Out',
-      'SAP Type',
-      'Plant',
-      'Division',
-      'Customer',
-      'Product',
-      'Material Desc',
-      'Invoice No',
-      'Invoice Date',
-      'Transporter Group',
-      'Transporter',
-      'LR No',
-      'Driver',
-      'Mobile',
-      'Dispatch Date',
-      'ETA',
-      'Eway No',
-      'Eway Valid Till',
-      'Status'
-    ];
+    // DETAILED
+    if (this.selectedReportType === 'Detailed') {
+      fileName = 'Service_Level_Detailed_Report';
 
-    const tableRows = this.filteredData.map((row: any) => [
-      row.REFERENCE_NUMBER || '',
-      row.INWARD_OUTWARD || '',
-      row.SAP_NONSAP || '',
-      row.PLANT || '',
-      row.DIVISION || '',
-      row.CUSTOMER || '',
-      row.PRODUCT || '',
-      row.MATERIAL_DESCRIPTION || '',
-      row.INVOICE_NUMBER || '',
-      this.formatDate(row.INVOICE_DATE),
-      row.TRANSPORTER_GROUP || '',
-      row.TRANSPORTER || '',
-      row.LR_NO || '',
-      row.DRIVER_NAME || '',
-      row.DRIVER_MOBILE || '',
-      this.formatDate(row.PHYSICAL_DISPATCH_DATE),
-      row.ETA || '',
-      row.EWAY_NO || '',
-      row.EWAY_VALIDITY_TILL || '',
-      row.STATUS || ''
-    ]);
+      tableColumn = [
+        'Reference No',
+        'SAP Type',
+        'Financial Year',
+        'Month',
+        'Plant',
+        'Transporter Group',
+        'Transporter',
+        'LR Number',
+        'LR Date',
+        'Division',
+        'Sub Division',
+        'Customer Group',
+        'Customer',
+        'No Of Vehicles',
+        'Vehicle Type',
+        'On Time Placement',
+        'Transhipment',
+        'On Time Delivery',
+        'Damage',
+        'Accident',
+        'Total Score',
+        'Feedback Date',
+        'Feedback'
+      ];
+
+      tableRows = this.filteredData.map(row => [
+        row.REFERENCE_NUMBER,
+        row.SAP_NONSAP,
+        row.FINANCIAL_YEAR,
+        row.MONTH,
+        row.PLANT,
+        row.TRANSPORTER_GROUP,
+        row.TRANSPORTER,
+        row.LR_NUMBER,
+        row.LR_DATE,
+        row.DIVISION,
+        row.SUB_DIVISION,
+        row.CUSTOMER_GROUP,
+        row.CUSTOMER,
+        row.NO_OF_VEHICLES_PLACED,
+        row.VEHICLE_TYPE,
+        row.ON_TIME_PLACEMENT,
+        row.TRANSHIPMENT_IF_ANY,
+        row.ON_TIME_DELIVERY,
+        row.DAMAGE_IF_ANY,
+        row.ACCIDENT_IF_ANY,
+        row.TOTAL_SCORE,
+        row.FEEDBACK_SUBMITTED_DATE,
+        row.FEEDBACK_FROM_USER
+      ]);
+    }
+
+    // SUMMARY
+    else if (this.selectedReportType === 'Summary') {
+      fileName = 'Service_Level_Summary_Audit_Report';
+
+      tableColumn = [
+        'Transporter Group',
+        'Transporter',
+        'No Of Feedbacks',
+        'No Of Vehicles',
+        'On Time Placement %',
+        'Transhipment %',
+        'On Time Delivery %',
+        'Damage %',
+        'Accident %',
+        'Problem Material Load %',
+        'Other Material Load %',
+        'POD Submission %',
+        'Freight Bill Submission %',
+        'Overall Feedback %'
+      ];
+
+      tableRows = this.filteredData.map(row => [
+        row.TRANSPORTER_GROUP,
+        row.TRANSPORTER,
+        row.NO_OF_FEEDBACKS,
+        row.NO_OF_VEHICLE_PLACED,
+        row.ON_TIME_PLACEMENT_PER,
+        row.TRANSHIPMENT_IF_ANY_PER,
+        row.ON_TIME_DELIVERY_PER,
+        row.DAMAGE_IF_ANY_PER,
+        row.ACCIDENT_IF_ANY_PER,
+        row.PROB_MAT_LOAD_DURING_TRANS_PER,
+        row.OTH_MAT_LOAD_DURING_TRANS_PER,
+        row.ON_TIME_POD_SUBMISSION_PER,
+        row.ON_TIME_FREIGHT_BILL_SUB_PER,
+        row.OVERALL_FEEDBACK_FROM_USER_PER
+      ]);
+    }
+
+    doc.text(fileName, 14, 10);
 
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
       startY: 15,
       styles: {
-        fontSize: 7,
+        fontSize: 6,
         cellWidth: 'wrap'
       },
       headStyles: {
-        fillColor: [41, 128, 185],
-        fontSize: 7
+        fillColor: [41, 128, 185]
       }
     });
 
-    doc.save(`Transit_Report_${Date.now()}.pdf`);
+    doc.save(`${fileName}.pdf`);
 
     Swal.fire('Success', 'PDF downloaded successfully.', 'success');
   }

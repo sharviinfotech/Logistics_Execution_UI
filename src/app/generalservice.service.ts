@@ -465,6 +465,10 @@ export class GeneralserviceService {
     return this.http.post(environment.baseUrl + 'api/external/LE/Reports/FetchInsuranceReportsDetails', obj);
   }
 
+  FetchServiceLevelReports(obj) {
+    return this.http.post(environment.baseUrl + 'api/external/LE/Reports/FetchServiceLevelDetails', obj);
+  }
+
   FetchDispatchOrderFlowData(obj) {
     return this.http.post(environment.baseUrl + 'api/external/LE/DispatchOrderFlow/FetchData', obj);
   }

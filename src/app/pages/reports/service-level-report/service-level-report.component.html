@@ -243,7 +243,7 @@
                             <label class="global-ng-select">Customer Name</label>
                         </div>
 
-                        
+
                         <!-- <div class="form-field" [class.filled]="filterForm.get('BRANCH')?.value?.length">
                             <ng-select [items]="branchList" bindLabel="BRANCH_DESC" bindValue="BRANCH_DESC"
                                 formControlName="BRANCH" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
@@ -359,30 +359,21 @@
                             </ng-select>
                             <label class="global-ng-select">Incoterms</label>
                         </div>
+                        <div class="radio-wrapper">
+                            <label class="radio-option">
+                                <input type="radio" formControlName="REPORT_TYPE" value="Detailed">
+                                Detailed
+                            </label>
 
-<!-- <div class="form-field radio-inline">
-    <div class="radio-item">
-        <input type="radio" formControlName="REPORT_TYPE" value="Detailed">
-        <span>Detailed</span>
-    </div>
-
-    <div class="radio-item">
-        <input type="radio" formControlName="REPORT_TYPE" value="Summary">
-        <span>Summary for Audit</span>
-    </div>
-</div> -->
-
-<div class="radio-wrapper">
-    <label class="radio-option">
-        <input type="radio" formControlName="REPORT_TYPE" value="Detailed">
-        Detailed
-    </label>
-
-    <label class="radio-option">
-        <input type="radio" formControlName="REPORT_TYPE" value="Summary">
-        Summary for Audit
-    </label>
-</div>
+                            <label class="radio-option">
+                                <input type="radio" formControlName="REPORT_TYPE" value="Summary">
+                                Summary for Audit
+                            </label>
+                            <span class="text-danger"
+                                *ngIf="filterForm.get('REPORT_TYPE')?.touched && filterForm.get('REPORT_TYPE')?.invalid">
+                                Please select report type
+                            </span>
+                        </div>
 
                     </div>
                     <div class="col-12 mt-3 d-flex justify-content-end gap-2">
@@ -437,60 +428,107 @@
                 </div>
 
                 <!-- TABLE -->
-                <div *ngIf="filteredData.length > 0" class="table-responsive">
+                <div *ngIf="filteredData.length > 0 && selectedReportType === 'Detailed'" class="table-responsive">
                     <table class="table table-bordered table-hover">
 
                         <thead class="bg-light">
                             <tr>
                                 <th>Reference No</th>
-                                <th>In/Out</th>
                                 <th>SAP Type</th>
+                                <th>Financial Year</th>
+                                <th>Month</th>
                                 <th>Plant</th>
-                                <th>Division</th>
-                                <th>Customer</th>
-                                <th>Product</th>
-                                <th>Material Desc</th>
-                                <th>Invoice No</th>
-                                <th>Invoice Date</th>
                                 <th>Transporter Group</th>
                                 <th>Transporter</th>
-                                <th>LR No</th>
-                                <th>Driver</th>
-                                <th>Mobile</th>
-                                <th>Dispatch Date</th>
-                                <th>ETA</th>
-                                <th>Eway No</th>
-                                <th>Eway Valid Till</th>
-                                <th>Status</th>
+                                <th>LR Number</th>
+                                <th>LR Date</th>
+                                <th>Division</th>
+                                <th>Sub Division</th>
+                                <th>Customer Group</th>
+                                <th>Customer</th>
+                                <th>No Of Vehicles</th>
+                                <th>Vehicle Type</th>
+                                <th>On Time Placement</th>
+                                <th>Transhipment</th>
+                                <th>On Time Delivery</th>
+                                <th>Damage</th>
+                                <th>Accident</th>
+                                <th>Total Score</th>
+                                <th>Feedback Date</th>
+                                <th>Feedback</th>
                             </tr>
                         </thead>
 
                         <tbody>
                             <tr *ngFor="let row of filteredData">
                                 <td>{{ row.REFERENCE_NUMBER }}</td>
-                                <td>{{ row.INWARD_OUTWARD }}</td>
-                                <td>{{ row.SAP_NONSAP || '-' }}</td>
+                                <td>{{ row.SAP_NONSAP }}</td>
+                                <td>{{ row.FINANCIAL_YEAR }}</td>
+                                <td>{{ row.MONTH }}</td>
                                 <td>{{ row.PLANT }}</td>
-                                <td>{{ row.DIVISION }}</td>
-                                <td>{{ row.CUSTOMER }}</td>
-                                <td>{{ row.PRODUCT || '-' }}</td>
-                                <td>{{ row.MATERIAL_DESCRIPTION || '-' }}</td>
-                                <td>{{ row.INVOICE_NUMBER }}</td>
-                                <td>{{ row.INVOICE_DATE }}</td>
                                 <td>{{ row.TRANSPORTER_GROUP }}</td>
                                 <td>{{ row.TRANSPORTER }}</td>
-                                <td>{{ row.LR_NO }}</td>
-                                <td>{{ row.DRIVER_NAME || '-' }}</td>
-                                <td>{{ row.DRIVER_MOBILE || '-' }}</td>
-                                <td>{{ row.PHYSICAL_DISPATCH_DATE }}</td>
-                                <td>{{ row.ETA || '-' }}</td>
-                                <td>{{ row.EWAY_NO || '-' }}</td>
-                                <td>{{ row.EWAY_VALIDITY_TILL || '-' }}</td>
-                                <td>{{ row.STATUS }}</td>
+                                <td>{{ row.LR_NUMBER }}</td>
+                                <td>{{ row.LR_DATE }}</td>
+                                <td>{{ row.DIVISION }}</td>
+                                <td>{{ row.SUB_DIVISION }}</td>
+                                <td>{{ row.CUSTOMER_GROUP }}</td>
+                                <td>{{ row.CUSTOMER }}</td>
+                                <td>{{ row.NO_OF_VEHICLES_PLACED }}</td>
+                                <td>{{ row.VEHICLE_TYPE }}</td>
+                                <td>{{ row.ON_TIME_PLACEMENT }}</td>
+                                <td>{{ row.TRANSHIPMENT_IF_ANY }}</td>
+                                <td>{{ row.ON_TIME_DELIVERY }}</td>
+                                <td>{{ row.DAMAGE_IF_ANY }}</td>
+                                <td>{{ row.ACCIDENT_IF_ANY }}</td>
+                                <td>{{ row.TOTAL_SCORE }}</td>
+                                <td>{{ row.FEEDBACK_SUBMITTED_DATE }}</td>
+                                <td>{{ row.FEEDBACK_FROM_USER }}</td>
                             </tr>
                         </tbody>
 
+                    </table>
+                </div>
 
+                <div *ngIf="filteredData.length > 0 && selectedReportType === 'Summary'" class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Transporter Group</th>
+                                <th>Transporter</th>
+                                <th>No Of Feedbacks</th>
+                                <th>No Of Vehicles</th>
+                                <th>On Time Placement %</th>
+                                <th>Transhipment %</th>
+                                <th>On Time Delivery %</th>
+                                <th>Damage %</th>
+                                <th>Accident %</th>
+                                <th>Problem Material Load %</th>
+                                <th>Other Material Load %</th>
+                                <th>POD Submission %</th>
+                                <th>Freight Bill Submission %</th>
+                                <th>Overall Feedback %</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr *ngFor="let row of filteredData">
+                                <td>{{ row.TRANSPORTER_GROUP }}</td>
+                                <td>{{ row.TRANSPORTER }}</td>
+                                <td>{{ row.NO_OF_FEEDBACKS }}</td>
+                                <td>{{ row.NO_OF_VEHICLE_PLACED }}</td>
+                                <td>{{ row.ON_TIME_PLACEMENT_PER }}</td>
+                                <td>{{ row.TRANSHIPMENT_IF_ANY_PER }}</td>
+                                <td>{{ row.ON_TIME_DELIVERY_PER }}</td>
+                                <td>{{ row.DAMAGE_IF_ANY_PER }}</td>
+                                <td>{{ row.ACCIDENT_IF_ANY_PER }}</td>
+                                <td>{{ row.PROB_MAT_LOAD_DURING_TRANS_PER }}</td>
+                                <td>{{ row.OTH_MAT_LOAD_DURING_TRANS_PER }}</td>
+                                <td>{{ row.ON_TIME_POD_SUBMISSION_PER }}</td>
+                                <td>{{ row.ON_TIME_FREIGHT_BILL_SUB_PER }}</td>
+                                <td>{{ row.OVERALL_FEEDBACK_FROM_USER_PER }}</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
 

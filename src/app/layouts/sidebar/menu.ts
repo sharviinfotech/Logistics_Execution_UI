@@ -166,13 +166,13 @@ export const MENU: MenuItem[] = [
                 icon: "bx-shield",
                 parentId: 12,
             },
-            // {
-            //     id: 16,
-            //     label: "Service Level",
-            //     link: "/service-level-report",
-            //     icon: "bx-cog",
-            //     parentId: 12,
-            // },
+            {
+                id: 16,
+                label: "Service Level",
+                link: "/service-level-report",
+                icon: "bx-cog",
+                parentId: 12,
+            },
 
 
         ],
