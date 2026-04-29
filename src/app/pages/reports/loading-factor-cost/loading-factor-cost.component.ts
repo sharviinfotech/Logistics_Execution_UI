@@ -282,22 +282,28 @@ const payload = {
     });
   }
 
-fetchpdb(): void {
-  this.spinner.show();
-  this.service.getpdb().subscribe(
-    (res: any) => {
-      console.log("PDB Data:", res);
+  fetchpdb(): void {
+    this.spinner.show();
+    this.service.getpdb().subscribe(
+      (res: any) => {
 
-      this.customerList = res?.[0]?.CUSTOMER || [];
+        console.log("Customer Data:", res);
 
-      this.spinner.hide();
-    },
-    error => {
-      console.error("❌ PDB Fetch Error:", error);
-      this.spinner.hide();
-    }
-  );
-}
+        this.customerList = res?.[0]?.CUSTOMER || [];
+        this.customerList = this.customerList.map((item: any) => ({
+          ...item,
+          searchText: `${item.CUSTOMER} - ${item.CUSTOMER_NAME}`
+        }));
+
+
+        this.spinner.hide();
+      },
+      error => {
+        console.error("❌ PDB Fetch Error:", error);
+        this.spinner.hide();
+      }
+    );
+  }
 
 onCustomerChange(): void {
   const selectedValues = this.Pendingform.get('CUSTOMER')?.value;

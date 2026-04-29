@@ -127,8 +127,8 @@ export class InvoiceLoadDetailsComponent implements OnInit {
       ZTRUC_WT: [data?.ZTRUC_WT || '', Validators.required],
       ZACT_LOAD: [data?.ZACT_LOAD || '', Validators.required],
       // ZTRUCK_LINE: [data?.ZTRUCK_LINE || ''],
-      ZACT_VOL: [data?.ZACT_VOL || '', Validators.required],
-      ZLF_VOL: [data?.ZLF_VOL || '', Validators.required],
+      ZACT_VOL: [data?.ZACT_VOL || ''],
+      ZLF_VOL: [data?.ZLF_VOL || ''],
       ZLF_WT: [data?.ZLF_WT || '', Validators.required],
       ZWEEK_SF: [data?.ZWEEK_SF || ''],
       ZEWAYBILL_NO: [data?.ZEWAYBILL_NO || '', Validators.required],
@@ -758,100 +758,103 @@ export class InvoiceLoadDetailsComponent implements OnInit {
   }
 
   // 8. ✅ Update saveInvoiceNonsapDetails similarly
-  saveInvoiceNonsapDetails(action: 'stay' | 'next' | 'previous' = 'stay'): void {
+saveInvoiceNonsapDetails(action: 'stay' | 'next' | 'previous' = 'stay'): void {
 
-    const filtered = this.invoices.value
-      .filter((row: any) => row.selected === true)
-      .map(({ selected, ...rest }) => rest);
+  const filtered = this.invoices.value
+    .filter((row: any) => row.selected === true)
+    .map(({ selected, ...rest }) => rest);
 
-    if (filtered.length === 0) {
-      Swal.fire({
-        title: 'Warning',
-        text: 'Please select at least one row to save.',
-        icon: 'warning',
-        timer: 3000,
-        confirmButtonText: 'Ok',
-      });
-      return;
-    }
-
-    const dcRefNo = this.InvoiceForm.get('INV_VBELN')?.value;
-    if (!dcRefNo || dcRefNo.trim() === '') {
-      Swal.fire('Warning', 'Please enter DC Reference Number', 'warning');
-      return;
-    }
-
-    if (this.InvoiceForm.invalid) {
-      Swal.fire('Error', 'Please fill all required fields', 'error');
-      return;
-    }
-
-
-
-    if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        text: 'Please select at least one reference row before saving'
-      });
-      return;
-    }
-
-    const payload = {
-      NSAP_LOAD: filtered.map((inv: any, index: number) => ({
-        MANDT: '',
-        ZREFNO: inv.ZREFNO || "",
-        ZWORK_ORDER: inv.ZWORK_ORDER || "",
-        ZLRNO: inv.ZLRNO || "",
-        ZTRANSPORTER: inv.ZTRANSPORTER || "",
-        VBELN: dcRefNo,
-        POSNR: index + 10,
-        ZLINE_NO: inv.ZLINE_NO,
-        ZTRUC_TYPE: inv.ZTRUC_TYPE,
-        ZTRUC_WT: inv.ZTRUC_WT,
-        ZACT_LOAD: inv.ZACT_LOAD,
-        ZACT_VOL: inv.ZACT_VOL,
-        ZLF_VOL: inv.ZLF_VOL,
-        ZLF_WT: inv.ZLF_WT,
-        ZODN_NO: inv.ZODN_NO,
-        ZSO_NO: inv.ZSO_NO,
-        ZWEEK_SF: inv.ZWEEK_SF,
-        ZEWAYBILL_NO: inv.ZEWAYBILL_NO,
-        ZEWAYBILL_DT: inv.ZEWAYBILL_DT,
-        ZMAPID: inv.ZMAPID || "",
-        ZUSER: this.getCurrentUser(),
-        ZUSER_CH: ''
-      })),
-    };
-
-    this.spinner.show();
-    this.service.InvoiceloaddetailsNonSap({CHANGE: "",payload}).subscribe({
-      next: (res: any) => {
-        this.spinner.hide();
-        if (res?.NUMBER === '200') {
-          Swal.fire({
-            title: 'Success',
-            text: res.MSG || 'Saved Successfully',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-          }).then(() => {
-            if (action === 'next') {
-              this.router.navigate(['/segment-info']);
-            } else if (action === 'previous') {
-              this.router.navigate(['/shipment-details']);
-            } else {
-              this.resetForm();
-            }
-          });
-        } else {
-          Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
-        }
-      },
-      error: () => {
-        this.spinner.hide();
-        Swal.fire('Error', 'Save failed', 'error');
-      }
+  if (filtered.length === 0) {
+    Swal.fire({
+      title: 'Warning',
+      text: 'Please select at least one row to save.',
+      icon: 'warning',
+      timer: 3000,
+      confirmButtonText: 'Ok',
     });
+    return;
   }
+
+  const dcRefNo = this.InvoiceForm.get('INV_VBELN')?.value;
+  if (!dcRefNo || dcRefNo.trim() === '') {
+    Swal.fire('Warning', 'Please enter DC Reference Number', 'warning');
+    return;
+  }
+
+  if (this.InvoiceForm.invalid) {
+    Swal.fire('Error', 'Please fill all required fields', 'error');
+    return;
+  }
+
+  if (this.orderType === 'Outward' && this.selectedItems.length === 0) {
+    Swal.fire({
+      icon: 'warning',
+      text: 'Please select at least one reference row before saving'
+    });
+    return;
+  }
+
+  const payload = {
+    CHANGE: "",
+    NSAP_LOAD: filtered.map((inv: any, index: number) => ({
+      MANDT: "",
+      ZREFNO: inv.ZREFNO || "",
+      ZWORK_ORDER: inv.ZWORK_ORDER || "",
+      ZLRNO: inv.ZLRNO || "",
+      ZTRANSPORTER: inv.ZTRANSPORTER || "",
+      VBELN: dcRefNo,
+      POSNR: index + 10,
+      ZLINE_NO: inv.ZLINE_NO || 1,
+      ZTRUC_TYPE: inv.ZTRUC_TYPE || "",
+      ZTRUC_WT: inv.ZTRUC_WT || "",
+      ZACT_LOAD: inv.ZACT_LOAD || "",
+      ZACT_VOL: inv.ZACT_VOL || "",
+      ZLF_VOL: inv.ZLF_VOL || "",
+      ZLF_WT: inv.ZLF_WT || "",
+      ZODN_NO: inv.ZODN_NO || "",
+      ZSO_NO: inv.ZSO_NO || "",
+      ZWEEK_SF: inv.ZWEEK_SF || "",
+      ZEWAYBILL_NO: inv.ZEWAYBILL_NO || "",
+      ZEWAYBILL_DT: inv.ZEWAYBILL_DT || "",
+      ZMAPID: inv.ZMAPID || "",
+      ZUSER: this.getCurrentUser(),
+      ZUSER_CH: ""
+    }))
+  };
+
+  console.log('Final Payload:', payload);
+
+  this.spinner.show();
+
+  this.service.InvoiceloaddetailsNonSap(payload).subscribe({
+    next: (res: any) => {
+      this.spinner.hide();
+
+      if (res?.NUMBER === '200') {
+        Swal.fire({
+          title: 'Success',
+          text: res.MSG || 'Saved Successfully',
+          icon: 'success',
+          confirmButtonText: 'Ok'
+        }).then(() => {
+          if (action === 'next') {
+            this.router.navigate(['/segment-info']);
+          } else if (action === 'previous') {
+            this.router.navigate(['/shipment-details']);
+          } else {
+            this.resetForm();
+          }
+        });
+      } else {
+        Swal.fire('Info', res.MSG || 'Unexpected response', 'info');
+      }
+    },
+    error: () => {
+      this.spinner.hide();
+      Swal.fire('Error', 'Save failed', 'error');
+    }
+  });
+}
 
 
 
