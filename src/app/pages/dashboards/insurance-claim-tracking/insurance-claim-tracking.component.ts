@@ -4,7 +4,7 @@ import {
   FormBuilder,
   FormGroup,
   FormArray,
-   Validators,
+  Validators,
   ReactiveFormsModule,
   FormsModule
 } from '@angular/forms';
@@ -100,6 +100,11 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   loggedInUser: string = '';
   plantList: any;
   divisionList: any;
+  supportingbase64: any = '';
+  supportingpath: any = '';
+  approveFileBase64: any = '';
+  approveFilePath: any = '';
+
   supportingDocError = false;
   approveDocError = false;
 
@@ -159,8 +164,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
       PAY_INFO: [''],
       UTR: [''],
       CLM_SET_DT: [''],
-      SupportingDocument: [''],
-      ApproveDocument: [''],
+      // SupportingDocument: [''],
+      // ApproveDocument: [''],
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
   }
@@ -455,7 +460,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
           d.INV_NO.forEach((inv: any) => {
             if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
               this.invoiceF4List.push(inv.VBELN);
-              this.HeaderForm.patchValue({ VBELN: '' }); 
+              this.HeaderForm.patchValue({ VBELN: '' });
             }
           });
         }
@@ -984,6 +989,11 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     headerValue.SO_NO = headerValue.SO_NO;
     headerValue.ODN_NO = headerValue.ODN_NO || '';
     headerValue.SALE_PERSON = headerValue.SALE_PERSON || '';
+    headerValue.ZSUPT_DOC = this.supportingbase64 || '';
+    headerValue.ZSUPT_PATH = this.supportingpath || '';
+
+    headerValue.ZAPP_DOC = this.approveFileBase64 || '';
+    headerValue.ZAPP_PATH = this.approveFilePath || '';
 
     // 5️⃣ Apply common values to ITEM
     filtered.forEach(row => {
@@ -1015,8 +1025,8 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
         if (res?.STATUS === 'TRUE') {
           Swal.fire({
-            text: '✅ Data Saved Successfully!',
-            icon: 'success',
+             icon: 'success',
+            text: res?.MESSAGE || 'Data Saved Successfully',
             confirmButtonText: 'Ok',
             willClose: () => {
               if (action === 'next') {
@@ -1269,6 +1279,10 @@ export class InsuranceClaimTrackingComponent implements OnInit {
     headerValue.REFNO = refNo;
     headerValue.LINE_NO = selectedRef.lineNumber || null;
     headerValue.ZUSER = this.loggedInUser;
+    headerValue.ZSUPT_DOC = this.supportingbase64 || '';
+    headerValue.ZSUPT_PATH = this.supportingpath || '';
+    headerValue.ZAPP_DOC = this.approveFileBase64 || '';
+    headerValue.ZAPP_PATH = this.approveFilePath || '';
     headerValue.ZUSER_CH = ''
     const itemsPayload = this.items.controls
       .filter(ctrl => ctrl.value.selected === true)
@@ -1405,7 +1419,7 @@ export class InsuranceClaimTrackingComponent implements OnInit {
         ZPAY_INFO: headerRow.ZPAY_INFO,
         ZUTR: headerRow.ZUTR,
         ZCLM_SET_DT: headerRow.ZCLM_SET_DT,
-           ZCREATED_DT: headerRow.ZCREATED_DT || null,
+        ZCREATED_DT: headerRow.ZCREATED_DT || null,
         ZUSER: headerRow.ZUSER,
         ZUSER_CH: this.loggedInUser,
 
@@ -1435,6 +1449,10 @@ export class InsuranceClaimTrackingComponent implements OnInit {
 
       // 🎯 Final payload with HEADER + ITEM
       const payload = {
+        ZSUPT_DOC: this.supportingbase64 || '',
+        ZSUPT_PATH: this.supportingpath || '',
+        ZAPP_DOC: this.approveFileBase64 || '',
+        ZAPP_PATH: this.approveFilePath || '',
         HEAD: headerPayload,
         ITEM: itemPayload
       };
@@ -2206,36 +2224,52 @@ export class InsuranceClaimTrackingComponent implements OnInit {
   }
 
 
-  onFileChange(event: any, fieldName: string) {
-
+  onFileSelected(event: any, fileInput: HTMLInputElement, type: string): void {
     const file = event.target.files[0];
+    if (!file) return;
 
-    // reset errors
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+
+    // reset all errors
     this.supportingDocError = false;
     this.approveDocError = false;
-
-    if (!file) {
-      this.HeaderForm.get(fieldName)?.setValue(null);
-      return;
-    }
-
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-
+    // ❌ Invalid file
     if (!allowedTypes.includes(file.type)) {
 
-      if (fieldName === 'SupportingDocument') {
+      if (type === 'supporting') {
         this.supportingDocError = true;
+        this.supportingbase64 = '';
+        this.supportingpath = '';
       }
-
-      if (fieldName === 'ApproveDocument') {
+      else if (type === 'approve') {
         this.approveDocError = true;
+        this.approveFileBase64 = '';
+        this.approveFilePath = '';
       }
 
-      this.HeaderForm.get(fieldName)?.setValue(null);
-      event.target.value = '';
+      fileInput.value = '';
       return;
     }
 
-    this.HeaderForm.get(fieldName)?.setValue(file);
+    // ✅ Valid file
+    const reader = new FileReader();
+
+    reader.onload = (e: any) => {
+      const base64 = e.target.result.split(',')[1];
+      const path = "C:/Users/ADMIN/OneDrive/Desktop/" + file.name;
+
+      if (type === 'supporting') {
+        this.supportingbase64 = base64;
+        this.supportingpath = path;
+      }
+      else if (type === 'approve') {
+        this.approveFileBase64 = base64;
+        this.approveFilePath = path;
+      }
+
+
+    };
+
+    reader.readAsDataURL(file);
   }
 }

@@ -68,7 +68,7 @@
       </button>
     </div> -->
 
-   
+
 
     <div *ngIf="mainMode === 'creation'">
 
@@ -122,7 +122,7 @@
         </div>
       </div>
 
-     
+
 
 
 
@@ -297,7 +297,7 @@
         </div>
 
         <div class="form-field">
-          <input type="file" #fileInput formControlName="PODSCAN" id="imagesuploading" accept=".jpg,.jpeg,.png"
+          <input type="file" #fileInput id="imagesuploading" accept=".jpg,.jpeg,.png"
             (change)="onFileSelected($event, fileInput)" />
 
           <label>POD Scan</label>
@@ -513,8 +513,9 @@
                 <th>Sales Person</th>
                 <th>Physical Arrived</th>
                 <th>Unloading DT</th>
-                <th>POD Scan</th>
+                <th>POD Scan Arrived</th>
                 <th>SIT/SALE</th>
+                <th>POD File</th>
                 <th>Location</th>
                 <th>Plant</th>
                 <th>Division</th>
@@ -573,8 +574,8 @@
 
                 <td>
                   <input *ngIf="headerData.isEdit" type="datetime-local" class="form-control form-control-sm width-md"
-                    [(ngModel)]="headerData.ZPOD_SCAN">
-                  <span *ngIf="!headerData.isEdit">{{ headerData.ZPOD_SCAN }}</span>
+                    [(ngModel)]="headerData.ZPY_ARRIVED_DEST">
+                  <span *ngIf="!headerData.isEdit">{{ headerData.ZPY_ARRIVED_DEST }}</span>
                 </td>
 
                 <td>
@@ -582,6 +583,16 @@
                     [(ngModel)]="headerData.ZSIT_SALE">
                   <span *ngIf="!headerData.isEdit">{{ headerData.ZSIT_SALE }}</span>
                 </td>
+
+                <td>
+                  <input *ngIf="headerData.isEdit" type="file" #editFileInput
+                    class="form-control form-control-sm width-md" accept=".jpg,.jpeg,.png"
+                    (change)="onFileSelected($event, editFileInput)">
+                  <span *ngIf="!headerData.isEdit">
+                    {{ headerData.ZPODNAME}}
+                  </span>
+                </td>
+
 
                 <td>
                   <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
@@ -621,7 +632,7 @@
                     <button class="btn btn-sm btn-primary" (click)="editSearchRow(headerData)">
                       <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-sm btn-danger" (click)="deleteRow(headerData, i)">
+                    <button class="btn btn-sm btn-danger" (click)="deleteRow(headerData)">
                       <i class="fas fa-trash"></i>
                     </button>
                   </div>

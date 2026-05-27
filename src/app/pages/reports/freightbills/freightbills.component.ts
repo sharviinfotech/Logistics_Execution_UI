@@ -356,7 +356,8 @@ export class FreightbillsComponent {
       'POD Submitted Date': row.POD_SUBMITTED_DATE || '-',
       'Provision Account Status': row.PROVISION_ACCOUNT_STATUS,
       'Freight Bill Status': row.FREIGHT_BILL_STATUS,
-      'Pending Days': row.PENDING_DAYS
+      'Pending Days': row.PENDING_DAYS,
+      'Age Group': row.POD_PENDING_AGE_GROUP
     }));
 
     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
@@ -396,7 +397,8 @@ export class FreightbillsComponent {
       'POD Submitted Date',
       'Provision Account Status',
       'Freight Bill Status',
-      'Pending Days'
+      'Pending Days',
+      'Age Group'
     ];
 
     const tableRows = this.filteredData.map((row: any) => [
@@ -417,7 +419,8 @@ export class FreightbillsComponent {
       row.POD_SUBMITTED_DATE || '-',
       row.PROVISION_ACCOUNT_STATUS || '',
       row.FREIGHT_BILL_STATUS || '',
-      row.PENDING_DAYS || ''
+      row.PENDING_DAYS || '',
+      row.POD_PENDING_AGE_GROUP || ''
     ]);
 
     autoTable(doc, {

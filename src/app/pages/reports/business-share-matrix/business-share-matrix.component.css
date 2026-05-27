@@ -350,3 +350,32 @@ input[type="radio"] {
   gap: 10px;
   margin-left: auto;
 }
+
+.radio-wrapper {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: nowrap !important;
+}
+
+.radio-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.radio-option input[type="radio"] {
+    display: inline-block !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0;
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: static !important;
+    appearance: auto !important;
+    -webkit-appearance: radio !important;
+    cursor: pointer;
+}

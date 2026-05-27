@@ -120,7 +120,7 @@ export class TransitInfoComponent implements OnInit {
       unloadingdateandtime: [''],
       podscanreceiveddateandtime: [''],
       sit: [''],
-      PODSCAN: [''],
+      // PODSCAN: [''],
       referenceItems: this.fb.array([this.createReferenceRow()])
     });
   }
@@ -797,8 +797,8 @@ export class TransitInfoComponent implements OnInit {
         ZSALE_PERSON: headerRow.ZSALE_PERSON || '',
         ZPY_ARRIVED_DEST: headerRow.ZPY_ARRIVED_DEST || '',
         ZUNLOADING_DT: headerRow.ZUNLOADING_DT || '',
-        ZPOD_SCAN: headerRow.ZPOD_SCAN || '',
         ZSIT_SALE: headerRow.ZSIT_SALE || '',
+        ZPOD_FNAME: headerRow.ZPOD_FNAME || '',
         ZLOCATION: headerRow.ZLOCATION || '',
         ZCREATED_DT: headerRow.ZCREATED_DT || '',
         ZPLANT: headerRow.ZPLANT || '',
@@ -826,6 +826,8 @@ export class TransitInfoComponent implements OnInit {
 
       // 🎯 Final payload with HEADER + ITEM
       const payload = {
+        ZPOD_FNAME: this.podFileBase64 || '',
+        ZPATH: this.podFilePath || '',
         HEADER: headerPayload,
         ITEM: itemPayload
       };
@@ -915,7 +917,8 @@ export class TransitInfoComponent implements OnInit {
           if (res?.STATUS === 'TRUE' || res?.STATUS === true || res?.NUMBER === '200') {
 
             // ✅ CORRECT: Delete from the passed array parameter
-            array.splice(index, 1);
+            // array.splice(index, 1);
+             this.headerData = null;
 
             Swal.fire({
               title: 'Deleted',
@@ -1552,15 +1555,10 @@ export class TransitInfoComponent implements OnInit {
 
   //  Valid file
   this.podScanError = false;
-
   const reader = new FileReader();
-
   reader.onload = (e: any) => {
-
-    const base64String = e.target.result;
-
-    this.podFileBase64 = base64String.split(',')[1];
-
+  const base64String = e.target.result;
+  this.podFileBase64 = base64String.split(',')[1];
     const fixedPath = "C:/Users/ADMIN/OneDrive/Desktop/";
     this.podFilePath = fixedPath + file.name;
 

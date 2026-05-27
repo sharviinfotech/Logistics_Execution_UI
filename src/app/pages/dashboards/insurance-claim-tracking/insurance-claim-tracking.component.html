@@ -69,7 +69,7 @@
       </button>
     </div> -->
 
-   
+
     <div *ngIf="mainMode === 'creation'">
       <!-- ORDER TYPE -->
       <div class="form-radio optional ">
@@ -129,7 +129,7 @@
         </div>
       </div>
 
-     
+
 
 
 
@@ -291,7 +291,7 @@
         </div>
       </div>
 
-     
+
 
       <!-- ✅ HEADER FORM -->
       <form [formGroup]="HeaderForm" *ngIf="ShowHeaderForm" class="form-grid">
@@ -439,29 +439,29 @@
           <label>Claim Settlement Date</label>
         </div>
 
-        <div class="form-field ">
-
-          <input type="file" formControlName="SupportingDocument" id="imagesuploading" accept=".jpg,.jpeg,.png"
-            (change)="onFileChange($event, 'SupportingDocument')" />
+        <div class="form-field">
+          <input type="file" id="supportingUpload" accept=".jpg,.jpeg,.png,.pdf" #supportingInput
+            (change)="onFileSelected($event, supportingInput, 'supporting')" />
           <label>Supporting Document</label>
+
           <span class="error-message" *ngIf="supportingDocError">
-            Only .jpg, .jpeg, .png files are allowed
+            Only .jpg, .jpeg, .png, files are allowed
           </span>
         </div>
 
-        <div class="form-field ">
-
-          <input type="file" formControlName="ApproveDocument" id="imagesuploading" accept=".jpg,.jpeg,.png"
-            (change)="onFileChange($event, 'ApproveDocument')" />
+        <div class="form-field">
+          <input type="file" id="approveUpload" accept=".jpg,.jpeg,.png,.pdf" #approveInput
+            (change)="onFileSelected($event, approveInput, 'approve')" />
           <label>Approve Document</label>
+
           <span class="error-message" *ngIf="approveDocError">
-            Only .jpg, .jpeg, .png files are allowed
+            Only .jpg, .jpeg, .png,files are allowed
           </span>
         </div>
 
       </form>
 
-     
+
 
       <!-- ✅ ITEMS TABLE -->
       <div *ngIf="showForm" style="overflow:auto;">
@@ -515,7 +515,7 @@
         </form>
       </div>
 
-     
+
 
       <!-- ✅ SAP BUTTON GROUP -->
       <div class="text-right" *ngIf="showForm && sapType === 'SAP'">
@@ -580,7 +580,7 @@
           </div>
         </div>
       </div>
-     
+
 
 
 
@@ -735,6 +735,8 @@
                 <th>Claim Reference</th>
                 <th>Invoice Date</th>
                 <th>Base Value</th>
+                <th>Supporting Document</th>
+                <th>Approve Document</th>
                 <th>Loss Declared</th>
                 <th>Claim Received</th>
                 <th>Salvage Value</th>
@@ -749,7 +751,6 @@
                 <th>Payment Info</th>
                 <th>UTR</th>
                 <th>Claim Settlement Date</th>
-
                 <th>Sales Person</th>
                 <th>Plant</th>
                 <th>Division</th>
@@ -822,8 +823,29 @@
                   <span *ngIf="!headerData.isEdit">
                     {{ headerData.ZINV_BV }}
                   </span>
-
                 </td>
+
+                <td>
+                  <input *ngIf="headerData.isEdit" type="file" class="form-control form-control-sm width-md"
+                    accept=".jpg,.jpeg,.png" #supportInput
+                    (change)="onFileSelected($event, supportInput, 'supporting', headerData)">
+
+                  <span *ngIf="!headerData.isEdit">
+                    {{ headerData.ZSUPT_DOC }}
+                  </span>
+                </td>
+
+                <td>
+                  <input *ngIf="headerData.isEdit" type="file" class="form-control form-control-sm width-md"
+                    accept=".jpg,.jpeg,.png" #approveInput
+                    (change)="onFileSelected($event, approveInput, 'approve', headerData)">
+
+                  <span *ngIf="!headerData.isEdit">
+                    {{ headerData.ZAPP_DOC }}
+                  </span>
+                </td>
+
+
 
                 <td>
                   <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm  width-md"

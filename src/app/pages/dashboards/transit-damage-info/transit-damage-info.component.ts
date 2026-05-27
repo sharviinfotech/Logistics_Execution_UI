@@ -58,7 +58,14 @@ export class TransitDamageInfoComponent implements OnInit {
   pendingCount: number = 0;
   completedCount: number = 0;
   casesCount: number = 0;
-
+  imagesbase64: any = '';
+  imagespath: any = '';
+  fsrreportFileBase64: any = '';
+  fsrreportFilePath: any = '';
+  firreportFileBase64: any = '';
+  firreportFilePath: any = '';
+  cofFileBase64: any = '';
+  cofFilePath: any = '';
 
 
   // Search functionality
@@ -103,9 +110,9 @@ export class TransitDamageInfoComponent implements OnInit {
   plantList: any;
   divisionList: any;
   imagesError = false;
-fsrReportError = false;
-firReportError = false;
-cofError = false;
+  fsrReportError = false;
+  firReportError = false;
+  cofError = false;
 
 
   constructor(
@@ -146,10 +153,10 @@ cofError = false;
       DAMAGE_RMK: [''],
       SETTLEMENT: ['', Validators.required],
       CLOSING_DT: [''],
-      IMAGES: [''],
-      FSRREPORT: [''],
-      FIRREPORT: [''],
-      COF: [''],
+      // IMAGES: [''],
+      // FSRREPORT: [''],
+      // FIRREPORT: [''],
+      // COF: [''],
       ODN_NO: [''],
       SONO: [''],
       LINE_NO: [''],
@@ -458,7 +465,7 @@ cofError = false;
           d.INV_NO.forEach((inv: any) => {
             if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
               this.invoiceF4List.push(inv.VBELN);
-              this.HeaderForm.patchValue({ VBELN: ''}); 
+              this.HeaderForm.patchValue({ VBELN: '' });
             }
           });
         }
@@ -959,7 +966,7 @@ cofError = false;
       return;
     }
 
-     const selectedRef = this.selectedItems[0] || {};
+    const selectedRef = this.selectedItems[0] || {};
 
     /* 3️⃣ HEADER preparation */
     const headerValue: any = { ...this.HeaderForm.value };
@@ -968,18 +975,26 @@ cofError = false;
     headerValue.INV_NO = invoiceNo;
 
     headerValue.REFNO = selectedItems[0]?.REFNO || null;
-  headerValue.LINE_NO = selectedRef.lineNumber           
-    || selectedItems[0]?.ZLINE_NO
-    || null;
+    headerValue.LINE_NO = selectedRef.lineNumber
+      || selectedItems[0]?.ZLINE_NO
+      || null;
     headerValue.INC_DATE = headerValue.INC_DATE || null;
     headerValue.CLOSING_DT = headerValue.CLOSING_DT || null;
     headerValue.ROUTE = headerValue.ROUTE || null;
+    headerValue.ZDIMAGES = this.imagesbase64 || '';
+    headerValue.ZDIMG_PATH = this.imagespath || '';
+    headerValue.ZFSRREP = this.fsrreportFileBase64 || '';
+    headerValue.ZFSRREP_PATH = this.fsrreportFilePath || '';
+    headerValue.ZFIRREP = this.firreportFileBase64 || '';
+    headerValue.ZFIRREP_PATH = this.firreportFilePath || '';
+    headerValue.ZCOF = this.cofFileBase64 || '';
+    headerValue.ZCOF_PATH = this.cofFilePath || '';
     headerValue.ZUSER = this.loggedInUser;
     headerValue.ZUSER_CH = ''
     selectedItems.forEach((row: any) => {
       row.INV_NO = invoiceNo;
       row.REFNO = headerValue.REFNO;
-   row.ZLINE_NO = row.ZLINE_NO || selectedRef.lineNumber || null;
+      row.ZLINE_NO = row.ZLINE_NO || selectedRef.lineNumber || null;
 
     });
 
@@ -1000,9 +1015,9 @@ cofError = false;
         if (res?.STATUS === 'TRUE') {
           Swal.fire({
             icon: 'success',
-            text: 'Data Saved Successfully',
+            text: res?.MESSAGE || 'Data Saved Successfully',
             timer: 1200,
-            showConfirmButton: false,
+            confirmButtonText: 'Ok',
             willClose: () => {
               if (action === 'next') {
                 this.router.navigate(['/insurance-claim-tracking']);
@@ -1169,7 +1184,8 @@ cofError = false;
           DAMAGE_RMK: header.DAMAGE_RMK,
           SETTLEMENT: header.SETTLEMENT,
           CLOSING_DT: header.CLOSING_DT,
-          IMAGES: header.IMAGES
+          IMAGES: header.IMAGES,
+          
         });
 
         this.items.clear();
@@ -1217,7 +1233,7 @@ cofError = false;
       this.selectedItems.length > 0
         ? this.selectedItems[0].referenceNumber
         : null;
-         const selectedRef = this.selectedItems[0] || {};  
+    const selectedRef = this.selectedItems[0] || {};
 
     /* HEADER */
     const headerValue: any = { ...this.HeaderForm.value };
@@ -1227,6 +1243,14 @@ cofError = false;
     headerValue.REFNO = refNo;
     headerValue.LINE_NO = this.selectedItems[0]?.lineNumber || null;
     headerValue.ZUSER = this.loggedInUser;
+    headerValue.ZDIMAGES = this.imagesbase64 || '';
+    headerValue.ZDIMG_PATH = this.imagespath || '';
+    headerValue.ZFSRREP = this.fsrreportFileBase64 || '';
+    headerValue.ZFSRREP_PATH = this.fsrreportFilePath || '';
+    headerValue.ZFIRREP = this.firreportFileBase64 || '';
+    headerValue.ZFIRREP_PATH = this.firreportFilePath || '';
+    headerValue.ZCOF = this.cofFileBase64 || '';
+    headerValue.ZCOF_PATH = this.cofFilePath || '';
     headerValue.ZUSER_CH = ''
 
 
@@ -1239,7 +1263,7 @@ cofError = false;
         REFNO: refNo,
         ZUSER: this.loggedInUser,
         ZUSER_CH: '',
-          ZLINE_NO: selectedRef.lineNumber || null
+        ZLINE_NO: selectedRef.lineNumber || null
       }));
 
     const payload = {
@@ -1322,7 +1346,7 @@ cofError = false;
         ZDAMAGE_RMK: headerRow.ZDAMAGE_RMK || null,
         ZSETTLEMENT: headerRow.ZSETTLEMENT || null,
         ZCLOSING_DT: headerRow.ZCLOSING_DT || null,
-        ZIMAGES: headerRow.ZIMAGES || null,
+       
         ZSALE_PERSON: headerRow.ZSALE_PERSON || null,
         ZLOCATION: headerRow.ZLOCATION || null,
         ZROUTE: headerRow.ZROUTE || null,
@@ -1354,6 +1378,14 @@ cofError = false;
 
       // 🎯 Final payload with HEADER + ITEM
       const payload = {
+        ZDIMAGES: this.imagesbase64 || '',
+        ZDIMG_PATH: this.imagespath || '',
+        ZFSRREP: this.fsrreportFileBase64 ||'',
+        ZFSRREP_PATH: this.fsrreportFilePath ||'',
+        ZFIRREP: this.firreportFileBase64 ||'',
+        ZFIRREP_PATH: this.firreportFilePath ||'',
+        ZCOF: this.cofFileBase64 ||'',
+        ZCOF_PATH: this.cofFilePath ||'',
         HEAD: headerPayload,
         ITEM: itemPayload
       };
@@ -2140,48 +2172,73 @@ cofError = false;
 
 
 
-onFileChange(event: any, field: string) {
+  onFileSelected(event: any, fileInput: HTMLInputElement, type: string): void {
+    const file = event.target.files[0];
+    if (!file) return;
 
-  const file = event.target.files[0];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
 
-  // reset all errors
-  this.imagesError = false;
-  this.fsrReportError = false;
-  this.firReportError = false;
-  this.cofError = false;
+    // reset all errors
+    this.imagesError = false;
+    this.fsrReportError = false;
+    this.firReportError = false;
+    this.cofError = false;
+    // ❌ Invalid file
+    if (!allowedTypes.includes(file.type)) {
 
-  if (!file) {
-    this.HeaderForm.get(field)?.setValue('');
-    return;
+      if (type === 'image') {
+        this.imagesError = true;
+        this.imagesbase64 = '';
+        this.imagespath = '';
+      }
+      else if (type === 'fsr') {
+        this.fsrReportError = true;
+        this.fsrreportFileBase64 = '';
+        this.fsrreportFilePath = '';
+      }
+      else if (type === 'fir') {
+        this.firReportError = true;
+        this.firreportFileBase64 = '';
+        this.firreportFilePath = '';
+      }
+      else if (type === 'cof') {
+        this.cofError = true;
+        this.cofFileBase64 = '';
+        this.cofFilePath = '';
+      }
+
+      fileInput.value = '';
+      return;
+    }
+
+    // ✅ Valid file
+    const reader = new FileReader();
+
+    reader.onload = (e: any) => {
+      const base64 = e.target.result.split(',')[1];
+      const path = "C:/Users/ADMIN/OneDrive/Desktop/" + file.name;
+
+      if (type === 'image') {
+        this.imagesbase64 = base64;
+        this.imagespath = path;
+      }
+      else if (type === 'fsr') {
+        this.fsrreportFileBase64 = base64;
+        this.fsrreportFilePath = path;
+      }
+      else if (type === 'fir') {
+        this.firreportFileBase64 = base64;
+        this.firreportFilePath = path;
+      }
+      else if (type === 'cof') {
+        this.cofFileBase64 = base64;
+        this.cofFilePath = path;
+      }
+
+    };
+
+    reader.readAsDataURL(file);
   }
-
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-
-  if (!allowedTypes.includes(file.type)) {
-
-    if (field === 'IMAGES') {
-      this.imagesError = true;
-    }
-
-    if (field === 'FSRREPORT') {
-      this.fsrReportError = true;
-    }
-
-    if (field === 'FIRREPORT') {
-      this.firReportError = true;
-    }
-
-    if (field === 'COF') {
-      this.cofError = true;
-    }
-
-    event.target.value = '';
-    this.HeaderForm.get(field)?.setValue('');
-    return;
-  }
-
-  this.HeaderForm.get(field)?.setValue(file);
-}
 
 
 }

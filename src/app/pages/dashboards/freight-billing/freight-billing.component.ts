@@ -40,6 +40,15 @@ export class FreightBillingComponent implements OnInit {
   orderType: string = '';
   mainMode: string = 'creation'; // Default to creation mode
   sapType: string = '';
+  freightBillfilebase64: any = '';
+  freightBillfilepath: any = '';
+  unloadingFileBase64: any = '';
+  unloadingFilePath: any = '';
+  detentionFileBase64: any = '';
+  detentionFilePath: any = '';
+  workOrderFileBase64: any = '';
+  workOrderFilePath: any = '';
+
   showForm = false;
   freightDetails: FreightDetails;
   totalFreight: number = 0;
@@ -103,13 +112,13 @@ export class FreightBillingComponent implements OnInit {
   filterSapType: string = '';
   invoiceF4List: string[] = [];
   minPhysicalDate: string = '';
-   loggedInUser: string = '';
-     plantList: any;
+  loggedInUser: string = '';
+  plantList: any;
   divisionList: any;
   freightBillError = false;
-unloadingError = false;
-detentionError = false;
-workOrderError = false;
+  unloadingError = false;
+  detentionError = false;
+  workOrderError = false;
 
   paFormData: any = {
     provisionChecked: false,
@@ -136,30 +145,30 @@ workOrderError = false;
   }
 
   ngOnInit(): void {
-     const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
-this.loggedInUser = userData.USER || '';
-console.log("Logged in user:", this.loggedInUser);
- this.plantList = userData.PLANTS || [];
+    const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    this.loggedInUser = userData.USER || '';
+    console.log("Logged in user:", this.loggedInUser);
+    this.plantList = userData.PLANTS || [];
 
-  // ✅ Divisions from login response
-  this.divisionList = userData.DIV || [];
+    // ✅ Divisions from login response
+    this.divisionList = userData.DIV || [];
 
-  console.log("Plants:", this.plantList);
-  console.log("Divisions:", this.divisionList);
+    console.log("Plants:", this.plantList);
+    console.log("Divisions:", this.divisionList);
 
     this.initializeForm();
     // this.setupWorkOrderListener();
     this.fetchTransporter();
     this.fetchPlantCodeList();
-    this.loginData= this.service.getLoginResponse()
-   console.log("this.loginData",this.loginData);
+    this.loginData = this.service.getLoginResponse()
+    console.log("this.loginData", this.loginData);
   }
 
   initializeForm(): void {
     this.FreightBilling = this.fb.group({
       ponumber: [''],
       REFNO: [''],
-      invoicenumber: ['',Validators.required],
+      invoicenumber: ['', Validators.required],
       FreightBillNumber: [''],
       FreightBillDate: [''],
       FreightBillPhysicalSubmissionDate: [''],
@@ -172,10 +181,10 @@ console.log("Logged in user:", this.loggedInUser);
       account: [false],
       ProvisionAmount: [''],
       ProvisionDate: [''],
-      FreightBillupload: [''],
-      UnloadingChargesApproval: [''],
-      DetentionChargesUploading: [''],
-      WorkOrderUploading: [''],
+      // FreightBillupload: [''],
+      // UnloadingChargesApproval: [''],
+      // DetentionChargesUploading: [''],
+      // WorkOrderUploading: [''],
       referenceItems: this.fb.array([this.createReferenceRow()])
 
     });
@@ -304,7 +313,7 @@ console.log("Logged in user:", this.loggedInUser);
       LR_NO: fieldKey === 'LR_NO' ? values.lrNumber : '',
       TRANSPORTER: fieldKey === 'TRANSPORTER' ? values.transporter : '',
       LINE_NO: values.lineNumber || '',
-       ZUSER: this.loggedInUser
+      ZUSER: this.loggedInUser
     };
 
     console.log('🔹 Sending Object:', obj);
@@ -344,7 +353,7 @@ console.log("Logged in user:", this.loggedInUser);
           d.INV_NO.forEach((inv: any) => {
             if (inv.VBELN && !this.invoiceF4List.includes(inv.VBELN)) {
               this.invoiceF4List.push(inv.VBELN);
-               this.FreightBilling.patchValue({ invoicenumber: '' });
+              this.FreightBilling.patchValue({ invoicenumber: '' });
             }
           });
         }
@@ -471,7 +480,7 @@ console.log("Logged in user:", this.loggedInUser);
     let payload1: any = {
 
       "global": "FREIGHT BILLING",
-        ZUSER: this.loggedInUser,
+      ZUSER: this.loggedInUser,
       "data": {
         "ref_no": "",
         "inv_no": "",
@@ -608,12 +617,16 @@ console.log("Logged in user:", this.loggedInUser);
       LRNO: ref.lrNumber || formValue.LRNO || '',
       TRANSPORTER: ref.transporter || '',
       BILL_SUBMISSION: formValue.BillSubmission,
-      FRBILLUP: formValue.FreightBillupload || '',
-      UNLOADAPP: formValue.UnloadingChargesApproval || '',
-      DETENTUP: formValue.DetentionChargesUploading || '',
-      WORDUP: formValue.WorkOrderUploading || '',
-      ZUSER:this.loggedInUser,
-        ZUSER_CH: '',
+      ZFRBILLUP: this.freightBillfilebase64 || '',
+      ZUNLOADAPP: this.unloadingFileBase64 || '',
+      ZDETENTUP: this.detentionFileBase64 || '',
+      ZWORDUP: this.workOrderFileBase64 || '',
+      ZFRB_PATH: this.freightBillfilepath || '',
+      ZUNAPP_PATH: this.unloadingFilePath || '',
+      ZDUP_PATH: this.detentionFilePath || '',
+      ZWORDUP_PATH: this.workOrderFilePath || '',
+      ZUSER: this.loggedInUser,
+      ZUSER_CH: '',
 
       // ✅ Freight Charges Breakdown (when Account checkbox is checked)
       ZFC_BASIC: formValue.account ? (this.paFreightBreakdown.basicFreight || 0) : 0,
@@ -687,58 +700,58 @@ console.log("Logged in user:", this.loggedInUser);
 
 
 
-onFileChange(event: any, controlName: string) {
+  // onFileChange(event: any, controlName: string) {
 
-  const file = event.target.files[0];
+  //   const file = event.target.files[0];
 
 
-  this.freightBillError = false;
-  this.unloadingError = false;
-  this.detentionError = false;
-  this.workOrderError = false;
+  //   this.freightBillError = false;
+  //   this.unloadingError = false;
+  //   this.detentionError = false;
+  //   this.workOrderError = false;
 
-  if (!file) {
-    this.FreightBilling.get(controlName)?.setValue(null);
-    return;
-  }
+  //   if (!file) {
+  //     this.FreightBilling.get(controlName)?.setValue(null);
+  //     return;
+  //   }
 
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+  //   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
-  if (!allowedTypes.includes(file.type)) {
+  //   if (!allowedTypes.includes(file.type)) {
 
-    if (controlName === 'FreightBillupload') {
-      this.freightBillError = true;
-    }
+  //     if (controlName === 'FreightBillupload') {
+  //       this.freightBillError = true;
+  //     }
 
-    if (controlName === 'UnloadingChargesApproval') {
-      this.unloadingError = true;
-    }
+  //     if (controlName === 'UnloadingChargesApproval') {
+  //       this.unloadingError = true;
+  //     }
 
-    if (controlName === 'DetentionChargesUploading') {
-      this.detentionError = true;
-    }
+  //     if (controlName === 'DetentionChargesUploading') {
+  //       this.detentionError = true;
+  //     }
 
-    if (controlName === 'WorkOrderUploading') {
-      this.workOrderError = true;
-    }
+  //     if (controlName === 'WorkOrderUploading') {
+  //       this.workOrderError = true;
+  //     }
 
-    this.FreightBilling.get(controlName)?.setValue(null);
-    event.target.value = '';
-    return;
-  }
+  //     this.FreightBilling.get(controlName)?.setValue(null);
+  //     event.target.value = '';
+  //     return;
+  //   }
 
-  const reader = new FileReader();
+  //   const reader = new FileReader();
 
-  reader.onload = () => {
-    const base64String = reader.result?.toString().split(',')[1];
+  //   reader.onload = () => {
+  //     const base64String = reader.result?.toString().split(',')[1];
 
-    this.FreightBilling.patchValue({
-      [controlName]: base64String
-    });
-  };
+  //     this.FreightBilling.patchValue({
+  //       [controlName]: base64String
+  //     });
+  //   };
 
-  reader.readAsDataURL(file);
-}
+  //   reader.readAsDataURL(file);
+  // }
 
   editSearchRow(row: any): void {
     // Backup original data
@@ -803,12 +816,16 @@ onFileChange(event: any, controlName: string) {
             ZACC_CHK: row.ZACC_CHK,
             ZPROVDT: row.ZPROVDT,
             ZPROVAMT: row.ZPROVAMT,
-            ZFRBILLUP: row.ZFRBILLUP,
-            ZUNLOADAPP: row.ZUNLOADAPP,
-            ZDETENTUP: row.ZDETENTUP,
-            ZWORDUP: row.ZWORDUP,
+            ZFRBILLUP:this.freightBillfilebase64 || row.ZFRBILLUP,
+            ZUNLOADAPP:this.unloadingFileBase64 || row.ZUNLOADAPP,
+            ZDETENTUP:this.detentionFileBase64 || row.ZDETENTUP,
+            ZWORDUP:this.workOrderFileBase64 || row.ZWORDUP,
+            ZFRB_PATH: this.freightBillfilepath || row.ZFRB_PATH,
+            ZUNAPP_PATH: this.unloadingFilePath || row.ZUNAPP_PATH,
+            ZDUP_PATH: this.detentionFilePath || row.ZDUP_PATH,
+            ZWORDUP_PATH: this.workOrderFilePath || row.ZWORDUP_PATH,
             ZUSER: row.ZUSER,
-              ZUSER_CH: this.loggedInUser,
+            ZUSER_CH: this.loggedInUser,
 
             // ✅ Freight Charges Breakdown
             ZFC_BASIC: row.ZFC_BASIC || 0,
@@ -1252,7 +1269,7 @@ onFileChange(event: any, controlName: string) {
       TRANSPORTER: this.filterTransporter || '',
       VEHICLE_TYPE: this.filterVehicleType || '',
       STATUS: this.filterStatus || '',
-        ZPACHECK: this.filterPACheck || ''
+      ZPACHECK: this.filterPACheck || ''
     };
 
     this.spinner.show();
@@ -1294,21 +1311,21 @@ onFileChange(event: any, controlName: string) {
 
         this.filterApplied = true;
 
-      if (this.filterStatus === 'Completed') {
-  let filtered = records;
+        if (this.filterStatus === 'Completed') {
+          let filtered = records;
 
-  if (this.filterPACheck === 'Provision') {
-    filtered = records.filter((r: any) => r.ZPRO_CHK === 'X' && r.ZACC_CHK !== 'X');
-  } else if (this.filterPACheck === 'Account') {
-    filtered = records.filter((r: any) => r.ZACC_CHK === 'X' && r.ZPRO_CHK !== 'X');
-  } else if (this.filterPACheck === 'Both') {
-    filtered = records.filter((r: any) => r.ZPRO_CHK === 'X' && r.ZACC_CHK === 'X');
-  }
+          if (this.filterPACheck === 'Provision') {
+            filtered = records.filter((r: any) => r.ZPRO_CHK === 'X' && r.ZACC_CHK !== 'X');
+          } else if (this.filterPACheck === 'Account') {
+            filtered = records.filter((r: any) => r.ZACC_CHK === 'X' && r.ZPRO_CHK !== 'X');
+          } else if (this.filterPACheck === 'Both') {
+            filtered = records.filter((r: any) => r.ZPRO_CHK === 'X' && r.ZACC_CHK === 'X');
+          }
 
-  this.FreightBillingData = filtered;
-  this.dispatchData = [];
-  Swal.fire('Success', `Freight Billing records: ${filtered.length}`, 'success');
-}
+          this.FreightBillingData = filtered;
+          this.dispatchData = [];
+          Swal.fire('Success', `Freight Billing records: ${filtered.length}`, 'success');
+        }
         else if (this.filterStatus === 'Pending') {
           this.dispatchData = records;
           this.FreightBillingData = [];
@@ -1837,14 +1854,14 @@ onFileChange(event: any, controlName: string) {
     // Load existing data into form
     this.paFormData = {
       provisionChecked: item.ZPRO_CHK === 'X',
-    provisionAmount: item.ZPROVAMT || '',
-    provisionDate: item.ZPROVDT || '',
-    accountChecked: item.ZACC_CHK === 'X',
-    freightBillNumber: item.ZBILLNO || '',
-    freightBillDate: item.ZBILLDATE || '',
-    physicalSubmissionDate: item.ZPHY_DATE || '',
-    freightCharges: item.ZFRT_CHARGES || '',
-    billSubmission: item.ZBILL_SUBMISSION || ''
+      provisionAmount: item.ZPROVAMT || '',
+      provisionDate: item.ZPROVDT || '',
+      accountChecked: item.ZACC_CHK === 'X',
+      freightBillNumber: item.ZBILLNO || '',
+      freightBillDate: item.ZBILLDATE || '',
+      physicalSubmissionDate: item.ZPHY_DATE || '',
+      freightCharges: item.ZFRT_CHARGES || '',
+      billSubmission: item.ZBILL_SUBMISSION || ''
     };
 
     // ✅ Load Freight Breakdown from backend
@@ -1970,5 +1987,73 @@ onFileChange(event: any, controlName: string) {
 
     // Call existing update method
     this.updateSearchRow(this.selectedPAItem, this.selectedPAIndex);
+  }
+
+  onFileSelected(event: any, fileInput: HTMLInputElement, type: string): void {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+
+    // reset all errors
+    this.freightBillError = false;
+    this.unloadingError = false;
+    this.detentionError = false;
+    this.workOrderError = false;
+
+    // ❌ Invalid file
+    if (!allowedTypes.includes(file.type)) {
+
+      if (type === 'freight') {
+        this.freightBillError = true;
+        this.freightBillfilebase64 = '';
+        this.freightBillfilepath = '';
+      }
+      else if (type === 'unloading') {
+        this.unloadingError = true;
+        this.unloadingFileBase64 = '';
+        this.unloadingFilePath = '';
+      }
+      else if (type === 'detention') {
+        this.detentionError = true;
+        this.detentionFileBase64 = '';
+        this.detentionFilePath = '';
+      }
+      else if (type === 'workorder') {
+        this.workOrderError = true;
+        this.workOrderFileBase64 = '';
+        this.workOrderFilePath = '';
+      }
+
+      fileInput.value = '';
+      return;
+    }
+
+    // ✅ Valid file
+    const reader = new FileReader();
+
+    reader.onload = (e: any) => {
+      const base64 = e.target.result.split(',')[1];
+      const path = "C:/Users/ADMIN/OneDrive/Desktop/" + file.name;
+
+      if (type === 'freight') {
+        this.freightBillfilebase64 = base64;
+        this.freightBillfilepath = path;
+      }
+      else if (type === 'unloading') {
+        this.unloadingFileBase64 = base64;
+        this.unloadingFilePath = path;
+      }
+      else if (type === 'detention') {
+        this.detentionFileBase64 = base64;
+        this.detentionFilePath = path;
+      }
+      else if (type === 'workorder') {
+        this.workOrderFileBase64 = base64;
+        this.workOrderFilePath = path;
+      }
+    };
+
+    reader.readAsDataURL(file);
   }
 }

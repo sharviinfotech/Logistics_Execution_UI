@@ -402,7 +402,7 @@ downloadExcel() {
     'Actual Load': row.ACTUAL_LOAD || '',
     'Loading Factor Weight': row.LOADING_FACTOR_WEIGHT || '',
     'Vehicle Volume': row.VEHICLE_VOLUME || '',
-    '% of Volume Occupied': row['%_OF_VOLUME_OCCUPIED'] || '',
+    '% of Volume Occupied': (row['%_OF_VOLUME_OCCUPIED'] || row['%_OF_VOLUME_OCCUPIED'] === 0) ? row['%_OF_VOLUME_OCCUPIED'] + '%' : '',
     'Shipment Volume': row.SHIPMENT_VOLUME || '',
     'Total Freight': row.TOTAL_FREIGHT || '',
     'AH Loaded in Truck': row.AH_LOADED_IN_THE_TRUCK || '',
@@ -415,7 +415,7 @@ downloadExcel() {
     'Cost Ton Actual Load': row.COST_TON_AS_PER_ACTUAL_LOAD || '',
     'Total Cost Passing Weight': row.TOTAL_COST_PASSING_WEIGHT || '',
     'Total Cost Actual Load': row.TOTAL_COST_AS_PER_ACTUAL_LOAD || '',
-    'Percentage': row.PERCENTAGE || ''
+    'Percentage': (row.PERCENTAGE || row.PERCENTAGE === 0) ? row.PERCENTAGE + '%' : ''
   }));
 
   const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
@@ -512,7 +512,7 @@ downloadPDF() {
     row.ACTUAL_LOAD || '',
     row.LOADING_FACTOR_WEIGHT || '',
     row.VEHICLE_VOLUME || '',
-    row['%_OF_VOLUME_OCCUPIED'] || '',
+    (row['%_OF_VOLUME_OCCUPIED'] || row['%_OF_VOLUME_OCCUPIED'] === 0) ? row['%_OF_VOLUME_OCCUPIED'] + '%' : '',
     row.SHIPMENT_VOLUME || '',
     row.TOTAL_FREIGHT || '',
     row.AH_LOADED_IN_THE_TRUCK || '',
@@ -525,7 +525,7 @@ downloadPDF() {
     row.COST_TON_AS_PER_ACTUAL_LOAD || '',
     row.TOTAL_COST_PASSING_WEIGHT || '',
     row.TOTAL_COST_AS_PER_ACTUAL_LOAD || '',
-    row.PERCENTAGE || ''
+    (row.PERCENTAGE || row.PERCENTAGE === 0) ? row.PERCENTAGE + '%' : ''
   ]);
 
   doc.text('Loading Factor Cost Report', 14, 10);

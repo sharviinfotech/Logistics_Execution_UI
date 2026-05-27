@@ -69,7 +69,7 @@
       </button>
     </div> -->
 
-   
+
 
     <div *ngIf="mainMode === 'creation'">
       <!-- ORDER TYPE -->
@@ -130,7 +130,7 @@
         </div>
       </div>
 
-     
+
 
 
 
@@ -286,7 +286,7 @@
         </div>
       </div>
 
-     
+
 
       <!-- ✅ HEADER FORM -->
       <form [formGroup]="HeaderForm" *ngIf="ShowHeaderForm" class="form-grid">
@@ -388,47 +388,49 @@
           <label>Closing Date</label>
         </div>
 
-        <div class="form-field ">
-          <input type="file" formControlName="IMAGES" id="imagesuploading" accept=".jpg,.jpeg,.png"
-            (change)="onFileChange($event, 'IMAGES')" />
+        <div class="form-field">
+          <input type="file" id="imagesuploading" accept=".jpg,.jpeg,.png,.pdf" #imgInput
+            (change)="onFileSelected($event, imgInput, 'image')" />
           <label>Images</label>
+
           <span class="error-message" *ngIf="imagesError">
-            Only .jpg, .jpeg, .png files are allowed
+            Only .jpg, .jpeg, .png, .pdf files are allowed
           </span>
         </div>
 
-        <div class="form-field ">
-          <input type="file" formControlName="FSRREPORT" id="imagesuploading" accept=".jpg,.jpeg,.png"
-            (change)="onFileChange($event, 'FSRREPORT')" />
+        <div class="form-field">
+          <input type="file" id="fsruploading" accept=".jpg,.jpeg,.png,.pdf" #fsrInput
+            (change)="onFileSelected($event, fsrInput, 'fsr')" />
           <label>FSR Report</label>
+
           <span class="error-message" *ngIf="fsrReportError">
-            Only .jpg, .jpeg, .png files are allowed
+            Only .jpg, .jpeg, .png, .pdf files are allowed
           </span>
         </div>
 
-        <div class="form-field ">
-
-          <input type="file" formControlName="FIRREPORT" id="imagesuploading" accept=".jpg,.jpeg,.png"
-            (change)="onFileChange($event, 'FIRREPORT')" />
+        <div class="form-field">
+          <input type="file" id="firuploading" accept=".jpg,.jpeg,.png,.pdf" #firInput
+            (change)="onFileSelected($event, firInput, 'fir')" />
           <label>FIR Report</label>
+
           <span class="error-message" *ngIf="firReportError">
-            Only .jpg, .jpeg, .png files are allowed
+            Only .jpg, .jpeg, .png, .pdf files are allowed
           </span>
         </div>
 
-        <div class="form-field ">
-
-          <input type="file" formControlName="COF" id="imagesuploading" accept=".jpg,.jpeg,.png"
-            (change)="onFileChange($event, 'COF')" />
+        <div class="form-field">
+          <input type="file" id="cofuploading" accept=".jpg,.jpeg,.png,.pdf" #cofInput
+            (change)="onFileSelected($event, cofInput, 'cof')" />
           <label>COF</label>
+
           <span class="error-message" *ngIf="cofError">
-            Only .jpg, .jpeg, .png files are allowed
+            Only .jpg, .jpeg, .png, .pdf files are allowed
           </span>
         </div>
 
       </form>
 
-     
+
 
       <!-- ✅ ITEMS TABLE -->
       <div *ngIf="showForm" style="overflow:auto;">
@@ -476,7 +478,7 @@
         </form>
       </div>
 
-     
+
 
       <!-- ✅ SAP BUTTON GROUP -->
       <div class="text-right" *ngIf="showForm && sapType === 'SAP'">
@@ -697,6 +699,9 @@
                 <th>Settlement</th>
                 <th>Closing Date</th>
                 <th>Images</th>
+                <th>FSR Report</th>
+                <th>FIR Report</th>
+                <th>COF</th>
                 <th>Sales Person</th>
                 <th>Location</th>
                 <th>Route</th>
@@ -799,9 +804,27 @@
                 </td>
 
                 <td>
-                  <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
-                    [(ngModel)]="headerData.ZIMAGES">
-                  <span *ngIf="!headerData.isEdit">{{ headerData.ZIMAGES }}</span>
+                  <input *ngIf="headerData.isEdit" type="file" class="form-control form-control-sm width-md"
+                    accept=".jpg,.jpeg,.png,.pdf" (change)="onFileSelected($event, imgInput, 'image')" #imgInput>
+                  <span *ngIf="!headerData.isEdit">{{ headerData.ZDIMAGES }}</span>
+                </td>
+
+                <td>
+                  <input *ngIf="headerData.isEdit" type="file" class="form-control form-control-sm width-md"
+                    accept=".jpg,.jpeg,.png,.pdf" (change)="onFileSelected($event, fsrInput, 'fsr')" #fsrInput>
+                  <span *ngIf="!headerData.isEdit">{{ headerData.ZFSRREP }}</span>
+                </td>
+
+                <td>
+                  <input *ngIf="headerData.isEdit" type="file" class="form-control form-control-sm width-md"
+                    accept=".jpg,.jpeg,.png,.pdf" (change)="onFileSelected($event, firInput, 'fir')" #firInput>
+                  <span *ngIf="!headerData.isEdit">{{ headerData.ZFIRREP }}</span>
+                </td>
+
+                <td>
+                  <input *ngIf="headerData.isEdit" type="file" class="form-control form-control-sm width-md"
+                    accept=".jpg,.jpeg,.png,.pdf" (change)="onFileSelected($event, cofInput, 'cof')" #cofInput>
+                  <span *ngIf="!headerData.isEdit">{{ headerData.ZCOF }}</span>
                 </td>
 
                 <td>

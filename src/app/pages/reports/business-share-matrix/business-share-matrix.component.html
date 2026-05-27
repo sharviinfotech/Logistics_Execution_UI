@@ -276,7 +276,37 @@
                         </div>
                         <!-- BUTTONS -->
 
+                        <div class="radio-wrapper">
+                            <label class="radio-option">
+                                <input type="radio" formControlName="REPORT_TYPE" value="All">
+                                ALL Records
+                            </label>
 
+                            <label class="radio-option">
+                                <input type="radio" formControlName="REPORT_TYPE" value="Header">
+                                Header
+                            </label>
+                            <span class="text-danger"
+                                *ngIf="filterForm.get('REPORT_TYPE')?.touched && filterForm.get('REPORT_TYPE')?.invalid">
+                                Please select report type
+                            </span>
+                        </div>
+
+                        <div class="radio-wrapper">
+                            <label class="radio-option">
+                                <input type="radio" formControlName="REPORT_TYPE" value="HeaderWithPlant">
+                                Header with Plant
+                            </label>
+
+                            <label class="radio-option">
+                                <input type="radio" formControlName="REPORT_TYPE" value="HeaderWithInOut">
+                                Header with Inward/Outward
+                            </label>
+                            <span class="text-danger"
+                                *ngIf="filterForm.get('REPORT_TYPE')?.touched && filterForm.get('REPORT_TYPE')?.invalid">
+                                Please select report type
+                            </span>
+                        </div>
                     </div>
                     <div class="col-12 mt-3 d-flex justify-content-end gap-2">
                         <button type="button" (click)="resetForm()" class="btn btnclear">
@@ -330,7 +360,7 @@
                 </div>
 
                 <!-- TABLE -->
-                <div *ngIf="filteredData.length > 0" class="table-responsive">
+                <div *ngIf="filteredData.length > 0 && selectedReportType === 'All'" class="table-responsive">
                     <table class="table table-bordered table-hover">
 
                         <thead class="bg-light">
@@ -342,7 +372,7 @@
                                 <th>Transporter Group</th>
                                 <th>Transporter</th>
                                 <th>No. of Vehicles</th>
-                                <th>Freight Amount</th>
+                                
                                 <th>Basic Charge</th>
                                 <th>Detention Loading</th>
                                 <th>Detention Unloading</th>
@@ -352,6 +382,7 @@
                                 <th>Transshipment Charges</th>
                                 <th>Other Charges</th>
                                 <th>Deduction Charges</th>
+                                <th>Total Amount</th>
                             </tr>
                         </thead>
 
@@ -364,7 +395,7 @@
                                 <td>{{ row.TRANSPORTER_GROUP }}</td>
                                 <td>{{ row.TRANSPORTER }}</td>
                                 <td>{{ row.NO_OF_VEHICLES_PLACED }}</td>
-                                <td>{{ row.FREIGHT_AMOUNT }}</td>
+                                
                                 <td>{{ row.BASIC_CHARGE }}</td>
                                 <td>{{ row.DETENTION_LOADING }}</td>
                                 <td>{{ row.DETENTION_UNLOADING }}</td>
@@ -374,11 +405,78 @@
                                 <td>{{ row.TRANSHIPMENT_CHARGES }}</td>
                                 <td>{{ row.OTHER_CHARGES }}</td>
                                 <td>{{ row.DEDUCTION_CHARGES }}</td>
+                                <td>{{ row.FREIGHT_AMOUNT }}</td>
                             </tr>
                         </tbody>
 
                     </table>
                 </div>
+
+                <div *ngIf="filteredData.length > 0 && selectedReportType !== 'All'" class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Transporter</th>
+                                <!-- Dynamic Column -->
+                                <th *ngIf="selectedReportType === 'HeaderWithPlant'">
+                                    Plant
+                                </th>
+                                <th *ngIf="selectedReportType === 'HeaderWithInOut'">
+                                    Inward/Outward
+                                </th>
+
+                                <th>No Of Vehicles Placed</th>
+                                
+                                <th>Basic Charge</th>
+                                <th>Detention Loading</th>
+                                <th>Detention Unloading</th>
+                                <th>Loading Charge</th>
+                                <th>Unloading Charge</th>
+                                <th>Routing Charges</th>
+                                <th>Transhipment Charges</th>
+                                <th>Other Charges</th>
+                                <th>Deduction Charges</th>
+                                <th>Total Amount</th>
+
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <tr *ngFor="let row of filteredData">
+
+                                <td>{{ row.TRANSPORTER }}</td>
+
+                                <!-- Dynamic Value -->
+                                <td *ngIf="selectedReportType === 'HeaderWithPlant'">
+                                    {{ row.PLANT }}
+                                </td>
+
+                                <td *ngIf="selectedReportType === 'HeaderWithInOut'">
+                                    {{ row.INWARD_OUTWARD }}
+                                </td>
+
+                                <td>{{ row.NO_OF_VEHICLES_PLACED }}</td>
+                                
+                                <td>{{ row.BASIC_CHARGE }}</td>
+                                <td>{{ row.DETENTION_LOADING }}</td>
+                                <td>{{ row.DETENTION_UNLOADING }}</td>
+                                <td>{{ row.LOADING_CHARGE }}</td>
+                                <td>{{ row.UNLOADING_CHARGE }}</td>
+                                <td>{{ row.ROUTING_CHARGES }}</td>
+                                <td>{{ row.TRANSHIPMENT_CHARGES }}</td>
+                                <td>{{ row.OTHER_CHARGES }}</td>
+                                <td>{{ row.DEDUCTION_CHARGES }}</td>
+                                <td>{{ row.FREIGHT_AMOUNT }}</td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
 
             </div>
         </div>
