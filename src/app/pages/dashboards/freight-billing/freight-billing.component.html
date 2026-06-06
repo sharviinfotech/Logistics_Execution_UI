@@ -705,25 +705,41 @@
                 <td>
                   <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md" #f1
                     (change)="onFileSelected($event, f1, 'freight')">
-                  <span *ngIf="!item.isEdit">{{ item.ZFRBILLUP }}</span>
+                  <span *ngIf="!item.isEdit">
+                    <a *ngIf="item.ZFRBILLUP" href="javascript:void(0)" (click)="viewCertificate(item, 'freight')">{{
+                      item.ZFRBILLUP }}</a>
+                    <span *ngIf="!item.ZFRBILLUP">-</span>
+                  </span>
                 </td>
 
                 <td>
                   <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md" #f2
                     (change)="onFileSelected($event, f2, 'unloading')">
-                  <span *ngIf="!item.isEdit">{{ item.ZUNLOADAPP }}</span>
+                  <span *ngIf="!item.isEdit">
+                    <a *ngIf="item.ZUNLOADAPP" href="javascript:void(0)" (click)="viewCertificate(item, 'unloading')">{{
+                      item.ZUNLOADAPP }}</a>
+                    <span *ngIf="!item.ZUNLOADAPP">-</span>
+                  </span>
                 </td>
 
                 <td>
                   <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md" #f3
                     (change)="onFileSelected($event, f3, 'detention')">
-                  <span *ngIf="!item.isEdit">{{ item.ZDETENTUP }}</span>
+                  <span *ngIf="!item.isEdit">
+                    <a *ngIf="item.ZDETENTUP" href="javascript:void(0)" (click)="viewCertificate(item, 'detention')">{{
+                      item.ZDETENTUP }}</a>
+                    <span *ngIf="!item.ZDETENTUP">-</span>
+                  </span>
                 </td>
 
                 <td>
                   <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md" #f4
                     (change)="onFileSelected($event, f4, 'workorder')">
-                  <span *ngIf="!item.isEdit">{{ item.ZWORDUP }}</span>
+                  <span *ngIf="!item.isEdit">
+                    <a *ngIf="item.ZWORDUP" href="javascript:void(0)" (click)="viewCertificate(item, 'workorder')">{{
+                      item.ZWORDUP }}</a>
+                    <span *ngIf="!item.ZWORDUP">-</span>
+                  </span>
                 </td>
                 <td>
                   <input *ngIf="item.isEdit" type="text" class="form-control form-control-sm width-md"
@@ -916,27 +932,43 @@
                 </td>
 
                 <td>
-                  <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md"
-                    [(ngModel)]="item.ZFRBILLUP">
-                  <span *ngIf="!item.isEdit">{{ item.ZFRBILLUP }}</span>
+                  <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md" #f1
+                    (change)="onFileSelected($event, f1, 'freight')">
+                  <span *ngIf="!item.isEdit">
+                    <a *ngIf="item.ZFRBILLUP" href="javascript:void(0)" (click)="viewCertificate(item, 'freight')">{{
+                      item.ZFRBILLUP }}</a>
+                    <span *ngIf="!item.ZFRBILLUP">-</span>
+                  </span>
                 </td>
 
                 <td>
-                  <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md"
-                    [(ngModel)]="item.ZUNLOADAPP">
-                  <span *ngIf="!item.isEdit">{{ item.ZUNLOADAPP }}</span>
+                  <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md" #f2
+                    (change)="onFileSelected($event, f2, 'unloading')">
+                  <span *ngIf="!item.isEdit">
+                    <a *ngIf="item.ZUNLOADAPP" href="javascript:void(0)" (click)="viewCertificate(item, 'unloading')">{{
+                      item.ZUNLOADAPP }}</a>
+                    <span *ngIf="!item.ZUNLOADAPP">-</span>
+                  </span>
                 </td>
 
                 <td>
-                  <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md"
-                    [(ngModel)]="item.ZDETENTUP">
-                  <span *ngIf="!item.isEdit">{{ item.ZDETENTUP }}</span>
+                  <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md" #f3
+                    (change)="onFileSelected($event, f3, 'detention')">
+                  <span *ngIf="!item.isEdit">
+                    <a *ngIf="item.ZDETENTUP" href="javascript:void(0)" (click)="viewCertificate(item, 'detention')">{{
+                      item.ZDETENTUP }}</a>
+                    <span *ngIf="!item.ZDETENTUP">-</span>
+                  </span>
                 </td>
 
                 <td>
-                  <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md"
-                    [(ngModel)]="item.ZWORDUP">
-                  <span *ngIf="!item.isEdit">{{ item.ZWORDUP }}</span>
+                  <input *ngIf="item.isEdit" type="file" class="form-control form-control-sm width-md" #f4
+                    (change)="onFileSelected($event, f4, 'workorder')">
+                  <span *ngIf="!item.isEdit">
+                    <a *ngIf="item.ZWORDUP" href="javascript:void(0)" (click)="viewCertificate(item, 'workorder')">{{
+                      item.ZWORDUP }}</a>
+                    <span *ngIf="!item.ZWORDUP">-</span>
+                  </span>
                 </td>
 
                 <td>
@@ -1070,6 +1102,10 @@
                 <th>Location</th>
                 <th>Vehicle Line</th>
                 <th>Vehicle Number</th>
+                <th>Freight Bill upload</th>
+                <th>Unloading Charges Approval</th>
+                <th>Detention Charges Uploading</th>
+                <th>Work Order Uploading</th>
                 <th>Plant</th>
                 <th>Division</th>
                 <th>Work Order</th>
@@ -1130,6 +1166,29 @@
                 <td>{{ item.ZLOCATION}}</td>
                 <td>{{ item.ZVEH_LINE }}</td>
                 <td>{{ item.ZVEH_NUM }}</td>
+                <td>
+                  <a *ngIf="item.ZFRBILLUP" href="javascript:void(0)" (click)="viewCertificate(item, 'freight')">{{
+                    item.ZFRBILLUP }}</a>
+                  <span *ngIf="!item.ZFRBILLUP">-</span>
+                </td>
+
+                <td>
+                  <a *ngIf="item.ZUNLOADAPP" href="javascript:void(0)" (click)="viewCertificate(item, 'unloading')">{{
+                    item.ZUNLOADAPP }}</a>
+                  <span *ngIf="!item.ZUNLOADAPP">-</span>
+                </td>
+
+                <td>
+                  <a *ngIf="item.ZDETENTUP" href="javascript:void(0)" (click)="viewCertificate(item, 'detention')">{{
+                    item.ZDETENTUP }}</a>
+                  <span *ngIf="!item.ZDETENTUP">-</span>
+                </td>
+
+                <td>
+                  <a *ngIf="item.ZWORDUP" href="javascript:void(0)" (click)="viewCertificate(item, 'workorder')">{{
+                    item.ZWORDUP }}</a>
+                  <span *ngIf="!item.ZWORDUP">-</span>
+                </td>
                 <td>{{ item.ZPLANT}}</td>
                 <td>{{ item.ZDIVISION }}</td>
                 <td>{{ item.ZWORK_ORDER }}</td>
@@ -1180,6 +1239,10 @@
                 <th>Location</th>
                 <th>Vehicle Line</th>
                 <th>Vehicle Number</th>
+                <th>Freight Bill upload</th>
+                <th>Unloading Charges Approval</th>
+                <th>Detention Charges Uploading</th>
+                <th>Work Order Uploading</th>
                 <th>Plant</th>
                 <th>Division</th>
                 <th>Work Order</th>
@@ -1222,6 +1285,29 @@
                 <td>{{ item.ZLOCATION}}</td>
                 <td>{{ item.ZVEH_LINE }}</td>
                 <td>{{ item.ZVEH_NUM }}</td>
+                <td>
+                  <a *ngIf="item.ZFRBILLUP" href="javascript:void(0)" (click)="viewCertificate(item, 'freight')">{{
+                    item.ZFRBILLUP }}</a>
+                  <span *ngIf="!item.ZFRBILLUP">-</span>
+                </td>
+
+                <td>
+                  <a *ngIf="item.ZUNLOADAPP" href="javascript:void(0)" (click)="viewCertificate(item, 'unloading')">{{
+                    item.ZUNLOADAPP }}</a>
+                  <span *ngIf="!item.ZUNLOADAPP">-</span>
+                </td>
+
+                <td>
+                  <a *ngIf="item.ZDETENTUP" href="javascript:void(0)" (click)="viewCertificate(item, 'detention')">{{
+                    item.ZDETENTUP }}</a>
+                  <span *ngIf="!item.ZDETENTUP">-</span>
+                </td>
+
+                <td>
+                  <a *ngIf="item.ZWORDUP" href="javascript:void(0)" (click)="viewCertificate(item, 'workorder')">{{
+                    item.ZWORDUP }}</a>
+                  <span *ngIf="!item.ZWORDUP">-</span>
+                </td>
                 <td>{{ item.ZPLANT}}</td>
                 <td>{{ item.ZDIVISION }}</td>
                 <td>{{ item.ZWORK_ORDER }}</td>

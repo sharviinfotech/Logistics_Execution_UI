@@ -584,12 +584,24 @@
                   <span *ngIf="!headerData.isEdit">{{ headerData.ZSIT_SALE }}</span>
                 </td>
 
-                <td>
+                <!-- <td>
                   <input *ngIf="headerData.isEdit" type="file" #editFileInput
                     class="form-control form-control-sm width-md" accept=".jpg,.jpeg,.png"
                     (change)="onFileSelected($event, editFileInput)">
                   <span *ngIf="!headerData.isEdit">
                     {{ headerData.ZPODNAME}}
+                  </span>
+                </td> -->
+
+                <td>
+                  <input *ngIf="headerData.isEdit" type="file" #editFileInput
+                    class="form-control form-control-sm width-md" accept=".jpg,.jpeg,.png"
+                    (change)="onFileSelected($event, editFileInput)">
+                  <span *ngIf="!headerData.isEdit">
+                    <a *ngIf="headerData.ZPODNAME" href="javascript:void(0)" (click)="viewCertificate(headerData)">
+                      {{ headerData.ZPODNAME }}
+                    </a>
+                    <span *ngIf="!headerData.ZPODNAME">-</span>
                   </span>
                 </td>
 
@@ -768,7 +780,8 @@
                 <th>Sales Person</th>
                 <th>Physical Arrived</th>
                 <th>Unloading DT</th>
-                <th>POD Scan</th>
+                <th>POD Scan File</th>
+                <th>POD Scan Received date</th>
                 <th>SIT/SALE</th>
                 <th>Location</th>
                 <th>Plant</th>
@@ -789,6 +802,12 @@
                 <td>{{ item.ZSALE_PERSON }}</td>
                 <td>{{ item.ZPY_ARRIVED_DEST }}</td>
                 <td>{{ item.ZUNLOADING_DT }}</td>
+                <td>
+                  <a *ngIf="item.ZPODNAME" href="javascript:void(0)" (click)="viewCertificate(item)">
+                    {{ item.ZPODNAME }}
+                  </a>
+                  <span *ngIf="!item.ZPODNAME">-</span>
+                </td>
                 <td>{{ item.ZPOD_SCAN}}</td>
                 <td>{{ item.ZSIT_SALE }}</td>
                 <td>{{ item.ZLOCATION }}</td>

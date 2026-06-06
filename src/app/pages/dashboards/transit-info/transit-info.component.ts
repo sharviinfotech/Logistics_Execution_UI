@@ -1569,5 +1569,76 @@ export class TransitInfoComponent implements OnInit {
   reader.readAsDataURL(file);
 }
 
+viewCertificate(row: any): void {
+
+  // Step 1: Build payload
+  const payload = {
+    ZINVOICE: row.ZINV_NO,
+    ZLIST: '',
+    ZFNAME: row.ZPODNAME,
+    ZFTYPE: 'WITHSAP'
+  };
+
+  this.spinner.show();
+
+  this.service.GlobalFileView(payload).subscribe({
+
+    next: (res: any) => {
+      this.spinner.hide();
+
+      // Step 2: Check if response has data
+      if (!res) {
+        Swal.fire('Info', 'No file available', 'info');
+        return;
+      }
+
+      // Step 3: Convert base64 to blob
+      const blob = this.base64ToBlob(res, row.ZPODNAME);
+
+      // Step 4: Create URL from blob
+      const fileUrl = URL.createObjectURL(blob);
+
+      // Step 5: View or Download based on mode
+      if (this.mainMode === 'creation') {
+        window.open(fileUrl, '_blank');         // View in new tab
+      } else {
+        this.downloadFile(fileUrl, row.ZPODNAME); // Download file
+      }
+    },
+
+    error: (err) => {
+      this.spinner.hide();
+      Swal.fire('Error', 'Failed to load file', 'error');
+    }
+
+  });
+}
+
+
+// Helper 1: Convert base64 string to Blob
+base64ToBlob(base64: string, fileName: string): Blob {
+  const ext = fileName.split('.').pop()?.toLowerCase() || '';
+
+  // Detect file type
+  let mimeType = 'image/jpeg'; // default
+  if (ext === 'png') mimeType = 'image/png';
+  if (ext === 'pdf') mimeType = 'application/pdf';
+
+  // Convert base64 to bytes
+  const byteCharacters = atob(base64);
+  const byteArray = new Uint8Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteArray[i] = byteCharacters.charCodeAt(i);
+  }
+
+  return new Blob([byteArray], { type: mimeType });
+}
+downloadFile(fileUrl: string, fileName: string): void {
+  const a = document.createElement('a');
+  a.href = fileUrl;
+  a.download = fileName;
+  a.click();
+  URL.revokeObjectURL(fileUrl); // cleanup memory
+}
 
 }

@@ -1185,7 +1185,7 @@ export class TransitDamageInfoComponent implements OnInit {
           SETTLEMENT: header.SETTLEMENT,
           CLOSING_DT: header.CLOSING_DT,
           IMAGES: header.IMAGES,
-          
+
         });
 
         this.items.clear();
@@ -1346,7 +1346,7 @@ export class TransitDamageInfoComponent implements OnInit {
         ZDAMAGE_RMK: headerRow.ZDAMAGE_RMK || null,
         ZSETTLEMENT: headerRow.ZSETTLEMENT || null,
         ZCLOSING_DT: headerRow.ZCLOSING_DT || null,
-       
+
         ZSALE_PERSON: headerRow.ZSALE_PERSON || null,
         ZLOCATION: headerRow.ZLOCATION || null,
         ZROUTE: headerRow.ZROUTE || null,
@@ -1380,12 +1380,12 @@ export class TransitDamageInfoComponent implements OnInit {
       const payload = {
         ZDIMAGES: this.imagesbase64 || '',
         ZDIMG_PATH: this.imagespath || '',
-        ZFSRREP: this.fsrreportFileBase64 ||'',
-        ZFSRREP_PATH: this.fsrreportFilePath ||'',
-        ZFIRREP: this.firreportFileBase64 ||'',
-        ZFIRREP_PATH: this.firreportFilePath ||'',
-        ZCOF: this.cofFileBase64 ||'',
-        ZCOF_PATH: this.cofFilePath ||'',
+        ZFSRREP: this.fsrreportFileBase64 || '',
+        ZFSRREP_PATH: this.fsrreportFilePath || '',
+        ZFIRREP: this.firreportFileBase64 || '',
+        ZFIRREP_PATH: this.firreportFilePath || '',
+        ZCOF: this.cofFileBase64 || '',
+        ZCOF_PATH: this.cofFilePath || '',
         HEAD: headerPayload,
         ITEM: itemPayload
       };
@@ -2240,5 +2240,88 @@ export class TransitDamageInfoComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
+  viewCertificate(row: any, fileType: string): void {
+
+    // Step 1: Pick correct file name based on file type
+    let fileName = '';
+    if (fileType === 'image') fileName = row.ZDIMAGES || '';
+    if (fileType === 'fsr') fileName = row.ZFSRREP || '';
+    if (fileType === 'fir') fileName = row.ZFIRREP || '';
+    if (fileType === 'cof') fileName = row.ZCOF || '';
+
+
+    if (!fileName) {
+      Swal.fire('Info', 'No file available', 'info');
+      return;
+    }
+
+    // Step 2: Build payload (same as before, no change)
+    const payload = {
+      ZINVOICE: row.ZINV_NO,
+      ZLIST: '',
+      ZFNAME: fileName,
+      ZFTYPE: 'WITHSAP'
+    };
+
+    console.log('Payload:', payload);
+    this.spinner.show();
+
+    this.service.GlobalFileView(payload).subscribe({
+      next: (res: any) => {
+        this.spinner.hide();
+
+        // Step 3: Check response
+        if (!res) {
+          Swal.fire('Info', 'No file available', 'info');
+          return;
+        }
+
+        // Step 4: Convert base64 to blob
+        const blob = this.base64ToBlob(res, fileName);
+
+        // Step 5: Create URL
+        const fileUrl = URL.createObjectURL(blob);
+
+        // ✅ Step 6: VIEW in creation | DOWNLOAD in filter (same as transit info)
+        if (this.mainMode === 'creation') {
+          window.open(fileUrl, '_blank');         // View in new tab
+        } else if (this.mainMode === 'filter') {
+          this.downloadFile(fileUrl, fileName);   // Download file
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        Swal.fire('Error', 'Failed to load file', 'error');
+      }
+    });
+  }
+
+
+  // Helper 1: Convert base64 to Blob
+  base64ToBlob(base64: string, fileName: string): Blob {
+    const ext = fileName.split('.').pop()?.toLowerCase() || '';
+
+    let mimeType = 'image/jpeg'; // default
+    if (ext === 'png') mimeType = 'image/png';
+    if (ext === 'pdf') mimeType = 'application/pdf';
+
+    const byteCharacters = atob(base64);
+    const byteArray = new Uint8Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteArray[i] = byteCharacters.charCodeAt(i);
+    }
+
+    return new Blob([byteArray], { type: mimeType });
+  }
+
+
+  // Helper 2: Trigger file download
+  downloadFile(fileUrl: string, fileName: string): void {
+    const a = document.createElement('a');
+    a.href = fileUrl;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(fileUrl); // cleanup memory
+  }
 
 }

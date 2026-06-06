@@ -27,6 +27,17 @@ export class BusinessShareMatrixComponent {
   originalData: any[] = [];
   plantList: any;
   divisionList: any;
+  totalVehicles: number = 0;
+  totalFreightAmount: number = 0;
+  totalBasicCharge: number = 0;
+  totalDetentionLoading: number = 0;
+  totalDetentionUnloading: number = 0;
+  totalLoadingCharge: number = 0;
+  totalUnloadingCharge: number = 0;
+  totalRoutingCharges: number = 0;
+  totalTranshipmentCharges: number = 0;
+  totalOtherCharges: number = 0;
+  totalDeductionCharges: number = 0;
   loggedInUser: string = '';
   selectedReportType: string = '';
   transporterList: any[] = [];
@@ -72,6 +83,7 @@ export class BusinessShareMatrixComponent {
     { value: 'Machinery', label: 'Machinery' },
     { value: 'Others', label: 'Others' }
   ];
+  totals: any;
 
 
 
@@ -213,11 +225,11 @@ export class BusinessShareMatrixComponent {
       destination_location: this.createArray(form.DEST_LOCATION, 'destination_location'),
       segment: this.createArray(form.SEGMENT, 'segment'),
       incoterms: this.createArray(form.INCOTERMS, 'incoterms'),
-       mode:
-    form.REPORT_TYPE === 'All' ? 'A' :
-    form.REPORT_TYPE === 'Header' ? 'H' :
-    form.REPORT_TYPE === 'HeaderWithPlant' ? 'P' :
-    form.REPORT_TYPE === 'HeaderWithInOut' ? 'S' :  ''
+      mode:
+        form.REPORT_TYPE === 'All' ? 'A' :
+          form.REPORT_TYPE === 'Header' ? 'H' :
+            form.REPORT_TYPE === 'HeaderWithPlant' ? 'P' :
+              form.REPORT_TYPE === 'HeaderWithInOut' ? 'S' : ''
     };
     console.log('Payload:', payload);
 
@@ -248,8 +260,21 @@ export class BusinessShareMatrixComponent {
           return;
         }
 
-        this.filteredData = res;
-        this.originalData = [...res];
+        this.filteredData = res?.[0]?.DATA || [];
+        this.originalData = [...this.filteredData];
+        this.totals = res?.[0] || {};
+        
+        this.totalVehicles = res?.[0]?.TOTAL_VEHICLES || 0;
+        this.totalFreightAmount = res?.[0]?.TOTAL_FREIGHT_AMOUNT || 0;
+        this.totalBasicCharge = res?.[0]?.TOTAL_BASIC_CHARGE || 0;
+        this.totalDetentionLoading = res?.[0]?.TOTAL_DETENTION_LOADING || 0;
+        this.totalDetentionUnloading = res?.[0]?.TOTAL_DETENTION_UNLOADING || 0;
+        this.totalLoadingCharge = res?.[0]?.TOTAL_LOADING_CHARGE || 0;
+        this.totalUnloadingCharge = res?.[0]?.TOTAL_UNLOADING_CHARGE || 0;
+        this.totalRoutingCharges = res?.[0]?.TOTAL_ROUTING_CHARGES || 0;
+        this.totalTranshipmentCharges = res?.[0]?.TOTAL_TRANSHIPMENT_CHARGES || 0;
+        this.totalOtherCharges = res?.[0]?.TOTAL_OTHER_CHARGES || 0;
+        this.totalDeductionCharges = res?.[0]?.TOTAL_DEDUCTION_CHARGES || 0;
 
         if (this.filteredData.length > 0) {
           Swal.fire({
@@ -340,419 +365,609 @@ export class BusinessShareMatrixComponent {
     });
   }
 
-exportToExcel(): void {
-
-  // =========================
-  // VALIDATION
-  // =========================
-  if (!this.filteredData || this.filteredData.length === 0) {
-
-    Swal.fire(
-      'No Data',
-      'Nothing to export',
-      'warning'
-    );
-
-    return;
-  }
-
-  let exportData: any[] = [];
-
   // ======================================================
-  // ALL RECORDS MODE
+  // EXPORT TO EXCEL
   // ======================================================
-  if (this.selectedReportType === 'All') {
-
-    exportData = this.filteredData.map((row: any) => ({
-      'Reference No': row.REFERENCE_NUMBER || '',
-      'In/Out': row.INWARD_OUTWARD || '',
-      'SAP Type': row.SAP_NONSAP || '',
-      'Plant': row.PLANT || '',
-      'Transporter Group': row.TRANSPORTER_GROUP || '',
-      'Transporter': row.TRANSPORTER || '',
-      'No. of Vehicles': row.NO_OF_VEHICLES_PLACED || 0,
-      
-      'Basic Charge': row.BASIC_CHARGE || 0,
-      'Detention Loading': row.DETENTION_LOADING || 0,
-      'Detention Unloading': row.DETENTION_UNLOADING || 0,
-      'Loading Charge': row.LOADING_CHARGE || 0,
-      'Unloading Charge': row.UNLOADING_CHARGE || 0,
-      'Routing Charges': row.ROUTING_CHARGES || 0,
-      'Transshipment Charges': row.TRANSHIPMENT_CHARGES || 0,
-      'Other Charges': row.OTHER_CHARGES || 0,
-      'Deduction Charges': row.DEDUCTION_CHARGES || 0,
-      'Total Amount': row.FREIGHT_AMOUNT || 0,
-    }));
-
-  }
-
-  // ======================================================
-  // HEADER MODE
-  // ======================================================
-  else if (this.selectedReportType === 'Header') {
-
-    exportData = this.filteredData.map((row: any) => ({
-      'Transporter': row.TRANSPORTER || '',
-      'No. of Vehicles': row.NO_OF_VEHICLES_PLACED || 0,
-      
-      'Basic Charge': row.BASIC_CHARGE || 0,
-      'Detention Loading': row.DETENTION_LOADING || 0,
-      'Detention Unloading': row.DETENTION_UNLOADING || 0,
-      'Loading Charge': row.LOADING_CHARGE || 0,
-      'Unloading Charge': row.UNLOADING_CHARGE || 0,
-      'Routing Charges': row.ROUTING_CHARGES || 0,
-      'Transshipment Charges': row.TRANSHIPMENT_CHARGES || 0,
-      'Other Charges': row.OTHER_CHARGES || 0,
-      'Deduction Charges': row.DEDUCTION_CHARGES || 0,
-       'Total Amount': row.FREIGHT_AMOUNT || 0,
-    }));
-
-  }
-
-  // ======================================================
-  // HEADER WITH PLANT MODE
-  // ======================================================
-  else if (this.selectedReportType === 'HeaderWithPlant') {
-
-    exportData = this.filteredData.map((row: any) => ({
-      'Transporter': row.TRANSPORTER || '',
-      'Plant': row.PLANT || '',
-      'No. of Vehicles': row.NO_OF_VEHICLES_PLACED || 0,
-     
-      'Basic Charge': row.BASIC_CHARGE || 0,
-      'Detention Loading': row.DETENTION_LOADING || 0,
-      'Detention Unloading': row.DETENTION_UNLOADING || 0,
-      'Loading Charge': row.LOADING_CHARGE || 0,
-      'Unloading Charge': row.UNLOADING_CHARGE || 0,
-      'Routing Charges': row.ROUTING_CHARGES || 0,
-      'Transshipment Charges': row.TRANSHIPMENT_CHARGES || 0,
-      'Other Charges': row.OTHER_CHARGES || 0,
-      'Deduction Charges': row.DEDUCTION_CHARGES || 0,
-       'Total Amount': row.FREIGHT_AMOUNT || 0,
-
-    }));
-
-  }
-
-  // ======================================================
-  // HEADER WITH INWARD/OUTWARD MODE
-  // ======================================================
-  else if (this.selectedReportType === 'HeaderWithInOut') {
-
-    exportData = this.filteredData.map((row: any) => ({
-      'Transporter': row.TRANSPORTER || '',
-      'Inward/Outward': row.INWARD_OUTWARD || '',
-      'No. of Vehicles': row.NO_OF_VEHICLES_PLACED || 0,
-      
-      'Basic Charge': row.BASIC_CHARGE || 0,
-      'Detention Loading': row.DETENTION_LOADING || 0,
-      'Detention Unloading': row.DETENTION_UNLOADING || 0,
-      'Loading Charge': row.LOADING_CHARGE || 0,
-      'Unloading Charge': row.UNLOADING_CHARGE || 0,
-      'Routing Charges': row.ROUTING_CHARGES || 0,
-      'Transshipment Charges': row.TRANSHIPMENT_CHARGES || 0,
-      'Other Charges': row.OTHER_CHARGES || 0,
-      'Deduction Charges': row.DEDUCTION_CHARGES || 0,
-      'Total Amount': row.FREIGHT_AMOUNT || 0
-
-    }));
-
-  }
-
-  // ======================================================
-  // CREATE WORKSHEET
-  // ======================================================
-  const worksheet: XLSX.WorkSheet =
-    XLSX.utils.json_to_sheet(exportData);
-
-  // ======================================================
-  // CREATE WORKBOOK
-  // ======================================================
-  const workbook: XLSX.WorkBook = {
-
-    Sheets: {
-      'Business Share Matrix': worksheet
-    },
-
-    SheetNames: [
-      'Business Share Matrix'
-    ]
-
-  };
-
-  // ======================================================
-  // EXPORT FILE
-  // ======================================================
-  XLSX.writeFile(
-    workbook,
-    `Business_Share_Matrix_${this.selectedReportType}.xlsx`
-  );
-
-  // ======================================================
-  // SUCCESS MESSAGE
-  // ======================================================
-  Swal.fire(
-    'Success',
-    'Excel exported successfully.',
-    'success'
-  );
-
-}
-
-downloadPDF() {
-
-  // ======================================================
-  // VALIDATION
-  // ======================================================
-  if (!this.filteredData || this.filteredData.length === 0) {
-
-    Swal.fire(
-      'Warning',
-      'No data available to download.',
-      'warning'
-    );
-
-    return;
-  }
-
-  // ======================================================
-  // PDF CONFIG
-  // ======================================================
-  const doc = new jsPDF('l', 'mm', 'a2');
-
-  doc.text(
-    `Business Share Matrix Report - ${this.selectedReportType}`,
-    14,
-    10
-  );
-
-  let tableColumn: string[] = [];
-
-  let tableRows: any[] = [];
-
-  // ======================================================
-  // ALL REPORT
-  // ======================================================
-  if (this.selectedReportType === 'All') {
-
-    tableColumn = [
-
-      'Reference No',
-      'In/Out',
-      'SAP Type',
-      'Plant',
-      'Transporter Group',
-      'Transporter',
-      'No. of Vehicles',
-      
-      'Basic Charge',
-      'Detention Loading',
-      'Detention Unloading',
-      'Loading Charge',
-      'Unloading Charge',
-      'Routing Charges',
-      'Transshipment Charges',
-      'Other Charges',
-      'Deduction Charges',
-      'Total Amount',
-
-    ];
-
-    tableRows = this.filteredData.map((row: any) => [
-
-      row.REFERENCE_NUMBER || '',
-      row.INWARD_OUTWARD || '',
-      row.SAP_NONSAP || '',
-      row.PLANT || '',
-      row.TRANSPORTER_GROUP || '',
-      row.TRANSPORTER || '',
-      row.NO_OF_VEHICLES_PLACED || 0,
-      row.BASIC_CHARGE || 0,
-      row.DETENTION_LOADING || 0,
-      row.DETENTION_UNLOADING || 0,
-      row.LOADING_CHARGE || 0,
-      row.UNLOADING_CHARGE || 0,
-      row.ROUTING_CHARGES || 0,
-      row.TRANSHIPMENT_CHARGES || 0,
-      row.OTHER_CHARGES || 0,
-      row.DEDUCTION_CHARGES || 0,
-      row.FREIGHT_AMOUNT || 0,
-
-    ]);
-
-  }
-
-  // ======================================================
-  // HEADER REPORT
-  // ======================================================
-  else if (this.selectedReportType === 'Header') {
-
-    tableColumn = [
-
-      'Transporter',
-      'No. of Vehicles',
-      
-      'Basic Charge',
-      'Detention Loading',
-      'Detention Unloading',
-      'Loading Charge',
-      'Unloading Charge',
-      'Routing Charges',
-      'Transshipment Charges',
-      'Other Charges',
-      'Deduction Charges',
-      'Total Amount',
-
-    ];
-
-    tableRows = this.filteredData.map((row: any) => [
-
-      row.TRANSPORTER || '',
-      row.NO_OF_VEHICLES_PLACED || 0,
-      
-      row.BASIC_CHARGE || 0,
-      row.DETENTION_LOADING || 0,
-      row.DETENTION_UNLOADING || 0,
-      row.LOADING_CHARGE || 0,
-      row.UNLOADING_CHARGE || 0,
-      row.ROUTING_CHARGES || 0,
-      row.TRANSHIPMENT_CHARGES || 0,
-      row.OTHER_CHARGES || 0,
-      row.DEDUCTION_CHARGES || 0,
-      row.FREIGHT_AMOUNT || 0,
-
-    ]);
-
-  }
-
-  // ======================================================
-  // HEADER WITH PLANT REPORT
-  // ======================================================
-  else if (this.selectedReportType === 'HeaderWithPlant') {
-
-    tableColumn = [
-
-      'Transporter',
-      'Plant',
-      'No. of Vehicles',
-     
-      'Basic Charge',
-      'Detention Loading',
-      'Detention Unloading',
-      'Loading Charge',
-      'Unloading Charge',
-      'Routing Charges',
-      'Transshipment Charges',
-      'Other Charges',
-      'Deduction Charges',
-       'Total Amount',
-
-    ];
-
-    tableRows = this.filteredData.map((row: any) => [
-
-      row.TRANSPORTER || '',
-      row.PLANT || '',
-      row.NO_OF_VEHICLES_PLACED || 0,
-      
-      row.BASIC_CHARGE || 0,
-      row.DETENTION_LOADING || 0,
-      row.DETENTION_UNLOADING || 0,
-      row.LOADING_CHARGE || 0,
-      row.UNLOADING_CHARGE || 0,
-      row.ROUTING_CHARGES || 0,
-      row.TRANSHIPMENT_CHARGES || 0,
-      row.OTHER_CHARGES || 0,
-      row.DEDUCTION_CHARGES || 0,
-      row.FREIGHT_AMOUNT || 0,
-
-    ]);
-
-  }
-
-  // ======================================================
-  // HEADER WITH INWARD/OUTWARD REPORT
-  // ======================================================
-  else if (this.selectedReportType === 'HeaderWithInOut') {
-
-    tableColumn = [
-
-      'Transporter',
-      'Inward/Outward',
-      'No. of Vehicles',
-      
-      'Basic Charge',
-      'Detention Loading',
-      'Detention Unloading',
-      'Loading Charge',
-      'Unloading Charge',
-      'Routing Charges',
-      'Transshipment Charges',
-      'Other Charges',
-      'Deduction Charges',
-      'Total Amount',
-
-    ];
-
-    tableRows = this.filteredData.map((row: any) => [
-
-      row.TRANSPORTER || '',
-      row.INWARD_OUTWARD || '',
-      row.NO_OF_VEHICLES_PLACED || 0,
-      
-      row.BASIC_CHARGE || 0,
-      row.DETENTION_LOADING || 0,
-      row.DETENTION_UNLOADING || 0,
-      row.LOADING_CHARGE || 0,
-      row.UNLOADING_CHARGE || 0,
-      row.ROUTING_CHARGES || 0,
-      row.TRANSHIPMENT_CHARGES || 0,
-      row.OTHER_CHARGES || 0,
-      row.DEDUCTION_CHARGES || 0,
-      row.FREIGHT_AMOUNT || 0,
-    ]);
-
-  }
-
-  // ======================================================
-  // PDF TABLE
-  // ======================================================
-  autoTable(doc, {
-
-    head: [tableColumn],
-
-    body: tableRows,
-
-    startY: 15,
-
-    styles: {
-      fontSize: 7,
-      cellWidth: 'wrap'
-    },
-
-    headStyles: {
-      fillColor: [41, 128, 185],
-      fontSize: 7
+  exportToExcel(): void {
+
+    // ======================================================
+    // VALIDATION
+    // ======================================================
+    if (!this.filteredData || this.filteredData.length === 0) {
+
+      Swal.fire(
+        'No Data',
+        'Nothing to export',
+        'warning'
+      );
+
+      return;
     }
 
-  });
+    let exportData: any[] = [];
+
+    // ======================================================
+    // ALL RECORDS MODE
+    // ======================================================
+    if (this.selectedReportType === 'All') {
+
+      exportData = this.filteredData.map((row: any) => ({
+
+        'Reference No': row.REFERENCE_NUMBER || '',
+        'In/Out': row.INWARD_OUTWARD || '',
+        'SAP Type': row.SAP_NONSAP || '',
+        'Plant': row.PLANT || '',
+        'Transporter Group': row.TRANSPORTER_GROUP || '',
+        'Transporter': row.TRANSPORTER || '',
+        'No. of Vehicles': row.NO_OF_VEHICLES_PLACED || 0,
+
+        'Basic Charge': row.BASIC_CHARGE || 0,
+        'Detention Loading': row.DETENTION_LOADING || 0,
+        'Detention Unloading': row.DETENTION_UNLOADING || 0,
+        'Loading Charge': row.LOADING_CHARGE || 0,
+        'Unloading Charge': row.UNLOADING_CHARGE || 0,
+        'Routing Charges': row.ROUTING_CHARGES || 0,
+        'Transshipment Charges': row.TRANSHIPMENT_CHARGES || 0,
+        'Other Charges': row.OTHER_CHARGES || 0,
+        'Deduction Charges': row.DEDUCTION_CHARGES || 0,
+        'Total Amount': row.FREIGHT_AMOUNT || 0,
+
+      }));
+
+      // ======================================================
+      // TOTAL ROW
+      // ======================================================
+      exportData.push({
+
+        'Reference No': 'TOTAL',
+        'In/Out': '',
+        'SAP Type': '',
+        'Plant': '',
+        'Transporter Group': '',
+        'Transporter': '',
+
+        'No. of Vehicles': this.totals.TOTAL_VEHICLES || 0,
+
+        'Basic Charge': this.totals.TOTAL_BASIC_CHARGE || 0,
+        'Detention Loading': this.totals.TOTAL_DETENTION_LOADING || 0,
+        'Detention Unloading': this.totals.TOTAL_DETENTION_UNLOADING || 0,
+        'Loading Charge': this.totals.TOTAL_LOADING_CHARGE || 0,
+        'Unloading Charge': this.totals.TOTAL_UNLOADING_CHARGE || 0,
+        'Routing Charges': this.totals.TOTAL_ROUTING_CHARGES || 0,
+        'Transshipment Charges': this.totals.TOTAL_TRANSHIPMENT_CHARGES || 0,
+        'Other Charges': this.totals.TOTAL_OTHER_CHARGES || 0,
+        'Deduction Charges': this.totals.TOTAL_DEDUCTION_CHARGES || 0,
+        'Total Amount': this.totals.TOTAL_FREIGHT_AMOUNT || 0,
+
+      });
+
+    }
+
+    // ======================================================
+    // HEADER MODE
+    // ======================================================
+    else if (this.selectedReportType === 'Header') {
+
+      exportData = this.filteredData.map((row: any) => ({
+
+        'Transporter': row.TRANSPORTER || '',
+        'No. of Vehicles': row.NO_OF_VEHICLES_PLACED || 0,
+
+        'Basic Charge': row.BASIC_CHARGE || 0,
+        'Detention Loading': row.DETENTION_LOADING || 0,
+        'Detention Unloading': row.DETENTION_UNLOADING || 0,
+        'Loading Charge': row.LOADING_CHARGE || 0,
+        'Unloading Charge': row.UNLOADING_CHARGE || 0,
+        'Routing Charges': row.ROUTING_CHARGES || 0,
+        'Transshipment Charges': row.TRANSHIPMENT_CHARGES || 0,
+        'Other Charges': row.OTHER_CHARGES || 0,
+        'Deduction Charges': row.DEDUCTION_CHARGES || 0,
+        'Total Amount': row.FREIGHT_AMOUNT || 0,
+
+      }));
+
+      exportData.push({
+
+        'Transporter': 'TOTAL',
+
+        'No. of Vehicles': this.totals.TOTAL_VEHICLES || 0,
+
+        'Basic Charge': this.totals.TOTAL_BASIC_CHARGE || 0,
+        'Detention Loading': this.totals.TOTAL_DETENTION_LOADING || 0,
+        'Detention Unloading': this.totals.TOTAL_DETENTION_UNLOADING || 0,
+        'Loading Charge': this.totals.TOTAL_LOADING_CHARGE || 0,
+        'Unloading Charge': this.totals.TOTAL_UNLOADING_CHARGE || 0,
+        'Routing Charges': this.totals.TOTAL_ROUTING_CHARGES || 0,
+        'Transshipment Charges': this.totals.TOTAL_TRANSHIPMENT_CHARGES || 0,
+        'Other Charges': this.totals.TOTAL_OTHER_CHARGES || 0,
+        'Deduction Charges': this.totals.TOTAL_DEDUCTION_CHARGES || 0,
+        'Total Amount': this.totals.TOTAL_FREIGHT_AMOUNT || 0,
+
+      });
+
+    }
+
+    // ======================================================
+    // HEADER WITH PLANT MODE
+    // ======================================================
+    else if (this.selectedReportType === 'HeaderWithPlant') {
+
+      exportData = this.filteredData.map((row: any) => ({
+
+        'Transporter': row.TRANSPORTER || '',
+        'Plant': row.PLANT || '',
+        'No. of Vehicles': row.NO_OF_VEHICLES_PLACED || 0,
+
+        'Basic Charge': row.BASIC_CHARGE || 0,
+        'Detention Loading': row.DETENTION_LOADING || 0,
+        'Detention Unloading': row.DETENTION_UNLOADING || 0,
+        'Loading Charge': row.LOADING_CHARGE || 0,
+        'Unloading Charge': row.UNLOADING_CHARGE || 0,
+        'Routing Charges': row.ROUTING_CHARGES || 0,
+        'Transshipment Charges': row.TRANSHIPMENT_CHARGES || 0,
+        'Other Charges': row.OTHER_CHARGES || 0,
+        'Deduction Charges': row.DEDUCTION_CHARGES || 0,
+        'Total Amount': row.FREIGHT_AMOUNT || 0,
+
+      }));
+
+      exportData.push({
+
+        'Transporter': 'TOTAL',
+        'Plant': '',
+
+        'No. of Vehicles': this.totals.TOTAL_VEHICLES || 0,
+
+        'Basic Charge': this.totals.TOTAL_BASIC_CHARGE || 0,
+        'Detention Loading': this.totals.TOTAL_DETENTION_LOADING || 0,
+        'Detention Unloading': this.totals.TOTAL_DETENTION_UNLOADING || 0,
+        'Loading Charge': this.totals.TOTAL_LOADING_CHARGE || 0,
+        'Unloading Charge': this.totals.TOTAL_UNLOADING_CHARGE || 0,
+        'Routing Charges': this.totals.TOTAL_ROUTING_CHARGES || 0,
+        'Transshipment Charges': this.totals.TOTAL_TRANSHIPMENT_CHARGES || 0,
+        'Other Charges': this.totals.TOTAL_OTHER_CHARGES || 0,
+        'Deduction Charges': this.totals.TOTAL_DEDUCTION_CHARGES || 0,
+        'Total Amount': this.totals.TOTAL_FREIGHT_AMOUNT || 0,
+
+      });
+
+    }
+
+    // ======================================================
+    // HEADER WITH INWARD/OUTWARD MODE
+    // ======================================================
+    else if (this.selectedReportType === 'HeaderWithInOut') {
+
+      exportData = this.filteredData.map((row: any) => ({
+
+        'Transporter': row.TRANSPORTER || '',
+        'Inward/Outward': row.INWARD_OUTWARD || '',
+        'No. of Vehicles': row.NO_OF_VEHICLES_PLACED || 0,
+
+        'Basic Charge': row.BASIC_CHARGE || 0,
+        'Detention Loading': row.DETENTION_LOADING || 0,
+        'Detention Unloading': row.DETENTION_UNLOADING || 0,
+        'Loading Charge': row.LOADING_CHARGE || 0,
+        'Unloading Charge': row.UNLOADING_CHARGE || 0,
+        'Routing Charges': row.ROUTING_CHARGES || 0,
+        'Transshipment Charges': row.TRANSHIPMENT_CHARGES || 0,
+        'Other Charges': row.OTHER_CHARGES || 0,
+        'Deduction Charges': row.DEDUCTION_CHARGES || 0,
+        'Total Amount': row.FREIGHT_AMOUNT || 0
+
+      }));
+
+      exportData.push({
+
+        'Transporter': 'TOTAL',
+        'Inward/Outward': '',
+
+        'No. of Vehicles': this.totals.TOTAL_VEHICLES || 0,
+
+        'Basic Charge': this.totals.TOTAL_BASIC_CHARGE || 0,
+        'Detention Loading': this.totals.TOTAL_DETENTION_LOADING || 0,
+        'Detention Unloading': this.totals.TOTAL_DETENTION_UNLOADING || 0,
+        'Loading Charge': this.totals.TOTAL_LOADING_CHARGE || 0,
+        'Unloading Charge': this.totals.TOTAL_UNLOADING_CHARGE || 0,
+        'Routing Charges': this.totals.TOTAL_ROUTING_CHARGES || 0,
+        'Transshipment Charges': this.totals.TOTAL_TRANSHIPMENT_CHARGES || 0,
+        'Other Charges': this.totals.TOTAL_OTHER_CHARGES || 0,
+        'Deduction Charges': this.totals.TOTAL_DEDUCTION_CHARGES || 0,
+        'Total Amount': this.totals.TOTAL_FREIGHT_AMOUNT || 0
+
+      });
+
+    }
+
+    // ======================================================
+    // CREATE WORKSHEET
+    // ======================================================
+    const worksheet: XLSX.WorkSheet =
+      XLSX.utils.json_to_sheet(exportData);
+
+    // ======================================================
+    // CREATE WORKBOOK
+    // ======================================================
+    const workbook: XLSX.WorkBook = {
+
+      Sheets: {
+        'Business Share Matrix': worksheet
+      },
+
+      SheetNames: [
+        'Business Share Matrix'
+      ]
+
+    };
+
+    // ======================================================
+    // EXPORT FILE
+    // ======================================================
+    XLSX.writeFile(
+      workbook,
+      `Business_Share_Matrix_${this.selectedReportType}.xlsx`
+    );
+
+    // ======================================================
+    // SUCCESS MESSAGE
+    // ======================================================
+    Swal.fire(
+      'Success',
+      'Excel exported successfully.',
+      'success'
+    );
+
+  }
 
   // ======================================================
-  // SAVE PDF
+  // DOWNLOAD PDF
   // ======================================================
-  doc.save(
-    `Business_Share_Matrix_${this.selectedReportType}_${Date.now()}.pdf`
-  );
+  downloadPDF() {
 
-  // ======================================================
-  // SUCCESS MESSAGE
-  // ======================================================
-  Swal.fire(
-    'Success',
-    'PDF downloaded successfully.',
-    'success'
-  );
+    // ======================================================
+    // VALIDATION
+    // ======================================================
+    if (!this.filteredData || this.filteredData.length === 0) {
 
-}
+      Swal.fire(
+        'Warning',
+        'No data available to download.',
+        'warning'
+      );
+
+      return;
+    }
+
+    // ======================================================
+    // PDF CONFIG
+    // ======================================================
+    const doc = new jsPDF('l', 'mm', 'a2');
+
+    doc.text(
+      `Business Share Matrix Report - ${this.selectedReportType}`,
+      14,
+      10
+    );
+
+    let tableColumn: string[] = [];
+
+    let tableRows: any[] = [];
+
+    // ======================================================
+    // ALL REPORT
+    // ======================================================
+    if (this.selectedReportType === 'All') {
+
+      tableColumn = [
+
+        'Reference No',
+        'In/Out',
+        'SAP Type',
+        'Plant',
+        'Transporter Group',
+        'Transporter',
+        'No. of Vehicles',
+
+        'Basic Charge',
+        'Detention Loading',
+        'Detention Unloading',
+        'Loading Charge',
+        'Unloading Charge',
+        'Routing Charges',
+        'Transshipment Charges',
+        'Other Charges',
+        'Deduction Charges',
+        'Total Amount',
+
+      ];
+
+      tableRows = this.filteredData.map((row: any) => [
+
+        row.REFERENCE_NUMBER || '',
+        row.INWARD_OUTWARD || '',
+        row.SAP_NONSAP || '',
+        row.PLANT || '',
+        row.TRANSPORTER_GROUP || '',
+        row.TRANSPORTER || '',
+        row.NO_OF_VEHICLES_PLACED || 0,
+
+        row.BASIC_CHARGE || 0,
+        row.DETENTION_LOADING || 0,
+        row.DETENTION_UNLOADING || 0,
+        row.LOADING_CHARGE || 0,
+        row.UNLOADING_CHARGE || 0,
+        row.ROUTING_CHARGES || 0,
+        row.TRANSHIPMENT_CHARGES || 0,
+        row.OTHER_CHARGES || 0,
+        row.DEDUCTION_CHARGES || 0,
+        row.FREIGHT_AMOUNT || 0,
+
+      ]);
+
+      // ======================================================
+      // TOTAL ROW
+      // ======================================================
+      tableRows.push([
+
+        'TOTAL',
+        '',
+        '',
+        '',
+        '',
+        '',
+
+        this.totals.TOTAL_VEHICLES || 0,
+
+        this.totals.TOTAL_BASIC_CHARGE || 0,
+        this.totals.TOTAL_DETENTION_LOADING || 0,
+        this.totals.TOTAL_DETENTION_UNLOADING || 0,
+        this.totals.TOTAL_LOADING_CHARGE || 0,
+        this.totals.TOTAL_UNLOADING_CHARGE || 0,
+        this.totals.TOTAL_ROUTING_CHARGES || 0,
+        this.totals.TOTAL_TRANSHIPMENT_CHARGES || 0,
+        this.totals.TOTAL_OTHER_CHARGES || 0,
+        this.totals.TOTAL_DEDUCTION_CHARGES || 0,
+        this.totals.TOTAL_FREIGHT_AMOUNT || 0,
+
+      ]);
+
+    }
+
+    // ======================================================
+    // HEADER REPORT
+    // ======================================================
+    else if (this.selectedReportType === 'Header') {
+
+      tableColumn = [
+
+        'Transporter',
+        'No. of Vehicles',
+
+        'Basic Charge',
+        'Detention Loading',
+        'Detention Unloading',
+        'Loading Charge',
+        'Unloading Charge',
+        'Routing Charges',
+        'Transshipment Charges',
+        'Other Charges',
+        'Deduction Charges',
+        'Total Amount',
+
+      ];
+
+      tableRows = this.filteredData.map((row: any) => [
+
+        row.TRANSPORTER || '',
+        row.NO_OF_VEHICLES_PLACED || 0,
+
+        row.BASIC_CHARGE || 0,
+        row.DETENTION_LOADING || 0,
+        row.DETENTION_UNLOADING || 0,
+        row.LOADING_CHARGE || 0,
+        row.UNLOADING_CHARGE || 0,
+        row.ROUTING_CHARGES || 0,
+        row.TRANSHIPMENT_CHARGES || 0,
+        row.OTHER_CHARGES || 0,
+        row.DEDUCTION_CHARGES || 0,
+        row.FREIGHT_AMOUNT || 0,
+
+      ]);
+
+      tableRows.push([
+
+        'TOTAL',
+
+        this.totals.TOTAL_VEHICLES || 0,
+
+        this.totals.TOTAL_BASIC_CHARGE || 0,
+        this.totals.TOTAL_DETENTION_LOADING || 0,
+        this.totals.TOTAL_DETENTION_UNLOADING || 0,
+        this.totals.TOTAL_LOADING_CHARGE || 0,
+        this.totals.TOTAL_UNLOADING_CHARGE || 0,
+        this.totals.TOTAL_ROUTING_CHARGES || 0,
+        this.totals.TOTAL_TRANSHIPMENT_CHARGES || 0,
+        this.totals.TOTAL_OTHER_CHARGES || 0,
+        this.totals.TOTAL_DEDUCTION_CHARGES || 0,
+        this.totals.TOTAL_FREIGHT_AMOUNT || 0,
+
+      ]);
+
+    }
+
+    // ======================================================
+    // HEADER WITH PLANT REPORT
+    // ======================================================
+    else if (this.selectedReportType === 'HeaderWithPlant') {
+
+      tableColumn = [
+
+        'Transporter',
+        'Plant',
+        'No. of Vehicles',
+
+        'Basic Charge',
+        'Detention Loading',
+        'Detention Unloading',
+        'Loading Charge',
+        'Unloading Charge',
+        'Routing Charges',
+        'Transshipment Charges',
+        'Other Charges',
+        'Deduction Charges',
+        'Total Amount',
+
+      ];
+
+      tableRows = this.filteredData.map((row: any) => [
+
+        row.TRANSPORTER || '',
+        row.PLANT || '',
+        row.NO_OF_VEHICLES_PLACED || 0,
+
+        row.BASIC_CHARGE || 0,
+        row.DETENTION_LOADING || 0,
+        row.DETENTION_UNLOADING || 0,
+        row.LOADING_CHARGE || 0,
+        row.UNLOADING_CHARGE || 0,
+        row.ROUTING_CHARGES || 0,
+        row.TRANSHIPMENT_CHARGES || 0,
+        row.OTHER_CHARGES || 0,
+        row.DEDUCTION_CHARGES || 0,
+        row.FREIGHT_AMOUNT || 0,
+
+      ]);
+
+      tableRows.push([
+
+        'TOTAL',
+        '',
+
+        this.totals.TOTAL_VEHICLES || 0,
+
+        this.totals.TOTAL_BASIC_CHARGE || 0,
+        this.totals.TOTAL_DETENTION_LOADING || 0,
+        this.totals.TOTAL_DETENTION_UNLOADING || 0,
+        this.totals.TOTAL_LOADING_CHARGE || 0,
+        this.totals.TOTAL_UNLOADING_CHARGE || 0,
+        this.totals.TOTAL_ROUTING_CHARGES || 0,
+        this.totals.TOTAL_TRANSHIPMENT_CHARGES || 0,
+        this.totals.TOTAL_OTHER_CHARGES || 0,
+        this.totals.TOTAL_DEDUCTION_CHARGES || 0,
+        this.totals.TOTAL_FREIGHT_AMOUNT || 0,
+
+      ]);
+
+    }
+
+    // ======================================================
+    // HEADER WITH INWARD/OUTWARD REPORT
+    // ======================================================
+    else if (this.selectedReportType === 'HeaderWithInOut') {
+
+      tableColumn = [
+
+        'Transporter',
+        'Inward/Outward',
+        'No. of Vehicles',
+
+        'Basic Charge',
+        'Detention Loading',
+        'Detention Unloading',
+        'Loading Charge',
+        'Unloading Charge',
+        'Routing Charges',
+        'Transshipment Charges',
+        'Other Charges',
+        'Deduction Charges',
+        'Total Amount',
+
+      ];
+
+      tableRows = this.filteredData.map((row: any) => [
+
+        row.TRANSPORTER || '',
+        row.INWARD_OUTWARD || '',
+        row.NO_OF_VEHICLES_PLACED || 0,
+
+        row.BASIC_CHARGE || 0,
+        row.DETENTION_LOADING || 0,
+        row.DETENTION_UNLOADING || 0,
+        row.LOADING_CHARGE || 0,
+        row.UNLOADING_CHARGE || 0,
+        row.ROUTING_CHARGES || 0,
+        row.TRANSHIPMENT_CHARGES || 0,
+        row.OTHER_CHARGES || 0,
+        row.DEDUCTION_CHARGES || 0,
+        row.FREIGHT_AMOUNT || 0,
+
+      ]);
+
+      tableRows.push([
+
+        'TOTAL',
+        '',
+
+        this.totals.TOTAL_VEHICLES || 0,
+
+        this.totals.TOTAL_BASIC_CHARGE || 0,
+        this.totals.TOTAL_DETENTION_LOADING || 0,
+        this.totals.TOTAL_DETENTION_UNLOADING || 0,
+        this.totals.TOTAL_LOADING_CHARGE || 0,
+        this.totals.TOTAL_UNLOADING_CHARGE || 0,
+        this.totals.TOTAL_ROUTING_CHARGES || 0,
+        this.totals.TOTAL_TRANSHIPMENT_CHARGES || 0,
+        this.totals.TOTAL_OTHER_CHARGES || 0,
+        this.totals.TOTAL_DEDUCTION_CHARGES || 0,
+        this.totals.TOTAL_FREIGHT_AMOUNT || 0,
+
+      ]);
+
+    }
+
+    // ======================================================
+    // PDF TABLE
+    // ======================================================
+    autoTable(doc, {
+
+      head: [tableColumn],
+
+      body: tableRows,
+
+      startY: 15,
+
+      styles: {
+        fontSize: 7,
+        cellWidth: 'wrap'
+      },
+
+      headStyles: {
+        fillColor: [41, 128, 185],
+        fontSize: 7
+      },
+
+      bodyStyles: {
+        fontSize: 7
+      }
+
+    });
+
+    // ======================================================
+    // SAVE PDF
+    // ======================================================
+    doc.save(
+      `Business_Share_Matrix_${this.selectedReportType}_${Date.now()}.pdf`
+    );
+
+    // ======================================================
+    // SUCCESS MESSAGE
+    // ======================================================
+    Swal.fire(
+      'Success',
+      'PDF downloaded successfully.',
+      'success'
+    );
+
+  }
 }
 

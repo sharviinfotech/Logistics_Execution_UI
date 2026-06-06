@@ -806,25 +806,44 @@
                 <td>
                   <input *ngIf="headerData.isEdit" type="file" class="form-control form-control-sm width-md"
                     accept=".jpg,.jpeg,.png,.pdf" (change)="onFileSelected($event, imgInput, 'image')" #imgInput>
-                  <span *ngIf="!headerData.isEdit">{{ headerData.ZDIMAGES }}</span>
+                  <span *ngIf="!headerData.isEdit">
+                    <a *ngIf="headerData.ZDIMAGES" href="javascript:void(0)"
+                      (click)="viewCertificate(headerData, 'image')">{{
+                      headerData.ZDIMAGES }}</a>
+                    <span *ngIf="!headerData.ZDIMAGES">-</span>
+                  </span>
                 </td>
 
                 <td>
                   <input *ngIf="headerData.isEdit" type="file" class="form-control form-control-sm width-md"
                     accept=".jpg,.jpeg,.png,.pdf" (change)="onFileSelected($event, fsrInput, 'fsr')" #fsrInput>
-                  <span *ngIf="!headerData.isEdit">{{ headerData.ZFSRREP }}</span>
+                  <span *ngIf="!headerData.isEdit">
+                    <a *ngIf="headerData.ZFSRREP" href="javascript:void(0)"
+                      (click)="viewCertificate(headerData, 'fsr')">{{
+                      headerData.ZFSRREP }}</a>
+                    <span *ngIf="!headerData.ZFSRREP">-</span>
+                  </span>
                 </td>
 
                 <td>
                   <input *ngIf="headerData.isEdit" type="file" class="form-control form-control-sm width-md"
                     accept=".jpg,.jpeg,.png,.pdf" (change)="onFileSelected($event, firInput, 'fir')" #firInput>
-                  <span *ngIf="!headerData.isEdit">{{ headerData.ZFIRREP }}</span>
+                  <span *ngIf="!headerData.isEdit">
+                    <a *ngIf="headerData.ZFIRREP" href="javascript:void(0)"
+                      (click)="viewCertificate(headerData, 'fir')">{{
+                      headerData.ZFIRREP }}</a>
+                    <span *ngIf="!headerData.ZFIRREP">-</span>
+                  </span>
                 </td>
 
                 <td>
                   <input *ngIf="headerData.isEdit" type="file" class="form-control form-control-sm width-md"
                     accept=".jpg,.jpeg,.png,.pdf" (change)="onFileSelected($event, cofInput, 'cof')" #cofInput>
-                  <span *ngIf="!headerData.isEdit">{{ headerData.ZCOF }}</span>
+                  <span *ngIf="!headerData.isEdit">
+                    <a *ngIf="headerData.ZCOF" href="javascript:void(0)" (click)="viewCertificate(headerData, 'cof')">{{
+                      headerData.ZCOF }}</a>
+                    <span *ngIf="!headerData.ZCOF">-</span>
+                  </span>
                 </td>
 
                 <td>
@@ -1046,12 +1065,15 @@
                 <th>FSR Report Date</th>
                 <th>Invoice Base Value</th>
                 <th>Incident Date</th>
+                <th>Images</th>
+                <th>FSR Report</th>
+                <th>FIR Report</th>
+                <th>COF</th>
                 <th>Customer</th>
                 <th>Consign Name</th>
                 <th>Damage Remarks</th>
                 <th>Settlement</th>
                 <th>Closing date</th>
-                <th>Images</th>
                 <th>Sale Person</th>
                 <th>Location</th>
                 <th>Route</th>
@@ -1074,12 +1096,34 @@
                 <td>{{ item.ZFSR_RPT_DT }}</td>
                 <td>{{ item.ZBASIC_VALUE }}</td>
                 <td>{{ item.ZINC_DATE}}</td>
+                <td>
+                  <a *ngIf="item.ZDIMAGES" href="javascript:void(0)" (click)="viewCertificate(item, 'image')">{{
+                    item.ZDIMAGES }}</a>
+                  <span *ngIf="!item.ZDIMAGES">-</span>
+                </td>
+
+                <td>
+                  <a *ngIf="item.ZFSRREP" href="javascript:void(0)" (click)="viewCertificate(item, 'fsr')">{{
+                    item.ZFSRREP }}</a>
+                  <span *ngIf="!item.ZFSRREP">-</span>
+                </td>
+
+                <td>
+                  <a *ngIf="item.ZFIRREP" href="javascript:void(0)" (click)="viewCertificate(item, 'fir')">{{
+                    item.ZFIRREP }}</a>
+                  <span *ngIf="!item.ZFIRREP">-</span>
+                </td>
+
+                <td>
+                  <a *ngIf="item.ZCOF" href="javascript:void(0)" (click)="viewCertificate(item, 'cof')">{{
+                    item.ZCOF }}</a>
+                  <span *ngIf="!item.ZCOF">-</span>
+                </td>
                 <td>{{ item.ZCUSTOMER}}</td>
                 <td>{{ item.ZCONSIGN_NAME }}</td>
                 <td>{{ item.ZDAMAGE_RMK}}</td>
                 <td>{{ item.ZSETTLEMENT}}</td>
                 <td>{{ item.ZCLOSING_DT }}</td>
-                <td>{{ item.ZIMAGES }}</td>
                 <td>{{ item.ZSALE_PERSON }}</td>
                 <td>{{ item.ZLOCATION }}</td>
                 <td>{{ item.ZROUTE }}</td>

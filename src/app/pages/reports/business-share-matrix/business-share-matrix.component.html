@@ -360,6 +360,10 @@
                 </div>
 
                 <!-- TABLE -->
+                <!-- ===================================================== -->
+                <!-- ALL REPORT TABLE -->
+                <!-- ===================================================== -->
+
                 <div *ngIf="filteredData.length > 0 && selectedReportType === 'All'" class="table-responsive">
                     <table class="table table-bordered table-hover">
 
@@ -372,7 +376,6 @@
                                 <th>Transporter Group</th>
                                 <th>Transporter</th>
                                 <th>No. of Vehicles</th>
-                                
                                 <th>Basic Charge</th>
                                 <th>Detention Loading</th>
                                 <th>Detention Unloading</th>
@@ -387,6 +390,7 @@
                         </thead>
 
                         <tbody>
+
                             <tr *ngFor="let row of filteredData">
                                 <td>{{ row.REFERENCE_NUMBER }}</td>
                                 <td>{{ row.INWARD_OUTWARD }}</td>
@@ -395,7 +399,6 @@
                                 <td>{{ row.TRANSPORTER_GROUP }}</td>
                                 <td>{{ row.TRANSPORTER }}</td>
                                 <td>{{ row.NO_OF_VEHICLES_PLACED }}</td>
-                                
                                 <td>{{ row.BASIC_CHARGE }}</td>
                                 <td>{{ row.DETENTION_LOADING }}</td>
                                 <td>{{ row.DETENTION_UNLOADING }}</td>
@@ -407,26 +410,47 @@
                                 <td>{{ row.DEDUCTION_CHARGES }}</td>
                                 <td>{{ row.FREIGHT_AMOUNT }}</td>
                             </tr>
+
                         </tbody>
 
+                        <!-- TOTAL FOOTER -->
+                        <tfoot class="table-footer">
+                            <tr>
+                                <td colspan="6"><b>Total</b></td>
+                                <td><b>{{ totalVehicles }}</b></td>
+                                <td><b>{{ totalBasicCharge }}</b></td>
+                                <td><b>{{ totalDetentionLoading }}</b></td>
+                                <td><b>{{ totalDetentionUnloading }}</b></td>
+                                <td><b>{{ totalLoadingCharge }}</b></td>
+                                <td><b>{{ totalUnloadingCharge }}</b></td>
+                                <td><b>{{ totalRoutingCharges }}</b></td>
+                                <td><b>{{ totalTranshipmentCharges }}</b></td>
+                                <td><b>{{ totalOtherCharges }}</b></td>
+                                <td><b>{{ totalDeductionCharges }}</b></td>
+                                <td><b>{{ totalFreightAmount }}</b></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
+
+
+
+                <!-- ===================================================== -->
+                <!-- HEADER / HEADER WITH PLANT / HEADER WITH INOUT -->
+                <!-- ===================================================== -->
 
                 <div *ngIf="filteredData.length > 0 && selectedReportType !== 'All'" class="table-responsive">
                     <table class="table table-bordered table-hover">
                         <thead class="bg-light">
                             <tr>
                                 <th>Transporter</th>
-                                <!-- Dynamic Column -->
                                 <th *ngIf="selectedReportType === 'HeaderWithPlant'">
                                     Plant
                                 </th>
                                 <th *ngIf="selectedReportType === 'HeaderWithInOut'">
                                     Inward/Outward
                                 </th>
-
                                 <th>No Of Vehicles Placed</th>
-                                
                                 <th>Basic Charge</th>
                                 <th>Detention Loading</th>
                                 <th>Detention Unloading</th>
@@ -437,27 +461,18 @@
                                 <th>Other Charges</th>
                                 <th>Deduction Charges</th>
                                 <th>Total Amount</th>
-
                             </tr>
                         </thead>
-
                         <tbody>
-
                             <tr *ngFor="let row of filteredData">
-
                                 <td>{{ row.TRANSPORTER }}</td>
-
-                                <!-- Dynamic Value -->
                                 <td *ngIf="selectedReportType === 'HeaderWithPlant'">
                                     {{ row.PLANT }}
                                 </td>
-
                                 <td *ngIf="selectedReportType === 'HeaderWithInOut'">
                                     {{ row.INWARD_OUTWARD }}
                                 </td>
-
                                 <td>{{ row.NO_OF_VEHICLES_PLACED }}</td>
-                                
                                 <td>{{ row.BASIC_CHARGE }}</td>
                                 <td>{{ row.DETENTION_LOADING }}</td>
                                 <td>{{ row.DETENTION_UNLOADING }}</td>
@@ -469,15 +484,30 @@
                                 <td>{{ row.DEDUCTION_CHARGES }}</td>
                                 <td>{{ row.FREIGHT_AMOUNT }}</td>
                             </tr>
-
                         </tbody>
 
+                        <!-- TOTAL FOOTER -->
+                        <tfoot class="table-footer">
+                            <tr>
+                                <td><b>Total</b></td>
+                                <!-- EMPTY COLUMN ALIGNMENT -->
+                                <td *ngIf="selectedReportType === 'HeaderWithPlant'"></td>
+                                <td *ngIf="selectedReportType === 'HeaderWithInOut'"></td>
+                                <td><b>{{ totalVehicles }}</b></td>
+                                <td><b>{{ totalBasicCharge }}</b></td>
+                                <td><b>{{ totalDetentionLoading }}</b></td>
+                                <td><b>{{ totalDetentionUnloading }}</b></td>
+                                <td><b>{{ totalLoadingCharge }}</b></td>
+                                <td><b>{{ totalUnloadingCharge }}</b></td>
+                                <td><b>{{ totalRoutingCharges }}</b></td>
+                                <td><b>{{ totalTranshipmentCharges }}</b></td>
+                                <td><b>{{ totalOtherCharges }}</b></td>
+                                <td><b>{{ totalDeductionCharges }}</b></td>
+                                <td><b>{{ totalFreightAmount }}</b></td>
+                            </tr>
+                        </tfoot>
                     </table>
-
                 </div>
-
-
-
             </div>
         </div>
     </div>

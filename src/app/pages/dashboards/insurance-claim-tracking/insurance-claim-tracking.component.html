@@ -829,9 +829,10 @@
                   <input *ngIf="headerData.isEdit" type="file" class="form-control form-control-sm width-md"
                     accept=".jpg,.jpeg,.png" #supportInput
                     (change)="onFileSelected($event, supportInput, 'supporting', headerData)">
-
                   <span *ngIf="!headerData.isEdit">
-                    {{ headerData.ZSUPT_DOC }}
+                    <a *ngIf="headerData.ZSUPT_DOC" href="javascript:void(0)"
+                      (click)="viewCertificate(headerData, 'supporting')">{{ headerData.ZSUPT_DOC }}</a>
+                    <span *ngIf="!headerData.ZSUPT_DOC">-</span>
                   </span>
                 </td>
 
@@ -839,9 +840,10 @@
                   <input *ngIf="headerData.isEdit" type="file" class="form-control form-control-sm width-md"
                     accept=".jpg,.jpeg,.png" #approveInput
                     (change)="onFileSelected($event, approveInput, 'approve', headerData)">
-
                   <span *ngIf="!headerData.isEdit">
-                    {{ headerData.ZAPP_DOC }}
+                    <a *ngIf="headerData.ZAPP_DOC" href="javascript:void(0)"
+                      (click)="viewCertificate(headerData, 'approve')">{{ headerData.ZAPP_DOC }}</a>
+                    <span *ngIf="!headerData.ZAPP_DOC">-</span>
                   </span>
                 </td>
 
@@ -936,10 +938,6 @@
                     {{ headerData.ZCLM_SET_DT | date:'dd-MM-yyyy' }}
                   </span>
                 </td>
-
-
-
-
 
                 <td>
                   <input *ngIf="headerData.isEdit" type="text" class="form-control form-control-sm width-md"
@@ -1155,6 +1153,8 @@
                 <th>Claim Reference</th>
                 <th>Invoice Date</th>
                 <th>Invoice Base Value</th>
+                <th>Supporting Document</th>
+                <th>Approve Document</th>
                 <th>Loss Declared</th>
                 <th>Claim Received</th>
                 <th>Salvage Value</th>
@@ -1190,6 +1190,16 @@
                 <td>{{ item.ZCLAIM_REF }}</td>
                 <td>{{ item.ZINV_DATE}}</td>
                 <td>{{ item.ZINV_BV}}</td>
+                <td>
+                  <a *ngIf="item.ZSUPT_DOC" href="javascript:void(0)"
+                    (click)="viewCertificate(item, 'supporting')">{{ item.ZSUPT_DOC }}</a>
+                  <span *ngIf="!item.ZSUPT_DOC">-</span>
+                </td>
+                <td>
+                  <a *ngIf="item.ZAPP_DOC" href="javascript:void(0)"
+                    (click)="viewCertificate(item, 'approve')">{{ item.ZAPP_DOC }}</a>
+                  <span *ngIf="!item.ZAPP_DOC">-</span>
+                </td>
                 <td>{{ item.ZLOSS_DCL }}</td>
                 <td>{{ item.ZCLM_RF}}</td>
                 <td>{{ item.ZSOL_VAL}}</td>

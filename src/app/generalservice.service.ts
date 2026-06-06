@@ -476,6 +476,9 @@ export class GeneralserviceService {
   FetchDispatchOrderPendingCounts() {
     return this.http.get(environment.baseUrl + 'api/external/LE/DispatchOrderFlow/PendingCounts');
   }
+  GlobalFileView(obj) {
+    return this.http.put(environment.baseUrl + 'api/external/LE/GlobalFileView', obj);
+  }
 
 
 
